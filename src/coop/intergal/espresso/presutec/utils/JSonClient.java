@@ -503,6 +503,14 @@ public class JSonClient {
 //		String type = null;
 		
 		//********** STEP 1 ******** // get all the resources and scans to get the ident
+		int posPointForSubR = resourceName.indexOf(".");
+		String subResourceName = null;
+		if (posPointForSubR > -1)
+		{
+			subResourceName = resourceName.substring(posPointForSubR+1 );
+			resourceName = resourceName.substring(0, posPointForSubR);
+		}
+			
 		ident = getIdentOfResuorce(resourceName, cache, preConfParam);
 	
 		///*******  STEP 2 ***** gets a concret resource using ident 
@@ -730,6 +738,13 @@ public class JSonClient {
 //		}
 		else
 		{
+			int posPointForSubR = resourceName.indexOf(".");
+			//String subResourceName = null;
+			if (posPointForSubR > -1)
+			{
+				subResourceName = resourceName.substring(posPointForSubR+1 );
+				resourceName = resourceName.substring(0, posPointForSubR);
+			} 
 			ident = getIdentOfResuorce(resourceName, cache,preConfParam);
 			try {
 				resource = JSonClient.get("@resources/"+ident,null,cache,preConfParam);  
@@ -746,6 +761,26 @@ public class JSonClient {
 					String dataType = getDataTypeFromTable(tableName, fieldName, cache,preConfParam);
 					listFields.put(fieldName,dataType);
 					}
+				// *** get Atributes for subresources
+				JsonNode subresources = resource.get("subresources");
+//				tableName = resource.get("table_name").asText();
+//				setResourceTableName(tableName);
+//				if (subResourceName != null) // only when you send a subResourceName you want his attributes names in the list
+//				{
+				for (JsonNode eachRow : subresources) {
+					JsonNode fieldListSR = eachRow.get("attributes");
+					tableName = eachRow.get("table_name").asText();
+					String name = eachRow.get("name").asText();
+					if (name.equals(subResourceName) || name.startsWith("FK-")) // only when you are getting a subresourceList or is  FK you want add the fields to the list
+					{
+						for (JsonNode eachRowSR : fieldListSR) {
+							String fieldName = eachRowSR.get("column_name").asText();
+							String dataType = getDataTypeFromTable(tableName, fieldName, cache,preConfParam);
+							listFields.put(fieldName,dataType);
+						}
+					}	
+					}
+				//}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
