@@ -544,7 +544,7 @@ public class JSonClient {
 			return getDataTypeFromTable(tableName, field, cache,preConfParam);
 			}
 	
-	private static String getIdentOfResuorce(String resourceName, boolean cache, String preConfParam) {
+	public static String getIdentOfResuorce(String resourceName, boolean cache, String preConfParam) {
 		String ident = null;
 		JsonNode resource = null;
 		try {
@@ -791,7 +791,7 @@ public class JSonClient {
 		rowFields.add(listFields);
 		return rowFields;
 	}
-	private static void keepJoinConditionSubResources(JsonNode resource) { // Keeps Join Condition for all resources 3 levels deep
+	public static void keepJoinConditionSubResources(JsonNode resource) { // Keeps Join Condition for all resources 3 levels deep
 		String parentResource = resource.get("name").asText(); // is add to sub-resource to avoid conflicts when a child have more than one parent
 		JsonNode subResources = resource.get("subresources");
 		if (subResources != null && subResources.size() > 0)
