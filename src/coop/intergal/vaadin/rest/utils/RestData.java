@@ -87,10 +87,15 @@ public class RestData {
 					field.setAccessible(true);
 					if (rowsColList.get(i) !=null)
 						{
-						String value = eachRow.get(rowsColList.get(i)).asText();
-						if (value.equals("null"))
-							value= "";
-						field.set(dB, value);
+						if (eachRow.get(rowsColList.get(i)) == null)
+							field.set(dB, null);
+						else
+						{
+							String value = eachRow.get(rowsColList.get(i)).asText();
+							if (value.equals("null"))
+								value= "";
+							field.set(dB, value);
+						}	
 						}
 					i++;
 					}
