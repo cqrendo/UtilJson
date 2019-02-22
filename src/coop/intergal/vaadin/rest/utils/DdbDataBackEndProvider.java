@@ -24,7 +24,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 //	    this.departmentFilter = department;
 //	    refreshAll();
 //	  }
-	private ArrayList<String> rowsColList;// = new ArrayList<String>();
+	private ArrayList<String[]> rowsColList;// = new ArrayList<String>();
 	private static final long serialVersionUID = 1L;
 	/** Text filter that can be changed separately. */
 //    private String filterText = "";
@@ -85,55 +85,58 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 //	  protected int sizeInBackEnd(Query<DynamicDBean, String> query) { //query.getFilter().orElse(null)
 //		return RestData.getCountRows(getTableDbForCount(resourceName), preConfParam, filter, false);
 //	  }
-	  public ArrayList<String> getRowsColList() {
-			if (rowsColList == null || rowsColList.isEmpty())
-				{
-				JsonNode cols;
-				try {				
-					String genericResourceName = resourceName;
-					if (genericResourceName.indexOf(".") > 1) /// it means a sub-resource 
-						genericResourceName = resourceName;
-					else
-					{
-					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
-					if (indx__ > 1)
-						genericResourceName = resourceName.substring(0, indx__);
-					}
-					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'", true, preConfParam);
-					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
-					{
-						rowsColList = new ArrayList<String>();
-						for (JsonNode col :cols)
-						{
-							rowsColList.add(col.get("fieldName").asText());
-						}
-						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
-						String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
-						
-						JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
-						JSonClient.keepJoinConditionSubResources(resource); 
-
-					}
-					
-					else	
-					{
-						cols = JSonClient.getColumnsFromTable(resourceName, null, true, preConfParam);
-						
-						rowsColList = new ArrayList<String>();
-						Iterator<String> fN = cols.get(0).fieldNames();
-						while (fN.hasNext()) {
-							rowsColList.add(fN.next());
-						}
-					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				}	
-			return rowsColList;
+	
+	  public ArrayList<String[]> getRowsColList() {
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, variant);
+		 
+//			if (rowsColList == null || rowsColList.isEmpty())
+//				{
+//				JsonNode cols;
+//				try {				
+//					String genericResourceName = resourceName;
+//					if (genericResourceName.indexOf(".") > 1) /// it means a sub-resource 
+//						genericResourceName = resourceName;
+//					else
+//					{
+//					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
+//					if (indx__ > 1)
+//						genericResourceName = resourceName.substring(0, indx__);
+//					}
+//					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'", true, preConfParam);
+//					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
+//					{
+//						rowsColList = new ArrayList<String>();
+//						for (JsonNode col :cols)
+//						{
+//							rowsColList.add(col.get("fieldName").asText());
+//						}
+//						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
+//						String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
+//						
+//						JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
+//						JSonClient.keepJoinConditionSubResources(resource); 
+//
+//					}
+//					
+//					else	
+//					{
+//						cols = JSonClient.getColumnsFromTable(resourceName, null, true, preConfParam);
+//						
+//						rowsColList = new ArrayList<String>();
+//						Iterator<String> fN = cols.get(0).fieldNames();
+//						while (fN.hasNext()) {
+//							rowsColList.add(fN.next());
+//						}
+//					}
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				}	
+//			return rowsColList;
 		}
 
-		public void setRowsColList(ArrayList<String> rowsColList) {
+		public void setRowsColList(ArrayList<String[]> rowsColList) {
 			this.rowsColList = rowsColList;
 		}
 

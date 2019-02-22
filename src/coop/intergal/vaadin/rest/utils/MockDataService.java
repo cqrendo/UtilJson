@@ -44,7 +44,7 @@ public class MockDataService extends DataService {
     }
 
 	@Override
-	public synchronized List<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean refreshFromServer, String resourceName, String preConfParam, ArrayList<String> rowsColList, String filtro) { // RestData.getResourceDaily(); 
+	public synchronized List<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean refreshFromServer, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filtro) { // RestData.getResourceDaily(); 
 	//	if (refreshFromServer)
 			rows = RestData.getResourceData(offset,limit, resourceName, preConfParam, rowsColList, filtro, refreshFromServer);// refresh data from server each interaction with grid
         return rows;

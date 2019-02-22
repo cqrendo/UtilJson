@@ -15,7 +15,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 public class RestData {
 
 
-	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String> rowsColList, String filter, boolean cache) {
+	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filter, boolean cache) {
 
 		if (resourceName  == null ||  resourceName.trim().length() == 0)
 		{
@@ -48,7 +48,7 @@ public class RestData {
 	//		String[] rowsColList = new String[] { "code_customer", "name_customer", "cif" , "amount_un_disbursed_payments"};
 
 		for (JsonNode eachRow : rowsList)  {
-			if (eachRow.get(rowsColList.get(0)) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
+			if (eachRow.get(rowsColList.get(0)[0]) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
 			{
 				DynamicDBean d = fillRowDaily(eachRow, rowsColList);//, cols.get(0)); 
 				d.setResourceName(resourceName);
@@ -65,7 +65,7 @@ public class RestData {
 		return customerList;
 	}
 
-	private static DynamicDBean fillRowDaily(JsonNode eachRow, ArrayList<String> rowsColList) {// JsonNode cols) {
+	private static DynamicDBean fillRowDaily(JsonNode eachRow, ArrayList<String[]> rowsColList) {// JsonNode cols) {
 //		Class dynamicDBeanClass = Class.forName("coop.intergal.xespropan.production.samples.backend.data.DynamicDBean");
 		
 		DynamicDBean dB = new DynamicDBean();
@@ -87,11 +87,11 @@ public class RestData {
 					field.setAccessible(true);
 					if (rowsColList.get(i) !=null)
 						{
-						if (eachRow.get(rowsColList.get(i)) == null)
+						if (eachRow.get(rowsColList.get(i)[0]) == null)
 							field.set(dB, null);
 						else
 						{
-							String value = eachRow.get(rowsColList.get(i)).asText();
+							String value = eachRow.get(rowsColList.get(i)[0]).asText();
 							if (value.equals("null"))
 								value= "";
 							field.set(dB, value);
@@ -159,13 +159,13 @@ public class RestData {
 		
 	}
 
-	public static DynamicDBean getOneRow(String resourceName, String filter, String preConfParam, ArrayList<String> rowsColList)
+	public static DynamicDBean getOneRow(String resourceName, String filter, String preConfParam, ArrayList<String[]> rowsColList)
 	{
 		try {
 			JsonNode rowsList = JSonClient.get(resourceName,filter,false,preConfParam,"20");
 			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam, "");
 			for (JsonNode eachRow : rowsList)  {
-				if (eachRow.get(rowsColList.get(0)) !=null)
+				if (eachRow.get(rowsColList.get(0)[0]) !=null)
 				{
 					DynamicDBean d = fillRowDaily(eachRow, rowsColList);//, cols.get(0)); 
 					d.setResourceName(resourceName);
@@ -182,8 +182,7 @@ public class RestData {
 		return null;
 		
 	}
-	// TODO call this method for other class by example DdbDataProvider  
-	public static ArrayList<String> getRowsColList(ArrayList<String> rowsColList, String resourceName, String preConfParam, String variant) {
+	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, String variant) {
 			if (rowsColList == null || rowsColList.isEmpty())
 				{
 				JsonNode cols;
@@ -192,13 +191,20 @@ public class RestData {
 					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
 					if (indx__ > 1)
 						genericResourceName = resourceName.substring(0, indx__);
-					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'", true, preConfParam);
+					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'&order=colOrder,idFieldTemplate", true, preConfParam);
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
-						rowsColList = new ArrayList<String>();
+						rowsColList = new ArrayList<String[]>();
 						for (JsonNode col :cols)
 						{
-							rowsColList.add(col.get("fieldName").asText());
+							String[] fieldArr  = new String[2];
+
+							fieldArr[0] = col.get("fieldName").asText();
+							if ( col.get("showInGrid").asBoolean())
+								fieldArr[1] = "#SIG#";
+							else
+								fieldArr[1] = "";
+							rowsColList.add(fieldArr);
 						}
 						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
 						String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
@@ -212,10 +218,13 @@ public class RestData {
 					{
 						cols = JSonClient.getColumnsFromTable(resourceName, null, true, preConfParam);
 						
-						rowsColList = new ArrayList<String>();
+						rowsColList = new ArrayList<String[]>();
 						Iterator<String> fN = cols.get(0).fieldNames();
 						while (fN.hasNext()) {
-							rowsColList.add(fN.next());
+							String[] fieldArr  = new String[2];
+							fieldArr[0] =fN.next();
+							fieldArr[1] = "#SIG#";
+							rowsColList.add(fieldArr);
 						}
 					}
 				} catch (Exception e) {

@@ -27,7 +27,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private JsonNode rowJSon;
 
 	JsonNode rowColTypeList;
-	private ArrayList<String> rowsColList = new ArrayList<String>();
+	private ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 	private String col0;
 	private String col1;
 	private String col2;
@@ -143,14 +143,14 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 
 
-	public ArrayList<String> getRowsColList() {
+	public ArrayList<String[]> getRowsColList() {
 		return rowsColList;
 	}
 
 
 
-	public void setRowsColList(ArrayList<String> rowsColList) {
-		this.rowsColList = rowsColList;
+	public void setRowsColList(ArrayList<String[]> rowsColList2) {
+		this.rowsColList = rowsColList2;
 	}
 
 
