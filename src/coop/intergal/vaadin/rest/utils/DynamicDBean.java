@@ -86,6 +86,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private Date col2Date;
 	private Date col3Date;
 	private Date col4Date;
+	private Date col10Date;
 	public boolean isNew() {
 		return col0 == null;
 	}
@@ -233,6 +234,9 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 	public void setCol2Date(Date col2Date) {
 		this.col2Date = col2Date;
+	}
+	public void setCol10Date(Date col10Date) {
+		this.col10Date = col10Date;
 	}
 	public Date getCol3Date() {
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -687,16 +691,37 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 		return null;//col3Date;
 	}
-
+	public void setColDate(Date colDate, int i ) {
+		Object dbean = this;
+		try {
+			Method setColX = ((DynamicDBean.class)).getMethod("setCol"+i, new Class[] {java.lang.String.class} );
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			setColX.invoke(dbean,df.format(colDate));
+		} catch (NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		Method getColX = ((DynamicDBean.class)).getMethod("setCol"+i);
+//		this.col2Date = col2Date;
+	}
 	public LocalDate getColLocalDate(int i) {
-//		System.out.println("DynamicDBean.getColDate() "+ i);
+		System.out.println("DynamicDBean.getColLocalDate() "+ i);
 //		return LocalDate.now();
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		Object dbean = this;
 		try {
 //			Method setColXDate = ((DynamicDBean.class)).getMethod("setCol"+i+"Date", new Class[] {java.util.Date.class} );
 			Method getColX = ((DynamicDBean.class)).getMethod("getCol"+i);
-		if (getColX.invoke(dbean)!= null)
+		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 0)
 			return formatter.parse((String) getColX.invoke(dbean)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -719,15 +744,20 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	}
 
 	public Date getColDate(int i) {
+		System.out.println("DynamicDBean.getColDate().."+i);
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		Object dbean = this;
 		try {
 		Method getColX = ((DynamicDBean.class)).getMethod("getCol"+i);
-		if (getColX.invoke(dbean)!= null)
+		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 0)
+		{
 			
+				return formatter.parse((String) getColX.invoke(dbean));		
+
 	//			return formatter.parse(col2).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-				return formatter.parse(col2);
+	//			return formatter.parse(col2);
 		
+		}
 		}
 			 catch (ParseException e) {
 				// TODO Auto-generated catch block
