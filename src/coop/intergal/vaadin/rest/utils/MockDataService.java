@@ -96,7 +96,7 @@ public class MockDataService extends DataService {
 					{
 						
 						JsonNode lTxsumary = postResult.get("txsummary");
-						lTxsumary = getResourceFromResult(lTxsumary, preConfParam);
+						lTxsumary = getResourceFromResult(lTxsumary, preConfParam, resourceName);
 						dB.setRowJSon(lTxsumary);
 						putJSonData(lTxsumary, null,false);
 						rows.add(dB);
@@ -128,6 +128,7 @@ public class MockDataService extends DataService {
 						JsonNode lTxsumary = postResult.get("txsummary");
 						if (lTxsumary.size() > 0 ) //&& tableEL != null)
 						{
+							lTxsumary = getResourceFromResult(lTxsumary, preConfParam, resourceName);
 							putJSonData(lTxsumary, dB, true);
 						}
 						//		idEntity = lTxsumary.get(0).get("idEntity").intValue();
@@ -316,9 +317,10 @@ private String getTableName(JsonNode rowJson) {
 				break;
 		}
 	}
-	private JsonNode getResourceFromResult(JsonNode lTxsumary, String preConfParam) {
+
+	private JsonNode getResourceFromResult(JsonNode lTxsumary, String preConfParam, String resourceName) {
 //		String pathtables = tableEL.getPathtables();
-		String href =  lTxsumary.get(0).get("@metadata").get("href").asText();
+		String href = searchRootResource(lTxsumary, resourceName);
 		String url = href;
 //		if (pathtables != null)
 //			url = href.replace("main:"+tableName, pathtables);
@@ -328,6 +330,22 @@ private String getTableName(JsonNode rowJson) {
 			e.printStackTrace();
 		} 
 		//		return lTxsumary;
+		return null;
+	}
+
+	private String searchRootResource(JsonNode lTxsumary, String resourceName) { // in lTxsunary also comes subreources, we just want root resource
+		int i = 0; 
+		while (i < lTxsumary.size())
+		{
+		 String resource = lTxsumary.get(i).get("@metadata").get("resource").asText();
+//		 if (resource.indexOf(".")> -1) // is a sub-resource
+		 if (resource.equals(resourceName))
+			 return lTxsumary.get(i).get("@metadata").get("href").asText();
+		 else
+			 i ++;
+//		 else if ()
+//			 return lTxsumary.get(i).get("@metadata").get("href").asText();
+		}
 		return null;
 	}
 
