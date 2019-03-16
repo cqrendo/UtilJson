@@ -757,7 +757,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		Object dbean = this;
 		try {
-			String methodName = "setCol" + colName;
+			String methodName = "getCol" + colName;
 			if (colName.startsWith("col"))
 				methodName= "getC" + colName.substring(1);
 
