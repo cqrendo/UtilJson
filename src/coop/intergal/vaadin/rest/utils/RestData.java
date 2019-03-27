@@ -214,6 +214,9 @@ public class RestData {
 							rowsColList.add(fieldArr);
 						}
 						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
+						int idxPoint = resourceName.indexOf(".");
+						if (idxPoint > -1) 
+							resourceName = resourceName.substring(0, idxPoint);
 						String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
 						
 						JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
