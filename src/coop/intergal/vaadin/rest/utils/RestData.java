@@ -182,14 +182,15 @@ public class RestData {
 		return null;
 		
 	}
-	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, String variant) {
+	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, String variant) { // variant is use to have different lists of fields in the same resource
 			if (rowsColList == null || rowsColList.isEmpty())
 				{
 				JsonNode cols;
 				try {				
 					String genericResourceName = resourceName;
 					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
-					if (indx__ > 1)
+					int idxPomt = resourceName.indexOf(".");
+					if (indx__ > 1 && idxPomt == -1) // only when there is not a subresource (after a point), you can extract the generic name from first name substring(0....
 						genericResourceName = resourceName.substring(0, indx__);
 					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'&order=colOrder,idFieldTemplate", true, preConfParam);
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
