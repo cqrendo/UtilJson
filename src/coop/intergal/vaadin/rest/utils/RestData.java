@@ -61,7 +61,7 @@ public class RestData {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}// preConfParam, null);//globalVars.getPagesize());
-		System.out.println("RestData.getResourceCustomer() after FILL LIST "+ resourceName + " " + new Date());
+		System.out.println("RestData.getResourceCustomer() after FILL LIST "+ resourceName + " Filter:" +filter + " " + new Date());
 		return customerList;
 	}
 
@@ -192,7 +192,9 @@ public class RestData {
 					int idxPomt = resourceName.indexOf(".");
 					if (indx__ > 1 && idxPomt == -1) // only when there is not a subresource (after a point), you can extract the generic name from first name substring(0....
 						genericResourceName = resourceName.substring(0, indx__);
-					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'&order=colOrder,idFieldTemplate", true, preConfParam);
+					String tableNameToSearch = genericResourceName+variant;
+					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch );
+					cols = JSonClient.get("FieldTemplate","tableName='"+tableNameToSearch+"'", true, preConfParam);
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
 						rowsColList = new ArrayList<String[]>();
