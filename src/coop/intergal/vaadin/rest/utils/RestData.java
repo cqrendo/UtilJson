@@ -200,7 +200,7 @@ public class RestData {
 						rowsColList = new ArrayList<String[]>();
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[4];
+							String[] fieldArr  = new String[5];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -214,6 +214,10 @@ public class RestData {
 								fieldArr[3] = "";
 							else
 								fieldArr[3] = col.get("idFieldType").asText();
+							if ( col.get("PathToParentField").asText().isEmpty() || col.get("PathToParentField").asText().equals("null"))
+								fieldArr[4] = "";
+							else
+								fieldArr[4] = col.get("PathToParentField").asText();
 							rowsColList.add(fieldArr);
 						}
 						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
@@ -234,7 +238,7 @@ public class RestData {
 						rowsColList = new ArrayList<String[]>();
 						Iterator<String> fN = cols.get(0).fieldNames();
 						while (fN.hasNext()) {
-							String[] fieldArr  = new String[4];
+							String[] fieldArr  = new String[5];
 							String fieldName = fN.next();
 							fieldArr[0] =fieldName;
 							
@@ -242,6 +246,7 @@ public class RestData {
 							String type = cols.get(0).get(fieldName).asText();		
 							fieldArr[2] = "";								
 							fieldArr[3] = "";
+							fieldArr[4] = ""; // @@ TODO get FK data
 							if (type.equals("Date"))
 								fieldArr[3] = "1";
 							rowsColList.add(fieldArr);
