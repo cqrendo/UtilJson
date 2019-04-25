@@ -222,13 +222,13 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 								if (!value.isEmpty()) {
 									value=addAutoComodin(value);
 									System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
-										+ " valor :" + ((TextField) fieldObj).getValue() + "");
+										+ " valor :" + value + "");
 								// filter=componefilter(filter, rowCol[0], ((TextField) fieldObj).getValue());
 									if (filter.length() > 1)
 										filter = filter + "%20AND%20" + rowCol[0]
-												+ determineOperator(((TextField) fieldObj).getValue());
+												+ determineOperator(value);
 									else
-										filter = rowCol[0] + determineOperator(((TextField) fieldObj).getValue());
+										filter = rowCol[0] + determineOperator(value);
 								}
 						}  
 						else if (rowCol[3].equals("1")) // is Date
@@ -236,13 +236,13 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 							String value = ((TextField) fieldObj).getValue() + "";
 							if (!value.isEmpty()) {
 								System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
-										+ " valor :" + ((TextField) fieldObj).getValue());
+										+ " valor :" + value);
 //				filter=componeDateFilter(filter, rowCol[0], ((TextField) fieldObj).getValue());
 								if (filter.length() > 1)
 									filter = filter + "%20AND%20("
-											+ componeDateFilter(rowCol[0], ((TextField) fieldObj).getValue()) + ")";
+											+ componeDateFilter(rowCol[0], value) + ")";
 								else
-									filter = componeDateFilter(rowCol[0], ((TextField) fieldObj).getValue());
+									filter = componeDateFilter(rowCol[0], value);
 							}
 
 						} else if (rowCol[3].equals("2")) // is TextArea
