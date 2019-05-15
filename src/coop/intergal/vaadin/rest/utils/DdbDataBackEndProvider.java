@@ -250,5 +250,24 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		                .orElse((o1, o2) -> 0);
 		    }
 
+			public void save(DynamicDBean selectedRow) {
+		        boolean newProduct = selectedRow.getCol0()== null ;
+		        
+		        DataService.get().updateDynamicDBean(selectedRow);
+		        if (newProduct) {
+		            refreshAll();
+		        } else {
+		            refreshItem(selectedRow);
+		        }
+//				return selectedRow;
+		    }
+
+			public void refresh(DynamicDBean selectedRow) {
+				 refreshItem(selectedRow);
+				
+			}
+				
+			
+
 
 	}

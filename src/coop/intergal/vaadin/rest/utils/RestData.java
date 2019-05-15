@@ -1,6 +1,8 @@
 package coop.intergal.vaadin.rest.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -48,7 +50,8 @@ public class RestData {
 	//		String[] rowsColList = new String[] { "code_customer", "name_customer", "cif" , "amount_un_disbursed_payments"};
 
 		for (JsonNode eachRow : rowsList)  {
-			if (eachRow.get(rowsColList.get(0)[0]) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
+			String col1name = rowsColList.get(0)[0]; 
+			if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
 			{
 				DynamicDBean d = fillRowDaily(eachRow, rowsColList);//, cols.get(0)); 
 				d.setResourceName(resourceName);
@@ -87,11 +90,12 @@ public class RestData {
 					field.setAccessible(true);
 					if (rowsColList.get(i) !=null)
 						{
-						if (eachRow.get(rowsColList.get(i)[0]) == null)
+						String colName = getColName(rowsColList,i);
+						if (eachRow.get(colName)==null)
 							field.set(dB, null);
 						else
 						{
-							String value = eachRow.get(rowsColList.get(i)[0]).asText();
+							String value = eachRow.get(colName).asText();
 							if (value.equals("null"))
 								value= "";
 							field.set(dB, value);
@@ -112,7 +116,23 @@ public class RestData {
 
 		return dB;
 	}
-
+	private static String getColName(ArrayList<String[]> rowsColList, int i) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
+		String colNameInCL = rowsColList.get(i)[2];
+		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
+			return rowsColList.get(i)[0];
+		else // otherwise it searches
+		{
+			System.out.println("RestData.getColName() ----> Fields witn col... not in order "+ "col"+i );
+			for (String[] row : rowsColList) // search for col.. to get his column name
+			{
+				if (row[2].equals("col"+i))
+					return row[0];
+			}
+				
+			return "null";
+		}
+	}
+	
 	public static void refresh(DynamicDBean dDb) {
 		getResourceData(0,0,dDb.getResourceName(), dDb.getPreConfParam(), dDb.getRowsColList(), dDb.getFilter(), true);
 		
@@ -194,10 +214,11 @@ public class RestData {
 						genericResourceName = resourceName.substring(0, indx__);
 					String tableNameToSearch = genericResourceName+variant;
 					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch );
-					cols = JSonClient.get("FieldTemplate","tableName='"+tableNameToSearch+"'", true, preConfParam);
+					cols = JSonClient.get("FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", true, preConfParam);
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
 						rowsColList = new ArrayList<String[]>();
+						int i = 0;
 						for (JsonNode col :cols)
 						{
 							String[] fieldArr  = new String[5];
@@ -207,7 +228,7 @@ public class RestData {
 							else
 								fieldArr[1] = "";
 							if ( col.get("FieldNameInUI").asText().isEmpty())
-								fieldArr[2] = "";
+								fieldArr[2] = "col"+i;	
 							else
 								fieldArr[2] = col.get("FieldNameInUI").asText();
 							if ( col.get("idFieldType").asText().isEmpty() || col.get("idFieldType").asText().equals("null"))
@@ -219,6 +240,7 @@ public class RestData {
 							else
 								fieldArr[4] = col.get("PathToParentField").asText();
 							rowsColList.add(fieldArr);
+							i++;
 						}
 						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
 						int idxPoint = resourceName.indexOf(".");
@@ -237,6 +259,7 @@ public class RestData {
 						
 						rowsColList = new ArrayList<String[]>();
 						Iterator<String> fN = cols.get(0).fieldNames();
+						int i = 0;
 						while (fN.hasNext()) {
 							String[] fieldArr  = new String[5];
 							String fieldName = fN.next();
@@ -244,12 +267,13 @@ public class RestData {
 							
 							fieldArr[1] = "#SIG#";							
 							String type = cols.get(0).get(fieldName).asText();		
-							fieldArr[2] = "";								
+							fieldArr[2] = "col"+i;								
 							fieldArr[3] = "";
 							fieldArr[4] = ""; // @@ TODO get FK data
 							if (type.equals("Date"))
 								fieldArr[3] = "1";
 							rowsColList.add(fieldArr);
+							i++;
 						}
 					}
 				} catch (Exception e) {
@@ -259,5 +283,53 @@ public class RestData {
 				}	
 			return rowsColList;
 		}
+	public static DynamicDBean copyDatabean( DynamicDBean fromBean) {
+		DynamicDBean toBean = new DynamicDBean();
+//		toBean.setCol0(fromBean.getCol0());
+		Field[] fieldsTobean = toBean.getClass().getDeclaredFields();
+//		Field[] fieldsFromBean = fromBean.getClass().getDeclaredFields();
+		int i=0;
+		for(Field field : fieldsTobean )  
+		{
+//			field.setInt(eachRow.get("code_customer").asInt());
+			try {
+			
+				field.setAccessible(true);
+				if (field.getName().equals("col"+i))
+				{	
+				Method getColX = ((DynamicDBean.class)).getMethod("getCol"+i);
+				String value = (String) getColX.invoke(fromBean);
+				if (value == null|| value.equals("null"))
+							value= "";
+				field.set(toBean, value);
+						
+					i++;
+				}
+	
+					
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		}
+		toBean.setFilter(fromBean.getFilter());
+		toBean.setPreConfParam(fromBean.getPreConfParam());
+		toBean.setResourceName(fromBean.getResourceName());
+		toBean.setRowColTypeList(fromBean.getRowColTypeList());
+		toBean.setRowsColList(fromBean.getRowsColList());
+		toBean.setRowJSon(fromBean.getRowJSon());
+		return toBean;
+		
+	}
 
 }

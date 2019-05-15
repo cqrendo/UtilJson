@@ -4,11 +4,16 @@ import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeButton;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
@@ -111,7 +116,7 @@ public class MockDataService extends DataService {
 				JsonNode postResult;
 				try {
 					ObjectNode rowJsonChanged = putValuesOnObject(false, nodeFactory,dB, resourceName);
-					postResult = JSonClient.put(resourceName, rowJsonChanged,  preConfParam);// TODO  -->//globalVars.getPreConfParam()); 
+					postResult = JSonClient.put(resourceName, rowJsonChanged,  preConfParam); 
 
 					if (postResult.get("statusCode").intValue() != 200)
 					{
@@ -121,7 +126,9 @@ public class MockDataService extends DataService {
 						//		fieldGroup.commit();
 				//		showError(postResult.get("errorMessage").asText().substring(22));
 
-						throw new RuntimeException("Unable to update: " + postResult);
+			//			throw new RuntimeException("Unable to update: " + postResult);
+						showError(postResult.get("errorMessage").asText());
+						
 					}
 					else
 					{
@@ -166,8 +173,19 @@ public class MockDataService extends DataService {
 
 
 	} 
+		 
+private void showError(String error) {
+	Label content = new Label(error);
+	NativeButton buttonInside = new NativeButton("Cerrar");
+	Notification notification = new Notification(content, buttonInside);
+//	notification.setDuration(3000);
+	buttonInside.addClickListener(event -> notification.close());
+	notification.setPosition(Position.MIDDLE);
+	notification.open();
 		
-private String getTableName(JsonNode rowJson) {
+	}
+
+private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alterntive way, not sequential taking in consideration tal colx coiuld be not secuentail
 		String href = rowJson.get("@metadata").get("href").asText();
 		return null;
 	}
@@ -188,6 +206,8 @@ private String getTableName(JsonNode rowJson) {
 			int i= 0;
 			while (true)
 			{
+				if (JSonClient.getResourceHtPK().get(tableName) == null)
+					break;
 				String pkfield = JSonClient.getResourceHtPK().get(tableName).get("pkField"+i);
 				if (pkfield == null)
 					break;
@@ -197,7 +217,8 @@ private String getTableName(JsonNode rowJson) {
 		}
 //		Iterator<Component> fieldList = editorForm.iterator(); 
 		Field[] fields = dB.getClass().getDeclaredFields();
-		ArrayList rowsColList = dB.getRowsColList();
+		ArrayList<String[]> rowsColList = dB.getRowsColList();
+//		Iterator<String[]> itRowsColList = rowsColList.iterator();
 		
 		int i=0; 
 		for(Field field : fields )  
@@ -223,7 +244,7 @@ private String getTableName(JsonNode rowJson) {
 					}
 					else
 						
-						if (((String) rowsColList.get(i)).startsWith("FK-")) // Parent and Grand parent fields --> even doesn't have value must be fill to get filters from possible grant parents
+						if (getColName(rowsColList,i).startsWith("FK-")) // Parent and Grand parent fields --> even doesn't have value must be fill to get filters from possible grant parents
 						{
 							//				setFKIdsForFilter(field.getId(), (String) field.getValue()); 
 						}
@@ -233,28 +254,33 @@ private String getTableName(JsonNode rowJson) {
 							{
 								DateFormat fechaIni = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 								if (value != null)
-									newEntityinfo.put(rowsColList.get(i).toString(),fechaIni.format(value) );
+									newEntityinfo.put(getColName(rowsColList,i),fechaIni.format(value) );
 							}
 							else
 								if (isCheckBox(o))	
 								{
-									newEntityinfo.put(rowsColList.get(i).toString(), (Boolean) value);  
+									newEntityinfo.put(getColName(rowsColList,i), (Boolean) value);  
 								}
 								else
 									if (isInteger(o))	
 									{
 										//			((AbstractField<String>) field).setConverter(new StringToIntegerConverter());
 
-										newEntityinfo.put(rowsColList.get(i).toString(), (Integer) delPoints((String) rowsColList.get(i).toString()));  
+										newEntityinfo.put(getColName(rowsColList,i), (Integer) delPoints((String) rowsColList.get(i)[0]));  
 									}
 									else // normal fields that belongs to row
-										if (rowsColList.get(i).toString().toString().length() > 0)
-											newEntityinfo.put(rowsColList.get(i).toString(), (String) ""+value);  
+										if (rowsColList.get(i)[0].length() > 0)
+											newEntityinfo.put(getColName(rowsColList,i), (String) ""+value);  
 										else
-											newEntityinfo.put(rowsColList.get(i).toString(), "");
+											newEntityinfo.put(getColName(rowsColList,i), "");
 							i++;
 						}
-				}	
+				}
+				else if(field.getName() != null && field.getName().startsWith("col") == true)  // even there is not data i must continue to keep syncronice col1, col2... 
+				{
+					i++;
+				}
+					
 			}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				// TODO Auto-generated catch block
@@ -265,6 +291,23 @@ private String getTableName(JsonNode rowJson) {
 		return newEntityinfo;
 	}
 	
+	private String getColName(ArrayList<String[]> rowsColList, int i) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
+		String colNameInCL = rowsColList.get(i)[2];
+		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
+			return rowsColList.get(i)[0];
+		else // otherwise it searchs
+		{
+			for (String[] row : rowsColList) // search for col.. to get his column name
+			{
+				if (row[2].equals("col"+i))
+					return row[0];
+			}
+				
+			return "null";
+		}
+	}
+	
+
 	private boolean isDate(Object o) {
 //		if (o instanceof com.vaadin.ui.DateField)
 //			return true;
@@ -296,8 +339,8 @@ private String getTableName(JsonNode rowJson) {
 		boolean isNewItem = false; /// VER EN FormEL lo que hacía
 		Field[] fields = dB.getClass().getDeclaredFields();
 		int i=0;
-		ArrayList rowsColList = dB.getRowsColList();
-		JsonNode eachRow = lTxsumary.get(0); // VER EN TAbeEL como gestiona que el resultado traiga varias tablas
+		ArrayList<String[]> rowsColList = dB.getRowsColList();
+		JsonNode eachRow =  lTxsumary.get(0); // VER EN TAbeEL como gestiona que el resultado traiga varias tablas
 		dB.setRowJSon(eachRow); 
 		for(Field field : fields )  
 		{
@@ -306,7 +349,9 @@ private String getTableName(JsonNode rowJson) {
 				if (field.getName().equals("col"+i) && i < rowsColList.size())
 					{
 					field.setAccessible(true);
-					field.set(dB, eachRow.get((String)rowsColList.get(i)).asText());
+					String colName = getColName(rowsColList,i);
+					if (eachRow.get(colName) != null && eachRow.get(colName).asText().equals("null") == false)
+						field.set(dB, eachRow.get(colName).asText());
 					i++;
 					}
 			} catch (IllegalArgumentException | IllegalAccessException e) {

@@ -83,6 +83,17 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private String col52;
 	private String col53;
 
+	private String col90;
+	private String col91;
+	private String col92;
+	private String col93;
+	private String col94;
+	private String col95;
+	private String col96;
+	private String col97;
+	private String col98;
+	private String col99;
+/// RestData Only process until here, if more that 100 fields are need then RestData Must be adapted 
 	private Date col2Date;
 	private Date col3Date;
 	private Date col4Date;
@@ -655,6 +666,86 @@ public class DynamicDBean {// extends AbstractEntity{/**
 		this.col52 = col52;
 	}
 
+	public String getCol90() {
+		return col90;
+	}
+
+	public void setCol90(String col90) {
+		this.col90 = col90;
+	}
+
+	public String getCol91() {
+		return col91;
+	}
+
+	public void setCol91(String col91) {
+		this.col91 = col91;
+	}
+
+	public String getCol92() {
+		return col92;
+	}
+
+	public void setCol92(String col92) {
+		this.col92 = col92;
+	}
+
+	public String getCol93() {
+		return col93;
+	}
+
+	public void setCol93(String col93) {
+		this.col93 = col93;
+	}
+
+	public String getCol94() {
+		return col94;
+	}
+
+	public void setCol94(String col94) {
+		this.col94 = col94;
+	}
+
+	public String getCol95() {
+		return col95;
+	}
+
+	public void setCol95(String col95) {
+		this.col95 = col95;
+	}
+
+	public String getCol96() {
+		return col96;
+	}
+
+	public void setCol96(String col96) {
+		this.col96 = col96;
+	}
+
+	public String getCol97() {
+		return col97;
+	}
+
+	public void setCol97(String col97) {
+		this.col97 = col97;
+	}
+
+	public String getCol98() {
+		return col98;
+	}
+
+	public void setCol98(String col98) {
+		this.col98 = col98;
+	}
+
+	public String getCol99() {
+		return col99;
+	}
+
+	public void setCol99(String col99) {
+		this.col99 = col99;
+	}
+
 	public String getCol53() {
 		return col53;
 	}
@@ -730,7 +821,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 				methodName= "getC" + colName.substring(1);
 //			Method setColXDate = ((DynamicDBean.class)).getMethod("setCol"+i+"Date", new Class[] {java.util.Date.class} );
 			Method getColX = ((DynamicDBean.class)).getMethod(methodName);
-		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 0)
+		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 4) // 4 is the length of null, and not date is so short
 			return formatter.parse((String) getColX.invoke(dbean)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -762,7 +853,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 				methodName= "getC" + colName.substring(1);
 
 			Method getColX = ((DynamicDBean.class)).getMethod(methodName);
-		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 0)
+		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 4) // to avoid "null" as date has to be always bugger than 4 
 		{
 			
 				return formatter.parse((String) getColX.invoke(dbean));		
@@ -854,10 +945,51 @@ public class DynamicDBean {// extends AbstractEntity{/**
 			e.printStackTrace();
 		}
 	}
-
-	public Object setColInteger(String v, String fieldName) {
-		// TODO Auto-generated method stub
+	public Object setColInteger(String v, String colName) {
+		Object dbean = this;
+		try {
+			String methodName = "setCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "setC" + colName.substring(1);
+			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
+			setColX.invoke(dbean,v);
+		} catch (NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
+	}
+
+	public void setCol(String v, String colName) {
+		Object dbean = this;
+		try {
+			String methodName = "setCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "setC" + colName.substring(1);
+			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
+			setColX.invoke(dbean,v+"");
+		} catch (NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	
