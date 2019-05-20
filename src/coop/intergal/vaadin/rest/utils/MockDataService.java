@@ -18,6 +18,7 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
 
+
 /**
  * Mock data model. This implementation has very simplistic locking and does not
  * notify users of modifications.

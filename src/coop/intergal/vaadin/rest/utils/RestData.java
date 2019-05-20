@@ -221,12 +221,15 @@ public class RestData {
 						int i = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[5];
+							String[] fieldArr  = new String[6];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
 							else
 								fieldArr[1] = "";
+							fieldArr[0] = col.get("fieldName").asText();
+							if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
+								fieldArr[1] = fieldArr[1]+"#CNoEDT#";
 							if ( col.get("FieldNameInUI").asText().isEmpty())
 								fieldArr[2] = "col"+i;	
 							else
@@ -239,6 +242,10 @@ public class RestData {
 								fieldArr[4] = "";
 							else
 								fieldArr[4] = col.get("PathToParentField").asText();
+							if ( col.get("defaultValue").asText().isEmpty() || col.get("defaultValue").asText().equals("null"))
+								fieldArr[5] = "";
+							else
+								fieldArr[5] = col.get("defaultValue").asText();
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -261,7 +268,7 @@ public class RestData {
 						Iterator<String> fN = cols.get(0).fieldNames();
 						int i = 0;
 						while (fN.hasNext()) {
-							String[] fieldArr  = new String[5];
+							String[] fieldArr  = new String[6];
 							String fieldName = fN.next();
 							fieldArr[0] =fieldName;
 							
@@ -270,6 +277,7 @@ public class RestData {
 							fieldArr[2] = "col"+i;								
 							fieldArr[3] = "";
 							fieldArr[4] = ""; // @@ TODO get FK data
+							fieldArr[5] = "";
 							if (type.equals("Date"))
 								fieldArr[3] = "1";
 							rowsColList.add(fieldArr);

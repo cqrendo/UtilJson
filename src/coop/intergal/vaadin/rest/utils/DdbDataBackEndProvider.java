@@ -179,7 +179,6 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		                    .filter(predicate(query.getFilter().get()))
 		                    .sorted(comparator(query.getFilter().get()));
 		        }
-
 		        return stream;//.skip(offset).limit(limit);
 		    }
 
@@ -264,6 +263,11 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 
 			public void refresh(DynamicDBean selectedRow) {
 				 refreshItem(selectedRow);
+				
+			}
+
+			public void insertANewRow() {
+				// TODO Auto-generated method stub
 				
 			}
 				
