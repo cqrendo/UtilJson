@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -35,6 +36,12 @@ public class MockDataService extends DataService {
     private List<DynamicDBean> rows;
     private int nextProductId = 0;
 
+	private JsonNode lTxsumary;
+
+	private JsonNode allSaveSata;
+
+	private boolean errorSaving;
+
     private MockDataService() {
 //        categories = MockDataGenerator.createCategories();
 //        products = MockDataGenerator.createProducts(categories);
@@ -50,9 +57,9 @@ public class MockDataService extends DataService {
     }
 
 	@Override
-	public synchronized List<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean refreshFromServer, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filtro) { // RestData.getResourceDaily(); 
+	public synchronized List<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean refreshFromServer, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filtro, Boolean hasNewRow) { // RestData.getResourceDaily(); 
 	//	if (refreshFromServer)
-			rows = RestData.getResourceData(offset,limit, resourceName, preConfParam, rowsColList, filtro, refreshFromServer);// refresh data from server each interaction with grid
+			rows = RestData.getResourceData(offset,limit, resourceName, preConfParam, rowsColList, filtro, refreshFromServer, hasNewRow);// refresh data from server each interaction with grid
         return rows;
     }
 
@@ -88,11 +95,14 @@ public class MockDataService extends DataService {
 				JsonNode postResult;
 				try {
 					
-					postResult = JSonClient.post(resourceName, newEntityinfo, preConfParam);// TODO  -->//globalVars.getPreConfParam()); 
+					postResult = JSonClient.post(resourceName, newEntityinfo, preConfParam);
 
 					if (postResult.get("statusCode").intValue() != 201)
 					{
-						throw new IllegalArgumentException("Unable to insert: " + postResult);
+		//				throw new IllegalArgumentException("Unable to insert: " + postResult);
+						errorSaving = true;
+						showError(postResult.get("errorMessage").asText());
+						
 //						fieldGroup.discard();
 //						showError(postResult.get("errorMessage").asText().substring(22));
 //
@@ -101,11 +111,15 @@ public class MockDataService extends DataService {
 					else
 					{
 						
-						JsonNode lTxsumary = postResult.get("txsummary");
+						errorSaving = false;
+						lTxsumary = postResult.get("txsummary");
+						allSaveSata = lTxsumary;
 						lTxsumary = getResourceFromResult(lTxsumary, preConfParam, resourceName);
 						dB.setRowJSon(lTxsumary);
-						putJSonData(lTxsumary, null,false);
+						JsonNode eachRow =  lTxsumary.get(0);
+						putJSonData(eachRow, dB,false);
 						rows.add(dB);
+						showConfirmationSave("Registro salvado con éxito!");
 				//		tableEL.getTable().select(itemId);
 					}
 				} catch (Exception e) {
@@ -128,19 +142,24 @@ public class MockDataService extends DataService {
 				//		showError(postResult.get("errorMessage").asText().substring(22));
 
 			//			throw new RuntimeException("Unable to update: " + postResult);
+						errorSaving = true;
 						showError(postResult.get("errorMessage").asText());
 						
 					}
 					else
 					{
-						JsonNode lTxsumary = postResult.get("txsummary");
+						errorSaving = false;
+						lTxsumary = postResult.get("txsummary");
+						allSaveSata = lTxsumary;
 						if (lTxsumary.size() > 0 ) //&& tableEL != null)
 						{
 							lTxsumary = getResourceFromResult(lTxsumary, preConfParam, resourceName);
-							putJSonData(lTxsumary, dB, true);
+							JsonNode eachRow =  lTxsumary.get(0);
+							putJSonData(eachRow, dB, true);
 						}
 						//		idEntity = lTxsumary.get(0).get("idEntity").intValue();
 						System.err.println(" result  "+ lTxsumary); 
+						showConfirmationSave("Registro salvado con éxito!");
 //						if (customerPickComponents != null)
 //						{
 //							Enumeration<Component> listCustomerPickComponents = customerPickComponents.elements();
@@ -163,6 +182,7 @@ public class MockDataService extends DataService {
 		catch (java.lang.NullPointerException nullE)
 		{   
 			System.err.println(" Paso por el Segundo Catch :");
+			nullE.printStackTrace();
 		}
 
 		catch (Exception e ){//CommitException e) {
@@ -182,6 +202,16 @@ private void showError(String error) {
 //	notification.setDuration(3000);
 	buttonInside.addClickListener(event -> notification.close());
 	notification.setPosition(Position.MIDDLE);
+	notification.open();
+		
+	}
+private void showConfirmationSave(String error) {
+	Label content = new Label(error);
+//	NativeButton buttonInside = new NativeButton("Cerrar");
+	Notification notification = new Notification(content);
+	notification.setDuration(3000);
+//	buttonInside.addClickListener(event -> notification.close());
+	notification.setPosition(Position.TOP_STRETCH);
 	notification.open();
 		
 	}
@@ -205,17 +235,46 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 			metadata.put("checksum",rowJSon.get("@metadata").get("checksum").asText());
 			newEntityinfo.put("@metadata",metadata);
 			int i= 0;
-			while (true)
+			if (JSonClient.getResourceHtPK().get(tableName) != null) // when doesn't exist in field template has PK  data in ResourceHtPK
 			{
-				if (JSonClient.getResourceHtPK().get(tableName) == null)
-					break;
-				String pkfield = JSonClient.getResourceHtPK().get(tableName).get("pkField"+i);
-				if (pkfield == null)
-					break;
-				newEntityinfo.put(pkfield,rowJSon.get(pkfield));
-				i++;
+				while (true)
+				{
+					String pkfield = JSonClient.getResourceHtPK().get(tableName).get("pkField"+i);
+					if (pkfield == null)
+						break;
+					newEntityinfo.put(pkfield,rowJSon.get(pkfield));
+					i++;
+				}
 			}
 		}
+		else // isInsert Put Data from filter
+		{
+			String fKfilter = dB.getFilter();
+			if (fKfilter != null)
+			{
+	//			int fKfilterLength = fKfilter.length();
+				//FASE_CABEZERA='3'%20and%20CLAVE_ALMACEN='32'%20and%20N_PEDIDO='1'
+				int beginIndex = 0;
+				int endIndex = fKfilter.indexOf("=");
+				while (true)
+				{
+					String fieldName = fKfilter.substring(beginIndex, endIndex);
+					beginIndex = fKfilter.indexOf("'")+1;
+					fKfilter = fKfilter.substring(beginIndex);
+					endIndex = fKfilter.indexOf("'");
+					String fieldValue = fKfilter.substring(0, endIndex);
+					newEntityinfo.put(fieldName, fieldValue);
+					beginIndex = fKfilter.indexOf("%20and%20")+ 9;
+					if (beginIndex < 9)
+						break;
+					fKfilter = fKfilter.substring(beginIndex);
+					endIndex = fKfilter.indexOf("=");
+					beginIndex = 0;
+				}	
+			}
+			
+		}
+			
 //		Iterator<Component> fieldList = editorForm.iterator(); 
 		Field[] fields = dB.getClass().getDeclaredFields();
 		ArrayList<String[]> rowsColList = dB.getRowsColList();
@@ -335,13 +394,13 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 
 		return Integer.parseInt(value);
 	}
-	public void putJSonData(JsonNode lTxsumary, DynamicDBean dB, boolean isUpdate) { // same values are calculate in espresso and the nue value is returned in the lTxsumary, here fills the table 
+	public void putJSonData(JsonNode eachRow, DynamicDBean dB, boolean isUpdate) { // same values are calculate in espresso and the nue value is returned in the lTxsumary, here fills the table 
 		//		item.getItemProperty(id)
 		boolean isNewItem = false; /// VER EN FormEL lo que hacía
 		Field[] fields = dB.getClass().getDeclaredFields();
 		int i=0;
 		ArrayList<String[]> rowsColList = dB.getRowsColList();
-		JsonNode eachRow =  lTxsumary.get(0); // VER EN TAbeEL como gestiona que el resultado traiga varias tablas
+		 // VER EN TAbeEL como gestiona que el resultado traiga varias tablas
 		dB.setRowJSon(eachRow); 
 		for(Field field : fields )  
 		{
@@ -393,6 +452,34 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 //			 return lTxsumary.get(i).get("@metadata").get("href").asText();
 		}
 		return null;
+	}
+
+
+	@Override
+	public void updateDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
+		updateDynamicDBean(beansToSaveAndRefresh.get(resourceTobeSave)); // Saves
+		if (errorSaving == false)
+		{
+			int i = 0;
+			while (i < allSaveSata.size()) // refresh the rest
+			{
+				String resourcelTX = allSaveSata.get(i).get("@metadata").get("resource").asText();
+				if (resourcelTX.equals(resourceTobeSave) == false)
+				{
+					DynamicDBean beanTBR = beansToSaveAndRefresh.get(resourcelTX);
+					if (beanTBR != null)
+					{
+					putJSonData(allSaveSata.get(i), beanTBR, false);
+					}
+				}
+			i++;
+			}
+		}
+		else
+		{
+			beansToSaveAndRefresh.put("ERROR", new DynamicDBean());
+		}
+		
 	}
 
 }

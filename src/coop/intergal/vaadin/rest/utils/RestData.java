@@ -17,7 +17,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 public class RestData {
 
 
-	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filter, boolean cache) {
+	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filter, boolean cache, Boolean hasNewRow) {
 
 		if (resourceName  == null ||  resourceName.trim().length() == 0)
 		{
@@ -48,7 +48,14 @@ public class RestData {
 //				rowsColList.add(fN.next());
 //			}
 	//		String[] rowsColList = new String[] { "code_customer", "name_customer", "cif" , "amount_un_disbursed_payments"};
-
+		if (hasNewRow)
+		{
+			DynamicDBean d = fillRowDefaultValues(rowsColList);
+			d.setResourceName(resourceName);
+			d.setPreConfParam(preConfParam);
+			d.setFilter(filter); // for newRows fill data from filter normally parent data
+			customerList.add(d);
+		}	
 		for (JsonNode eachRow : rowsList)  {
 			String col1name = rowsColList.get(0)[0]; 
 			if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
@@ -66,6 +73,55 @@ public class RestData {
 		}// preConfParam, null);//globalVars.getPagesize());
 		System.out.println("RestData.getResourceCustomer() after FILL LIST "+ resourceName + " Filter:" +filter + " " + new Date());
 		return customerList;
+	}
+
+	private static DynamicDBean fillRowDefaultValues(ArrayList<String[]> rowsColList) {
+		// TODO Auto-generated method stub
+		DynamicDBean dB = new DynamicDBean();
+//		dB.setRowJSon(eachRow);
+		dB.setRowsColList(rowsColList); // TODO instead of put in each row, think in a way for only once (maybe row o) 
+//		dB.setRowColTypeList(cols); TODO Keep also cols type
+//		Object userInstance = DynamicDBean.getConstructor(new Class[] {String.class}).newInstance(new Object[] {"José González"});
+//		Field aliasField = userClass.getDeclaredField("alias");
+//		aliasField.setAccessible(true);
+//		aliasField.set(userInstance, "Pepe");
+		Field[] fields = dB.getClass().getDeclaredFields();
+		int i=0;
+		for(Field field : fields )  
+		{
+//			field.setInt(eachRow.get("code_customer").asInt());
+			try {
+				if (field.getName().equals("col"+i) && i < rowsColList.size())
+					{
+					field.setAccessible(true);
+					if (rowsColList.get(i) !=null)
+						{
+				//		String colName = getColName(rowsColList,i);
+						String defaultValue = getDefaultValue(rowsColList,i);
+						if (defaultValue==null || defaultValue.equals("null"))
+							field.set(dB, null);
+						else
+						{
+							String value = defaultValue;
+							if (value.equals("null"))
+								value= "";
+							field.set(dB, value);
+						}	
+						}
+					i++;
+					}
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (i>rowsColList.size()) 
+				break;
+		}
+//		c.setCodeCustomer(eachRow.get("code_customer").asInt());
+//		c.setNameCustomer(eachRow.get("name_customer").asText());
+		
+
+		return dB;
 	}
 
 	private static DynamicDBean fillRowDaily(JsonNode eachRow, ArrayList<String[]> rowsColList) {// JsonNode cols) {
@@ -132,12 +188,26 @@ public class RestData {
 			return "null";
 		}
 	}
-	
+	private static String getDefaultValue(ArrayList<String[]> rowsColList, int i) {
+		String colNameInCL = rowsColList.get(i)[2];
+		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
+			return rowsColList.get(i)[5];
+		else // otherwise it searchs
+		{
+			for (String[] row : rowsColList) // search for col.. to get his column name
+			{
+				if (row[2].equals("col"+i))
+					return row[5];
+			}
+				
+			return "null";
+		}
+	}
 	public static void refresh(DynamicDBean dDb) {
-		getResourceData(0,0,dDb.getResourceName(), dDb.getPreConfParam(), dDb.getRowsColList(), dDb.getFilter(), true);
+		getResourceData(0,0,dDb.getResourceName(), dDb.getPreConfParam(), dDb.getRowsColList(), dDb.getFilter(), true, false);
 		
 	}
-	public static int  getCountRows(String resourceName, String preConfParam, String filter, boolean cache) {
+	public static int  getCountRows(String resourceName, String preConfParam, String filter, boolean cache, boolean hasNewRow) {
 
 		if (resourceName  == null ||  resourceName.trim().length() == 0)
 		{
@@ -150,7 +220,7 @@ public class RestData {
 		JsonNode rowsList = null;
 		try { //TODO CACHE IS FALSE always , put as param
 		//	String filtro = null;
-			rowsList = JSonClient.get("Count_"+resourceName,filter,cache,preConfParam,"1"); // more then 120 it seems a problem with grid, that repeats rows 
+			rowsList = JSonClient.get("Count_"+resourceName,filter,cache,preConfParam,"1"); 
 			count = rowsList.get(0).get("count(*)").asInt();
 
 		
@@ -159,6 +229,8 @@ public class RestData {
 			e.printStackTrace();
 		}// preConfParam, null);//globalVars.getPagesize());
 //		System.out.println("RestData.getResourceCustomer() after FILL LIST" + new Date());
+		if (hasNewRow)
+			count = count+1;
 		return count;
 	}
 

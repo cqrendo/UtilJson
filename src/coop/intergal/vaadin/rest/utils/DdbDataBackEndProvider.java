@@ -3,6 +3,7 @@ package coop.intergal.vaadin.rest.utils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -32,6 +33,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 	private String filter;
 	private String preConfParam;
 	private Boolean cache = true;
+	private Boolean hasNewRow = false;
 //	private WrappedSession keepLastWSession;
 	private String variant = "";
 	private Consumer<Long> sizeChangeListener;
@@ -141,6 +143,14 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		}
 
 
+		public Boolean getHasNewRow() {
+			return hasNewRow;
+		}
+
+		public void setHasNewRow(Boolean hasNewRow) {
+			this.hasNewRow = hasNewRow;
+		}
+
 		private String getTableDbForCount(String resourceName2) {    // TODO check if is re-use in other classes and then add to a generic class
 			int startIdx = 3; // mormal format is CR_tableName__Variation
 			int endIdx = resourceName2.indexOf("__");
@@ -172,7 +182,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		        int offset = query.getOffset();
 		        int limit = query.getLimit();
 
-		        Stream<DynamicDBean> stream = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(),  filter).stream();
+		        Stream<DynamicDBean> stream = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(),  filter, hasNewRow).stream();
 
 		        if (query.getFilter().isPresent()) {
 		            stream = stream
@@ -185,7 +195,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		    @Override
 		    protected int sizeInBackEnd(Query<DynamicDBean, CrudFilter> query) {
 		        // For RDBMS just execute a SELECT COUNT(*) ... WHERE query
-		        long count = RestData.getCountRows(getTableDbForCount(resourceName), preConfParam, filter, false);//fetchFromBackEnd(query).count();
+		        long count = RestData.getCountRows(getTableDbForCount(resourceName), preConfParam, filter, false, hasNewRow);//fetchFromBackEnd(query).count();
 
 		        if (sizeChangeListener != null) {
 		            sizeChangeListener.accept(count);
@@ -249,14 +259,15 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		                .orElse((o1, o2) -> 0);
 		    }
 
-			public void save(DynamicDBean selectedRow) {
-		        boolean newProduct = selectedRow.getCol0()== null ;
+			public void save(String ResourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
+				DynamicDBean firstBean = beansToSaveAndRefresh.get(ResourceTobeSave);
+				boolean newProduct = firstBean.getCol0()== null ;
 		        
-		        DataService.get().updateDynamicDBean(selectedRow);
+		        DataService.get().updateDynamicDBean(ResourceTobeSave, beansToSaveAndRefresh);
 		        if (newProduct) {
 		            refreshAll();
 		        } else {
-		            refreshItem(selectedRow);
+		            refreshItem(firstBean);
 		        }
 //				return selectedRow;
 		    }

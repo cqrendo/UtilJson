@@ -3,6 +3,7 @@ package coop.intergal.vaadin.rest.utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
 
 
 /**
@@ -20,10 +21,12 @@ public abstract class DataService implements Serializable {
         return MockDataService.getInstance();
     }
 
-	public abstract Collection<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean b, String s, String s0, ArrayList<String[]> arrayList, String filtro) ;
+	public abstract Collection<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean b, String s, String s0, ArrayList<String[]> arrayList, String filtro, Boolean hasNewRow) ;
 
 	public abstract DynamicDBean getDynamicDBeanById(int productId) ;
 	public abstract void updateDynamicDBean(DynamicDBean customer) ;
+
+	public abstract void updateDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) ;
 
 }
 	
