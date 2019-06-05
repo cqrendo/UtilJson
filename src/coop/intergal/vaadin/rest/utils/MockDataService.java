@@ -118,7 +118,8 @@ public class MockDataService extends DataService {
 						dB.setRowJSon(lTxsumary);
 						JsonNode eachRow =  lTxsumary.get(0);
 						putJSonData(eachRow, dB,false);
-						rows.add(dB);
+						if (rows != null) // when the insert doesn't comes from a list rows is null
+							rows.add(dB);
 						showConfirmationSave("Registro salvado con éxito!");
 				//		tableEL.getTable().select(itemId);
 					}

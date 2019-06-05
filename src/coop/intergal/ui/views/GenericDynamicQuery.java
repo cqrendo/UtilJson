@@ -198,7 +198,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 																							// parents and grand parent
 																							// fields
 		Iterator<String[]> itRowsColList = RestData
-				.getRowsColList(rowsColList, ResourceName, preConfParam, "").iterator();
+				.getRowsColList(rowsColList, ResourceName, preConfParam).iterator();
 		String filter = "";
 		while (itRowsColList.hasNext()) {
 			String[] rowCol = itRowsColList.next();
@@ -299,7 +299,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		// combining ROW fields and
 		// parents and grand parent
 		// fields
-		Iterator<String[]> itRowsColList = RestData.getRowsColList(rowsColList, ResourceName, preConfParam, "").iterator();
+		Iterator<String[]> itRowsColList = RestData.getRowsColList(rowsColList, ResourceName, preConfParam).iterator();
 		String filter = "";
 		while (itRowsColList.hasNext()) {
 			String[] rowCol = itRowsColList.next();

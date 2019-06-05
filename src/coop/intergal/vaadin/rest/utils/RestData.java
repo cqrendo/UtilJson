@@ -255,7 +255,7 @@ public class RestData {
 	{
 		try {
 			JsonNode rowsList = JSonClient.get(resourceName,filter,false,preConfParam,"20");
-			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam, "");
+			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam);//, "");
 			for (JsonNode eachRow : rowsList)  {
 				if (eachRow.get(rowsColList.get(0)[0]) !=null)
 				{
@@ -274,17 +274,18 @@ public class RestData {
 		return null;
 		
 	}
-	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, String variant) { // variant is use to have different lists of fields in the same resource
+	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam){//, String variant) { // variant is use to have different lists of fields in the same resource
 			if (rowsColList == null || rowsColList.isEmpty())
 				{
 				JsonNode cols;
 				try {				
 					String genericResourceName = resourceName;
-					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
-					int idxPomt = resourceName.indexOf(".");
-					if (indx__ > 1 && idxPomt == -1) // only when there is not a subresource (after a point), you can extract the generic name from first name substring(0....
-						genericResourceName = resourceName.substring(0, indx__);
-					String tableNameToSearch = genericResourceName+variant;
+//					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
+//					int idxPomt = resourceName.indexOf(".");
+//					if (indx__ > 1 && idxPomt == -1) // only when there is not a subresource (after a point), you can extract the generic name from first name substring(0....
+//						genericResourceName = resourceName.substring(0, indx__);
+//					String tableNameToSearch = genericResourceName+variant;
+					String tableNameToSearch = genericResourceName;
 					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch );
 					cols = JSonClient.get("FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", true, preConfParam);
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)

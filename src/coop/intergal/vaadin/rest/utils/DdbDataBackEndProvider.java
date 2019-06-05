@@ -35,16 +35,16 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 	private Boolean cache = true;
 	private Boolean hasNewRow = false;
 //	private WrappedSession keepLastWSession;
-	private String variant = "";
+//	private String variant = "";
 	private Consumer<Long> sizeChangeListener;
 
-	public String getVariant() {
-		return variant;
-	}
-
-	public void setVariant(String variant) {
-		this.variant = variant;
-	}
+//	public String getVariant() {
+//		return variant;
+//	}
+//
+//	public void setVariant(String variant) {
+//		this.variant = variant;
+//	}
 
 	public String getPreConfParam() {
 		return preConfParam;
@@ -89,7 +89,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 //	  }
 	
 	  public ArrayList<String[]> getRowsColList() {
-		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, variant);
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam);
 		 
 //			if (rowsColList == null || rowsColList.isEmpty())
 //				{
