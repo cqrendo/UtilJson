@@ -271,6 +271,14 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		        }
 //				return selectedRow;
 		    }
+			public void delete(String ResourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
+				DynamicDBean firstBean = beansToSaveAndRefresh.get(ResourceTobeSave);
+				boolean newProduct = firstBean.getCol0()== null ;
+		        
+		        DataService.get().deleteDynamicDBean(ResourceTobeSave, beansToSaveAndRefresh);
+		        refreshAll();
+//				return selectedRow;
+		    }
 
 			public void refresh(DynamicDBean selectedRow) {
 				 refreshItem(selectedRow);

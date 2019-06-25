@@ -483,4 +483,110 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		
 	}
 
+	@Override
+	public void deleteDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
+		deleteDynamicDBean(beansToSaveAndRefresh.get(resourceTobeSave)); // deletes
+		if (errorSaving == false)
+		{
+			int i = 0;
+			while (i < allSaveSata.size()) // refresh the rest
+			{
+				String resourcelTX = allSaveSata.get(i).get("@metadata").get("resource").asText();
+				if (resourcelTX.equals(resourceTobeSave) == false)
+				{
+					DynamicDBean beanTBR = beansToSaveAndRefresh.get(resourcelTX);
+					if (beanTBR != null)
+					{
+					putJSonData(allSaveSata.get(i), beanTBR, false);
+					}
+				}
+			i++;
+			}
+		}
+		else
+		{
+			beansToSaveAndRefresh.put("ERROR", new DynamicDBean());
+		}
+		
+	}
+
+	private void deleteDynamicDBean(DynamicDBean dB) {
+		try
+		{
+	//		final JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
+			JsonNode rowJson = dB.getRowJSon();
+			String resourceName = dB.getResourceName();
+			String preConfParam = dB.getPreConfParam();
+			//** Creo la Entidad
+			
+
+				JsonNode postResult;
+				try {
+		//			ObjectNode rowJsonChanged = putValuesOnObject(false, nodeFactory,dB, resourceName);
+					postResult = JSonClient.delete( rowJson,  preConfParam); 
+
+					if (postResult.get("statusCode").intValue() != 200)
+					{
+						//		fieldGroup.discard();
+						//		fieldGroup.setItemDataSource(fieldBeforeCommit) ;
+						//		tableEL.putJSonData(fieldBeforeCommit);
+						//		fieldGroup.commit();
+				//		showError(postResult.get("errorMessage").asText().substring(22));
+
+			//			throw new RuntimeException("Unable to update: " + postResult);
+						errorSaving = true;
+						showError(postResult.get("errorMessage").asText());
+						
+					}
+					else
+					{
+						errorSaving = false;
+						lTxsumary = postResult.get("txsummary");
+						allSaveSata = lTxsumary;
+						if (lTxsumary.size() > 0 ) //&& tableEL != null)
+						{
+							lTxsumary = getResourceFromResult(lTxsumary, preConfParam, resourceName);
+					//		JsonNode eachRow =  lTxsumary.get(0);
+					//		putJSonData(eachRow, dB, true);
+						}
+						//		idEntity = lTxsumary.get(0).get("idEntity").intValue();
+						System.err.println(" result  "+ lTxsumary); 
+						showConfirmationSave("Registro eliminado con éxito!");
+//						if (customerPickComponents != null)
+//						{
+//							Enumeration<Component> listCustomerPickComponents = customerPickComponents.elements();
+//							while (listCustomerPickComponents.hasMoreElements())
+//								{
+//								Component pickComp =listCustomerPickComponents.nextElement();	
+//								if (pickComp instanceof Label) 
+//									((Label)pickComp).setValue(lTxsumary.get(0).get(pickComp.getId()).asText()); 
+//								}
+//							}
+						}
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			
+
+		}
+		catch (java.lang.NullPointerException nullE)
+		{   
+			System.err.println(" Paso por el Segundo Catch :");
+			nullE.printStackTrace();
+		}
+
+		catch (Exception e ){//CommitException e) {
+			// TODO @@revisar
+			e.printStackTrace();
+		}
+
+
+
+
+		
+	}
+
+
 }

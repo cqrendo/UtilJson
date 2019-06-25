@@ -27,6 +27,7 @@ public abstract class DataService implements Serializable {
 	public abstract void updateDynamicDBean(DynamicDBean customer) ;
 
 	public abstract void updateDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) ;
+	public abstract void deleteDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) ;
 
 }
 	
