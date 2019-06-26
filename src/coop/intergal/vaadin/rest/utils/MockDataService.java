@@ -196,7 +196,7 @@ public class MockDataService extends DataService {
 
 	} 
 		 
-private void showError(String error) {
+public void showError(String error) {
 	Label content = new Label(error);
 	NativeButton buttonInside = new NativeButton("Cerrar");
 	Notification notification = new Notification(content, buttonInside);
