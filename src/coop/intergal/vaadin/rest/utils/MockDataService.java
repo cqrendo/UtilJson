@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
+import com.vaadin.flow.data.provider.QuerySortOrder;
 
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
@@ -57,10 +59,33 @@ public class MockDataService extends DataService {
     }
 
 	@Override
-	public synchronized List<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean refreshFromServer, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filtro, Boolean hasNewRow) { // RestData.getResourceDaily(); 
-	//	if (refreshFromServer)
-			rows = RestData.getResourceData(offset,limit, resourceName, preConfParam, rowsColList, filtro, refreshFromServer, hasNewRow);// refresh data from server each interaction with grid
-        return rows;
+//	public Collection<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean b, String s, String s0,
+		public Collection<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean refreshFromServer, String resourceName, String preConfParam,
+				ArrayList<String[]> rowsColList, String filtro, List<QuerySortOrder> sortOrdersFields, Boolean hasNewRow) {
+		//	if (refreshFromServer)
+		if (sortOrdersFields.isEmpty() == false)
+		{
+			Iterator<QuerySortOrder> itSortOrdersFields = sortOrdersFields.iterator();
+			if (filtro !=null)
+				filtro=filtro+"&order=";
+			else
+				filtro="order=";
+			int nFields = 0;
+			while (itSortOrdersFields.hasNext())
+			{
+				QuerySortOrder sortOrdersField = itSortOrdersFields.next();
+				String QuerySortOrderDir = "DESC";
+				if (sortOrdersField.getDirection().toString().startsWith("ASC"))
+						QuerySortOrderDir = "ASC";
+				if (nFields > 0)
+					filtro=filtro+",%20"+sortOrdersField.getSorted()+"%20"+QuerySortOrderDir;
+				else
+					filtro=filtro+sortOrdersField.getSorted()+"%20"+QuerySortOrderDir;
+				nFields++;
+			}
+		}
+				rows = RestData.getResourceData(offset,limit, resourceName, preConfParam, rowsColList, filtro, refreshFromServer, hasNewRow);// refresh data from server each interaction with grid
+	        return rows;
     }
 
 	@Override
@@ -587,6 +612,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 
 		
 	}
-
-
 }
+
+
+

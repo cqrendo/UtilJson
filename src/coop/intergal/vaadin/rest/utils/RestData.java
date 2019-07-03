@@ -300,6 +300,8 @@ public class RestData {
 								fieldArr[1] = "#SIG#";
 							else
 								fieldArr[1] = "";
+							if ( col.get("isSorteable").asBoolean())
+								fieldArr[1] = fieldArr[1]+"SORT";
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 								fieldArr[1] = fieldArr[1]+"#CNoEDT#";
