@@ -25,7 +25,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private String resourceName; 
 	private String filter; 
 	private JsonNode rowJSon;
-
+	private boolean isReadOnly ;
 	JsonNode rowColTypeList;
 	private ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 	private String col0;
@@ -142,6 +142,14 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	}
 
 
+
+	public boolean isReadOnly() {
+		return isReadOnly;
+	}
+
+	public void setReadOnly(boolean isReadOnly) {
+		this.isReadOnly = isReadOnly;
+	}
 
 	public JsonNode getRowColTypeList() {
 		return rowColTypeList;
@@ -946,6 +954,67 @@ public class DynamicDBean {// extends AbstractEntity{/**
 		}
 	}
 	public Object setColInteger(String v, String colName) {
+		Object dbean = this;
+		try {
+			String methodName = "setCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "setC" + colName.substring(1);
+			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
+			setColX.invoke(dbean,v);
+		} catch (NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public Boolean getColBoolean(String colName) {  // TODO  !!!!!!! adjust to values the returns LAC for booleans
+		Object dbean = this;
+		try {
+			String methodName = "getCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "getC" + colName.substring(1);
+
+			Method getColX = ((DynamicDBean.class)).getMethod(methodName);
+		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 0)
+		{
+			
+				String colValue = (String)getColX.invoke(dbean);
+				if (colValue.equals("true"))
+					return true;
+				else
+					return false;
+		
+		}
+		}
+			 catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return null;
+	}
+
+	public Object setColBoolean(String v, String colName) {   // TODO @@CQR Adjust for booleans
 		Object dbean = this;
 		try {
 			String methodName = "setCol" + colName;

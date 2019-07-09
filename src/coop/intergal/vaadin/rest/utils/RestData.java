@@ -60,7 +60,7 @@ public class RestData {
 			String col1name = rowsColList.get(0)[0]; 
 			if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
 			{
-				DynamicDBean d = fillRowDaily(eachRow, rowsColList);//, cols.get(0)); 
+				DynamicDBean d = fillRow(eachRow, rowsColList);//, cols.get(0)); 
 				d.setResourceName(resourceName);
 				d.setPreConfParam(preConfParam);
 				d.setFilter(filter);
@@ -124,12 +124,22 @@ public class RestData {
 		return dB;
 	}
 
-	private static DynamicDBean fillRowDaily(JsonNode eachRow, ArrayList<String[]> rowsColList) {// JsonNode cols) {
+	private static DynamicDBean fillRow(JsonNode eachRow, ArrayList<String[]> rowsColList) {// JsonNode cols) {
 //		Class dynamicDBeanClass = Class.forName("coop.intergal.xespropan.production.samples.backend.data.DynamicDBean");
 		
 		DynamicDBean dB = new DynamicDBean();
 		dB.setRowJSon(eachRow);
 		dB.setRowsColList(rowsColList); // TODO instead of put in each row, think in a way for only once (maybe row o) 
+		if (eachRow.get("readOnly") != null) // to mark as read only add row.readONly=true to the event of the resource in LAC 
+		{
+			if (eachRow.get("readOnly").asBoolean())
+				dB.setReadOnly(true);
+			else
+				dB.setReadOnly(false);
+				
+		}
+		else
+			dB.setReadOnly(false);
 //		dB.setRowColTypeList(cols); TODO Keep also cols type
 //		Object userInstance = DynamicDBean.getConstructor(new Class[] {String.class}).newInstance(new Object[] {"José González"});
 //		Field aliasField = userClass.getDeclaredField("alias");
@@ -218,6 +228,8 @@ public class RestData {
 		int count = 0;
 		List<DynamicDBean> customerList = new ArrayList<DynamicDBean>();
 		JsonNode rowsList = null;
+		if (resourceName.startsWith("@")) // is to handle @resources by example because the resource name it changes @ by _
+			resourceName = resourceName.replace("@", "_");
 		try { //TODO CACHE IS FALSE always , put as param
 		//	String filtro = null;
 			rowsList = JSonClient.get("Count_"+resourceName,filter,cache,preConfParam,"1"); 
@@ -259,7 +271,7 @@ public class RestData {
 			for (JsonNode eachRow : rowsList)  {
 				if (eachRow.get(rowsColList.get(0)[0]) !=null)
 				{
-					DynamicDBean d = fillRowDaily(eachRow, rowsColList);//, cols.get(0)); 
+					DynamicDBean d = fillRow(eachRow, rowsColList);//, cols.get(0)); 
 					d.setResourceName(resourceName);
 					d.setPreConfParam(preConfParam);
 					d.setFilter(filter);
@@ -325,14 +337,16 @@ public class RestData {
 							i++;
 						}
 						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
-						int idxPoint = resourceName.indexOf(".");
-						if (idxPoint > -1) 
+						if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself
+							{
+							int idxPoint = resourceName.indexOf(".");
+							if (idxPoint > -1) 
 							resourceName = resourceName.substring(0, idxPoint);
-						String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
+							String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
 						
-						JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
-						JSonClient.keepJoinConditionSubResources(resource); 
-
+							JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
+							JSonClient.keepJoinConditionSubResources(resource); 
+							}
 					}
 					
 					else	

@@ -154,6 +154,8 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		}
 
 		private String getTableDbForCount(String resourceName2) {    // TODO check if is re-use in other classes and then add to a generic class
+			if (resourceName2.startsWith("@")) // is use for system tables, as it is 
+				return resourceName2;
 			int startIdx = 3; // mormal format is CR_tableName__Variation
 			int endIdx = resourceName2.indexOf("__");
 			if (endIdx < 0)

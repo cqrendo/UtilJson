@@ -259,6 +259,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 			//	newEntityinfo = (ObjectNode) rowJSon;// new ObjectNode(nodeFactory);
 			ObjectNode metadata = new ObjectNode(nodeFactory);
 			metadata.put("checksum",rowJSon.get("@metadata").get("checksum").asText());
+			metadata.put("href",rowJSon.get("@metadata").get("href").asText());
 			newEntityinfo.put("@metadata",metadata);
 			int i= 0;
 			if (JSonClient.getResourceHtPK().get(tableName) != null) // when doesn't exist in field template has PK  data in ResourceHtPK
@@ -343,9 +344,14 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 									newEntityinfo.put(getColName(rowsColList,i),fechaIni.format(value) );
 							}
 							else
-								if (isCheckBox(o))	
+								if (isCheckBox(o) || value.equals("true") ||  value.equals("false") )	
 								{
-									newEntityinfo.put(getColName(rowsColList,i), (Boolean) value);  
+									if (value.equals("true")) 
+										newEntityinfo.put(getColName(rowsColList,i), (Boolean) true);  
+									else if (  value.equals("false") )
+										newEntityinfo.put(getColName(rowsColList,i), (Boolean) false);  
+									else
+										newEntityinfo.put(getColName(rowsColList,i), (Boolean) value);  
 								}
 								else
 									if (isInteger(o))	

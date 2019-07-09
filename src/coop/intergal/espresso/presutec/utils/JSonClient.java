@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -157,7 +159,7 @@ public class JSonClient {
 //
 //		if (baseURL == null |! !nlPcP.equals(knlPcP))
 //			{
-		
+		filter=changeIfIsDerbyDBFromLAC(resource, filter);
 		if (pagesize == null)
 			pagesize = "200";
 		printLog("1 preConfParam "+preConfParam  + " kPreConfParam "+ kPreConfParam);
@@ -213,6 +215,38 @@ public class JSonClient {
 		printLog("Response : " + parResponse.asText().substring(0,max)+".............");
 		return parResponse;//parseResponse(response);
 	}
+	private static String changeIfIsDerbyDBFromLAC(String resourceName, String filter) {
+		if (filter != null && filter.length() > 0 && resourceName.indexOf("resource") > 0)   // for now resources with the name of resources on it belongs to LAC, that uses Derby as DB
+		{
+			
+			int idxFirstEqual = filter.indexOf("=");
+			int idxFirstLike = filter.indexOf("%20like");
+			int idxFirstApostrofe = filter.indexOf("'");
+			
+			if (containsDigits(filter.substring(idxFirstApostrofe+1,idxFirstApostrofe+2))) // numbers in Derby doesn't use '
+				{
+				filter = filter.replaceAll("'", "");
+				}
+			else
+				{
+				filter = filter.replaceAll("'", "%27");
+				}
+			if (idxFirstEqual > 0)
+				filter = "%22"+ filter.substring(0, idxFirstEqual) + "%22"+ filter.substring(idxFirstEqual);
+			else // doesn't uses "=" 
+			{
+				filter = "%22"+ filter.substring(0, idxFirstLike) + "%22"+ filter.substring(idxFirstLike);
+			}
+		}
+
+		return filter;
+	}
+	private static boolean containsDigits(String str) {
+		  Pattern patt = Pattern.compile("\\d");
+		  Matcher m = patt.matcher(str);
+		  return m.matches();
+		}
+
 	private static void setConfigEspreso(String preConfParam) {
 		 kPreConfParam = preConfParam;
 		 Properties prop = new Properties();
