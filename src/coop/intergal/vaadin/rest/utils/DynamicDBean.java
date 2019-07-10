@@ -13,6 +13,7 @@ import java.util.Date;
 import com.fasterxml.jackson.databind.JsonNode;
 //@Entity
 //@Component
+import com.vaadin.flow.server.StreamResource;
 
 //@Entity
 //@Bean
@@ -26,6 +27,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private String filter; 
 	private JsonNode rowJSon;
 	private boolean isReadOnly ;
+	private StreamResource streamResource;
 	JsonNode rowColTypeList;
 	private ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 	private String col0;
@@ -149,6 +151,14 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 	public void setReadOnly(boolean isReadOnly) {
 		this.isReadOnly = isReadOnly;
+	}
+
+	public StreamResource getStreamResource() {
+		return streamResource;
+	}
+
+	public void setStreamResource(StreamResource streamResource) {
+		this.streamResource = streamResource;
 	}
 
 	public JsonNode getRowColTypeList() {
