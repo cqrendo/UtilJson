@@ -215,6 +215,44 @@ public class JSonClient {
 		printLog("Response : " + parResponse.asText().substring(0,max)+".............");
 		return parResponse;//parseResponse(response);
 	}
+	public static InputStream getStream(String url, String preConfParam) throws Exception {
+		printLog(" preConfParam "+preConfParam  + " kPreConfParam "+ kPreConfParam);
+		if (preConfParam == null )
+		{	
+			if (baseURL == null)
+				setConfigEspreso(null);	
+		}		
+		else if (baseURL == null |! !preConfParam.equals(kPreConfParam))
+		{
+			setConfigEspreso(preConfParam);
+			if (baseURL == null)
+			{
+				baseURL= BASE_URL;
+				apiKeyHeader = API_KEY_HEADER;
+			}
+		}
+		else if (!preConfParam.equals(kPreConfParam))
+		{
+			setConfigEspreso(preConfParam);
+			if (baseURL == null)
+			{
+				baseURL= BASE_URL;
+				apiKeyHeader = API_KEY_HEADER;
+			}
+		}
+		if (!url.startsWith("http"))
+			url = baseURL + url;	
+	//	client = HttpClientBuilder.create().build();
+		printLog("tengo en url  (JsonNode get(String url,.....) : " + url);
+		HttpGet get = new HttpGet(url);
+		get.addHeader(apiKeyHeader);
+		HttpResponse response = client.execute(get);
+		
+//		JsonNode parResponse = parseResponse(response);
+	//	client.close();
+//		printLog("Response : " + parResponse);
+		return response.getEntity().getContent() ;
+	}
 	private static String changeIfIsDerbyDBFromLAC(String resourceName, String filter) {
 		if (filter != null && filter.length() > 0 && resourceName.indexOf("resource") > 0)   // for now resources with the name of resources on it belongs to LAC, that uses Derby as DB
 		{

@@ -200,7 +200,7 @@ public class RestData {
 	}
 	private static void keepStreaminDb(DynamicDBean dB, String url, String preConfParam) {
 		try {
-			dB.setInputStream(new ByteArrayInputStream(JSonClient.get(url, preConfParam).binaryValue()));
+			dB.setInputStream(JSonClient.getStream(url, preConfParam));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
