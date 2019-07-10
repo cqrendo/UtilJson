@@ -1,5 +1,6 @@
 package coop.intergal.vaadin.rest.utils;
 
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
@@ -28,6 +29,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private JsonNode rowJSon;
 	private boolean isReadOnly ;
 	private StreamResource streamResource;
+	private InputStream inputStream;
 	JsonNode rowColTypeList;
 	private ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 	private String col0;
@@ -159,6 +161,14 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 	public void setStreamResource(StreamResource streamResource) {
 		this.streamResource = streamResource;
+	}
+
+	public InputStream getInputStream() {
+		return inputStream;
+	}
+
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
 	}
 
 	public JsonNode getRowColTypeList() {

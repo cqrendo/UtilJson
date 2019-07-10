@@ -1,5 +1,7 @@
 package coop.intergal.vaadin.rest.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,6 +11,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.vaadin.flow.server.InputStreamFactory;
+import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.StreamResourceWriter;
+import com.vaadin.flow.server.communication.StreamResourceHandler;
 
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
@@ -60,7 +66,7 @@ public class RestData {
 			String col1name = rowsColList.get(0)[0]; 
 			if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
 			{
-				DynamicDBean d = fillRow(eachRow, rowsColList);//, cols.get(0)); 
+				DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam);//, cols.get(0)); 
 				d.setResourceName(resourceName);
 				d.setPreConfParam(preConfParam);
 				d.setFilter(filter);
@@ -124,7 +130,7 @@ public class RestData {
 		return dB;
 	}
 
-	private static DynamicDBean fillRow(JsonNode eachRow, ArrayList<String[]> rowsColList) {// JsonNode cols) {
+	private static DynamicDBean fillRow(JsonNode eachRow, ArrayList<String[]> rowsColList, String preConfParam) {// JsonNode cols) {
 //		Class dynamicDBeanClass = Class.forName("coop.intergal.xespropan.production.samples.backend.data.DynamicDBean");
 		
 		DynamicDBean dB = new DynamicDBean();
@@ -161,10 +167,20 @@ public class RestData {
 							field.set(dB, null);
 						else
 						{
-							String value = eachRow.get(colName).asText();
-							if (value.equals("null"))
-								value= "";
-							field.set(dB, value);
+							if (isNotABinary(eachRow.get(colName)))
+							{
+								String value = eachRow.get(colName).asText();
+								if (value.equals("null"))
+									value= "";
+								field.set(dB, value);
+							}
+							else
+							{
+								
+								JsonNode binaryData= eachRow.get(colName);
+								String url = binaryData.asText();
+								keepStreaminDb(dB, url,preConfParam );
+							}
 						}	
 						}
 					i++;
@@ -182,6 +198,25 @@ public class RestData {
 
 		return dB;
 	}
+	private static void keepStreaminDb(DynamicDBean dB, String url, String preConfParam) {
+		try {
+			dB.setInputStream(new ByteArrayInputStream(JSonClient.get(url, preConfParam).binaryValue()));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}			
+	}
+
+	private static boolean isNotABinary(JsonNode jsonNode) {
+		if (jsonNode.get("type") != null)
+		{
+			if (jsonNode.get("type").asText().equals("binary"))
+				return false;
+		}
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 	private static String getColName(ArrayList<String[]> rowsColList, int i) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
 		String colNameInCL = rowsColList.get(i)[2];
 		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
@@ -271,7 +306,7 @@ public class RestData {
 			for (JsonNode eachRow : rowsList)  {
 				if (eachRow.get(rowsColList.get(0)[0]) !=null)
 				{
-					DynamicDBean d = fillRow(eachRow, rowsColList);//, cols.get(0)); 
+					DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam);//, cols.get(0)); 
 					d.setResourceName(resourceName);
 					d.setPreConfParam(preConfParam);
 					d.setFilter(filter);
