@@ -178,7 +178,7 @@ public class RestData {
 							{
 								
 								JsonNode binaryData= eachRow.get(colName);
-								String url = binaryData.asText();
+								String url = binaryData.get("url").asText();
 								keepStreaminDb(dB, url,preConfParam );
 							}
 						}	
