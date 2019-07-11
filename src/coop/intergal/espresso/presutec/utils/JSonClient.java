@@ -217,7 +217,7 @@ public class JSonClient {
 		return parResponse;//parseResponse(response);
 	}
 	public static InputStream getStream(String url, String preConfParam) throws Exception {
-		CloseableHttpClient clientStream = HttpClientBuilder.create().build();
+		CloseableHttpClient clientStream = HttpClientBuilder.create().build(); // if you don't build each time you all this then it hangs the conection 
 		InputStream inoutStream ;
 		printLog(" preConfParam "+preConfParam  + " kPreConfParam "+ kPreConfParam);
 		if (preConfParam == null )
