@@ -77,6 +77,7 @@ public class JSonClient {
 	static Hashtable<String, Hashtable<String, JsonNode>> parentsResource = new Hashtable<String, Hashtable<String, JsonNode>>();
 	private static String resourceTableName;
 	private static String kbaseURL = "";
+//	private static CloseableHttpClient clientStream;
 	private JsonNode keepJson ;
 	public static void main(String[] args) throws Exception {
 		setConfigEspreso(null);
@@ -216,6 +217,8 @@ public class JSonClient {
 		return parResponse;//parseResponse(response);
 	}
 	public static InputStream getStream(String url, String preConfParam) throws Exception {
+		CloseableHttpClient clientStream = HttpClientBuilder.create().build();
+		InputStream inoutStream ;
 		printLog(" preConfParam "+preConfParam  + " kPreConfParam "+ kPreConfParam);
 		if (preConfParam == null )
 		{	
@@ -242,16 +245,29 @@ public class JSonClient {
 		}
 		if (!url.startsWith("http"))
 			url = baseURL + url;	
-	//	client = HttpClientBuilder.create().build();
+		
 		printLog("tengo en url  (JsonNode get(String url,.....) : " + url);
+//		try{
 		HttpGet get = new HttpGet(url);
 		get.addHeader(apiKeyHeader);
-		HttpResponse response = client.execute(get);
+		HttpResponse response = clientStream.execute(get);
 		
 //		JsonNode parResponse = parseResponse(response);
 	//	client.close();
 //		printLog("Response : " + parResponse);
-		return response.getEntity().getContent() ;
+//		try{
+		inoutStream = response.getEntity().getContent() ;
+//		clientStream.close();
+//	    
+//     }finally{
+//    	 clientStream.close();
+//    	 
+//     }
+//  }finally{
+//	  clientStream.close();
+//  }
+		return inoutStream ;	
+		
 	}
 	private static String changeIfIsDerbyDBFromLAC(String resourceName, String filter) {
 		if (filter != null && filter.length() > 0 && resourceName.indexOf("resource") > 0)   // for now resources with the name of resources on it belongs to LAC, that uses Derby as DB
