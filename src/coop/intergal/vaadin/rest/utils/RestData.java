@@ -2,13 +2,18 @@ package coop.intergal.vaadin.rest.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.server.InputStreamFactory;
@@ -200,13 +205,17 @@ public class RestData {
 	}
 	private static void keepStreaminDb(DynamicDBean dB, String url, String preConfParam) {
 		try {
-			dB.setInputStream(JSonClient.getStream(url, preConfParam));
+			InputStream inputStream = JSonClient.getStream(url, preConfParam);
+//			byte[] bytes = IOUtils.toByteArray(inputStream);
+//			String encoded =   "0x"+bytesToHex(bytes);//Base64.getEncoder().encodeToString(bytes);
+			dB.setInputStream(inputStream);
 //			JSonClient.getClientStream().close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}			
 	}
+
 
 	private static boolean isNotABinary(JsonNode jsonNode) {
 		if (jsonNode.get("type") != null)

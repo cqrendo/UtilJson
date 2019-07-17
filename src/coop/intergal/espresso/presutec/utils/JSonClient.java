@@ -217,8 +217,8 @@ public class JSonClient {
 		return parResponse;//parseResponse(response);
 	}
 	public static InputStream getStream(String url, String preConfParam) throws Exception {
-		CloseableHttpClient clientStream = HttpClientBuilder.create().build(); // if you don't build each time you all this then it hangs the conection 
-		InputStream inoutStream ;
+		CloseableHttpClient clientStream = HttpClientBuilder.create().build(); // if you don't build each time this, then it hangs the connection 
+		InputStream inputStream ;
 		printLog(" preConfParam "+preConfParam  + " kPreConfParam "+ kPreConfParam);
 		if (preConfParam == null )
 		{	
@@ -256,7 +256,7 @@ public class JSonClient {
 	//	client.close();
 //		printLog("Response : " + parResponse);
 //		try{
-		inoutStream = response.getEntity().getContent() ;
+		inputStream = response.getEntity().getContent() ;
 //		clientStream.close();
 //	    
 //     }finally{
@@ -266,7 +266,7 @@ public class JSonClient {
 //  }finally{
 //	  clientStream.close();
 //  }
-		return inoutStream ;	
+		return inputStream ;	
 		
 	}
 	private static String changeIfIsDerbyDBFromLAC(String resourceName, String filter) {

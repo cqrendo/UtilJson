@@ -1,5 +1,6 @@
 package coop.intergal.vaadin.rest.utils;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -8,6 +9,8 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -116,7 +119,8 @@ public class MockDataService extends DataService {
 			{
 				ObjectNode newEntityinfo = putValuesOnObject(true, nodeFactory, dB, resourceName);// new ObjectNode(nodeFactory);
 				//					Iterator<Component> fieldList = editorForm.iterator(); 
-				//@@CQR gestionar PK auto numbers				newEntityinfo.put("idEntity", 0);  
+				//@@CQR gestionar PK auto numbers				newEntityinfo.put("idEntity", 0);
+				newEntityinfo = addImagenIfExist(dB, newEntityinfo);
 				JsonNode postResult;
 				try {
 					
@@ -221,6 +225,31 @@ public class MockDataService extends DataService {
 
 	} 
 		 
+private ObjectNode addImagenIfExist(DynamicDBean dB, ObjectNode newEntityinfo) {  // it must exists a field call "Imagen" of the the type BLOD use to keep a imagen
+		if (dB.getInputStream() != null && dB.getInputStream().toString().length() > 0)
+		{
+			byte[] bytes;
+			try {
+				bytes = IOUtils.toByteArray(dB.getInputStream());			
+				String encoded =   "0x"+bytesToHex(bytes);
+				newEntityinfo.put("Imagen", encoded);  
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+			
+		return newEntityinfo;
+	}
+
+public static String bytesToHex(byte[] in) {
+    final StringBuilder builder = new StringBuilder();
+    for(byte b : in) {
+        builder.append(String.format("%02x", b));
+    }
+    return builder.toString();
+}
+
 public void showError(String error) {
 	Label content = new Label(error);
 	NativeButton buttonInside = new NativeButton("Cerrar");
