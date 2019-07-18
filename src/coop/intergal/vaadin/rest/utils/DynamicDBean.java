@@ -30,6 +30,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private boolean isReadOnly ;
 //	private StreamResource streamResource;
 	private InputStream inputStream;
+	private byte[] bytes;
 	JsonNode rowColTypeList;
 	private ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 	private String col0;
@@ -169,6 +170,14 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 	public void setInputStream(InputStream inputStream) {
 		this.inputStream = inputStream;
+	}
+
+	public byte[] getBytes() {
+		return bytes;
+	}
+
+	public void setBytes(byte[] bytes) {
+		this.bytes = bytes;
 	}
 
 	public JsonNode getRowColTypeList() {

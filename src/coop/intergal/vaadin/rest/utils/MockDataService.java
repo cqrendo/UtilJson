@@ -228,15 +228,9 @@ public class MockDataService extends DataService {
 private ObjectNode addImagenIfExist(DynamicDBean dB, ObjectNode newEntityinfo) {  // it must exists a field call "Imagen" of the the type BLOD use to keep a imagen
 		if (dB.getInputStream() != null && dB.getInputStream().toString().length() > 0)
 		{
-			byte[] bytes;
-			try {
-				bytes = IOUtils.toByteArray(dB.getInputStream());			
-				String encoded =   "0x"+bytesToHex(bytes);
-				newEntityinfo.put("Imagen", encoded);  
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//				bytes = IOUtils.toByteArray(dB.getInputStream());			
+				String encoded =   "0x"+bytesToHex(dB.getBytes());
+				newEntityinfo.put("Imagen", encoded);
 		}
 			
 		return newEntityinfo;
