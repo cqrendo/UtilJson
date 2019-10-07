@@ -29,8 +29,8 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private JsonNode rowJSon;
 	private boolean isReadOnly ;
 //	private StreamResource streamResource;
-	private InputStream inputStream;
-	private byte[] bytes;
+	private InputStream inputStream; // is use to keep the blob data read from LAC
+	private byte[] bytes;  // is use to save data into LAC read in a upload  
 	JsonNode rowColTypeList;
 	private ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 	private String col0;
@@ -87,7 +87,13 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private String col51;
 	private String col52;
 	private String col53;
-
+	private String col54;
+	private String col55;
+	private String col56;
+	private String col57;
+	private String col58;
+	private String col59;
+	private String col60;
 	private String col90;
 	private String col91;
 	private String col92;
@@ -703,6 +709,62 @@ public class DynamicDBean {// extends AbstractEntity{/**
 		this.col52 = col52;
 	}
 
+	public String getCol54() {
+		return col54;
+	}
+
+	public void setCol54(String col54) {
+		this.col54 = col54;
+	}
+
+	public String getCol55() {
+		return col55;
+	}
+
+	public void setCol55(String col55) {
+		this.col55 = col55;
+	}
+
+	public String getCol56() {
+		return col56;
+	}
+
+	public void setCol56(String col56) {
+		this.col56 = col56;
+	}
+
+	public String getCol57() {
+		return col57;
+	}
+
+	public void setCol57(String col57) {
+		this.col57 = col57;
+	}
+
+	public String getCol58() {
+		return col58;
+	}
+
+	public void setCol58(String col58) {
+		this.col58 = col58;
+	}
+
+	public String getCol59() {
+		return col59;
+	}
+
+	public void setCol59(String col59) {
+		this.col59 = col59;
+	}
+
+	public String getCol60() {
+		return col60;
+	}
+
+	public void setCol60(String col60) {
+		this.col60 = col60;
+	}
+
 	public String getCol90() {
 		return col90;
 	}
@@ -1088,6 +1150,30 @@ public class DynamicDBean {// extends AbstractEntity{/**
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public Object setColBoolean(Boolean v, String colName) {
+		Object dbean = this;
+		try {
+			String methodName = "setCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "setC" + colName.substring(1);
+			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
+			setColX.invoke(dbean,v);
+		} catch (NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	

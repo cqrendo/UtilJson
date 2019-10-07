@@ -92,53 +92,13 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 	
 	  public ArrayList<String[]> getRowsColList() {
 		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam);
+	  }
+	  public ArrayList<String[]> getRowsFieldList() {
+		 return RestData.getRowsFieldList(rowsColList, resourceName, preConfParam);	
+	  }	 
 		 
-//			if (rowsColList == null || rowsColList.isEmpty())
-//				{
-//				JsonNode cols;
-//				try {				
-//					String genericResourceName = resourceName;
-//					if (genericResourceName.indexOf(".") > 1) /// it means a sub-resource 
-//						genericResourceName = resourceName;
-//					else
-//					{
-//					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
-//					if (indx__ > 1)
-//						genericResourceName = resourceName.substring(0, indx__);
-//					}
-//					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'", true, preConfParam);
-//					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
-//					{
-//						rowsColList = new ArrayList<String>();
-//						for (JsonNode col :cols)
-//						{
-//							rowsColList.add(col.get("fieldName").asText());
-//						}
-//						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
-//						String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
-//						
-//						JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
-//						JSonClient.keepJoinConditionSubResources(resource); 
-//
-//					}
-//					
-//					else	
-//					{
-//						cols = JSonClient.getColumnsFromTable(resourceName, null, true, preConfParam);
-//						
-//						rowsColList = new ArrayList<String>();
-//						Iterator<String> fN = cols.get(0).fieldNames();
-//						while (fN.hasNext()) {
-//							rowsColList.add(fN.next());
-//						}
-//					}
-//				} catch (Exception e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				}	
-//			return rowsColList;
-		}
+		 
+
 
 		public void setRowsColList(ArrayList<String[]> rowsColList) {
 			this.rowsColList = rowsColList;
@@ -157,6 +117,8 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 			if (resourceName2.startsWith("@")) // is use for system tables, as it is 
 				return resourceName2;
 			int startIdx = 3; // mormal format is CR_tableName__Variation
+			if (resourceName2.startsWith("CR-") == false) // for using of tables without resources, when is a resource it starts with CR_
+				startIdx = 0;
 			int endIdx = resourceName2.indexOf("__");
 			if (endIdx < 0)
 				endIdx=resourceName2.length();

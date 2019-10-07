@@ -498,6 +498,8 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		while (i < lTxsumary.size())
 		{
 		 String resource = lTxsumary.get(i).get("@metadata").get("resource").asText();
+		 if (resource.indexOf(":")> -1) // is a table not a resource by example  main:tabla
+			 resource=resource.substring(resource.indexOf(":")+1);
 //		 if (resource.indexOf(".")> -1) // is a sub-resource
 		 if (resource.equals(resourceName))
 			 return lTxsumary.get(i).get("@metadata").get("href").asText();

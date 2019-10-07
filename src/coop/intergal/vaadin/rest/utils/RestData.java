@@ -28,6 +28,8 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 public class RestData {
 
 
+	private static final boolean CACHE_TRUE = false;
+
 	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filter, boolean cache, Boolean hasNewRow) {
 
 		if (resourceName  == null ||  resourceName.trim().length() == 0)
@@ -344,14 +346,14 @@ public class RestData {
 //					String tableNameToSearch = genericResourceName+variant;
 					String tableNameToSearch = genericResourceName;
 					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch );
-					cols = JSonClient.get("FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", true, preConfParam);
+					cols = JSonClient.get("FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", CACHE_TRUE, "metadata");
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
 						rowsColList = new ArrayList<String[]>();
 						int i = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[6];
+							String[] fieldArr  = new String[9];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -378,6 +380,33 @@ public class RestData {
 								fieldArr[5] = "";
 							else
 								fieldArr[5] = col.get("defaultValue").asText();
+							if ( col.get("colOrder").asText().isEmpty())
+								fieldArr[6] = "";
+							else if ( col.get("colOrder").asText().contains("#")) // after the # becames the col header
+								{
+								String colOrder =  col.get("colOrder").asText();
+								fieldArr[6] =colOrder.substring(colOrder.indexOf("#")+1);
+								}
+							else
+								fieldArr[6] = "";
+							if ( col.get("fieldOrder").asText().isEmpty())
+								fieldArr[7] = "";
+							else if ( col.get("fieldOrder").asText().contains("#")) // after the # becames the field label
+								{
+								String fieldOrder =  col.get("fieldOrder").asText();
+								fieldArr[7] =fieldOrder.substring(fieldOrder.indexOf("#")+1);
+								}
+							else
+								fieldArr[7] = "";
+							if ( col.get("queryOrder").asText().isEmpty())
+								fieldArr[8] = "";
+							else if ( col.get("queryOrder").asText().contains("#")) // after the # becames the query label
+								{
+								String fieldOrder =  col.get("queryOrder").asText();
+								fieldArr[8] =fieldOrder.substring(fieldOrder.indexOf("#")+1);
+								}
+							else
+								fieldArr[8] = "";
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -389,34 +418,19 @@ public class RestData {
 							resourceName = resourceName.substring(0, idxPoint);
 							String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
 						
-							JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
-							JSonClient.keepJoinConditionSubResources(resource); 
+							 
+							if (ident !=null) 
+								{
+								JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam); 
+								JSonClient.keepJoinConditionSubResources(resource); 
+								}
 							}
 					}
 					
 					else	
 					{
-						cols = JSonClient.getColumnsFromTable(resourceName, null, true, preConfParam);
 						
-						rowsColList = new ArrayList<String[]>();
-						Iterator<String> fN = cols.get(0).fieldNames();
-						int i = 0;
-						while (fN.hasNext()) {
-							String[] fieldArr  = new String[6];
-							String fieldName = fN.next();
-							fieldArr[0] =fieldName;
-							
-							fieldArr[1] = "#SIG#";							
-							String type = cols.get(0).get(fieldName).asText();		
-							fieldArr[2] = "col"+i;								
-							fieldArr[3] = "";
-							fieldArr[4] = ""; // @@ TODO get FK data
-							fieldArr[5] = "";
-							if (type.equals("Date"))
-								fieldArr[3] = "1";
-							rowsColList.add(fieldArr);
-							i++;
-						}
+						rowsColList = getColListFromTable(resourceName, preConfParam);
 					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -425,6 +439,123 @@ public class RestData {
 				}	
 			return rowsColList;
 		}
+
+	public static ArrayList<String[]> getRowsFieldList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam){//, String variant) { // variant is use to have different lists of fields in the same resource
+		if (rowsColList == null || rowsColList.isEmpty())
+			{
+			JsonNode cols;
+			try {				
+				String genericResourceName = resourceName;
+//				int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
+//				int idxPomt = resourceName.indexOf(".");
+//				if (indx__ > 1 && idxPomt == -1) // only when there is not a subresource (after a point), you can extract the generic name from first name substring(0....
+//					genericResourceName = resourceName.substring(0, indx__);
+//				String tableNameToSearch = genericResourceName+variant;
+				String tableNameToSearch = genericResourceName;
+				System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch );
+				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInDisplay=true&order=fieldOrder";
+				cols = JSonClient.get("FieldTemplate",filter , CACHE_TRUE, "metadata"); // TODO put false to true
+				if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
+				{
+					rowsColList = new ArrayList<String[]>();
+					int i = 0;
+					for (JsonNode col :cols)
+					{
+						String[] fieldArr  = new String[9];
+						fieldArr[0] = col.get("fieldName").asText();
+						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
+							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
+						if ( col.get("FieldNameInUI").asText().isEmpty())
+							fieldArr[2] = "col"+i;	
+						else
+							fieldArr[2] = col.get("FieldNameInUI").asText();
+						if ( col.get("idFieldType").asText().isEmpty() || col.get("idFieldType").asText().equals("null"))
+							fieldArr[3] = "";
+						else
+							fieldArr[3] = col.get("idFieldType").asText();
+						if ( col.get("PathToParentField").asText().isEmpty() || col.get("PathToParentField").asText().equals("null"))
+							fieldArr[4] = "";
+						else
+							fieldArr[4] = col.get("PathToParentField").asText();
+						if ( col.get("defaultValue").asText().isEmpty() || col.get("defaultValue").asText().equals("null"))
+							fieldArr[5] = "";
+						else
+							fieldArr[5] = col.get("defaultValue").asText();
+						if ( col.get("fieldOrder").asText().isEmpty())
+							fieldArr[6] = "";
+						else if ( col.get("fieldOrder").asText().contains("#")) // after the # becames the field label
+							{
+							String fieldOrder =  col.get("fieldOrder").asText();
+							fieldArr[6] =fieldOrder.substring(fieldOrder.indexOf("#")+1);
+							}
+						else
+							fieldArr[6] = "";
+						if ( col.get("fieldWidth").asText().isEmpty() || col.get("fieldWidth").asText().equals("null") )
+							fieldArr[7] = "8";
+						else
+							fieldArr[7] = col.get("fieldWidth").asText();
+						if ( col.get("cssStyle").asText().isEmpty() || col.get("cssStyle").asText().equals("null") )
+							fieldArr[8] = "";
+						else
+							fieldArr[8] = col.get("cssStyle").asText();
+						rowsColList.add(fieldArr);
+						i++;
+					}
+					// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
+					if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself
+						{
+						int idxPoint = resourceName.indexOf(".");
+						if (idxPoint > -1) 
+						resourceName = resourceName.substring(0, idxPoint);
+						String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
+						if(ident != null)
+							{
+							JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
+							JSonClient.keepJoinConditionSubResources(resource); 
+							}
+						}
+						
+				}
+				
+				else	
+				{
+					rowsColList = getColListFromTable(resourceName, preConfParam);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			}	
+		return rowsColList;
+	}
+	private static ArrayList<String[]> getColListFromTable(String resourceName, String preConfParam) {
+		JsonNode cols = JSonClient.getColumnsFromTable(resourceName, null, CACHE_TRUE, preConfParam);
+		
+		ArrayList<String[]> rowsColList = new ArrayList<String[]>();
+		Iterator<String> fN = cols.get(0).fieldNames();
+		int i = 0;
+		while (fN.hasNext()) {
+			String[] fieldArr  = new String[9];
+			String fieldName = fN.next();
+			fieldArr[0] =fieldName;
+			
+			fieldArr[1] = "#SIG#";							
+			String type = cols.get(0).get(fieldName).asText();		
+			fieldArr[2] = "col"+i;								
+			fieldArr[3] = "";
+			fieldArr[4] = ""; // @@ TODO get FK data
+			fieldArr[5] = "";
+			fieldArr[6] = fieldName;
+			fieldArr[7] = "8";
+			fieldArr[8] = "";
+			if (type.equals("Date"))
+				fieldArr[3] = "1";
+			rowsColList.add(fieldArr);
+			i++;
+		}
+		return rowsColList;
+	}
+
 	public static DynamicDBean copyDatabean( DynamicDBean fromBean) {
 		DynamicDBean toBean = new DynamicDBean();
 //		toBean.setCol0(fromBean.getCol0());
