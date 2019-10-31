@@ -1,9 +1,7 @@
 package coop.intergal.ui.views;
 
-import static coop.intergal.tys.ui.utils.BakeryConst.PACKAGE_VIEWS;
-import static coop.intergal.tys.ui.utils.BakeryConst.PAGE_PRODUCTS;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import static coop.intergal.AppConst.PACKAGE_VIEWS;
+import static coop.intergal.AppConst.PAGE_PRODUCTS;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -14,12 +12,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.springframework.security.access.annotation.Secured;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -27,14 +24,12 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.renderer.IconRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -43,25 +38,22 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
+import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
-import coop.intergal.tys.backend.data.Role;
-import coop.intergal.tys.ui.components.FormButtonsBar;
-import coop.intergal.tys.ui.utils.BakeryConst;
-import coop.intergal.tys.ui.utils.TranslateResource;
-import coop.intergal.ui.views.DynamicGridDisplay;
+import coop.intergal.ui.components.FormButtonsBar;
+import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 import coop.intergal.vaadin.rest.utils.RestData;
-import com.vaadin.flow.component.button.Button;
 
 //@Tag("dynamic-view-grid")
 @Tag("dynamic-grid")
 @JsModule("./src/views/generic/dynamic-grid.js")
 //@Route(value = PAGE_DYNAMIC)//, layout = MainView.class)
-//@PageTitle(BakeryConst.TITLE_PRODUCTS)
-@Secured(Role.ADMIN)
+//@PageTitle(AppConst.TITLE_PRODUCTS)
+//@Secured(Role.ADMIN)
 //public class DynamicViewGrid extends CrudViewREST<DynamicDBean,TemplateModel> implements BeforeEnterObserver,AfterNavigationObserver, HasDynamicTitle  {
 public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver,AfterNavigationObserver, HasDynamicTitle  {
 
@@ -124,7 +116,7 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 
 //	private CrudEntityPresenter<DynamicDBean> presenter;
 
-	private final BeanValidationBinder<DynamicDBean> binder = new BeanValidationBinder<>(DynamicDBean.class);
+	private final Binder<DynamicDBean> binder = new Binder<>(DynamicDBean.class);
 	
 
 	private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
@@ -179,7 +171,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 	//	grid.getDataProvider().
 	//	DdbDataProvider dataProvider = new DdbDataProvider();
 		dataProvider = new DdbDataBackEndProvider();
-		dataProvider.setPreConfParam(BakeryConst.PRE_CONF_PARAM);
+		dataProvider.setPreConfParam(AppConst.PRE_CONF_PARAM);
 		dataProvider.setResourceName(getResourceName());
 		dataProvider.setFilter(getFilter());
 //		grid = new Grid<>(DynamicDBean.class); 
@@ -258,8 +250,150 @@ public DdbDataBackEndProvider getDataProvider() {
 	public void setDataProvider(DdbDataBackEndProvider dataProvider) {
 		this.dataProvider = dataProvider;
 	}
+	private Column<DynamicDBean> addFormatedColumn(int i, boolean isGridEditable) {
+		String colName = "col"+i;
+		String[] colData = rowsColListGrid.get(i);
+		String colType = colData[3];
+		String colHeader = colData[6];
+		Column<DynamicDBean> col = null;
+		boolean isNotAParentField = colData[1].indexOf("#SORT")>-1; // parent field for now can not be use as sort column
+		boolean isCOlEditable = true;;
+		if (colData[1].indexOf("#CNoEDT#")>-1)
+			isCOlEditable = false;
+		if (colData[1].indexOf("#SIG#")>-1) { // #SIG# = Show In Grid
+//			String header = TranslateResource.getFieldLocale(colData[0], preConfParam);
+			String header = colHeader;
+			if (isDate(header, colType)) {
+				if (header.indexOf("#")>0)
+					header = header.substring(2); // to avoid date typ indicator "D#"
+				if (isCOlEditable && isGridEditable)
+//					if (isNotAParentField)
+//						grid.addEditColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+//						.setResizable(true).setSortProperty(colData[0]);
+//					else
+//						grid.addEditColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+//						.setResizable(true);
+					System.err.println(" REVISAR ESTE CODIGO AL MIGRAR A 14 da error");
+				else
+					if (isNotAParentField)
+						col = grid.addColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).setHeader(header).setSortProperty(colData[0])
+						.setResizable(true).setSortProperty(colData[0]);
+					else
+						col = grid.addColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).setHeader(header).setSortProperty(colData[0])
+						.setResizable(true);
+						
+				
+//		grid.addColumn(d ->d.getCol(i)).setHeader(header).setResizable(true);
+			} else if (isCurrency(header,colType)) {
+				if (header.indexOf("#")>0)
+					header = header.substring(2);
+				if (isCOlEditable  && isGridEditable) 
+					if (isNotAParentField)
+					{
+						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+					}
+					else
+					{
+						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+					}
+				else
+					if (isNotAParentField)
+						{
+						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+						}
+					else
+						{
+						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+						}
 
-private Column<DynamicDBean> addFormatedColumn(int i, boolean isGridEditable) {
+			}  else if (isBoolean(header,colType)) {
+				if (header.indexOf("#")>0)
+					header = header.substring(2);
+				if (isCOlEditable  && isGridEditable) {
+					col = grid.addEditColumn(d -> d.getColBoolean(colName)).checkbox((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header);
+//		V14			gridPro.addEditColumn(b -> b.isBoolean(), new IconRenderer<>(
+//					        obj -> obj.isBoolean() ? 
+//					                VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create()))
+//					        .checkbox(Bean::setAtHome);
+//					grid.addEditColumn(new IconRenderer<DynamicDBean>(obj -> {
+//						if (obj.getColBoolean(colName)) {
+//						return VaadinIcon.CHECK.create();
+//						} else {
+//						return VaadinIcon.CLOSE.create();
+//						}
+//						}, obj->"")).checkbox((item, newValue) -> colChanged(item,colName,newValue));
+						 
+//					if (isNotAParentField)
+//					{
+//						grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+//						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+//					}
+//					else
+//					{
+//						grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+//						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+					}
+				else
+					if (isNotAParentField)
+						{
+						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+						}
+					else
+						{
+						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+						}
+
+			}
+			else
+				if ((isCOlEditable && isGridEditable))
+					if (isNotAParentField)						
+						col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header).setResizable(true).setSortProperty(colData[0]);
+					else
+						col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header).setResizable(true);				
+				else if (isGridEditable && isCOlEditable == false ) 
+				{
+				//	 grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).getElement());
+				//	 grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true);
+					//	 Grid<String> grid = new Grid<>();
+//					 grid.addColumn(d-> new ComponentRenderer<Label,String>(c->{
+//					 Label l = new Label(d.getCol(colName));
+//					 l.getElement().addEventListener("click", ev->System.out.println("clicked"));
+//					 return l;
+//					 })).setResizable(true);;
+					if (isNotAParentField)
+						{
+						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+						}
+					else {
+						col = grid.addColumn(new ComponentRenderer<Label,DynamicDBean>(item->{
+							 Label l = new Label("Buscar....");
+							 if (item.getCol(colName) != null && item.getCol(colName).isEmpty() == false)
+								 l = new Label(item.getCol(colName));
+							 l.getElement().addEventListener("click", ev->pickParent(colName, item));
+							 return l;
+							 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
+						
+					}
+				//	 grid.setItems("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+		//			 add(grid);
+				}	
+				else
+				{
+					if (isNotAParentField)
+						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+					else 
+						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true) ;
+				}
+		}
+		return col;
+	}
+private Column<DynamicDBean> addFormatedColumnOLD(int i, boolean isGridEditable) {
 		String colName = "col"+i;
 		String[] colData = rowsColListGrid.get(i);
 		String colType = colData[3];
@@ -446,8 +580,8 @@ private Object pickParent(String colName, DynamicDBean item) {
 //	subDynamicViewGrid.setupGrid();
 //	dynamicGridForPick.setRowsColList(currentRow.getRowsColList());
 	dialogForPick = new Dialog();
-	dialogForPick.setWidth(BakeryConst.DEFAULT_PICK_DIALOG_WITHD);
-	dialogForPick.setHeight(BakeryConst.DEFAULT_PICK_DIALOG_HEIGHT);
+	dialogForPick.setWidth(AppConst.DEFAULT_PICK_DIALOG_WITHD);
+	dialogForPick.setHeight(AppConst.DEFAULT_PICK_DIALOG_HEIGHT);
 	dialogForPick.add(dynamicGridForPick);
 	dialogForPick.open();
 	dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,currentRow, pickMapFields ));
@@ -519,7 +653,7 @@ private boolean isBoolean(String header, String colType) {
 	}
 
 //	@Override
-	protected BeanValidationBinder<DynamicDBean> getBinder() {
+	protected Binder<DynamicDBean> getBinder() {
 		return binder;
 	}
 
@@ -575,7 +709,7 @@ private boolean isBoolean(String header, String colType) {
 			Class<?> dynamicForm = Class.forName(displayFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
 			display = dynamicForm.newInstance();
 			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
-			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.BeanValidationBinder.class} );
+			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
 			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 			setRowsColList.invoke(display,rowsColListGrid);
 			setBinder.invoke(display,binder);
@@ -680,7 +814,7 @@ private boolean isBoolean(String header, String colType) {
 			
 			bean.setResourceName(resourceName);
 			bean.setRowsColList(rowsColListGrid);
-			bean.setPreConfParam(BakeryConst.PRE_CONF_PARAM);
+			bean.setPreConfParam(AppConst.PRE_CONF_PARAM);
 			fillDefaultValues(bean);
 			selectedRow = bean;
 			keepRowBeforChanges = RestData.copyDatabean(bean);
@@ -688,7 +822,7 @@ private boolean isBoolean(String header, String colType) {
 			Class<?> dynamicForm = Class.forName(displayFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
 			display = dynamicForm.newInstance();
 			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
-			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.BeanValidationBinder.class} );
+			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
 			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 			setRowsColList.invoke(display,rowsColListGrid);
 			setBinder.invoke(display,binder);
@@ -796,6 +930,11 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 	private String extractResourceSubGrid(DynamicDBean bean) {
 		// TODO Auto-generated method stub CR-entradas_cab.List-entradas_lin/
 		String rowJson = bean.getRowJSon().toString();
+		if (bean.getRowJSon().get("tableName") != null)
+			{
+			if (bean.getRowJSon().get("tableName").asText().equals("CR-FormTemplate.List-FieldTemplate")) // // the resource is the formTemplate or FieldTemplate, to configure themselves, then there is a conflict with the names 
+				return bean.getRowJSon().get("tableName").asText();
+			}
 		int idxResourceSubResource = rowJson.indexOf(bean.getResourceName() +".");
 		if (idxResourceSubResource > -1)
 		{

@@ -1,17 +1,16 @@
 package coop.intergal.ui.views;
 
-import static coop.intergal.tys.ui.utils.BakeryConst.PAGE_PRODUCTS;
+import static coop.intergal.AppConst.PAGE_PRODUCTS;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.security.access.annotation.Secured;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -19,7 +18,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -30,21 +29,19 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
+import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
-import coop.intergal.tys.backend.data.Role;
-import coop.intergal.tys.ui.utils.BakeryConst;
-import coop.intergal.tys.ui.utils.TranslateResource;
+import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
-import com.vaadin.flow.component.button.Button;
 
 //@Tag("dynamic-view-grid")
 @Tag("dynamic-view-grid")
 @JsModule("./src/views/admin/products/dynamic-view-grid.js")
 //@Route(value = PAGE_DYNAMIC)//, layout = MainView.class)
-//@PageTitle(BakeryConst.TITLE_PRODUCTS)
-@Secured(Role.ADMIN)
+//@PageTitle(AppConst.TITLE_PRODUCTS)
+//@Secured(Role.ADMIN)
 //public class DynamicViewGrid extends CrudViewREST<DynamicDBean,TemplateModel> implements BeforeEnterObserver,AfterNavigationObserver, HasDynamicTitle  {
 public class DynamicGridRowCard extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver,AfterNavigationObserver, HasDynamicTitle  {
 
@@ -103,7 +100,7 @@ public class DynamicGridRowCard extends PolymerTemplate<TemplateModel> implement
 
 //	private CrudEntityPresenter<DynamicDBean> presenter;
 
-	private final BeanValidationBinder<DynamicDBean> binder = new BeanValidationBinder<>(DynamicDBean.class);
+	private final Binder<DynamicDBean> binder = new Binder<>(DynamicDBean.class);
 	
 
 	private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
@@ -138,7 +135,7 @@ public class DynamicGridRowCard extends PolymerTemplate<TemplateModel> implement
 	//	grid.getDataProvider().
 	//	DdbDataProvider dataProvider = new DdbDataProvider();
 		DdbDataBackEndProvider dataProvider = new DdbDataBackEndProvider();
-		dataProvider.setPreConfParam(BakeryConst.PRE_CONF_PARAM);
+		dataProvider.setPreConfParam(AppConst.PRE_CONF_PARAM);
 		dataProvider.setResourceName(getResourceName());
 		dataProvider.setFilter(getFilter());
 //		grid = new Grid<>(DynamicDBean.class); 
@@ -158,7 +155,7 @@ public class DynamicGridRowCard extends PolymerTemplate<TemplateModel> implement
 //				.withProperty("orderCard", DynamicDBean::getCol0)
 //		//		.withProperty("header", order -> presenter.getHeaderByOrderId(order.getId()))
 //				.withEventHandler("cardClick",
-//						order -> UI.getCurrent().navigate(BakeryConst.PAGE_STOREFRONT + "/" + order.getId())));
+//						order -> UI.getCurrent().navigate(AppConst.PAGE_STOREFRONT + "/" + order.getId())));
 		
 		grid.addColumn(TemplateRenderer.<DynamicDBean> of(
 		        "<div style='border: 1px solid gray; padding: 10px; width: 100%; box-sizing: border-box;'>"
@@ -242,7 +239,7 @@ private boolean isDate(String header) {
 	}
 
 //	@Override
-	protected BeanValidationBinder<DynamicDBean> getBinder() {
+	protected Binder<DynamicDBean> getBinder() {
 		return binder;
 	}
 
@@ -292,7 +289,7 @@ private boolean isDate(String header) {
 			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
 			Object display = dynamicForm.newInstance();
 			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
-			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.BeanValidationBinder.class} );
+			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
 			Method setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 			setRowsColList.invoke(display,rowsColList);
 			setBinder.invoke(display,binder);

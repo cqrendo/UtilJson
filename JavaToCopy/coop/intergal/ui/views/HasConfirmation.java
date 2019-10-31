@@ -1,6 +1,6 @@
 package coop.intergal.ui.views;
 
-import coop.intergal.tys.ui.components.ConfirmDialog;
+import coop.intergal.ui.components.ConfirmDialog;
 
 public interface HasConfirmation {
 

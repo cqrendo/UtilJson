@@ -1154,12 +1154,15 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 	public Object setColBoolean(Boolean v, String colName) {
 		Object dbean = this;
+		String value = "false";
+		if (v!=null && v)
+			value = "true";
 		try {
 			String methodName = "setCol" + colName;
 			if (colName.startsWith("col"))
 				methodName= "setC" + colName.substring(1);
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
-			setColX.invoke(dbean,v);
+			setColX.invoke(dbean,value);
 		} catch (NoSuchMethodException | SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -13,14 +13,13 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
-import coop.intergal.tys.ui.components.FormButtonsBar;
-import coop.intergal.tys.ui.crud.CrudView.CrudForm;
+import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
 //@Tag("dynamic-form")
@@ -31,7 +30,7 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Route(value = "display")
 //public class DynamicForm extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, CrudForm<DynamicDBean> {
-public class DynamicForm extends GenericDynamicForm implements BeforeEnterObserver, CrudForm<DynamicDBean> {
+public class DynamicForm extends GenericDynamicForm implements BeforeEnterObserver{ //, CrudForm<DynamicDBean> {
 	//public class DynamicForm extends	Component implements BeforeEnterObserver, CrudForm<DynamicDBean> {
 	@Id("title")
 	private H3 title;
@@ -51,14 +50,14 @@ public class DynamicForm extends GenericDynamicForm implements BeforeEnterObserv
 	@Id("col2")
 	private TextField col2;
 
-	private BeanValidationBinder<DynamicDBean> binder;
+	private Binder<DynamicDBean> binder;
 
 	private DynamicDBean bean;
 
 	private ArrayList<String[]> rowsColList;
 
-	@Override
-	public void setBinder(BeanValidationBinder<DynamicDBean> binder) {
+//	@Override
+	public void setBinder(Binder<DynamicDBean> binder) {
 		this.binder = binder;
 		Iterator<String[]> itRowsColList = rowsColList.iterator();
 		if (form == null)
@@ -79,7 +78,7 @@ public class DynamicForm extends GenericDynamicForm implements BeforeEnterObserv
 //		col1.setPattern("\\d+(\\.\\d?\\d?)?$");
 //		col1.setPreventInvalidInput(true);
 
-//		String currencySymbol = Currency.getInstance(BakeryConst.APP_LOCALE).getSymbol();
+//		String currencySymbol = Currency.getInstance(AppConst.APP_LOCALE).getSymbol();
 //		col1.setPrefixComponent(new Span(currencySymbol));
 	}
 
@@ -88,11 +87,11 @@ public class DynamicForm extends GenericDynamicForm implements BeforeEnterObserv
 //		return buttons;
 //	}
 
-	@Override
-	public HasText getTitle() {
-		return title;
-		
-	}
+//	@Override
+//	public HasText getTitle() {
+//		return title;
+//		
+//	}
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {

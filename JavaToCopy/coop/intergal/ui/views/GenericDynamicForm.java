@@ -1,5 +1,5 @@
 package coop.intergal.ui.views;
-import static coop.intergal.tys.ui.utils.BakeryConst.PACKAGE_VIEWS;
+import static coop.intergal.AppConst.PACKAGE_VIEWS;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -17,7 +17,8 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
+
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.dom.DomEvent;
 import com.vaadin.flow.templatemodel.TemplateModel;
@@ -33,7 +34,7 @@ public class GenericDynamicForm extends PolymerTemplate<TemplateModel> {
 	 */
 	private static final long serialVersionUID = 1L;
 private ArrayList<String[]> rowsColList;
-protected BeanValidationBinder<DynamicDBean> binder;
+protected Binder<DynamicDBean> binder;
 private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
 private Dialog dialogForPick;
 private String pickMapFields; 
@@ -43,7 +44,7 @@ private String pickMapFields;
 //
 //		HasText getTitle();
 //
-//		void setBinder(BeanValidationBinder<E> binder);
+//		void setBinder(Binder<E> binder);
 //
 //		void setBean(DynamicDBean bean);
 //
@@ -59,7 +60,7 @@ private String pickMapFields;
 		return rowsColList;
 	}
 
-	public void setBinder(BeanValidationBinder<DynamicDBean> binder) {
+	public void setBinder(Binder<DynamicDBean> binder) {
 		// TODO Auto-generated method stub
 		
 	}

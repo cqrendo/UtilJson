@@ -1,15 +1,12 @@
 package coop.intergal.ui.views;
 
-import static coop.intergal.tys.ui.utils.BakeryConst.PACKAGE_VIEWS;
-import static coop.intergal.tys.ui.utils.BakeryConst.PAGE_DYNAMIC;
-import static coop.intergal.tys.ui.utils.BakeryConst.PAGE_PRODUCTS;
+import static coop.intergal.AppConst.PACKAGE_VIEWS;
+import static coop.intergal.AppConst.PAGE_PRODUCTS;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.security.access.annotation.Secured;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
@@ -22,32 +19,26 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.polymertemplate.TemplateParser;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.QueryParameters;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
-import coop.intergal.tys.backend.data.Role;
-import coop.intergal.ui.utils.converters.CurrencyFormatter;
-import coop.intergal.vaadin.rest.utils.DynamicDBean;
-import coop.intergal.tys.ui.components.FormButtonsBar;
-import coop.intergal.tys.ui.components.QueryButtonsBar;
-import coop.intergal.tys.ui.components.QueryButtonsBar.ClearSearchEvent;
-import coop.intergal.tys.ui.components.QueryButtonsBar.SearchEvent;
 import coop.intergal.tys.ui.views.comprasyventas.compras.ArticulosQueryForPick;
 import coop.intergal.tys.ui.views.comprasyventas.compras.ProveedorQueryForPick;
+import coop.intergal.ui.utils.converters.CurrencyFormatter;
+import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
 //@Tag("dynamic-view-grid")
 @Tag("dynamic-grid-for-pick")
 @JsModule("./src/views/generic/layout/dynamic-grid-for-pick.js")
 //@Route(value = PAGE_DYNAMIC+"forPICK")//, layout = MainView.class)
-//@PageTitle(BakeryConst.TITLE_PRODUCTS)
-@Secured(Role.ADMIN)
+//@PageTitle(AppConst.TITLE_PRODUCTS)
+//@Secured(Role.ADMIN)
 @Uses(ArticulosQueryForPick.class) 
 @Uses(ProveedorQueryForPick.class) 
 public class DynamicGridForPick extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle  {
@@ -99,7 +90,7 @@ public class DynamicGridForPick extends PolymerTemplate<TemplateModel> implement
 
 //	private CrudEntityPresenter<DynamicDBean> presenter;
 
-	private final BeanValidationBinder<DynamicDBean> binder = new BeanValidationBinder<>(DynamicDBean.class);
+	private final Binder<DynamicDBean> binder = new Binder<>(DynamicDBean.class);
 	
 
 	private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
@@ -181,7 +172,7 @@ public class DynamicGridForPick extends PolymerTemplate<TemplateModel> implement
 	}
 
 //	@Override
-	protected BeanValidationBinder<DynamicDBean> getBinder() {
+	protected Binder<DynamicDBean> getBinder() {
 		return binder;
 	}
 
