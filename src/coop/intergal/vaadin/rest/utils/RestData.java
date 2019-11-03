@@ -333,6 +333,22 @@ public class RestData {
 		return null;
 		
 	}
+	public static boolean checkIfExist(String resourceName, String filter , String preConfParam)
+	{
+		try {
+			JsonNode rowsList = JSonClient.get(resourceName,filter,false,preConfParam,"1");
+			if (rowsList.size() > 0)
+				return true;
+			else
+				return false;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}//"40"); // vamos a probar sin cache, para activarlo poner "cache" en vez de false
+
+		return 	false;
+		
+	}
 	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam){//, String variant) { // variant is use to have different lists of fields in the same resource
 			if (rowsColList == null || rowsColList.isEmpty())
 				{
