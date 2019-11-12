@@ -1237,9 +1237,12 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 	}
 
 	private void setVisibleRowData(boolean b) {
-		divDisplay.setVisible(b);
-		divSubGrid.setVisible(b);
-		buttonsForm.setVisible(b);
+		if (divDisplay != null)
+			divDisplay.setVisible(b);
+		if (divSubGrid != null)
+			divSubGrid.setVisible(b);
+		if (buttonsForm != null)
+			buttonsForm.setVisible(b);
 		
 	}
 
