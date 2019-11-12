@@ -1053,6 +1053,14 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 		this.filter = filter;
 	}
 
+	public DynamicDBean getSelectedRow() {
+		return selectedRow;
+	}
+
+	public void setSelectedRow(DynamicDBean selectedRow) {
+		this.selectedRow = selectedRow;
+	}
+
 	public String getDisplayFormClassName() {
 		return displayFormClassName;
 	}

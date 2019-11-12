@@ -28,7 +28,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 public class RestData {
 
 
-	private static final boolean CACHE_TRUE = false;
+	private static final boolean CACHE_TRUE = true;
 
 	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filter, boolean cache, Boolean hasNewRow) {
 
@@ -361,7 +361,7 @@ public class RestData {
 //						genericResourceName = resourceName.substring(0, indx__);
 //					String tableNameToSearch = genericResourceName+variant;
 					String tableNameToSearch = genericResourceName;
-					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch );
+					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch  + " "+ new Date());
 					cols = JSonClient.get("FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", CACHE_TRUE, "metadata");
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
