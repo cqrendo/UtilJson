@@ -22,12 +22,12 @@ public class DateTimeFormatter implements Serializable {
 	 *            the locale to use to determine the format
 	 * @return a formatted string
 	 */
-	public String format(LocalDateTime dateTime, Locale locale) {
+	public static String format(LocalDateTime dateTime, Locale locale) {
 		java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
 				.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(locale);
 		return dateTime.format(formatter);
 	}
-	public String format(String dateString , Locale locale) { // to send a string in the format yyyy-MM-dd'T'HH:mm:ss, and string in short date
+	public static String format(String dateString , Locale locale) { // to send a string in the format yyyy-MM-dd'T'HH:mm:ss, and string in short date
 		if (locale == null)
 			locale = new Locale("es","ES");
 		java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
