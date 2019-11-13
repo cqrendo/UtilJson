@@ -347,6 +347,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 				if (field.getName() != null && value != null && value.equals("null") == false && value.toString().equals("") == false 
 						&& value.toString().length() > 0 ) //&& field.getCaption().startsWith("HIDE @ FIELD") == false) // the Hide fields are not send in the data to PUT 
 				{
+					int colType = getColType(rowsColList,i);
 					//					System.err.println("FIELD......."+field.getId() + " VALUE.... "+ (String) field.getValue());
 					if (field.getName().startsWith("col") == false) // all the "normal" fields starts with col (col0, col1.....) 
 					{
@@ -385,7 +386,11 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 									}
 									else // normal fields that belongs to row
 										if (rowsColList.get(i)[0].length() > 0)
+										{
+											if (colType == 3) // is currency
+												value = cleanCurrencySymbols(value);
 											newEntityinfo.put(getColName(rowsColList,i), (String) ""+value);  
+										}
 										else
 											newEntityinfo.put(getColName(rowsColList,i), "");
 							i++;
@@ -406,6 +411,22 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		return newEntityinfo;
 	}
 	
+	private Object cleanCurrencySymbols(Object value) {
+		String valueStr = (String) value;
+		valueStr= valueStr.replace(",", ".");
+		int idxE = valueStr.indexOf("€");
+		if (idxE > -1)
+			valueStr = valueStr.substring(0, idxE-1);
+		return valueStr;
+	}
+
+	private int getColType(ArrayList<String[]> rowsColList, int i) {
+		String colType = rowsColList.get(i)[3];
+		if ( !colType.isEmpty() ) // if colinIU = col... then return colName 
+			return new Integer(colType);
+		return 0;
+	}
+
 	private String getColName(ArrayList<String[]> rowsColList, int i) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
 		String colNameInCL = rowsColList.get(i)[2];
 		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 

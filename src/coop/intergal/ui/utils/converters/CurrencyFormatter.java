@@ -21,6 +21,10 @@ public class CurrencyFormatter implements ModelEncoder<Integer, String> {
 	public Integer getCents(String col) {
 		if (col == null)
 			return null;
+		col=col.replace(",","."); // change , for .
+		int idxE = col.indexOf("€"); // take off € sign 
+		if (idxE > -1)
+			col = col.substring(0,idxE-1 );
 		String cents= col;
 		int idXOfPoint = col.indexOf(".");
 		if (idXOfPoint == -1) // not decimala -> 1 is converted to 1.00
