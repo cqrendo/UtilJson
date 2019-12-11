@@ -456,7 +456,11 @@ public class RestData {
 			return rowsColList;
 		}
 
-	public static ArrayList<String[]> getRowsFieldList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam){//, String variant) { // variant is use to have different lists of fields in the same resource
+	public static ArrayList<String[]> getRowsFieldList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache){//, String variant) { // variant is use to have different lists of fields in the same resource
+		if (cache == null)
+		{
+			cache = CACHE_TRUE;
+		}
 		if (rowsColList == null || rowsColList.isEmpty())
 			{
 			JsonNode cols;
@@ -470,7 +474,7 @@ public class RestData {
 				String tableNameToSearch = genericResourceName;
 				System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch );
 				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInDisplay=true&order=fieldOrder";
-				cols = JSonClient.get("FieldTemplate",filter , CACHE_TRUE, "metadata"); // TODO put false to true
+				cols = JSonClient.get("FieldTemplate",filter , cache, "metadata"); // TODO put false to true
 				if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 				{
 					rowsColList = new ArrayList<String[]>();

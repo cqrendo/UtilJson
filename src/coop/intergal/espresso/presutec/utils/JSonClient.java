@@ -7,11 +7,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -474,7 +476,7 @@ public class JSonClient {
 	 * Read a Response object and parse it into a JsonNode
 	 */
 	private static JsonNode parseResponse(HttpResponse response) throws Exception {
-		InputStreamReader inStr = new InputStreamReader(response.getEntity().getContent());
+		InputStreamReader inStr = new InputStreamReader(response.getEntity().getContent(), "utf-8");//response.getEntity().getContent());
 		
 		BufferedReader rd = new BufferedReader(inStr);
 		StringBuffer sb = new StringBuffer();
