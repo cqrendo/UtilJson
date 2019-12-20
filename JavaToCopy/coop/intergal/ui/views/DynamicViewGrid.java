@@ -32,7 +32,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.IconRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -320,18 +319,23 @@ public DdbDataBackEndProvider getDataProvider() {
 				if (header.indexOf("#")>0)
 					header = header.substring(2);
 				if (isCOlEditable  && isGridEditable) {
-//					col = grid.addEditColumn(d -> d.getColBoolean(colName)).checkbox((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header);
+					col = grid.addEditColumn(d -> d.getColBoolean(colName)).checkbox((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header);
+//					grid.addEditColumn(b -> b.getColBoolean(colName), new IconRenderer<>(
+//			        obj -> obj.getColBoolean(colName) ? 
+//			                VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create()))
+//			        .checkbox(b -> b.getColBoolean(colName));
+//
 //		V14			gridPro.addEditColumn(b -> b.isBoolean(), new IconRenderer<>(
 //					        obj -> obj.isBoolean() ? 
 //					                VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create()))
 //					        .checkbox(Bean::setAtHome);
-					col =grid.addEditColumn((ValueProvider<DynamicDBean, ?>) new IconRenderer<DynamicDBean>(obj -> {
-						if (obj.getColBoolean(colName)) {
-						return VaadinIcon.CHECK.create();
-						} else {
-						return VaadinIcon.CLOSE.create();
-						}
-						}, obj->"")).checkbox((item, newValue) -> colChanged(item,colName,newValue));
+//					grid.addEditColumn(new IconRenderer<DynamicDBean>(obj -> {
+//						if (obj.getColBoolean(colName)) {
+//						return VaadinIcon.CHECK.create();
+//						} else {
+//						return VaadinIcon.CLOSE.create();
+//						}
+//						}, obj->"")).checkbox((item, newValue) -> colChanged(item,colName,newValue));
 						 
 //					if (isNotAParentField)
 //					{
