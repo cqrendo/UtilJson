@@ -175,7 +175,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		dataProvider.setResourceName(getResourceName());
 		dataProvider.setFilter(getFilter());
 //		grid = new Grid<>(DynamicDBean.class); 
-		grid.removeAllColumns();
+//		grid.removeAllColumns();
 		grid.setDataProvider(dataProvider);
 		grid.setEnterNextRow(true);
 		grid.setMultiSort(true);
@@ -711,9 +711,12 @@ private boolean isBoolean(String header, String colType) {
 			display = dynamicForm.newInstance();
 			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
 			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
+			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+			
 			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 			setRowsColList.invoke(display,rowsColListGrid);
 			setBinder.invoke(display,binder);
+//			setDataProvider.invoke(display, dataProvider);
 			setBean.invoke(display,bean);
 			divDisplay.removeAll();
 			divDisplay.add((Component)display);
@@ -732,6 +735,7 @@ private boolean isBoolean(String header, String colType) {
 				subDynamicViewGrid.setDisplayParent(display);
 				subDynamicViewGrid.setBeanParent(setBean);
 				divSubGrid.add(subDynamicViewGrid );
+				setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
 			}
 			else
 			{
