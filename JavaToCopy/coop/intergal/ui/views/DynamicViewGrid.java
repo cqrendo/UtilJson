@@ -25,11 +25,14 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.IconRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -148,6 +151,8 @@ private String pickMapFields;
 @Id("deleteRow")
 private Button deleteRow;
 private FormButtonsBar buttonsForm;
+private boolean hasSideDisplay = true;
+
 
 //	@Autowired()
 //	public DynamicViewGrid(CrudEntityPresenter<DynamicDBean> presenter, CrudForm<DynamicDBean> form) {
@@ -315,18 +320,18 @@ public DdbDataBackEndProvider getDataProvider() {
 				if (header.indexOf("#")>0)
 					header = header.substring(2);
 				if (isCOlEditable  && isGridEditable) {
-					col = grid.addEditColumn(d -> d.getColBoolean(colName)).checkbox((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header);
+//					col = grid.addEditColumn(d -> d.getColBoolean(colName)).checkbox((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header);
 //		V14			gridPro.addEditColumn(b -> b.isBoolean(), new IconRenderer<>(
 //					        obj -> obj.isBoolean() ? 
 //					                VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create()))
 //					        .checkbox(Bean::setAtHome);
-//					grid.addEditColumn(new IconRenderer<DynamicDBean>(obj -> {
-//						if (obj.getColBoolean(colName)) {
-//						return VaadinIcon.CHECK.create();
-//						} else {
-//						return VaadinIcon.CLOSE.create();
-//						}
-//						}, obj->"")).checkbox((item, newValue) -> colChanged(item,colName,newValue));
+					col =grid.addEditColumn((ValueProvider<DynamicDBean, ?>) new IconRenderer<DynamicDBean>(obj -> {
+						if (obj.getColBoolean(colName)) {
+						return VaadinIcon.CHECK.create();
+						} else {
+						return VaadinIcon.CLOSE.create();
+						}
+						}, obj->"")).checkbox((item, newValue) -> colChanged(item,colName,newValue));
 						 
 //					if (isNotAParentField)
 //					{
@@ -676,6 +681,8 @@ private boolean isBoolean(String header, String colType) {
 		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
 			setResourceName(queryParameters.getParameters().get("resourceName").get(0));
 //@@		setupEventListeners();
+		if (hasSideDisplay )
+		{
 		grid.addSelectionListener(e -> {
 //			getBinder()..select(e.getFirstSelectedItem());
 //			e.getFirstSelectedItem().ifPresent(entity -> {
@@ -685,6 +692,7 @@ private boolean isBoolean(String header, String colType) {
 				showBean((DynamicDBean)e.getFirstSelectedItem().get());
 //				getGrid().deselectAll();
 			});
+		}
 //		});
 //@@		display.getButtons().addSaveListener(e -> nextRow());
 //		setupGrid();
@@ -1254,6 +1262,14 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 	public void setButtonsForm(FormButtonsBar buttons) {
 		this.buttonsForm = buttons;
 		
+	}
+
+	public boolean isHasSideDisplay() {
+		return hasSideDisplay;
+	}
+
+	public void setHasSideDisplay(boolean hasSideDisplay) {
+		this.hasSideDisplay = hasSideDisplay;
 	}
 	
 
