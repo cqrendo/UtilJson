@@ -299,7 +299,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		}
 		else // isInsert Put Data from filter
 		{
-			String fKfilter = dB.getFilter();
+			String fKfilter = dB.getFilter();  
 			if (fKfilter != null)
 			{
 	//			int fKfilterLength = fKfilter.length();
@@ -311,7 +311,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 					String fieldName = fKfilter.substring(beginIndex, endIndex);
 					beginIndex = fKfilter.indexOf("'")+1;
 					fKfilter = fKfilter.substring(beginIndex);
-					endIndex = fKfilter.indexOf("'");
+					endIndex = fKfilter.indexOf("'"); // the filters values must come between ' even they are numbers
 					String fieldValue = fKfilter.substring(0, endIndex);
 					newEntityinfo.put(fieldName, fieldValue);
 					beginIndex = fKfilter.indexOf("%20and%20")+ 9;
