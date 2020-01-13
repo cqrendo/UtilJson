@@ -319,11 +319,17 @@ public DdbDataBackEndProvider getDataProvider() {
 				if (header.indexOf("#")>0)
 					header = header.substring(2);
 				if (isCOlEditable  && isGridEditable) {
-					col = grid.addEditColumn(d -> d.getColBoolean(colName)).checkbox((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header);
-//					grid.addEditColumn(b -> b.getColBoolean(colName), new IconRenderer<>(
+					col = grid.addEditColumn(d -> d.getColBoolean(colName)?"Si":"No")
+	                .checkbox((item, newValue) ->
+	                        item.setColBoolean(newValue,colName))
+	                .setHeader(header);
+//					col = grid.addEditColumn(d -> d.getColBoolean(colName)).checkbox((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header);
+//			        col = grid.addEditColumn(d -> d.getColBoolean(colName), d->d.isX1111X()?"SI":"NO")
+//			                .checkbox((item, newValue) -> item.setColBoolean(newValue,colName));			
+//					col = grid.addEditColumn(b -> b.getColBoolean(colName), new IconRenderer<>(
 //			        obj -> obj.getColBoolean(colName) ? 
 //			                VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create()))
-//			        .checkbox(b -> b.getColBoolean(colName));
+//			        .checkbox(DynamicDBean::setColBoolean);
 //
 //		V14			gridPro.addEditColumn(b -> b.isBoolean(), new IconRenderer<>(
 //					        obj -> obj.isBoolean() ? 
@@ -1141,7 +1147,8 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 			dataProvider.save(beanTobeSave, beansToSaveAndRefresh2);	 
 			dataProvider.setHasNewRow(false);
 			try {
-				setBeanParent.invoke(display,parentRow);
+				if (display!= null && parentRow !=null)
+					setBeanParent.invoke(display,parentRow);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

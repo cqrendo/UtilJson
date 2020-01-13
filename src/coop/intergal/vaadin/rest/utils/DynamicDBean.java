@@ -1102,7 +1102,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		return null;
+		return false;
 	}
 
 	public Object setColBoolean(String v, String colName) {   // TODO @@CQR Adjust for booleans
@@ -1177,6 +1177,14 @@ public class DynamicDBean {// extends AbstractEntity{/**
 			e.printStackTrace();
 		}
 		return null;
+	}
+	public Object setColBoolean(Boolean v) {
+		return true;
+		
+	}
+	public Boolean isXX()
+	{
+		return true;
 	}
 
 	

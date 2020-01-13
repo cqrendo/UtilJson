@@ -213,6 +213,14 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 			filter = parFIlter.get(0);
 			filter=filter.replace("EEQQ", "=");
 			}
+//		List<String> parinlinelimit = queryParameters.getParameters().get("inlinelimit");
+//		if (parinlinelimit != null)
+//			{
+//			if (filter != null)
+//				filter = filter + "&inlinelimit="+parinlinelimit.get(0);
+//			else
+//				filter = "inlinelimit="+parinlinelimit.get(0);
+//			}
 		title="..";
 		String queryFormClassName = null;
 		String displayFormClassName  = null;
@@ -262,6 +270,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 		grid.setLayout(this);
 //		grid.setGridSplitDisplay(gridSplitDisplay);
 		grid.setResourceName(resourceName);
+		grid.setFilter(filter);
 		grid.setupGrid(false);
 //		divGrid.add(grid );
 		buttons.setVisible(false);
