@@ -320,9 +320,10 @@ public DdbDataBackEndProvider getDataProvider() {
 					header = header.substring(2);
 				if (isCOlEditable  && isGridEditable) {
 					col = grid.addEditColumn(d -> d.getColBoolean(colName)?"Si":"No")
-	                .checkbox((item, newValue) ->
-	                        item.setColBoolean(newValue,colName))
-	                .setHeader(header);
+//	                .checkbox((item, newValue) ->
+//	                        item.setColBoolean(newValue,colName))
+					.checkbox((item, newValue) -> colChanged(item,colName,newValue))		
+					.setHeader(header);
 //					col = grid.addEditColumn(d -> d.getColBoolean(colName)).checkbox((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header);
 //			        col = grid.addEditColumn(d -> d.getColBoolean(colName), d->d.isX1111X()?"SI":"NO")
 //			                .checkbox((item, newValue) -> item.setColBoolean(newValue,colName));			
