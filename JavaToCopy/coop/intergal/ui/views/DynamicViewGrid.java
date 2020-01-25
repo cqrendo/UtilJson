@@ -319,7 +319,8 @@ public DdbDataBackEndProvider getDataProvider() {
 				if (header.indexOf("#")>0)
 					header = header.substring(2);
 				if (isCOlEditable  && isGridEditable) {
-					col = grid.addEditColumn(d -> d.getColBoolean(colName)?"Si":"No")
+					col = grid.addEditColumn(d -> d.getColBoolean(colName)?//"Si":"No")
+							TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))
 //	                .checkbox((item, newValue) ->
 //	                        item.setColBoolean(newValue,colName))
 					.checkbox((item, newValue) -> colChanged(item,colName,newValue))		
@@ -357,12 +358,18 @@ public DdbDataBackEndProvider getDataProvider() {
 				else
 					if (isNotAParentField)
 						{
-						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						col = grid.addColumn(d -> d.getColBoolean(colName)?//"Si":"No")
+								TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))		
+								.setHeader(header)
+//						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
 						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
 						}
 					else
 						{
-						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						col = grid.addColumn(d -> d.getColBoolean(colName)?//"Si":"No")
+								TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))		
+								.setHeader(header)
+//						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
 						.setTextAlign(ColumnTextAlign.END).setResizable(true);
 						}
 
