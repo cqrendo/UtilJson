@@ -57,7 +57,7 @@ public class DynamicForm extends GenericDynamicForm implements BeforeEnterObserv
 	private ArrayList<String[]> rowsColList;
 
 //	@Override
-	public void setBinder(Binder<DynamicDBean> binder) {
+	public void setBinder(Binder<DynamicDBean> binder) { // @@ TODO revisar si se usa, si carga bien el nombre de la columna
 		this.binder = binder;
 		Iterator<String[]> itRowsColList = rowsColList.iterator();
 		if (form == null)
@@ -66,8 +66,11 @@ public class DynamicForm extends GenericDynamicForm implements BeforeEnterObserv
 		int i = 0;
 		while (itRowsColList.hasNext())
 		{
-			TextField tf = new TextField(itRowsColList.next()[0]);
-			binder.bind(tf, "col"+i);
+			String[] col = itRowsColList.next();
+//			TextField tf = new TextField(itRowsColList.next()[0]);			
+//			binder.bind(tf, "col"+i);
+			TextField tf = new TextField(col[0]);
+			binder.bind(tf, col[2]); //col[2] = fieldNameinUI
 			form.add(tf);
 			i++;
 			
