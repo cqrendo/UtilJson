@@ -89,11 +89,15 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 		this.rowsColListGrid = rowsColListGrid;
 	}	
 
-//	public DynamicViewGrid() {
-//		super();
-////		setupGrid();
-//		
-//	}
+	public DynamicViewGrid() {
+		super();
+		grid.addSelectionListener(e -> {
+			if (e.getFirstSelectedItem().isPresent())
+				selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
+			});
+//		setupGrid();
+		
+	}
 //
 //	public DynamicViewGrid(TemplateParser parser, VaadinService service) {
 //		super(parser, service);
@@ -151,6 +155,7 @@ private String pickMapFields;
 private Button deleteRow;
 private FormButtonsBar buttonsForm;
 private boolean hasSideDisplay = true;
+private boolean autoSaveGrid = true;
 
 
 //	@Autowired()
@@ -183,7 +188,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		grid.setDataProvider(dataProvider);
 		grid.setEnterNextRow(true);
 		grid.setMultiSort(true);
-		
+
 //		Crud<DynamicDBean> crud = new Crud<>();
 //		crud.setDataProvider(dataProvider);
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
@@ -571,6 +576,13 @@ private boolean isBoolean(String header, String colType) {
 				showBean((DynamicDBean)e.getFirstSelectedItem().get());
 //				getGrid().deselectAll();
 			});
+		}
+		else // for deleting and other events that need the selectedRow
+		{
+			grid.addSelectionListener(e -> {
+				if (e.getFirstSelectedItem().isPresent())
+					selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
+				});
 		}
 //		});
 //@@		display.getButtons().addSaveListener(e -> nextRow());
@@ -1011,7 +1023,7 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 	
 	public Object saveRowGridIfNotInserting(Hashtable<String, DynamicDBean> beansToSaveAndRefresh2, String beanTobeSave) {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + row.getRowJSon().toString());
-		if (dataProvider.getHasNewRow() == true || isInsertingALine == false)
+		if ((dataProvider.getHasNewRow() == true || isInsertingALine == false) && autoSaveGrid == true)
 		{
 			dataProvider.save(beanTobeSave, beansToSaveAndRefresh2);	 
 			dataProvider.setHasNewRow(false);
@@ -1150,6 +1162,14 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 
 	public void setHasSideDisplay(boolean hasSideDisplay) {
 		this.hasSideDisplay = hasSideDisplay;
+	}
+
+	public boolean isAutoSaveGrid() {
+		return autoSaveGrid;
+	}
+
+	public void setAutoSaveGrid(boolean autoSaveGrid) {
+		this.autoSaveGrid = autoSaveGrid;
 	}
 	
 
