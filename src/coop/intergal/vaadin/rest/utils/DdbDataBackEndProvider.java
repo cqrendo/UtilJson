@@ -159,6 +159,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		                    .filter(predicate(query.getFilter().get()))
 		                    .sorted(comparator(query.getFilter().get()));
 		        }
+	//	        System.out.println("DdbDataBackEndProvider.fetchFromBackEnd()......."+ stream.toArray().length);
 		        return stream;//.skip(offset).limit(limit);
 		    }
 

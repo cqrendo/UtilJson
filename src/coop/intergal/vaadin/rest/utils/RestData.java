@@ -1,26 +1,17 @@
 package coop.intergal.vaadin.rest.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.vaadin.flow.server.InputStreamFactory;
-import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.StreamResourceWriter;
-import com.vaadin.flow.server.communication.StreamResourceHandler;
 
+import coop.intergal.AppConstGeneric;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
 
@@ -39,7 +30,7 @@ public class RestData {
 		}
 		String pagesize = limit+""; 
 		if (limit==0) // when is not using a dataprovoder with paging and pr-count of rows limit is cero; 
-			pagesize="50";
+			pagesize=AppConstGeneric.DEFAULT_PAGESIZE;
 		
 		List<DynamicDBean> customerList = new ArrayList<DynamicDBean>();
 		JsonNode rowsList = null;
@@ -50,7 +41,7 @@ public class RestData {
 			if (offset > 0)
 				filter=filter+"&offset="+offset;
 //			System.out.println("RestData.getResourceCustomer() before GET" + new Date());
-			rowsList = JSonClient.get(resourceName,filter,false,preConfParam,pagesize+"");//"40"); // vamos a probar sin cache, para activarlo poner "cache" en vez de false
+			//"40"); // vamos a probar sin cache, para activarlo poner "cache" en vez de false
 //			System.out.println("RestData.getResourceCustomer() after GET" + new Date());
 //			JsonNode cols = JSonClient.getColumnsFromTable(resourceName, null, true, preConfParam);
 //			
@@ -61,24 +52,28 @@ public class RestData {
 //				rowsColList.add(fN.next());
 //			}
 	//		String[] rowsColList = new String[] { "code_customer", "name_customer", "cif" , "amount_un_disbursed_payments"};
-		if (hasNewRow)
-		{
-			DynamicDBean d = fillRowDefaultValues(rowsColList);
-			d.setResourceName(resourceName);
-			d.setPreConfParam(preConfParam);
-			d.setFilter(filter); // for newRows fill data from filter normally parent data
-			customerList.add(d);
-		}	
-		for (JsonNode eachRow : rowsList)  {
-			String col1name = rowsColList.get(0)[0]; 
-			if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
+			if (hasNewRow)
 			{
+				DynamicDBean d = fillRowDefaultValues(rowsColList);
+				d.setResourceName(resourceName);
+				d.setPreConfParam(preConfParam);
+				d.setFilter(filter); // for newRows fill data from filter normally parent data
+				customerList.add(d);
+				int pagesizeInt = new Integer(pagesize);
+				if (pagesizeInt > 0)
+					pagesize = pagesizeInt- 1 +"";
+			}
+			rowsList = JSonClient.get(resourceName,filter,false,preConfParam,pagesize+"");
+			for (JsonNode eachRow : rowsList)  {
+				String col1name = rowsColList.get(0)[0]; 
+				if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
+				{
 				DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam);//, cols.get(0)); 
 				d.setResourceName(resourceName);
 				d.setPreConfParam(preConfParam);
 				d.setFilter(filter);
 				customerList.add(d);
-			}
+				}
 		}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -235,7 +230,7 @@ public class RestData {
 			return rowsColList.get(i)[0];
 		else // otherwise it searches
 		{
-			System.out.println("RestData.getColName() ----> Fields witn col... not in order "+ "col"+i );
+//			System.out.println("RestData.getColName() ----> Fields witn col... not in order "+ "col"+i );
 			for (String[] row : rowsColList) // search for col.. to get his column name
 			{
 				if (row[2].equals("col"+i))
@@ -288,8 +283,17 @@ public class RestData {
 			e.printStackTrace();
 		}// preConfParam, null);//globalVars.getPagesize());
 //		System.out.println("RestData.getResourceCustomer() after FILL LIST" + new Date());
-		if (hasNewRow)
-			count = count+1;
+		System.out.println("RestData.getCountRows()--------"+ count);
+//		if (hasNewRow)
+//			{
+//			count = count+1;
+//			System.out.println("RestData.getCountRows()--------(hasNewRow) "+ count);
+//			
+//			Integer limit = new Integer (AppConstGeneric.DEFAULT_PAGESIZE);
+//			Integer actualCount =  new Integer (count);
+//			if (actualCount > limit)
+//				count = limit+1;
+//			}
 		return count;
 	}
 
@@ -362,14 +366,14 @@ public class RestData {
 //					String tableNameToSearch = genericResourceName+variant;
 					String tableNameToSearch = genericResourceName;
 					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch  + " "+ new Date());
-					cols = JSonClient.get("FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", CACHE_TRUE, "metadata");
+					cols = JSonClient.get("CR-FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", CACHE_TRUE, "metadata");
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
 						rowsColList = new ArrayList<String[]>();
 						int i = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[9];
+							String[] fieldArr  = new String[12];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -423,6 +427,19 @@ public class RestData {
 								}
 							else
 								fieldArr[8] = "";
+							if ( col.get("titleDisplay").asText().isEmpty() || col.get("titleDisplay").asText().equals("null") )
+								fieldArr[9] = "";
+							else
+								fieldArr[9] = col.get("titleDisplay").asText();
+							if ( col.get("titleQuery").asText().isEmpty() || col.get("titleQuery").asText().equals("null") )
+								fieldArr[10] = "";
+							else
+								fieldArr[10] = col.get("titleQuery").asText();
+							if ( col.get("titleGrid").asText().isEmpty() || col.get("titleGrid").asText().equals("null") )
+								fieldArr[11] = "";
+							else
+								fieldArr[11] = col.get("titleGrid").asText();
+
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -474,14 +491,14 @@ public class RestData {
 				String tableNameToSearch = genericResourceName;
 				System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch );
 				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInDisplay=true&order=fieldOrder";
-				cols = JSonClient.get("FieldTemplate",filter , cache, "metadata"); // TODO put false to true
+				cols = JSonClient.get("CR-FieldTemplate",filter , cache, "metadata"); // TODO put false to true
 				if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 				{
 					rowsColList = new ArrayList<String[]>();
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[9];
+						String[] fieldArr  = new String[12];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -518,6 +535,20 @@ public class RestData {
 							fieldArr[8] = "";
 						else
 							fieldArr[8] = col.get("cssStyle").asText();
+						if ( col.get("titleDisplay").asText().isEmpty() || col.get("titleDisplay").asText().equals("null") )
+							fieldArr[9] = "";
+						else
+							fieldArr[9] = col.get("titleDisplay").asText();
+						if ( col.get("titleQuery").asText().isEmpty() || col.get("titleQuery").asText().equals("null") )
+							fieldArr[10] = "";
+						else
+							fieldArr[10] = col.get("titleQuery").asText();
+						if ( col.get("titleGrid").asText().isEmpty() || col.get("titleGrid").asText().equals("null") )
+							fieldArr[11] = "";
+						else
+							fieldArr[11] = col.get("titleGrid").asText();
+
+
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -555,7 +586,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[9];
+			String[] fieldArr  = new String[12];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -568,6 +599,9 @@ public class RestData {
 			fieldArr[6] = fieldName;
 			fieldArr[7] = "8";
 			fieldArr[8] = "";
+			fieldArr[9] = "";
+			fieldArr[10] = "";
+			fieldArr[11] = "";
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
 			rowsColList.add(fieldArr);

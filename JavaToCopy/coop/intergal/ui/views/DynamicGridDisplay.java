@@ -100,6 +100,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 	private Div divQuery;
 	@Id("buttons")
 	private FormButtonsBar buttons;
+	private String apiname;
 //	@Id("splitQryAndResult")
 //	private SplitLayout splitQryAndResult;
 
@@ -229,8 +230,10 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 		{
 			title=queryParameters.getParameters().get("title").get(0);
 			resourceName = queryParameters.getParameters().get("resourceName").get(0);
+			apiname = queryParameters.getParameters().get("apiname").get(0);
 			queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
 			displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
+			
 //			resourceSubGrid =  queryParameters.getParameters().get("resourceSubGrid").get(0);
 		}
 		try {
@@ -270,11 +273,20 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 		grid.setLayout(this);
 //		grid.setGridSplitDisplay(gridSplitDisplay);
 		grid.setResourceName(resourceName);
+		if (filter != null  && filter.length() > 0)
+		{
+			filter = filter + "%20%AND%20APIname='"+apiname+"'";
+		}
+		else
+		{
+			filter = "APIname='"+apiname+"'";
+		}
+		
 		grid.setFilter(filter);
 		grid.setupGrid(false);
 //		divGrid.add(grid );
 		buttons.setVisible(false);
-		buttons.addSaveListener(e -> grid.saveSelectedRow());
+		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
 		buttons.addCancelListener(e -> grid.undoSelectedRow());
 		buttons.addAddListener(e -> grid.insertANewRow());
 		buttons.addDeleteListener(e -> grid.DeleteARow());

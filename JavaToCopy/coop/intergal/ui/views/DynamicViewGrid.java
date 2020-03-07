@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
@@ -73,7 +74,9 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 	private String displayFormClassName;
 	private String resourceSubGrid;
 	private Hashtable<String, DynamicDBean> beansToSaveAndRefresh = new Hashtable<String, DynamicDBean>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
-//public DynamicViewGrid() {
+	private Hashtable<String, String[]> resourceAndSubresources = new Hashtable<String, String[]>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
+
+	//public DynamicViewGrid() {
 //		// TODO Auto-generated constructor stub
 //	}
 
@@ -619,7 +622,7 @@ private boolean isBoolean(String header, String colType) {
 			setBean.invoke(display,bean);
 			divDisplay.removeAll();
 			divDisplay.add((Component)display);
-			String resourceSubGrid = extractResourceSubGrid(bean);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO send by param
+			String resourceSubGrid = extractResourceSubGrid(bean,0);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO adapt to use more than one subresource , use a variable instead of 9
 			divSubGrid.removeAll();
 			if (resourceSubGrid != null)
 			{
@@ -831,8 +834,15 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 	}
 }
 
-	private String extractResourceSubGrid(DynamicDBean bean) {
+	private String extractResourceSubGrid(DynamicDBean bean, int idx) {
 		// TODO Auto-generated method stub CR-entradas_cab.List-entradas_lin/
+		if (resourceAndSubresources.get(bean.getResourceName()) != null)
+			{
+			String[] subResourcesOfResource = resourceAndSubresources.get(bean.getResourceName());
+			if (subResourcesOfResource[idx].isEmpty() == false)
+				return subResourcesOfResource[idx];
+			}
+				
 		String rowJson = bean.getRowJSon().toString();
 		if (bean.getRowJSon().get("tableName") != null)
 			{
@@ -846,15 +856,44 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 			String pathSubreourceName = null;
 			if (idxResourceSubResource > -1 && idxEndSubreourceName >-1)
 				pathSubreourceName = rowJson.substring(idxResourceSubResource, idxEndSubreourceName);
+			keepSubResourcesNames(bean.getResourceName(),pathSubreourceName);	
 			return pathSubreourceName;
 		}
 		else
 		{
 			idxResourceSubResource = rowJson.indexOf("List-");
-			int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("\":[")+idxResourceSubResource;
-			String pathSubreourceName = rowJson.substring(idxResourceSubResource, idxEndSubreourceName);
-			return bean.getResourceName()+"."+pathSubreourceName;
+			if (idxResourceSubResource > -1)
+			{
+				int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("\":[")+idxResourceSubResource;
+				String pathSubreourceName = rowJson.substring(idxResourceSubResource, idxEndSubreourceName);		
+				pathSubreourceName = bean.getResourceName()+"."+pathSubreourceName;
+				keepSubResourcesNames(bean.getResourceName(),pathSubreourceName);	
+				return pathSubreourceName;
+			}
+			else
+				return null;
 		}
+	}
+
+	private void keepSubResourcesNames(String resourceName2, String pathSubreourceName) {
+		String[] subResourcesOfResource = null;
+		if (resourceAndSubresources.contains(resourceName2)==true)
+		{
+			subResourcesOfResource = resourceAndSubresources.get(resourceName2);
+			List<String> arrlist = new ArrayList<String>( 
+            Arrays.asList(subResourcesOfResource)); 
+			arrlist.add(pathSubreourceName); 
+			subResourcesOfResource = arrlist.toArray(subResourcesOfResource);
+			resourceAndSubresources.remove(resourceName2);
+			resourceAndSubresources.put(resourceName2,subResourcesOfResource);
+		}
+		else
+		{
+			subResourcesOfResource = new String[1]; 
+			subResourcesOfResource [0] = pathSubreourceName;
+			resourceAndSubresources.put(resourceName2,subResourcesOfResource);
+		}
+		
 	}
 
 	public String componFKFilter(DynamicDBean bean, String resourceSubGrid) {
@@ -981,8 +1020,10 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 		this.resourceSubGrid = resourceSubGrid;
 	}
 
-	public Object saveSelectedRow() {
+	public Object saveSelectedRow(String apiname) {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + selectedRow.getRowJSon().toString());
+		if (selectedRow.getResourceName().equals("CR-FormTemplate"));
+			selectedRow.setCol9(getApiID(apiname));
 		beansToSaveAndRefresh.clear();
 		beansToSaveAndRefresh.put(selectedRow.getResourceName(), selectedRow);
 		dataProvider.save(selectedRow.getResourceName(), beansToSaveAndRefresh);	
@@ -996,6 +1037,18 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 		showBean(selectedRow);
 		return null;
 	}
+	private String getApiID(String apiname) {
+		if ("anpas".equals(apiname))
+			return "1";
+		else if ("GFER".equals(apiname))
+			return "2";
+		else if ("monbus".equals(apiname))
+			return "3";
+		else if ("metadata".equals(apiname))
+			return "4";
+		return "999999";
+	}
+
 	private Object colChanged(DynamicDBean item, String colName, String newValue) {
 //		System.out.println("DynamicViewGrid.colChanged()..."+  "...colName "+ colName +"...newValue "+ newValue+"...item " + item.getRowJSon() + "...newValue "+ newValue);
 		if (colName != null) // is call by the acceptPick
