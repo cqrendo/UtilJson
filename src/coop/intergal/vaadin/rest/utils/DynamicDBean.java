@@ -94,6 +94,35 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private String col58;
 	private String col59;
 	private String col60;
+	private String col61;
+	private String col62;
+	private String col63;
+	private String col64;
+	private String col65;
+	private String col66;
+	private String col67;
+	private String col68;
+	private String col69;
+	private String col70;
+	private String col71;
+	private String col72;
+	private String col73;
+	private String col74;
+	private String col75;
+	private String col76;
+	private String col77;
+	private String col78;
+	private String col79;
+	private String col80;
+	private String col81;
+	private String col82;
+	private String col83;
+	private String col84;
+	private String col85;
+	private String col86;
+	private String col87;
+	private String col88;
+	private String col89;
 	private String col90;
 	private String col91;
 	private String col92;
@@ -763,6 +792,238 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 	public void setCol60(String col60) {
 		this.col60 = col60;
+	}
+
+	public String getCol61() {
+		return col61;
+	}
+
+	public void setCol61(String col61) {
+		this.col61 = col61;
+	}
+
+	public String getCol62() {
+		return col62;
+	}
+
+	public void setCol62(String col62) {
+		this.col62 = col62;
+	}
+
+	public String getCol63() {
+		return col63;
+	}
+
+	public void setCol63(String col63) {
+		this.col63 = col63;
+	}
+
+	public String getCol64() {
+		return col64;
+	}
+
+	public void setCol64(String col64) {
+		this.col64 = col64;
+	}
+
+	public String getCol65() {
+		return col65;
+	}
+
+	public void setCol65(String col65) {
+		this.col65 = col65;
+	}
+
+	public String getCol66() {
+		return col66;
+	}
+
+	public void setCol66(String col66) {
+		this.col66 = col66;
+	}
+
+	public String getCol67() {
+		return col67;
+	}
+
+	public void setCol67(String col67) {
+		this.col67 = col67;
+	}
+
+	public String getCol68() {
+		return col68;
+	}
+
+	public void setCol68(String col68) {
+		this.col68 = col68;
+	}
+
+	public String getCol69() {
+		return col69;
+	}
+
+	public void setCol69(String col69) {
+		this.col69 = col69;
+	}
+
+	public String getCol70() {
+		return col70;
+	}
+
+	public void setCol70(String col70) {
+		this.col70 = col70;
+	}
+
+	public String getCol71() {
+		return col71;
+	}
+
+	public void setCol71(String col71) {
+		this.col71 = col71;
+	}
+
+	public String getCol72() {
+		return col72;
+	}
+
+	public void setCol72(String col72) {
+		this.col72 = col72;
+	}
+
+	public String getCol73() {
+		return col73;
+	}
+
+	public void setCol73(String col73) {
+		this.col73 = col73;
+	}
+
+	public String getCol74() {
+		return col74;
+	}
+
+	public void setCol74(String col74) {
+		this.col74 = col74;
+	}
+
+	public String getCol75() {
+		return col75;
+	}
+
+	public void setCol75(String col75) {
+		this.col75 = col75;
+	}
+
+	public String getCol76() {
+		return col76;
+	}
+
+	public void setCol76(String col76) {
+		this.col76 = col76;
+	}
+
+	public String getCol77() {
+		return col77;
+	}
+
+	public void setCol77(String col77) {
+		this.col77 = col77;
+	}
+
+	public String getCol78() {
+		return col78;
+	}
+
+	public void setCol78(String col78) {
+		this.col78 = col78;
+	}
+
+	public String getCol79() {
+		return col79;
+	}
+
+	public void setCol79(String col79) {
+		this.col79 = col79;
+	}
+
+	public String getCol80() {
+		return col80;
+	}
+
+	public void setCol80(String col80) {
+		this.col80 = col80;
+	}
+
+	public String getCol81() {
+		return col81;
+	}
+
+	public void setCol81(String col81) {
+		this.col81 = col81;
+	}
+
+	public String getCol82() {
+		return col82;
+	}
+
+	public void setCol82(String col82) {
+		this.col82 = col82;
+	}
+
+	public String getCol83() {
+		return col83;
+	}
+
+	public void setCol83(String col83) {
+		this.col83 = col83;
+	}
+
+	public String getCol84() {
+		return col84;
+	}
+
+	public void setCol84(String col84) {
+		this.col84 = col84;
+	}
+
+	public String getCol85() {
+		return col85;
+	}
+
+	public void setCol85(String col85) {
+		this.col85 = col85;
+	}
+
+	public String getCol86() {
+		return col86;
+	}
+
+	public void setCol86(String col86) {
+		this.col86 = col86;
+	}
+
+	public String getCol87() {
+		return col87;
+	}
+
+	public void setCol87(String col87) {
+		this.col87 = col87;
+	}
+
+	public String getCol88() {
+		return col88;
+	}
+
+	public void setCol88(String col88) {
+		this.col88 = col88;
+	}
+
+	public String getCol89() {
+		return col89;
+	}
+
+	public void setCol89(String col89) {
+		this.col89 = col89;
 	}
 
 	public String getCol90() {

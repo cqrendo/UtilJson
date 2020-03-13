@@ -28,8 +28,8 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
-import coop.intergal.tys.ui.views.comprasyventas.compras.ArticulosQueryForPick;
-import coop.intergal.tys.ui.views.comprasyventas.compras.ProveedorQueryForPick;
+//import coop.intergal.tys.ui.views.comprasyventas.compras.ArticulosQueryForPick;//
+//import coop.intergal.tys.ui.views.comprasyventas.compras.ProveedorQueryForPick;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
@@ -39,8 +39,8 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 //@Route(value = PAGE_DYNAMIC+"forPICK")//, layout = MainView.class)
 //@PageTitle(AppConst.TITLE_PRODUCTS)
 //@Secured(Role.ADMIN)
-@Uses(ArticulosQueryForPick.class) 
-@Uses(ProveedorQueryForPick.class) 
+//@Uses(ArticulosQueryForPick.class)  TODO check is works with last releases of vaadin
+//@Uses(ProveedorQueryForPick.class) 
 public class DynamicGridForPick extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
 	private String preConfParam;
