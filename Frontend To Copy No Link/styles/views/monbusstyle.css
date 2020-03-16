@@ -1,0 +1,20 @@
+:host {
+--vaadin-form-item-label-width: 10em;
+--vaadin-form-item-label-spacing: 0em;
+--vaadin-form-item-row-spacing: 0em;
+}
+.labelright {
+	text-align: right; 
+}
+:host(.style1) {
+	height:35px;
+     margin-top:0px !important;
+ }
+:host(.filabelright) {
+	height:35px;
+     margin-top:0px !important;
+     text-align: right; 
+ }
+:host(.labelright) {
+	text-align: right; 
+}
