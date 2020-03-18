@@ -1,3 +1,4 @@
 applicationTheme=Project structure is not supported.
 eclipse.preferences.version=1
-serverAddress=192.168.1.16
+serverAddress=192.168.1.25
+serverPort=58464

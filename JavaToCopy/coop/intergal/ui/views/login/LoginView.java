@@ -15,7 +15,7 @@ public class LoginView extends FlexLayout implements AfterNavigationObserver {
     public LoginView(){
         login = new LoginOverlay();
 
-        login.setForgotPasswordButtonVisible(false);
+        login.setForgotPasswordButtonVisible(true);
         login.setAction("login");
 
         add(login);

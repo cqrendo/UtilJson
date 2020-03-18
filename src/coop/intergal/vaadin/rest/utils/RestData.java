@@ -274,6 +274,7 @@ public class RestData {
 			resourceName = resourceName.replace("@", "_");
 		try { //TODO CACHE IS FALSE always , put as param
 		//	String filtro = null;
+			System.out.println("RestData.getCountRows() resourceName " + resourceName + " filter " + filter +  " preConfParam " + preConfParam);
 			rowsList = JSonClient.get("Count_"+resourceName,filter,cache,preConfParam,"1"); 
 			count = rowsList.get(0).get("count(*)").asInt();
 

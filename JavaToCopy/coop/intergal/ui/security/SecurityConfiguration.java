@@ -1,9 +1,11 @@
 package coop.intergal.ui.security;
 
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -12,8 +14,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import coop.intergal.ui.security.data.Role;
+import coop.intergal.ui.security.data.entity.User;
+import coop.intergal.ui.security.data.repositories.UserRepository;
 
 
 /**
@@ -50,6 +55,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+	@Bean
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	public CurrentUser currentUser(UserRepository userRepository) {
+		final String username = SecurityUtils.getUsername();
+		User user =
+			username != null ? userRepository.findByEmailIgnoreCase(username) :
+				null;
+		return () -> user;
+	}
 
     /**
      * Registers our UserDetailsService and the password encoder to be used on login attempts.
@@ -83,7 +97,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 // Configure the login page.
                 .and().formLogin().loginPage(LOGIN_URL).permitAll().loginProcessingUrl(LOGIN_PROCESSING_URL)
-                //.failureUrl(LOGIN_FAILURE_URL)
+                .failureUrl(LOGIN_FAILURE_URL)
+                
+    			// Register the success handler that redirects users to the page they last tried
+				// to access
+				.successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
+
 
                 // Configure logout
                 .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);

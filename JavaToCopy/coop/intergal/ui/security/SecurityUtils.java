@@ -28,6 +28,23 @@ public final class SecurityUtils {
 	}
 
 	/**
+	 * Gets the user name of the currently signed in user.
+	 *
+	 * @return the user name of the current user or <code>null</code> if the user
+	 *         has not signed in
+	 */
+	public static String getUsername() {
+		SecurityContext context = SecurityContextHolder.getContext();
+		Object principal = context.getAuthentication().getPrincipal();
+		if(principal instanceof UserDetails) {
+			UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
+			return userDetails.getUsername();
+		}
+		// Anonymous or no authentication.
+		return null;
+	}
+
+	/**
 	 * Checks if access is granted for the current user for the given secured view,
 	 * defined by the view class.
 	 *
