@@ -36,6 +36,8 @@ public class User extends AbstractEntity {
 	@Size(max = 255)
 //	@GridColumn(order = 3)
 	private String role;
+	
+	private String filterMyData;
 
 	private boolean locked = false;
 
@@ -79,6 +81,14 @@ public class User extends AbstractEntity {
 
 	public void setRole(String role) {
 		this.role = role;
+	}
+
+	public String getfilterMyData() {
+		return filterMyData;
+	}
+
+	public void setfilterMyData(String filterMyData) {
+		this.filterMyData = filterMyData;
 	}
 
 	public String getEmail() {

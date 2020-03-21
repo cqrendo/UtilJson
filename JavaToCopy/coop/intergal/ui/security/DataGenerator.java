@@ -80,6 +80,7 @@ public class DataGenerator implements HasLogger {
         user.setPasswordHash(passwordEncoder.encode(password));
         user.setRole(role);
         user.setLocked(locked);
+        user.setfilterMyData("xxxxx");
         return user;
     }
 }

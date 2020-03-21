@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
+import coop.intergal.ui.security.data.CustomUser;
 import coop.intergal.ui.security.data.Role;
 import coop.intergal.ui.security.data.entity.User;
 import coop.intergal.ui.security.data.repositories.UserRepository;

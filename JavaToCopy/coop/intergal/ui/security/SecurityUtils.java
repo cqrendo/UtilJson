@@ -2,6 +2,9 @@ package coop.intergal.ui.security;
 
 import com.vaadin.flow.server.ServletHelper.RequestType;
 import com.vaadin.flow.shared.ApplicationConstants;
+
+import coop.intergal.ui.security.data.CustomUser;
+
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -35,10 +38,24 @@ public final class SecurityUtils {
 	 */
 	public static String getUsername() {
 		SecurityContext context = SecurityContextHolder.getContext();
+		Object details = context.getAuthentication().getDetails();
+		System.out.println("SecurityUtils.getUsername() details "+ details.toString());
 		Object principal = context.getAuthentication().getPrincipal();
 		if(principal instanceof UserDetails) {
 			UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
 			return userDetails.getUsername();
+		}
+		// Anonymous or no authentication.
+		return null;
+	}
+	public static String getFilterMyData() {
+		SecurityContext context = SecurityContextHolder.getContext();
+		Object principal = context.getAuthentication().getPrincipal();
+		if(principal instanceof UserDetails) {
+			UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
+			return ((CustomUser) userDetails).getFilterMyData();
+//			return userDetails.getUsername();
+			
 		}
 		// Anonymous or no authentication.
 		return null;
