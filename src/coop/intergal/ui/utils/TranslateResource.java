@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.vaadin.flow.component.UI;
 
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
@@ -13,8 +14,10 @@ public class TranslateResource {
 		return getFieldLocale(field, preConfParam, null);
 	}
 	public static String getFieldLocale(String field, String preConfParam, String tableName) {
-		String clave =field; 
-		ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", new Locale("es", "ES"));
+		String clave =field;
+		Locale locale = UI.getCurrent().getLocale();
+	    ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", locale);
+//		ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", new Locale("es", "ES"));
 		Enumeration bundleKeys = labels.getKeys();
 		try
 		{
