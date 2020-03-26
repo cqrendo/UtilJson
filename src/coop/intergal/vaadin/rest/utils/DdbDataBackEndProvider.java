@@ -91,7 +91,10 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 //	  }
 	
 	  public ArrayList<String[]> getRowsColList() {
-		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam);
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, null);
+	  }
+	  public ArrayList<String[]> getRowsColList(boolean cache) {
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, cache);
 	  }
 	  public ArrayList<String[]> getRowsFieldList() {
 		 return RestData.getRowsFieldList(rowsColList, resourceName, preConfParam, null);	

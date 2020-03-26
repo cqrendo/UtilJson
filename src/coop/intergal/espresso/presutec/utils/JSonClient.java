@@ -50,7 +50,8 @@ public class JSonClient {
 //	private final static HttpClient client = new DefaultHttpClient();
 	private static CloseableHttpClient client = HttpClientBuilder.create().build();
 	private final static JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
-	private static Boolean SHOW_LOGS = false;
+	private static Boolean SHOW_LOGS = true;
+	private static Boolean SHOW_LOGS_DETAIL = false;
 
 //	protected static String LOCAL_BASE_URL = "http://localhost:8080/KahunaService/rest/abl/demo/demo1/";   // for internal testing (ignore)
 	// @@ Adebate 		protected static String SERVER = "http://presutec.my.espressologic.com/rest/";
@@ -67,6 +68,7 @@ public class JSonClient {
 
 //	private static JsonNode keepJson = null;
 	private final static Header API_KEY_HEADER = new BasicHeader("Authorization", API_KEY );
+
 	private static Hashtable<String,JsonNode> jsonCaches=new Hashtable<String,JsonNode>();
 	private static Header apiKeyHeader;
 	private static String baseURL;
@@ -141,8 +143,14 @@ public class JSonClient {
 		printLog("\n------ Test is complete");
 	}
 	private static void printLog(String string) {
-		if (SHOW_LOGS)
+		if (SHOW_LOGS  && (string.startsWith("#line") == false))
+		{
 			System.out.println( new Date().toString() +" JSonClient.printLog()-->" + string);
+		}	
+		else if (SHOW_LOGS && SHOW_LOGS_DETAIL)
+		{
+			System.out.println( new Date().toString() +" JSonClient.printLog()-->" + string);
+		}	
 		
 	}
 //	public static JsonNode get(String resource, String filter, boolean useCache) throws Exception {
@@ -215,7 +223,7 @@ public class JSonClient {
 		if (max >50)
 			max =50;
 			
-		printLog("Response : " + parResponse.asText().substring(0,max)+".............");
+		printLog("Response : max:" +max +" "+ parResponse.asText().substring(0,max)+".............");
 		return parResponse;//parseResponse(response);
 	}
 	public static InputStream getStream(String url, String preConfParam) throws Exception {
@@ -482,7 +490,7 @@ public class JSonClient {
 		StringBuffer sb = new StringBuffer();
 		String line = null;
 		while ((line = rd.readLine()) != null) {
-			printLog("line "+ line);
+			printLog("#line "+ line);
 			sb.append(line);
 		}
 

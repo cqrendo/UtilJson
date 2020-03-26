@@ -16,16 +16,26 @@ public class TranslateResource {
 	public static String getFieldLocale(String field, String preConfParam, String tableName) {
 		String clave =field;
 		Locale locale = UI.getCurrent().getLocale();
-	    ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", locale);
-//		ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", new Locale("es", "ES"));
-		Enumeration bundleKeys = labels.getKeys();
 		try
 		{
-			clave = labels.getString(field);
+		System.out.println("TranslateResource.getFieldLocale() " + locale.getCountry());
+	    ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", locale);
+//		ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", new Locale("es", "ES"));
+//		Enumeration bundleKeys = labels.getKeys();
+		clave = labels.getString(field);
 		}
+//		catch ( java.util.MissingResourceException)
 		catch (java.util.MissingResourceException e)
 		{
-			clave = getClaveFromFieldTemplate(field, preConfParam, tableName);
+			try
+			{
+			ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", new Locale("es", "ES"));
+			clave = labels.getString(field);
+			}
+			catch (java.util.MissingResourceException e2)
+			{
+				clave = getClaveFromFieldTemplate(field, preConfParam, tableName);	
+			}
 		}
 	    return clave;
 	}

@@ -66,13 +66,20 @@ public class RestData {
 			rowsList = JSonClient.get(resourceName,filter,false,preConfParam,pagesize+"");
 			for (JsonNode eachRow : rowsList)  {
 				String col1name = rowsColList.get(0)[0]; 
+				int i = 0;
+				while (col1name.equals("#SPACE#"))  // to get the first real field
+				{
+					col1name = rowsColList.get(i)[0];
+					i ++;
+				}
+//				System.out.println("RestData.getResourceData() col1name "+ col1name +" "+ eachRow.get(col1name));
 				if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
 				{
-				DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam);//, cols.get(0)); 
-				d.setResourceName(resourceName);
-				d.setPreConfParam(preConfParam);
-				d.setFilter(filter);
-				customerList.add(d);
+					DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam);//, cols.get(0)); 
+					d.setResourceName(resourceName);
+					d.setPreConfParam(preConfParam);
+					d.setFilter(filter);
+					customerList.add(d);
 				}
 		}
 		} catch (Exception e) {
@@ -157,6 +164,7 @@ public class RestData {
 		int i=0;
 		for(Field field : fields )  
 		{
+//			System.out.println("RestData.fillRow() field "+ field.getName());
 //			field.setInt(eachRow.get("code_customer").asInt());
 			try {
 				if (field.getName().equals("col"+i) && i < rowsColList.size())
@@ -319,7 +327,7 @@ public class RestData {
 	{
 		try {
 			JsonNode rowsList = JSonClient.get(resourceName,filter,false,preConfParam,"20");
-			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam);//, "");
+			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam, null);//, "");
 			for (JsonNode eachRow : rowsList)  {
 				if (eachRow.get(rowsColList.get(0)[0]) !=null)
 				{
@@ -354,8 +362,12 @@ public class RestData {
 		return 	false;
 		
 	}
-	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam){//, String variant) { // variant is use to have different lists of fields in the same resource
-			if (rowsColList == null || rowsColList.isEmpty())
+	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache){//, String variant) { // variant is use to have different lists of fields in the same resource
+		if (cache == null)
+		{
+			cache = CACHE_TRUE;
+		}	
+		if (rowsColList == null || rowsColList.isEmpty() || cache == false)
 				{
 				JsonNode cols;
 				try {				
@@ -367,7 +379,7 @@ public class RestData {
 //					String tableNameToSearch = genericResourceName+variant;
 					String tableNameToSearch = genericResourceName;
 					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch  + " "+ new Date());
-					cols = JSonClient.get("CR-FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", CACHE_TRUE, "metadata");
+					cols = JSonClient.get("CR-FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", cache, "metadata");
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
 						rowsColList = new ArrayList<String[]>();
@@ -479,7 +491,7 @@ public class RestData {
 		{
 			cache = CACHE_TRUE;
 		}
-		if (rowsColList == null || rowsColList.isEmpty())
+		if (rowsColList == null || rowsColList.isEmpty() || cache == false)
 			{
 			JsonNode cols;
 			try {				
@@ -490,7 +502,7 @@ public class RestData {
 //					genericResourceName = resourceName.substring(0, indx__);
 //				String tableNameToSearch = genericResourceName+variant;
 				String tableNameToSearch = genericResourceName;
-				System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch );
+				System.out.println("RestData.getRowsFieldList()  tablename to search = "+tableNameToSearch );
 				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInDisplay=true&order=fieldOrder";
 				cols = JSonClient.get("CR-FieldTemplate",filter , cache, "metadata"); // TODO put false to true
 				if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
@@ -658,6 +670,11 @@ public class RestData {
 		toBean.setRowJSon(fromBean.getRowJSon());
 		return toBean;
 		
+	}
+
+	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam) {
+		// TODO Auto-generated method stub
+		return getRowsColList(rowsColList, resourceName, preConfParam, null);
 	}
 
 }
