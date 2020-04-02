@@ -2,6 +2,7 @@ package coop.intergal.ui.security;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
@@ -37,17 +39,41 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String LOGIN_FAILURE_URL = "/login?error";
     private static final String LOGIN_URL = "/login";
     private static final String LOGOUT_SUCCESS_URL = "/";
+	@Value("${ldap.urls}")
 
-    private final UserDetailsService userDetailsService;
+	private String ldapUrls;
+
+	@Value("${ldap.base.dn}")
+
+	private String ldapBaseDn;
+
+	@Value("${ldap.username}")
+
+	private String ldapSecurityPrincipal;
+
+	@Value("${ldap.password}")
+
+	private String ldapPrincipalPassword;
+
+	@Value("${ldap.user.dn.pattern}")
+
+	private String ldapUserDnPattern;
+
+	@Value("${ldap.enabled}")
+
+	private String ldapEnabled;
+
+
+//    private final UserDetailsService userDetailsService;
 
     @Autowired
     @Lazy
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public SecurityConfiguration(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
+//    @Autowired
+//    public SecurityConfiguration(UserDetailsService userDetailsService) {
+//        this.userDetailsService = userDetailsService;
+//    }
 
     /**
      * The password encoder to use when encrypting passwords.
@@ -56,23 +82,33 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-	@Bean
-	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public CurrentUser currentUser(UserRepository userRepository) {
-		final String username = SecurityUtils.getUsername();
-		User user =
-			username != null ? userRepository.findByEmailIgnoreCase(username) :
-				null;
-		return () -> user;
-	}
+//	@Bean
+//	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+//	public CurrentUser currentUser(UserRepository userRepository) {
+//		final String username = SecurityUtils.getUsername();
+//		User user =
+//			username != null ? userRepository.findByEmailIgnoreCase(username) :
+//				null;
+//		return () -> user;
+//	}
 
     /**
      * Registers our UserDetailsService and the password encoder to be used on login attempts.
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        super.configure(auth);
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+    	System.out.println("SecurityConfiguration.configure()----------------------------");
+	      auth.ldapAuthentication() // uid=juanjo,cn=Usuarios,ou=anpa terronio,ou=anpas,dc=intergal,dc=coop
+	       .groupSearchBase("ou=groups")
+	       .userSearchFilter("uid={0}")
+	        .contextSource()
+	        .url(ldapUrls + "/" +ldapBaseDn)
+	        .managerDn(ldapSecurityPrincipal)
+	        .managerPassword(ldapPrincipalPassword)
+	        .and()
+	        .passwordCompare()
+	        .passwordEncoder(new BCryptPasswordEncoder())
+	        .passwordAttribute("userPassword");
     }
 
     /**
@@ -82,7 +118,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // Not using Spring CSRF here to be able to use plain HTML for the login page
 
-        http.csrf().disable()
+//   	http
+//    	.csrf().disable()
+//		.authorizeRequests()
+//			.anyRequest().fullyAuthenticated()
+//			.and()
+//		.formLogin().loginPage(LOGIN_URL).permitAll().loginProcessingUrl(LOGIN_PROCESSING_URL);
+//      // Configure logout
+//		//.and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
+    	
+    	http.csrf().disable()
                 // Register our CustomRequestCache, that saves unauthorized access attempts, so
                 // the user is redirected after login.
                 .requestCache().requestCache(new CustomRequestCache()).and()
@@ -94,7 +139,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
 
                 // Allow all requests by logged in users.
-                .anyRequest().hasAnyAuthority(Role.getAllRoles())
+                .anyRequest().fullyAuthenticated()
+                //.hasAnyAuthority( "guest", "admin" )
 
                 // Configure the login page.
                 .and().formLogin().loginPage(LOGIN_URL).permitAll().loginProcessingUrl(LOGIN_PROCESSING_URL)

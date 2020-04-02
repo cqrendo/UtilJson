@@ -216,6 +216,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+           <!-- https://mvnrepository.com/artifact/org.springframework.ldap/spring-ldap-core -->
+		<dependency>
+    		<groupId>org.springframework.ldap</groupId>
+    		<artifactId>spring-ldap-core</artifactId>
+ 		</dependency>
+ 		<dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+        </dependency>
+        
         <!-- End Spring -->
         <!-- Add JAXB explicitly as the java.xml.bind module is not included
              by default anymore in Java 9-->

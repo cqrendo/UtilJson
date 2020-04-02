@@ -230,7 +230,8 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 		{
 			title=queryParameters.getParameters().get("title").get(0);
 			resourceName = queryParameters.getParameters().get("resourceName").get(0);
-			apiname = queryParameters.getParameters().get("apiname").get(0);
+			if (queryParameters.getParameters().get("apiname") != null)
+				apiname = queryParameters.getParameters().get("apiname").get(0);
 			queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
 			displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
 			
@@ -273,15 +274,17 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 		grid.setLayout(this);
 //		grid.setGridSplitDisplay(gridSplitDisplay);
 		grid.setResourceName(resourceName);
-		if (filter != null  && filter.length() > 0)
+		if ((apiname == null || apiname.length() == 0) == false)
 		{
-			filter = filter + "%20%AND%20APIname='"+apiname+"'";
-		}
-		else
-		{
+			if (filter != null  && filter.length() > 0)
+			{
+				filter = filter + "%20%AND%20APIname='"+apiname+"'";
+			}
+			else
+			{
 			filter = "APIname='"+apiname+"'";
+			}
 		}
-		
 		grid.setFilter(filter);
 		grid.setupGrid(false);
 //		divGrid.add(grid );
