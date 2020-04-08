@@ -1,27 +1,27 @@
 package coop.intergal.ui.security;
 
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Scope;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.ldap.authentication.BindAuthenticator;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+import org.springframework.security.ldap.authentication.LdapAuthenticator;
+import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
+import org.springframework.security.ldap.ppolicy.PasswordPolicyAwareContextSource;
+import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
+import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-
-import coop.intergal.ui.security.data.CustomUser;
-import coop.intergal.ui.security.data.Role;
-import coop.intergal.ui.security.data.entity.User;
-import coop.intergal.ui.security.data.repositories.UserRepository;
 
 
 /**
@@ -74,7 +74,49 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 //    public SecurityConfiguration(UserDetailsService userDetailsService) {
 //        this.userDetailsService = userDetailsService;
 //    }
-
+//    @Bean
+//    public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
+//        ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider("", ldapUrls, ldapBaseDn);//, "cn=admin,dc=intergal,dc=coop");
+//        provider.setConvertSubErrorCodesToExceptions(true);
+//        provider.setUseAuthenticationRequestCredentials(true);
+//        provider.setUserDetailsContextMapper(userDetailsContextMapper());
+//        System.out.println("SecurityConfiguration.activeDirectoryLdapAuthenticationProvider() :"+ ldapBaseDn);
+//        return provider;
+//    }
+//    @Bean
+//    public AuthenticationProvider mYactiveDirectoryLdapAuthenticationProvider() {
+//        LdapAuthenticationProvider provider = new LdapAuthenticationProvider(ldapAuthenticator());//, "cn=admin,dc=intergal,dc=coop");
+//        provider.setUseAuthenticationRequestCredentials(true);
+//        provider.setUserDetailsContextMapper(userDetailsContextMapper());
+//        System.out.println("SecurityConfiguration.activeDirectoryLdapAuthenticationProvider() :"+ ldapBaseDn);
+//        return provider;
+//    }
+//    @Bean
+//    public LdapContextSource ldapContextSource() throws Exception {
+//        PasswordPolicyAwareContextSource contextSource = new PasswordPolicyAwareContextSource("ldap://intergal01.cloud.netimaging.net:389");
+//        contextSource.setUserDn("CN=admin,DC=intergal,DC=coop");
+//        contextSource.setPassword("toorLDAP44");
+//        return contextSource;
+//    }
+//    @Bean
+//    public LdapAuthenticator ldapAuthenticator() {
+//        BindAuthenticator authenticator;
+//		try {
+//			authenticator = new BindAuthenticator(ldapContextSource());
+//		
+//        authenticator.setUserSearch(new FilterBasedLdapUserSearch("cn=admin,dc=intergal,dc=coop", "uid={0}", ldapContextSource()));
+//        return authenticator;
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return null;
+//		
+//    }
+//    @Bean
+//    public UserDetailsContextMapper userDetailsContextMapper() {
+//         return new CustomUserMapper();
+//    }
     /**
      * The password encoder to use when encrypting passwords.
      */
@@ -98,7 +140,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     	System.out.println("SecurityConfiguration.configure()----------------------------");
-	      auth.ldapAuthentication() // uid=juanjo,cn=Usuarios,ou=anpa terronio,ou=anpas,dc=intergal,dc=coop
+//    	auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider());
+//    	auth.userDetailsService(userDetailsService());
+// 
+ //   	auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider()).ldapAuthentication()
+ //   	auth.authenticationProvider(mYactiveDirectoryLdapAuthenticationProvider()) ;
+    	if(Boolean.parseBoolean(ldapEnabled)){
+    	auth.ldapAuthentication() // uid=juanjo,cn=Usuarios,ou=anpa terronio,ou=anpas,dc=intergal,dc=coop
 	       .groupSearchBase("ou=groups")
 	       .userSearchFilter("uid={0}")
 	        .contextSource()
@@ -109,8 +157,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	        .passwordCompare()
 	        .passwordEncoder(new BCryptPasswordEncoder())
 	        .passwordAttribute("userPassword");
+ //   	auth.userDetailsService(userDetailsService());
+    	
+    } else {
+    	System.out.println("SecurityConfiguration.configure()---------------------------- .inMemoryAuthentication()");
+    	auth
+    	.inMemoryAuthentication()  // password = admin
+    	.withUser("admin").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER");
+//    	.and()
+//    	.withUser("admin").password("{noop}admin").roles("ADMIN");
+    	}
     }
-
+    
     /**
      * Require login to access internal pages and configure login form.
      */
@@ -194,3 +252,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/frontend-es5/**", "/frontend-es6/**");
     }
 }
+

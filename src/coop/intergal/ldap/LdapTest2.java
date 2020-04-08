@@ -1,23 +1,30 @@
 package coop.intergal.ldap;
  
 import java.util.Properties;
+
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.naming.directory.*;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.ModificationItem;
  
 public class LdapTest2 {
  
     public void run() {
         try {
             DirContext context = getContext();
-            String name = "employeeNumber=00001,ou=system";
-            createLDAPObject(context, name);
-            createAttribute(context, name, "displayName", "JOBS");
+            String name = "uid=bobx,ou=people";
+//            createLDAPObject(context, name);
+//            createAttribute(context, name, "displayName", "JOBS");
             viewAttribute(context, name, "displayName");
             updateAttribute(context, name, "displayName", "STEVE");
             viewAttribute(context, name, "displayName");
-            removeAttribute(context, name, "displayName");
-            removeLDAPObject(context, name);
+    //        removeAttribute(context, name, "displayName");
+    //        removeLDAPObject(context, name);
         } catch (NamingException e) {
             e.printStackTrace();
         }
@@ -32,17 +39,50 @@ public class LdapTest2 {
  
         Attribute attribute = new BasicAttribute("objectClass");
         attribute.add("inetOrgPerson");
+        attribute.add("organizationalPerson");
+        attribute.add("person");
+        attribute.add("top");
         attributes.put(attribute);
  
+//        Attribute oc = new BasicAttribute("objectClass");
+//        oc.add("organizationalPerson");
+//        attributes.put(oc);
+// 
+//        Attribute person = new BasicAttribute("objectClass");
+//        person.add("person");
+//        attributes.put(person);
+        
+//        Attribute calEntry = new BasicAttribute("objectClass");
+//        calEntry.add("calEntry");
+//        attributes.put(calEntry);
+
+//        attribute = new BasicAttribute("objectClass");
+//        attribute.add("top");
+//        attributes.put(attribute);
+       
+
         Attribute sn = new BasicAttribute("sn");
-        sn.add("Steve");
+        sn.add("Steve2");
         attributes.put(sn);
  
         Attribute cn = new BasicAttribute("cn");
         cn.add("Jobs");
         attributes.put(cn);
+        
+//       Attribute uid = new BasicAttribute("uid");
+//       uid.add("bob2");
+//       attributes.put(uid);
+// 
  
-        attributes.put("telephoneNumber", "123456");
+        Attribute userPassword = new BasicAttribute("userPassword");
+        userPassword.add("$2a$10$c6bSeWPhg06xB1lvmaWNNe4NROmZiSpYhlocU/98HNr2MhIOiSt36");
+        attributes.put(userPassword);
+ 
+
+//        Attribute dname = new BasicAttribute("texto");
+//        dname.add(name);
+//        attributes.put(dname);
+       attributes.put("telephoneNumber", "1234");
         context.createSubcontext(name, attributes);
     }
  
@@ -76,8 +116,9 @@ public class LdapTest2 {
         Properties properties = new Properties();
         properties.put(Context.INITIAL_CONTEXT_FACTORY,
                 "com.sun.jndi.ldap.LdapCtxFactory");
-        properties.put(Context.PROVIDER_URL, "ldap://localhost:10389");
- 
+        properties.put(Context.PROVIDER_URL, "ldap://intergal01.cloud.netimaging.net:389/dc=intergal,dc=coop");
+        properties.put(Context.SECURITY_CREDENTIALS, "toorLDAP44");
+        properties.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=intergal,dc=coop");
         return new InitialDirContext(properties);
     }
  
