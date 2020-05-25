@@ -618,9 +618,20 @@ private boolean isBoolean(String header, String colType) {
 			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 			setRowsColList.invoke(display,rowsColListGrid);
 			setBinder.invoke(display,binder);
-//			setDataProvider.invoke(display, dataProvider);
+			
 			setBean.invoke(display,bean);
+			setDataProvider.invoke(display, dataProvider);
+			if (displayFormClassName.indexOf("Generated") > -1)
+			{
+			//	setDataProvider.invoke(display, dataProvider);
+				Method createContent= dynamicForm.getMethod("createContent");
+				display = createContent.invoke(display);
+			}
+	//		else
+
+
 			divDisplay.removeAll();
+	//		divDisplay.remove((Component) display);
 			divDisplay.add((Component)display);
 			String resourceSubGrid = extractResourceSubGrid(bean,0);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO adapt to use more than one subresource , use a variable instead of 9
 			divSubGrid.removeAll();
@@ -637,7 +648,7 @@ private boolean isBoolean(String header, String colType) {
 				subDynamicViewGrid.setDisplayParent(display);
 				subDynamicViewGrid.setBeanParent(setBean);
 				divSubGrid.add(subDynamicViewGrid );
-				setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
+	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
 			}
 			else
 			{

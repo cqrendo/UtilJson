@@ -283,6 +283,8 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 			//	newEntityinfo = (ObjectNode) rowJSon;// new ObjectNode(nodeFactory);
 			ObjectNode metadata = new ObjectNode(nodeFactory);
 			metadata.put("checksum",rowJSon.get("@metadata").get("checksum").asText());
+			if (rowJSon.get("@metadata").get("href") == null)
+				System.err.println("href Doesn' existe, probably PK is missing !!!!!!!!!!");
 			metadata.put("href",rowJSon.get("@metadata").get("href").asText());
 			newEntityinfo.put("@metadata",metadata);
 			int i= 0;

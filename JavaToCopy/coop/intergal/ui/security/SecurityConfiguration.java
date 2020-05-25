@@ -140,11 +140,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     	System.out.println("SecurityConfiguration.configure()----------------------------");
-//    	auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider());
-//    	auth.userDetailsService(userDetailsService());
-// 
- //   	auth.authenticationProvider(activeDirectoryLdapAuthenticationProvider()).ldapAuthentication()
- //   	auth.authenticationProvider(mYactiveDirectoryLdapAuthenticationProvider()) ;
     	if(Boolean.parseBoolean(ldapEnabled)){
     	auth.ldapAuthentication() // uid=juanjo,cn=Usuarios,ou=anpa terronio,ou=anpas,dc=intergal,dc=coop
 	       .groupSearchBase("ou=groups")
@@ -163,7 +158,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     	System.out.println("SecurityConfiguration.configure()---------------------------- .inMemoryAuthentication()");
     	auth
     	.inMemoryAuthentication()  // password = admin
-    	.withUser("admin").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER");
+    	.withUser("user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER");
 //    	.and()
 //    	.withUser("admin").password("{noop}admin").roles("ADMIN");
     	}
@@ -176,15 +171,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // Not using Spring CSRF here to be able to use plain HTML for the login page
 
-//   	http
-//    	.csrf().disable()
-//		.authorizeRequests()
-//			.anyRequest().fullyAuthenticated()
-//			.and()
-//		.formLogin().loginPage(LOGIN_URL).permitAll().loginProcessingUrl(LOGIN_PROCESSING_URL);
-//      // Configure logout
-//		//.and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
-    	
     	http.csrf().disable()
                 // Register our CustomRequestCache, that saves unauthorized access attempts, so
                 // the user is redirected after login.

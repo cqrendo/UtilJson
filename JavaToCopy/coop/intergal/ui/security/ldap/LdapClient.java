@@ -229,10 +229,18 @@ public class LdapClient {
 
 	public static DirContext getContext() throws NamingException {
 		SecurityContext context = SecurityContextHolder.getContext();
-		Object details = context.getAuthentication().getDetails();
-		System.out.println("SecurityUtils.getUsername() details "+ details.toString());
-//		Object autorities = ((LdapUserDetails) context.getAuthentication().getPrincipal()).getAuthorities();
-		Object principal = ((LdapUserDetails) context.getAuthentication().getPrincipal());
+		if (context.getAuthentication() != null)
+		{
+			Object details = context.getAuthentication().getDetails();
+			System.out.println("SecurityUtils.getUsername() details "+ details.toString());
+//			Object autorities = ((LdapUserDetails) context.getAuthentication().getPrincipal()).getAuthorities();
+			Object principal = ((LdapUserDetails) context.getAuthentication().getPrincipal());
+			if (principal instanceof LdapUserDetails) 
+			{
+				String dn = ((LdapUserDetails) principal).getDn();
+				uidOu = getUidOu(dn); // "uid=bobx,ou=people"
+			}	
+		}
 		AnnotationConfigApplicationContext anotContext = new AnnotationConfigApplicationContext();
 		anotContext.scan("coop.intergal.ui.security");
 		anotContext.refresh();
@@ -242,12 +250,8 @@ public class LdapClient {
 		DirContext ldpaContex = null;	
 		anotContext.close();
 		try {
-			if (principal instanceof LdapUserDetails) 
-			{
-				String dn = ((LdapUserDetails) principal).getDn();
 				ldpaContex = ldapConnection.getContext();
-				uidOu = getUidOu(dn); // "uid=bobx,ou=people"
-			}	
+				
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -328,11 +330,17 @@ public class JSonClient {
 			   if (is !=null)
 			   	   {
 				   prop.load(is);
+				   String hostName = InetAddress.getLocalHost().getHostName() ;
 		 	   	   baseURL = prop.getProperty(preConfParam+"BASE_URL");
 		 	   	   apiKeyHeader=  new BasicHeader("Authorization", prop.getProperty(preConfParam+"API_KEY")); 
-		 	   	   
+		 	   	   if (hostName.indexOf(".local") == -1) // when you run in local LAC server is remote, when you run in remote Vaadin Should use the same server than LAC 
+		 	   	   { 
+//		 	   		   baseURL=hostName+baseURL.substring(baseURL.indexOf("/rest/"));
+		 	   		   String urlHost = prop.getProperty(hostName); // In the properties file, should a Key that with the hostname that returns InetAddress.getLocalHost().getHostName() has his URL
+		 	   		   baseURL=urlHost+baseURL.substring(baseURL.indexOf("/rest/"));
+		 	   	   }
 		 	   	   /**Imprimimos los valores*/
-		 	   	   printLog("baseUrl: "+baseURL);
+		 	   	   printLog("host name "+ hostName +" baseUrl: "+baseURL);
 			   	   }
 		  } catch (FileNotFoundException e) {
 			  printLog("Error, El archivo no exite");
@@ -732,25 +740,35 @@ public class JSonClient {
 				htPkForThisReource = new Hashtable<String, String>();
 				JsonNode pkFieldList;
 				boolean is31 = false;
-				if (resource.get("primaryKey") != null) // depens in LAC release (2.1)
-					pkFieldList = resource.get("primaryKey").get("columns"); // TODO Adadapt to SPRING API Call center Rest API
-				else // depens in LAC release (3.1)
-					{
-					pkFieldList = resource.get("primaryKeyColumns");
-					is31=true;
-					}
+				if (resource.get("keys") != null)
+				{
+					pkFieldList = resource.get("keys"); // TODO Adadapt to SPRING API Call center Rest API
+//				else // depens in LAC release (3.1)
+//					{
+//					pkFieldList = resource.get("primaryKeyColumns");
+//					is31=true;
+//					}
 				int i = 0;
 				for (JsonNode eachRow : pkFieldList) { // @@ CQR revisar a forma de cargar e usar HT
 					String fieldName;
-					if 	(is31)
-						fieldName = eachRow.asText();	
-					else
-						fieldName = eachRow.get("name").asText();
+//					if 	(is31)
+//						fieldName = eachRow.asText();	
+//					else
+//						fieldName = eachRow.get("name").asText();
+					if (eachRow.get("type").asText().equalsIgnoreCase("primary"))
+						{
+						Iterator<JsonNode> colsKey = eachRow.get("columns").elements();
+						while (colsKey.hasNext())
+						{
+							fieldName = colsKey.next().asText();
+							htPkForThisReource.put("pkField" + i,fieldName);
+							i++;
+						}
 			//	String dataType = eachRow.get("generic_type").asText();
-					htPkForThisReource.put("pkField" + i,fieldName);
+					
 					resourceHtPK.put(resourceName, htPkForThisReource);
 					
-					i++;
+					
 					}
 				}
 			JsonNode fieldList = resource.get("columns");
@@ -776,6 +794,8 @@ public class JSonClient {
 					}
 				}
 			}
+		}
+		}	
 		return null;
 	}
 	public static Hashtable<String, Hashtable<String, String>> getResourceHtPK() {

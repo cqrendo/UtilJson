@@ -1,0 +1,53 @@
+
+:host(.formMargin50) {
+	margin-top: 10px;
+}
+:host(.formMargin100) {
+	margin-top: 50px;
+}
+:host(.formMargin150) {
+	margin-top: 110px;
+}
+:host(.formMargin200) {
+	margin-top: 16px;
+}
+:host(.formMargin250) {
+	margin-top: 210px;
+}
+:host(.formMargin300) {
+	margin-top: 260px;
+}
+:host(.formMargin350) {
+	margin-top: 310px;
+}
+:host(.formMargin400) {
+	margin-top: 370px;
+}
+
+:host(.formMarginL50) {
+	margin-left: 50px;
+}
+:host(.formMarginL100) {
+	margin-left: 100px;
+}
+:host(.formMarginL150) {
+	margin-left: 150px;
+}
+:host(.formMarginL200) {
+	margin-left: 200px;
+}
+:host(.formMarginL250) {
+	margin-left: 250px;
+}
+:host(.formMarginL300) {
+	margin-left: 300px;
+}
+:host(.formMarginL350) {
+	margin-left: 350px;
+}
+:host(.formMarginL400) {
+	margin-left: 400px;
+}
+:host(.formMarginL400) {
+	margin-left: 400px;
+}	

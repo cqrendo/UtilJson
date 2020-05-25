@@ -25,8 +25,10 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
+import coop.intergal.AppConst;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
+import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
 //@Tag("dynamic-view-grid")
@@ -36,6 +38,7 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 //@PageTitle(AppConst.TITLE_PRODUCTS)
 //@Secured(Role.ADMIN)
 public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle  {
+//public class DynamicGridDisplay extends ThemableMixin(PolymerElement<TemplateModel>) implements BeforeEnterObserver, HasDynamicTitle  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
 	private String preConfParam;
 	public ArrayList<String> getRowsColList() {
@@ -232,8 +235,14 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 			resourceName = queryParameters.getParameters().get("resourceName").get(0);
 			if (queryParameters.getParameters().get("apiname") != null)
 				apiname = queryParameters.getParameters().get("apiname").get(0);
-			queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
-			displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
+
+			//*** PACKAGE_VIEWS is used when the class is no generic for several projects. and corresponds a particular class for the form
+			queryFormClassName = queryParameters.getParameters().get("queryFormClassName").get(0);
+			displayFormClassName= queryParameters.getParameters().get("displayFormClassName").get(0);
+			if (queryFormClassName.startsWith("coop.intergal.ui.views") == false)
+				queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
+			if (queryFormClassName.startsWith("coop.intergal.ui.views") == false)
+				displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
 			
 //			resourceSubGrid =  queryParameters.getParameters().get("resourceSubGrid").get(0);
 		}
@@ -242,6 +251,21 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 			Object queryForm = dynamicQuery.newInstance();
 			Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
 			setGrid.invoke(queryForm,grid);
+			if (displayFormClassName.indexOf("Generated") > -1)
+			{
+				
+				DdbDataBackEndProvider dataProvider = new DdbDataBackEndProvider();
+				dataProvider.setPreConfParam(AppConst.PRE_CONF_PARAM);
+				dataProvider.setResourceName(resourceName);
+				Method setDataProvider= dynamicQuery.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+				Method createContent= dynamicQuery.getMethod("createDetails");
+				Method setRowsColList = dynamicQuery.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+				setDataProvider.invoke(queryForm,dataProvider );
+				setRowsColList.invoke(queryForm,rowsColList);
+//				Method createContent= dynamicQuery.getMethod("createDetails");
+//				queryForm = 
+				createContent.invoke(queryForm);
+			}
 			divQuery.add((Component)queryForm);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block

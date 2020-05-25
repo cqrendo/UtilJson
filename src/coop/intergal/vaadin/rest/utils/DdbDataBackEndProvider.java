@@ -28,6 +28,8 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 //	    refreshAll();
 //	  }
 	private ArrayList<String[]> rowsColList;// = new ArrayList<String>();
+	private ArrayList<String[]> rowsFieldList;
+	private ArrayList<String[]> rowsFIeldQueryList;
 	private static final long serialVersionUID = 1L;
 	/** Text filter that can be changed separately. */
 //    private String filterText = "";
@@ -97,20 +99,30 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, cache);
 	  }
 	  public ArrayList<String[]> getRowsFieldList() {
-		 return RestData.getRowsFieldList(rowsColList, resourceName, preConfParam, null);	
+		 return RestData.getRowsFieldList(rowsFieldList, resourceName, preConfParam, null);	
 	  }	
 	  
 	  public ArrayList<String[]> getRowsFieldList(boolean cache) {
-		  return RestData.getRowsFieldList(rowsColList, resourceName, preConfParam, cache);	
+		  return RestData.getRowsFieldList(rowsFieldList, resourceName, preConfParam, cache);	
 		}
 		 
-		 
+	  public ArrayList<String[]> getRowsQueryFieldList(boolean b) {
+		  return RestData.getRowsQueryFieldList(rowsFIeldQueryList, resourceName, preConfParam, cache);	
+	  	} 
 
 
 		public void setRowsColList(ArrayList<String[]> rowsColList) {
 			this.rowsColList = rowsColList;
 		}
 
+
+		public void setRowsFieldList(ArrayList<String[]> rowsFieldList) {
+			this.rowsFieldList = rowsFieldList;
+		}
+
+		public void setRowsFIeldQueryList(ArrayList<String[]> rowsFIeldQueryList) {
+			this.rowsFIeldQueryList = rowsFIeldQueryList;
+		}
 
 		public Boolean getHasNewRow() {
 			return hasNewRow;
@@ -263,6 +275,8 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 				// TODO Auto-generated method stub
 				
 			}
+
+
 
 
 				

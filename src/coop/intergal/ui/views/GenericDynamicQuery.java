@@ -7,12 +7,18 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.FormItem;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.espresso.presutec.utils.JSonClient;
@@ -67,9 +73,11 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 	}
 
 	public String getFieldsDataForFilter(Class<?> class1, Object object, String ResourceName) {
-			return prepareFilter(class1, object, ResourceName);
+			if (class1.getName().equals("coop.intergal.ui.views.GeneratedQuery"))
+					return prepareFilter(class1, object, ResourceName, true );
+				else				
+					return prepareFilter(class1, object, ResourceName, false);
 	}
-
 	private String componeDateFilter(String filter, String field, String value) {
 		if (value.trim().length() == 0)
 			return filter;
@@ -193,32 +201,62 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 	// in childs must be the FK fieslds and a param in row event call - >
 	// row.p_a_r_filterPK="idPkeyParent"; <- in the child (if are different)
 
-	protected String prepareFilter(Class<?> class1, Object object, String ResourceName) { // compose the filter
+	protected String prepareFilter(Class<?> class1, Object object, String ResourceName, boolean isGeneratedForm) { // compose the filter
 																							// combining ROW fields and
 																							// parents and grand parent
 																							// fields
 		Iterator<String[]> itRowsColList = RestData
-				.getRowsColList(rowsColList, ResourceName, preConfParam).iterator();
+				//.getRowsColList(rowsColList, ResourceName, preConfParam).iterator();
+				.getRowsQueryFieldList(rowsColList, ResourceName, preConfParam, true).iterator();
+
+		
+		FormLayout form = null ;
+		if (isGeneratedForm)
+		{
+			Field fieldForm;
+			try {
+				fieldForm = ((class1)).getDeclaredField("form");
+				fieldForm.setAccessible(true);
+				Object fieldObj = fieldForm.get(object);
+				form = ((FormLayout) fieldObj);
+			} catch (NoSuchFieldException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	
+		}	
+		
 		String filter = "";
 		while (itRowsColList.hasNext()) {
 			String[] rowCol = itRowsColList.next();
 			String fieldName = rowCol[2];
 			if (!fieldName.isEmpty())
-				try {
-//		System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
+				try {//		System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
+					String id = rowCol[2];
 					if (!fieldName.equals("null")) {
-						Field field = ((class1)).getDeclaredField(fieldName);// .get(instancia);
-						field.setAccessible(true);
-						Object fieldObj = field.get(object);
+						Field field = null ;
+						Object fieldObj =null;
+						if (isGeneratedForm == false)
+							{
+							field = ((class1)).getDeclaredField(fieldName);// .get(instancia);
+							field.setAccessible(true);
+							fieldObj = field.get(object);
+							}
 						if (rowCol[4].length() > 0) // it means a parent field , the field "PathToParentField" comes in 4 position  if have FK the field the path is fill it 
 							{
-							String value = ((TextField) fieldObj).getValue() + "";
+							String value = getValueFromField(form, id, fieldObj, isGeneratedForm);
 							value=addAutoComodin(value);
 							setFKIdsForFilter(rowCol[4], value);
 							}	
 
 						else if (rowCol[3].isEmpty()) {
-								String value = ((TextField) fieldObj).getValue() + "";								
+								String value = getValueFromField(form, id, fieldObj, isGeneratedForm);								
 								if (!value.isEmpty()) {
 									value=addAutoComodin(value);
 									System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
@@ -233,7 +271,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 						}  
 						else if (rowCol[3].equals("1")) // is Date
 							{
-							String value = ((TextField) fieldObj).getValue() + "";
+							String value = getValueFromField(form, id, fieldObj, isGeneratedForm);
 							if (!value.isEmpty()) {
 								System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
 										+ " valor :" + value);
@@ -285,6 +323,153 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		System.err.println("filter------" + filter);
 		return filter;
 	}
+
+	private String getValueFromField(FormLayout form, String id, Object fieldObj, boolean isGeneratedForm) {
+		String value = "";
+		if (isGeneratedForm)
+		{
+			id = "tf"+id;
+			value = (String) getValueFromField(form, id );
+		}
+		else
+			value = ((TextField) fieldObj).getValue() + "";
+		return value;
+	}
+
+//	protected String prepareFilterWithGeneratedForm(Class<?> class1, Object object, String ResourceName) { // compose the
+//																										// filter
+//		// combining ROW fields and
+//		// parents and grand parent
+//		// fields
+//		Iterator<String[]> itRowsColList = RestData//.getRowsColList(rowsColList, ResourceName, preConfParam).iterator();
+//				.getRowsQueryFieldList(rowsColList, ResourceName, preConfParam, true).iterator();
+//
+//		String filter = "";
+//		Field fieldForm;
+//		try {
+//			fieldForm = ((class1)).getDeclaredField("form");
+//
+//		fieldForm.setAccessible(true);
+//		Object fieldObj = fieldForm.get(object);
+//		FormLayout form = ((FormLayout) fieldObj);
+//		Stream<Component> childs = form.getChildren();
+//		Iterator<Component> itChilds = childs.iterator();
+//		String id = "tfcol2";
+//		while (itChilds.hasNext()) {
+//			Component rowCol = itChilds.next();
+////			rowCol.
+//			Element el = rowCol.getElement();
+//			System.out.println("GenericDynamicQuery.prepareFilterWithGeneratedForm()---"+ el.getText() + rowCol.getId());
+//			Object value = getValueFromField(form, id );
+//
+//			//			String fieldName = rowCol[2];
+////			if (!fieldName.isEmpty())
+////				try {//System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
+////					if (!fieldName.equals("null")) {
+////						Field field = null;
+////							field = getFieldFromForm(class1, object, fieldName);
+////						if (rowCol[4].length() > 0) // it means a parent field , the field "PathToParentField" comes in
+////													// 4 position if have FK the field the path is fill it
+////						{
+////							String value = ((TextField) fieldObj).getValue() + "";
+////							value = addAutoComodin(value);
+////							setFKIdsForFilter(rowCol[4], value);
+////						}
+////
+////						else if (rowCol[3].isEmpty()) {
+////							String value = ((TextField) fieldObj).getValue() + "";
+////							if (!value.isEmpty()) {
+////								value = addAutoComodin(value);
+////								System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
+////										+ " valor :" + value + "");// filter=componefilter(filter, rowCol[0], ((TextField) fieldObj).getValue());
+////								if (filter.length() > 1)
+////									filter = filter + "%20AND%20" + rowCol[0] + determineOperator(value);
+////								else
+////									filter = rowCol[0] + determineOperator(value);
+////							}
+////						} else if (rowCol[3].equals("1")) // is Date
+////						{
+////							String value = ((TextField) fieldObj).getValue() + "";
+////							if (!value.isEmpty()) {
+////								System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
+////										+ " valor :" + value);//filter=componeDateFilter(filter, rowCol[0], ((TextField) fieldObj).getValue());
+////								if (filter.length() > 1)
+////									filter = filter + "%20AND%20(" + componeDateFilter(rowCol[0], value) + ")";
+////								else
+////									filter = componeDateFilter(rowCol[0], value);
+////							}
+////
+////						} else if (rowCol[3].equals("2")) // is TextArea
+////
+////						{
+////							System.out.println("GenericDynamicForm.getFieldsData() fieldName " + fieldName + " valor :"
+////									+ ((TextArea) fieldObj).getValue());
+////						} else if (rowCol[3].equals("3")) // is currency
+////						{
+////							System.out.println("GenericDynamicForm.getFieldsData() fieldName " + fieldName + " valor :"
+////									+ ((TextArea) fieldObj).getValue());
+////						}
+////					}
+////
+////				} catch (NoSuchFieldException | SecurityException e) {
+////					System.err.println("Field not defined in Form... " + e.toString());
+////
+////				} catch (IllegalArgumentException e) {// TODO Auto-generated catch block
+////					e.printStackTrace();
+////				} catch (IllegalAccessException e) {// TODO Auto-generated catch block
+////					e.printStackTrace();
+////
+////				} catch (java.lang.ClassCastException e) {
+////					System.err.println("Field type incorret in Form with FiledTemplate... " + e.toString());
+////				}
+//
+//		}
+////		String parentKeys = getParentKeys();
+////		if (filter.length() > 1 && parentKeys.length() > 1) // if have filters from the Row it self adds the parent// generated filters
+////			filter = filter + "%20AND%20" + parentKeys;
+////		else if (parentKeys.length() > 1)
+////			filter = parentKeys;
+////		System.err.println("filter------" + filter);
+//		} catch (NoSuchFieldException | SecurityException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IllegalArgumentException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IllegalAccessException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return filter;
+//	}	
+
+	private Object getValueFromField(FormLayout form, String id) {
+		Object value = form.getChildren()
+			    .flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
+			    .filter(c->id.equals(c.getId().orElse(null))).findFirst()
+			    .filter(HasValue.class::isInstance)
+			.map(HasValue.class::cast)
+			    .map(HasValue::getValue)
+			    .orElse(null);
+		if (value == null)
+			value = "";
+		System.out.println("VALUE........"+ value);
+		return value;
+	}
+
+//	private Object clearValueFromField(FormLayout form, String id) {
+//		Object value = form.getChildren()
+//			    .flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
+//			    .filter(c->id.equals(c.getId().orElse(null))).findFirst()
+//			    .filter(HasValue.class::isInstance)
+//			.map(HasValue.class::cast)
+//			    .map(HasValue::clear)
+//			    .orElse(null);
+//		if (value == null)
+//			value = "";
+//		System.out.println("VALUE........"+ value);
+//		return value;
+//	}
 
 	private String addAutoComodin(String value) {
 	    if (value.length()>0) {

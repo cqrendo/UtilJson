@@ -64,8 +64,19 @@ public class RestData {
 					pagesize = pagesizeInt- 1 +"";
 			}
 			rowsList = JSonClient.get(resourceName,filter,false,preConfParam,pagesize+"");
+			String col1name = rowsColList.get(0)[0]; 
+			if ( rowsList.get(col1name) != null) // it means that the result is only one row, not an array, then no loop  
+			{
+				DynamicDBean d = fillRow(rowsList, rowsColList, preConfParam);//, cols.get(0)); 
+				d.setResourceName(resourceName);
+				d.setPreConfParam(preConfParam);
+				d.setFilter(filter);
+				customerList.add(d);				
+			}
+			else
+			{	
 			for (JsonNode eachRow : rowsList)  {
-				String col1name = rowsColList.get(0)[0]; 
+				
 				int i = 0;
 				while (col1name.equals("#SPACE#"))  // to get the first real field
 				{
@@ -81,6 +92,7 @@ public class RestData {
 					d.setFilter(filter);
 					customerList.add(d);
 				}
+			}	
 		}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -676,5 +688,114 @@ public class RestData {
 		// TODO Auto-generated method stub
 		return getRowsColList(rowsColList, resourceName, preConfParam, null);
 	}
+
+	public static ArrayList<String[]> getRowsQueryFieldList(ArrayList<String[]> rowsFIeldQueryList, String resourceName,String preConfParam, Boolean cache){
+
+		if (cache == null)
+		{
+			cache = CACHE_TRUE;
+		}
+		if (rowsFIeldQueryList == null || rowsFIeldQueryList.isEmpty() || cache == false)
+			{
+			JsonNode cols;
+			try {				
+				String genericResourceName = resourceName;
+//				int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
+//				int idxPomt = resourceName.indexOf(".");
+//				if (indx__ > 1 && idxPomt == -1) // only when there is not a subresource (after a point), you can extract the generic name from first name substring(0....
+//					genericResourceName = resourceName.substring(0, indx__);
+//				String tableNameToSearch = genericResourceName+variant;
+				String tableNameToSearch = genericResourceName;
+				System.out.println("RestData.getRowsFieldList()  tablename to search = "+tableNameToSearch );
+				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInQuery=true&order=queryOrder";
+				cols = JSonClient.get("CR-FieldTemplate",filter , cache, "metadata"); // TODO put false to true
+				if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
+				{
+					rowsFIeldQueryList = new ArrayList<String[]>();
+					int i = 0;
+					for (JsonNode col :cols)
+					{
+						String[] fieldArr  = new String[12];
+						fieldArr[0] = col.get("fieldName").asText();
+//						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
+//							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
+						if ( col.get("FieldNameInUI").asText().isEmpty())
+							fieldArr[2] = "col"+i;	
+						else
+							fieldArr[2] = col.get("FieldNameInUI").asText();
+						if ( col.get("idFieldType").asText().isEmpty() || col.get("idFieldType").asText().equals("null"))
+							fieldArr[3] = "";
+						else
+							fieldArr[3] = col.get("idFieldType").asText();
+						if ( col.get("PathToParentField").asText().isEmpty() || col.get("PathToParentField").asText().equals("null"))
+							fieldArr[4] = "";
+						else
+							fieldArr[4] = col.get("PathToParentField").asText();
+						if ( col.get("defaultValue").asText().isEmpty() || col.get("defaultValue").asText().equals("null"))
+							fieldArr[5] = "";
+						else
+							fieldArr[5] = col.get("defaultValue").asText();
+						if ( col.get("fieldOrder").asText().isEmpty())
+							fieldArr[6] = "";
+						else if ( col.get("fieldOrder").asText().contains("#")) // after the # becames the field label
+							{
+							String fieldOrder =  col.get("fieldOrder").asText();
+							fieldArr[6] =fieldOrder.substring(fieldOrder.indexOf("#")+1);
+							}
+						else
+							fieldArr[6] = "";
+						if ( col.get("fieldWidth").asText().isEmpty() || col.get("fieldWidth").asText().equals("null") )
+							fieldArr[7] = "8";
+						else
+							fieldArr[7] = col.get("queryFieldWidth").asText();  /// for query different fields with width
+						if ( col.get("cssStyle").asText().isEmpty() || col.get("cssStyle").asText().equals("null") )
+							fieldArr[8] = "";
+						else
+							fieldArr[8] = col.get("cssStyle").asText();
+						if ( col.get("titleDisplay").asText().isEmpty() || col.get("titleDisplay").asText().equals("null") )
+							fieldArr[9] = "";
+						else
+							fieldArr[9] = col.get("titleDisplay").asText();
+						if ( col.get("titleQuery").asText().isEmpty() || col.get("titleQuery").asText().equals("null") )
+							fieldArr[10] = "";
+						else
+							fieldArr[10] = col.get("titleQuery").asText();
+						if ( col.get("titleGrid").asText().isEmpty() || col.get("titleGrid").asText().equals("null") )
+							fieldArr[11] = "";
+						else
+							fieldArr[11] = col.get("titleGrid").asText();
+
+
+						rowsFIeldQueryList.add(fieldArr);
+						i++;
+					}
+					// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
+					if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself
+						{
+						int idxPoint = resourceName.indexOf(".");
+						if (idxPoint > -1) 
+						resourceName = resourceName.substring(0, idxPoint);
+						String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
+						if(ident != null)
+							{
+							JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
+							JSonClient.keepJoinConditionSubResources(resource); 
+							}
+						}
+						
+				}
+				
+				else	
+				{
+					rowsFIeldQueryList = getColListFromTable(resourceName, preConfParam);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			}	
+		return rowsFIeldQueryList;
+	}
+
 
 }
