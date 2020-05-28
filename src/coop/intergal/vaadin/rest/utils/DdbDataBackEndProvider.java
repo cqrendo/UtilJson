@@ -2,6 +2,7 @@ package coop.intergal.vaadin.rest.utils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -12,6 +13,10 @@ import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.crud.CrudFilter;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeButton;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.QuerySortOrder;
@@ -41,6 +46,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 //	private WrappedSession keepLastWSession;
 //	private String variant = "";
 	private Consumer<Long> sizeChangeListener;
+private long sizeBE;
 
 //	public String getVariant() {
 //		return variant;
@@ -167,7 +173,17 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		        int offset = query.getOffset();
 		        int limit = query.getLimit();
 		        List<QuerySortOrder> sortOrdersFields = query.getSortOrders();
-		        Stream<DynamicDBean> stream = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(),  filter,sortOrdersFields, hasNewRow).stream();
+		        Collection<DynamicDBean> rows = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(),  filter,sortOrdersFields, hasNewRow);
+		        if (rows.size() == 1 && sizeBE > 1)
+		        {
+		        	DynamicDBean row = rows.iterator().next();
+		        	rows = fillDummy(sizeBE, limit, row.getCol0());
+		        //	showError("error");
+		        	return rows.stream();
+		        }
+		        	
+		        Stream<DynamicDBean> stream = rows.stream();
+		        //		DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(),  filter,sortOrdersFields, hasNewRow).stream();
 
 		        if (query.getFilter().isPresent()) {
 		            stream = stream
@@ -178,11 +194,27 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 		        return stream;//.skip(offset).limit(limit);
 		    }
 
-		    @Override
+		    private Collection<DynamicDBean> fillDummy(long sizeBE2, int limit, String error) {
+		    	List<DynamicDBean> dummyRows = new ArrayList<DynamicDBean>();
+		    	int i = 0;
+		    	while (i < sizeBE2 && i < limit)
+		    		{
+		    		DynamicDBean d = new DynamicDBean();
+		    		d.setCol0(error);
+		    		d.setCol1(error);
+		    		d.setCol2(error);
+		    		d.setCol3(error);
+		    		dummyRows.add(d);
+		    		i++;
+		    		}		    	
+		    	return dummyRows;
+		    }
+
+			@Override
 		    protected int sizeInBackEnd(Query<DynamicDBean, CrudFilter> query) {
 		        // For RDBMS just execute a SELECT COUNT(*) ... WHERE query
 		        long count = RestData.getCountRows(getTableDbForCount(resourceName), preConfParam, filter, false, hasNewRow);//fetchFromBackEnd(query).count();
-
+		        sizeBE = count;
 		        if (sizeChangeListener != null) {
 		            sizeChangeListener.accept(count);
 		        }
@@ -277,6 +309,16 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 			}
 
 
+			public static void showError(String error) {
+				Label content = new Label(error);
+				NativeButton buttonInside = new NativeButton("Cerrar");
+				Notification notification = new Notification(content, buttonInside);
+//				notification.setDuration(3000);
+				buttonInside.addClickListener(event -> notification.close());
+				notification.setPosition(Position.MIDDLE);
+				notification.open();
+					
+				}
 
 
 				

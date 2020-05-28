@@ -87,9 +87,13 @@ public class MockDataService extends DataService {
 				nFields++;
 			}
 		}
+				
 				rows = RestData.getResourceData(offset,limit, resourceName, preConfParam, rowsColList, filtro, refreshFromServer, hasNewRow);// refresh data from server each interaction with grid
-				System.out.println("MockDataService.getAllDynamicDBean()-----"+rows.size()+ ".....resourceName "+resourceName);
-		return rows;
+				if (rows != null)
+					System.out.println("MockDataService.getAllDynamicDBean()-----"+rows.size()+ ".....resourceName "+resourceName);
+				else
+					System.out.println("MockDataService.getAllDynamicDBean()----- ROWS NULL");
+				return rows;
     }
 
 	@Override

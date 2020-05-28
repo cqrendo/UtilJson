@@ -10,6 +10,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeButton;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 
 import coop.intergal.AppConstGeneric;
 import coop.intergal.espresso.presutec.utils.JSonClient;
@@ -64,6 +68,18 @@ public class RestData {
 					pagesize = pagesizeInt- 1 +"";
 			}
 			rowsList = JSonClient.get(resourceName,filter,false,preConfParam,pagesize+"");
+			if (rowsList.get("statusCode") != null)
+			{
+				String errorMsg = rowsList.get("errorMessage").asText();
+			//	showError(errorMsg);  doesn't work in this scope, 
+				System.err.println("*********** ERROR ******* "+errorMsg);
+				DynamicDBean d = new DynamicDBean();
+				d.setCol0("##ERROR## "+ errorMsg);
+				customerList.add(d);
+				return customerList;
+			}
+			else
+			{
 			String col1name = rowsColList.get(0)[0]; 
 			if ( rowsList.get(col1name) != null) // it means that the result is only one row, not an array, then no loop  
 			{
@@ -93,6 +109,7 @@ public class RestData {
 					customerList.add(d);
 				}
 			}	
+		}
 		}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -296,7 +313,14 @@ public class RestData {
 		//	String filtro = null;
 			System.out.println("RestData.getCountRows() resourceName " + resourceName + " filter " + filter +  " preConfParam " + preConfParam);
 			rowsList = JSonClient.get("Count_"+resourceName,filter,cache,preConfParam,"1"); 
-			count = rowsList.get(0).get("count(*)").asInt();
+			if (rowsList.get("statusCode") != null)
+			{
+				showError(rowsList.get("errorMessage").asText());
+			}
+			else
+			{
+				count = rowsList.get(0).get("count(*)").asInt();
+			}
 
 		
 		} catch (Exception e) {
@@ -796,6 +820,15 @@ public class RestData {
 			}	
 		return rowsFIeldQueryList;
 	}
-
+	public static void showError(String error) {
+		Label content = new Label(error);
+		NativeButton buttonInside = new NativeButton("Cerrar");
+		Notification notification = new Notification(content, buttonInside);
+//		notification.setDuration(3000);
+		buttonInside.addClickListener(event -> notification.close());
+		notification.setPosition(Position.MIDDLE);
+		notification.open();
+			
+		}
 
 }
