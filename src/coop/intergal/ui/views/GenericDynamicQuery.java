@@ -480,7 +480,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		return value;
 	}
 
-	protected void cleanForm(Class<?> class1, Object object, String ResourceName) { // compose the filter
+	protected void cleanForm(Class<?> class1, Object object, String ResourceName, boolean isQuery) { // compose the filter
 		// combining ROW fields and
 		// parents and grand parent
 		// fields
@@ -494,26 +494,61 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 					//System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
 					if (!fieldName.equals("null")) {
 						Field field;
+						if (isQuery)
+						{
+							FormLayout form = null;
+							try {
+								Field fieldForm = ((class1)).getDeclaredField("form");
+								fieldForm.setAccessible(true);
+								Object fieldObj = fieldForm.get(object);
+								form = ((FormLayout) fieldObj);
+							} catch (NoSuchFieldException | SecurityException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IllegalArgumentException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IllegalAccessException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							fieldName = "tf"+fieldName;
+							clearField(form, fieldName);
+						}
+						else
+						{	
+						
 						try {
 							field = ((class1)).getDeclaredField(fieldName);
-				// .get(instancia);
-						field.setAccessible(true);
-						Object fieldObj = field.get(object);
-						((TextField) fieldObj).clear();
+							// .get(instancia);
+							field.setAccessible(true);
+							Object fieldObj = field.get(object);
+							((TextField) fieldObj).clear();
 						
-					} catch (NoSuchFieldException | SecurityException e) {
-						System.err.println("Field not defined in Form... " + e.toString());
-					} catch (IllegalArgumentException e) {
+						} catch (NoSuchFieldException | SecurityException e) {
+							System.err.println("Field not defined in Form... " + e.toString());
+						} catch (IllegalArgumentException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						System.err.println("Field type incorret in Form with FiledTemplate... " + e.toString());
+							e.printStackTrace();
+						} catch (IllegalAccessException e) {
+							System.err.println("Field type incorret in Form with FiledTemplate... " + e.toString());
 					}
-		
+					}	
 					}
 		}
 	}
 				
+private void clearField(FormLayout form, String id) {
+	
+	form.getChildren()
+    .flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
+    .filter(c->id.equals(c.getId().orElse(null))).findFirst()
+    .filter(HasValue.class::isInstance)
+    .map(HasValue.class::cast)
+    .ifPresent(HasValue::clear);
+		
+	}
+
 //}	
 
 //}

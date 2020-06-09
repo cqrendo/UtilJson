@@ -112,7 +112,7 @@ private long sizeBE;
 		  return RestData.getRowsFieldList(rowsFieldList, resourceName, preConfParam, cache);	
 		}
 		 
-	  public ArrayList<String[]> getRowsQueryFieldList(boolean b) {
+	  public ArrayList<String[]> getRowsQueryFieldList(boolean cache) {
 		  return RestData.getRowsQueryFieldList(rowsFIeldQueryList, resourceName, preConfParam, cache);	
 	  	} 
 

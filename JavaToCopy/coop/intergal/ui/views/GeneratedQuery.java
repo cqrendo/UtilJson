@@ -59,7 +59,14 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 	private String title;
 //	private String resource;
 //	private DynamicDBean bean;
-	private boolean cache = true;
+	private Boolean cache = true;
+
+	public boolean isCache() {
+		return cache;
+	}
+	public void setCache(Boolean cache) {
+		this.cache = cache;
+	}
 
 	@Id("form")
 	private FormLayout form;
@@ -73,7 +80,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		queryButtonsBar.addClearSearchListener(e -> cleanQryForm());//System.out.println("PedidoProveedorQuery.beforeEnter() BUSCAR>>>>"));
 	}
 	private Object cleanQryForm() {
-		cleanForm(GeneratedQuery.class, this, dataProvider.getResourceName());
+		cleanForm(GeneratedQuery.class, this, dataProvider.getResourceName(), true);
 		return null;
 	}
 
@@ -82,7 +89,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		keysFromParent = "";
 		String filter = getFieldsDataForFilter(GeneratedQuery.class, this, dataProvider.getResourceName());
 		System.out.println("GeneratedQuery.createFilter()...." + filter);
-		DdbDataBackEndProvider dataProvider = grid.getDataProvider();
+//		DdbDataBackEndProvider dataProvider = grid.getDataProvider();
 		dataProvider.setFilter(filter);
 		dataProvider.refreshAll();
 		return null;

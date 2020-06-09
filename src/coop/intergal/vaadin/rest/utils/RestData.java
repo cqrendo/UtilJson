@@ -422,7 +422,7 @@ public class RestData {
 						int i = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[12];
+							String[] fieldArr  = new String[13];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -488,6 +488,7 @@ public class RestData {
 								fieldArr[11] = "";
 							else
 								fieldArr[11] = col.get("titleGrid").asText();
+							fieldArr[12] = ""; // is only used for query fields
 
 							rowsColList.add(fieldArr);
 							i++;
@@ -547,7 +548,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[12];
+						String[] fieldArr  = new String[13];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -596,8 +597,10 @@ public class RestData {
 							fieldArr[11] = "";
 						else
 							fieldArr[11] = col.get("titleGrid").asText();
-
-
+//						if ( col.get("cssStyleQueryField").asText().isEmpty() || col.get("cssStyleQueryField").asText().equals("null") )
+							fieldArr[12] = ""; // is only used for query fields
+//						else
+//							fieldArr[12] = col.get("cssStyleQueryField").asText();
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -635,7 +638,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[12];
+			String[] fieldArr  = new String[13];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -651,6 +654,7 @@ public class RestData {
 			fieldArr[9] = "";
 			fieldArr[10] = "";
 			fieldArr[11] = "";
+			fieldArr[12] = "";
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
 			rowsColList.add(fieldArr);
@@ -713,6 +717,7 @@ public class RestData {
 		return getRowsColList(rowsColList, resourceName, preConfParam, null);
 	}
 
+	/// ******* CAMPOS QUERY ********
 	public static ArrayList<String[]> getRowsQueryFieldList(ArrayList<String[]> rowsFIeldQueryList, String resourceName,String preConfParam, Boolean cache){
 
 		if (cache == null)
@@ -739,7 +744,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[12];
+						String[] fieldArr  = new String[13];
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -759,12 +764,12 @@ public class RestData {
 							fieldArr[5] = "";
 						else
 							fieldArr[5] = col.get("defaultValue").asText();
-						if ( col.get("fieldOrder").asText().isEmpty())
+						if ( col.get("queryOrder").asText().isEmpty())
 							fieldArr[6] = "";
-						else if ( col.get("fieldOrder").asText().contains("#")) // after the # becames the field label
+						else if ( col.get("queryOrder").asText().contains("#")) // after the # becames the field label
 							{
-							String fieldOrder =  col.get("fieldOrder").asText();
-							fieldArr[6] =fieldOrder.substring(fieldOrder.indexOf("#")+1);
+							String queryOrder =  col.get("queryOrder").asText();
+							fieldArr[6] =queryOrder.substring(queryOrder.indexOf("#")+1);
 							}
 						else
 							fieldArr[6] = "";
@@ -788,8 +793,10 @@ public class RestData {
 							fieldArr[11] = "";
 						else
 							fieldArr[11] = col.get("titleGrid").asText();
-
-
+						if ( col.get("cssStyleQueryField").asText().isEmpty() || col.get("cssStyleQueryField").asText().equals("null") )
+							fieldArr[12] = "";
+						else
+							fieldArr[12] = col.get("cssStyleQueryField").asText();
 						rowsFIeldQueryList.add(fieldArr);
 						i++;
 					}

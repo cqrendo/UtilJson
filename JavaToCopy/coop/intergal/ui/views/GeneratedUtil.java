@@ -244,6 +244,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				String classNames =  rowField[8];
 				String classNamesForm = ""; 
 				String classNamesItem = ""; 
+				String classNamesItemQuery = rowField[12];
 				String [] tokens = classNames.split(Pattern.quote("."));
 				int iii = 0;
 				while (tokens.length > iii)
@@ -324,6 +325,8 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //					if (isRightLabel)
 //						item.addClassName("filabelright");
 //					else
+					if (isQuery)
+						classNamesItem = classNamesItemQuery;
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
