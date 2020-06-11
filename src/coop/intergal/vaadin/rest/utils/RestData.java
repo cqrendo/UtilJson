@@ -773,10 +773,10 @@ public class RestData {
 							}
 						else
 							fieldArr[6] = "";
-						if ( col.get("fieldWidth").asText().isEmpty() || col.get("fieldWidth").asText().equals("null") )
-							fieldArr[7] = "8";
+						if ( col.get("queryFieldWidth").asText().isEmpty() || col.get("queryFieldWidth").asText().equals("null") )/// for query different fields with width
+							fieldArr[7] = "20#20";
 						else
-							fieldArr[7] = col.get("queryFieldWidth").asText();  /// for query different fields with width
+							fieldArr[7] = col.get("queryFieldWidth").asText();  
 						if ( col.get("cssStyle").asText().isEmpty() || col.get("cssStyle").asText().equals("null") )
 							fieldArr[8] = "";
 						else

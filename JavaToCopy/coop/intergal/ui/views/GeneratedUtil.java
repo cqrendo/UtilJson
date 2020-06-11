@@ -52,6 +52,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMarginL50";
 //	private Grid<DynamicDBean> grid;
 	private DynamicViewGrid grid;
 
@@ -258,7 +259,10 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				if (nRow == 0)
 				{
 					form.setClassName("");
-					form = addClassNames(form,classNamesForm.trim());
+					if(isQuery)
+						form = addClassNames(form,CLASSNAME_FOR_FORM_QUERY);
+					else
+						form = addClassNames(form,classNamesForm.trim());
 					title = rowField[9];
 					
 				}
@@ -326,7 +330,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //						item.addClassName("filabelright");
 //					else
 					if (isQuery)
-						classNamesItem = classNamesItemQuery;
+						classNamesItem = classNamesItemQuery; 
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
