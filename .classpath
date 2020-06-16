@@ -6,6 +6,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="srcAVOIDErrors/intergal"/>
 	<classpathentry kind="lib" path="lib/com.fasterxml.jackson.annotations.jar"/>
 	<classpathentry kind="lib" path="lib/com.fasterxml.jackson.core.jar"/>
 	<classpathentry kind="lib" path="lib/com.fasterxml.jackson.databind.jar"/>

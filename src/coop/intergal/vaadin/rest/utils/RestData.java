@@ -416,7 +416,7 @@ public class RestData {
 //					String tableNameToSearch = genericResourceName+variant;
 					String tableNameToSearch = genericResourceName;
 					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch  + " "+ new Date());
-					cols = JSonClient.get("CR-FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", cache, "metadata");
+					cols = JSonClient.get("CR-FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", cache, AppConst.PRE_CONF_PARAM_METADATA);
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
 						rowsColList = new ArrayList<String[]>();
@@ -542,7 +542,7 @@ public class RestData {
 				String tableNameToSearch = genericResourceName;
 				System.out.println("RestData.getRowsFieldList()  tablename to search = "+tableNameToSearch );
 				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInDisplay=true&order=fieldOrder";
-				cols = JSonClient.get("CR-FieldTemplate",filter , cache, "metadata"); // TODO put false to true
+				cols = JSonClient.get("CR-FieldTemplate",filter , cache, AppConst.PRE_CONF_PARAM_METADATA); // TODO put false to true
 				if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 				{
 					rowsColList = new ArrayList<String[]>();
@@ -738,7 +738,7 @@ public class RestData {
 				String tableNameToSearch = genericResourceName;
 				System.out.println("RestData.getRowsFieldList()  tablename to search = "+tableNameToSearch );
 				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInQuery=true&order=queryOrder";
-				cols = JSonClient.get("CR-FieldTemplate",filter , cache, "metadata"); // TODO put false to true
+				cols = JSonClient.get("CR-FieldTemplate",filter , cache, AppConst.PRE_CONF_PARAM_METADATA); // TODO put false to true
 				if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 				{
 					rowsFIeldQueryList = new ArrayList<String[]>();
