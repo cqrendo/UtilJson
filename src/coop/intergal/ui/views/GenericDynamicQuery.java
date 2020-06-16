@@ -79,6 +79,8 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 					return prepareFilter(class1, object, ResourceName, false);
 	}
 	private String componeDateFilter(String filter, String field, String value) {
+		if (value.indexOf("/") > 0)
+			value = value.replaceAll("/", "-");
 		if (value.trim().length() == 0)
 			return filter;
 		if (filter.trim().length() == 0)
@@ -102,6 +104,8 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		// posible formats ( DD-MM-AAAA // DD-MM-AAAA hh:mm // DD-MM-AAAA::DD-MM-AAAA //
 		// DD-MM-AAAA hh:mm::DD-MM-AAAA hh:mm // >DD-MM-AAAA hh:mm..... )
 		// DD-MM-AAAA
+		if (value.indexOf("/") > 0)
+			value = value.replaceAll("/", "-");
 		if (value.startsWith("<") || value.startsWith(">")) {
 			String op = "%3E";
 			if (value.startsWith("<"))
@@ -480,7 +484,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		return value;
 	}
 
-	protected void cleanForm(Class<?> class1, Object object, String ResourceName, boolean isQuery) { // compose the filter
+	protected void cleanForm(Class<?> class1, Object object, String ResourceName, boolean isQryFormGenrated) { // compose the filter
 		// combining ROW fields and
 		// parents and grand parent
 		// fields
@@ -494,7 +498,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 					//System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
 					if (!fieldName.equals("null")) {
 						Field field;
-						if (isQuery)
+						if (isQryFormGenrated)
 						{
 							FormLayout form = null;
 							try {

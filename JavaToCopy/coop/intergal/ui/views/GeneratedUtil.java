@@ -330,7 +330,16 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //						item.addClassName("filabelright");
 //					else
 					if (isQuery)
+						{
+//				        Tooltip tooltip = new Tooltip();
+//				        tooltip.attachToComponent(tf);
+//				        tooltip.setPosition(TooltipPosition.RIGHT);
+//				        tooltip.setAlignment(TooltipAlignment.LEFT);
+//				        tooltip.add("Hola");
+//				        tooltip.add(new Paragraph(TranslateResource.getFieldLocale("FABORRARAVISO", AppConst.PRE_CONF_PARAM)));
+						item.getElement().setAttribute("title","Ayuda busqueda...."); 
 						classNamesItem = classNamesItemQuery; 
+						}
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);

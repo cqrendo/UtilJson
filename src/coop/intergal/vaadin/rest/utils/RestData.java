@@ -15,6 +15,7 @@ import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 
+import coop.intergal.AppConst;
 import coop.intergal.AppConstGeneric;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
@@ -774,7 +775,7 @@ public class RestData {
 						else
 							fieldArr[6] = "";
 						if ( col.get("queryFieldWidth").asText().isEmpty() || col.get("queryFieldWidth").asText().equals("null") )/// for query different fields with width
-							fieldArr[7] = "20#20";
+							fieldArr[7] = AppConst.QUERY_FIELD_DEFAULT_SIZE;
 						else
 							fieldArr[7] = col.get("queryFieldWidth").asText();  
 						if ( col.get("cssStyle").asText().isEmpty() || col.get("cssStyle").asText().equals("null") )
@@ -794,7 +795,7 @@ public class RestData {
 						else
 							fieldArr[11] = col.get("titleGrid").asText();
 						if ( col.get("cssStyleQueryField").asText().isEmpty() || col.get("cssStyleQueryField").asText().equals("null") )
-							fieldArr[12] = "";
+							fieldArr[12] =AppConst.DEFAULT_CSS_STYLE_QRY_FIELD;
 						else
 							fieldArr[12] = col.get("cssStyleQueryField").asText();
 						rowsFIeldQueryList.add(fieldArr);
