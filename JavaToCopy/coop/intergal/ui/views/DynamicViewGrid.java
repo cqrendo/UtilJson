@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.vaadin.haijian.Exporter;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
@@ -24,6 +26,7 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.gridpro.GridPro;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -39,6 +42,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.QueryParameters;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
@@ -144,6 +148,8 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 	private DynamicDBean selectedRow;
 	private Object display;
 	private Method setBean;
+	@Id("itemButtons")
+	private Div itemButtons;
 	private DynamicDBean keepRowBeforChanges;
 	@Id("newRow")
 	private Button newRow;
@@ -207,6 +213,17 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 			if (col != null)
 				col.setAutoWidth(true);
 		}
+//		ExporterOption exporterOption = new ExporterOption();
+//		exporterOption.getColumnOption("col0").columnName("My Name").toUpperCase();
+//		int nCols = list.getRowsColList().size();
+//		int i = 1;
+//		while (i < nCols)
+//		{
+//			exporterOption.getColumnOption("col"+i).columnName(TranslateResource.getFieldLocale(list.getRowsColList().get(i), preConfParam));
+//			i++;
+//		}
+		Anchor anchor = new Anchor(new StreamResource("my-excel.xlsx", Exporter.exportAsExcel(grid)), "Download As Excel");
+		itemButtons.add(anchor);
 //		grid.getColumns().forEach(column -> column.setAutoWidth(true));
 
 }
@@ -269,6 +286,7 @@ public DdbDataBackEndProvider getDataProvider() {
 		String colName = colData[2];
 		String colType = colData[3];
 		String colHeader = colData[6];
+		String header = colHeader;
 		Column<DynamicDBean> col = null;
 		boolean isNotAParentField = colData[1].indexOf("#SORT")>-1; // parent field for now can not be use as sort column
 		boolean isCOlEditable = true;;
@@ -276,7 +294,7 @@ public DdbDataBackEndProvider getDataProvider() {
 			isCOlEditable = false;
 		if (colData[1].indexOf("#SIG#")>-1) { // #SIG# = Show In Grid
 //			String header = TranslateResource.getFieldLocale(colData[0], preConfParam);
-			String header = colHeader;
+			header = colHeader;
 			if (isDate(header, colType)) {
 				if (header.indexOf("#")>0)
 					header = header.substring(2); // to avoid date typ indicator "D#"
@@ -290,12 +308,16 @@ public DdbDataBackEndProvider getDataProvider() {
 					System.err.println(" REVISAR ESTE CODIGO AL MIGRAR A 14 da error");
 				else
 					if (isNotAParentField)
+					{
 						col = grid.addColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).setHeader(header).setSortProperty(colData[0])
 						.setResizable(true).setSortProperty(colData[0]);
+					}
 					else
+					{
 						col = grid.addColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).setHeader(header).setSortProperty(colData[0])
 						.setResizable(true);
 						
+					}	
 				
 //		grid.addColumn(d ->d.getCol(i)).setHeader(header).setResizable(true);
 			} else if (isCurrency(header,colType)) {
@@ -423,6 +445,11 @@ public DdbDataBackEndProvider getDataProvider() {
 					else 
 						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true) ;
 				}
+		}
+		if (col !=null)
+		{
+			col.setKey(colName);
+			System.out.println("DynamicViewGrid.addFormatedColumn() Header" + colName);
 		}
 		return col;
 	}

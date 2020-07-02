@@ -1,18 +1,24 @@
 package coop.intergal.ui.views;
 
+import static coop.intergal.AppConst.PACKAGE_VIEWS;
+
+import java.lang.reflect.Method;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.FormItem;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
@@ -24,12 +30,15 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
+import com.vaadin.flow.dom.DomEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.QueryParameters;
 
+import coop.intergal.AppConst;
+import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawerFooter;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawerHeader;
@@ -70,6 +79,8 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 	private String title;
 	private String resource;
 	private DynamicDBean bean;
+	private Dialog dialogForPick;
+	private String pickMapFields; 
 
 
 
@@ -124,7 +135,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
     }
  
  
-    Component createDetails(ArrayList<String[]> rowsFieldList, FormLayout form, Boolean isQuery ) {
+    public Component createDetails(ArrayList<String[]> rowsFieldList, FormLayout form, Boolean isQuery ) {
  			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
 //			rowsFieldList = dataProvider.getRowsFieldList(cache);
 		    if (bean != null)
@@ -340,6 +351,10 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 						item.getElement().setAttribute("title","Ayuda busqueda...."); 
 						classNamesItem = classNamesItemQuery; 
 						}
+					if (isReadOnly)
+					{
+						tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldNameInUI, tf));
+					}
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
@@ -398,6 +413,94 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 			
 	}
 
+private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
+		
+		try {
+		DynamicGridForPick dynamicGridForPick = new DynamicGridForPick(); 
+		String queryFormForPickClassName = null;
+//		Object queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
+		DynamicDBean currentRow = binder.getBean();
+		String resourceName =currentRow.getResourceName();
+		String filter="tableName='"+resourceName+"'%20AND%20FieldNameInUI='"+fieldName+"'";
+		String parentResource = "";
+		
+		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,"metadata","1");
+		for (JsonNode eachRow : rowsList)  {
+			if (eachRow.size() > 0)
+			{
+				parentResource = eachRow.get("parentResource").asText();
+				pickMapFields =  eachRow.get("pickMapFields").asText();
+				queryFormForPickClassName =  eachRow.get("queryFormForPickClassName").asText();
+			}
+		}
+//		queryFormForPickClassName = queryFormForPickClassName;
+		if (queryFormForPickClassName.startsWith("coop.intergal.ui.views") == false)
+			queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;
+	
+		DynamicViewGrid grid = dynamicGridForPick.getGrid();
+		Class<?> dynamicQuery = Class.forName(queryFormForPickClassName);
+		Object queryForm = dynamicQuery.newInstance();
+//		Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.tys.ui.views.DynamicViewGrid.class} );
+		Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
 
+		setGrid.invoke(queryForm,grid);
+		if (queryFormForPickClassName.indexOf("Generated") > -1)
+		{
+			
+			DdbDataBackEndProvider dataProvider = new DdbDataBackEndProvider();
+			dataProvider.setPreConfParam(AppConst.PRE_CONF_PARAM);
+			dataProvider.setResourceName(parentResource);
+			Method setDataProvider= dynamicQuery.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+			Method createContent= dynamicQuery.getMethod("createDetails");
+			Method setRowsColList = dynamicQuery.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+			setDataProvider.invoke(queryForm,dataProvider );
+//			setRowsColList.invoke(queryForm,rowsColList);
+//			Method createContent= dynamicQuery.getMethod("createDetails");
+//			queryForm = 
+			createContent.invoke(queryForm);
+		}
+		dynamicGridForPick.getDivQuery().add((Component)queryForm);
+
+		
+		grid.setButtonsRowVisible(false);
+		grid.setResourceName(parentResource);
+		grid.setupGrid();
+//			subDynamicViewGrid.getElement().getStyle().set("height","100%");
+//		subDynamicViewGrid.setResourceName(resourceSubGrid);
+//		if (resourceSubGrid.indexOf(".")> -1)
+//			subDynamicViewGrid.setFilter(componFKFilter(bean, resourceSubGrid));
+//		subDynamicViewGrid.setupGrid();
+//		dynamicGridForPick.setRowsColList(currentRow.getRowsColList());
+		dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,currentRow, pickMapFields ));
+		if (dialogForPick == null)
+			dialogForPick = new Dialog();
+		dialogForPick.removeAll();
+		dialogForPick.add(dynamicGridForPick);
+		dialogForPick.open();
+		
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+	private Object fillDataForPickAndAccept(Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
+		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
+		DynamicDBean seletedParentRow = seletedRows.iterator().next();
+		while (tokens.hasMoreElements())
+		{
+			String eachFieldMap = tokens.nextToken();
+			int idxSeparator = eachFieldMap.indexOf(";");
+			String childField = eachFieldMap.substring(0, idxSeparator);
+			String parentField = eachFieldMap.substring(idxSeparator+1);
+			currentRow.setCol(seletedParentRow.getCol(parentField), childField);						
+		}
+		binder.setBean(currentRow);
+		dialogForPick.close();
+		return null;
+	}
  
 }

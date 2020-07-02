@@ -89,7 +89,8 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		keysFromParent = "";
 		String filter = getFieldsDataForFilter(GeneratedQuery.class, this, dataProvider.getResourceName());
 		System.out.println("GeneratedQuery.createFilter()...." + filter);
-//		DdbDataBackEndProvider dataProvider = grid.getDataProvider();
+		if (grid != null) // when is a query form of a popup doesn't have grid thta is null
+			dataProvider = grid.getDataProvider();
 		dataProvider.setFilter(filter);
 		dataProvider.refreshAll();
 		return null;
