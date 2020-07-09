@@ -310,7 +310,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 			}
 		}
 		grid.setFilter(filter);
-		grid.setupGrid(false);
+		grid.setupGrid(false, true);
 //		divGrid.add(grid );
 		buttons.setVisible(false);
 		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));

@@ -11,6 +11,7 @@ import java.util.List;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -205,6 +206,7 @@ public class DynamicGridForPick extends PolymerTemplate<TemplateModel> implement
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {
+		acceptPick.addClickShortcut(Key.F10);
 		QueryParameters queryParameters = event.getLocation().getQueryParameters();
 		filter = null; 
 		List<String> parFIlter = queryParameters.getParameters().get("filter");

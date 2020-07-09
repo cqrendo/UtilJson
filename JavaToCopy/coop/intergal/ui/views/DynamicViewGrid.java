@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.vaadin.haijian.Exporter;
+import org.vaadin.olli.FileDownloadWrapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
@@ -29,6 +30,7 @@ import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
@@ -179,11 +181,11 @@ private boolean autoSaveGrid = true;
 //	}
 
 public void setupGrid() { // by Default the grid is not editable, to be editable, call setupGrid(true)
-	setupGrid(false);
+	setupGrid(false, false);
 	
 }
 
-	public void setupGrid(boolean isGridEditable) {
+	public void setupGrid(boolean isGridEditable, boolean hasExportButton) {
 	
 	//	grid.scrollTo(1); 
 	//	grid.getDataProvider().
@@ -197,6 +199,14 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		grid.setDataProvider(dataProvider);
 		grid.setEnterNextRow(true);
 		grid.setMultiSort(true);
+        grid.getElement().executeJs("this.addEventListener('keydown', function(e) {\r\n" + "  let delta = 0;\r\n"
+        		+ "  if (e.key === 'ArrowUp') {\r\n" + "    delta = -1;\r\n"
+        		+ "  } else if (e.key === 'ArrowDown') {\r\n" + "    delta = 1;\r\n" + "  }\r\n"
+        		+ "  if (this.selectedItems[0] && delta) {\r\n"
+        		+ "    const currentIndex = +this._cache.getCacheAndIndexByKey(this.selectedItems[0].key).scaledIndex;\r\n"
+        		+ "    const itemToSelect = this._cache.getItemForIndex(currentIndex + delta)\r\n"
+        		+ "    itemToSelect && this.$connector.doSelection([itemToSelect], true);\r\n" + "  }\r\n"
+        		+ "}.bind(this));");
 
 //		Crud<DynamicDBean> crud = new Crud<>();
 //		crud.setDataProvider(dataProvider);
@@ -222,8 +232,17 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 //			exporterOption.getColumnOption("col"+i).columnName(TranslateResource.getFieldLocale(list.getRowsColList().get(i), preConfParam));
 //			i++;
 //		}
-		Anchor anchor = new Anchor(new StreamResource("my-excel.xlsx", Exporter.exportAsExcel(grid)), "Download As Excel");
-		itemButtons.add(anchor);
+	//	Anchor anchor = new Anchor(new StreamResource("my-excel.xlsx", Exporter.exportAsExcel(grid)), "Download As Excel");
+        if (hasExportButton)
+        {
+        	Button button = new Button(new Icon(VaadinIcon.FILE_TABLE));
+        	button.addThemeName("small");
+        	FileDownloadWrapper buttonWrapper = new FileDownloadWrapper(
+            new StreamResource("export.xls", Exporter.exportAsExcel(grid)));
+        	buttonWrapper.wrapComponent(button);
+        	itemButtons.add(buttonWrapper);  
+        }
+//		itemButtons.add(anchor);
 //		grid.getColumns().forEach(column -> column.setAutoWidth(true));
 
 }
@@ -448,6 +467,8 @@ public DdbDataBackEndProvider getDataProvider() {
 		}
 		if (col !=null)
 		{
+			if (colName.equals("col0"))
+				System.out.println("DynamicViewGrid.addFormatedColumn()");
 			col.setKey(colName);
 			System.out.println("DynamicViewGrid.addFormatedColumn() Header" + colName);
 		}
@@ -670,7 +691,7 @@ private boolean isBoolean(String header, String colType) {
 				subDynamicViewGrid.setResourceName(resourceSubGrid);
 				if (resourceSubGrid.indexOf(".")> -1)
 					subDynamicViewGrid.setFilter(componFKFilter(bean, resourceSubGrid));
-				subDynamicViewGrid.setupGrid(true);
+				subDynamicViewGrid.setupGrid(true,true);
 				subDynamicViewGrid.setParentRow(selectedRow);
 				subDynamicViewGrid.setDisplayParent(display);
 				subDynamicViewGrid.setBeanParent(setBean);

@@ -133,6 +133,18 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	private String col97;
 	private String col98;
 	private String col99;
+	private String col100;
+	private String col101;
+	private String col102;
+	private String col103;
+	private String col104;
+	private String col105;
+	private String col106;
+	private String col107;
+	private String col108;
+	private String col109;
+	private String col110;
+	
 /// RestData Only process until here, if more that 100 fields are need then RestData Must be adapted 
 	private Date col2Date;
 	private Date col3Date;
@@ -1104,6 +1116,94 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 	public void setCol99(String col99) {
 		this.col99 = col99;
+	}
+
+	public String getCol100() {
+		return col100;
+	}
+
+	public void setCol100(String col100) {
+		this.col100 = col100;
+	}
+
+	public String getCol101() {
+		return col101;
+	}
+
+	public void setCol101(String col101) {
+		this.col101 = col101;
+	}
+
+	public String getCol102() {
+		return col102;
+	}
+
+	public void setCol102(String col102) {
+		this.col102 = col102;
+	}
+
+	public String getCol103() {
+		return col103;
+	}
+
+	public void setCol103(String col103) {
+		this.col103 = col103;
+	}
+
+	public String getCol104() {
+		return col104;
+	}
+
+	public void setCol104(String col104) {
+		this.col104 = col104;
+	}
+
+	public String getCol105() {
+		return col105;
+	}
+
+	public void setCol105(String col105) {
+		this.col105 = col105;
+	}
+
+	public String getCol106() {
+		return col106;
+	}
+
+	public void setCol106(String col106) {
+		this.col106 = col106;
+	}
+
+	public String getCol107() {
+		return col107;
+	}
+
+	public void setCol107(String col107) {
+		this.col107 = col107;
+	}
+
+	public String getCol108() {
+		return col108;
+	}
+
+	public void setCol108(String col108) {
+		this.col108 = col108;
+	}
+
+	public String getCol109() {
+		return col109;
+	}
+
+	public void setCol109(String col109) {
+		this.col109 = col109;
+	}
+
+	public String getCol110() {
+		return col110;
+	}
+
+	public void setCol110(String col110) {
+		this.col110 = col110;
 	}
 
 	public String getCol53() {

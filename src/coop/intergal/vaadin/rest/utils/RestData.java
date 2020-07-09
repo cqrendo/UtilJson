@@ -203,13 +203,19 @@ public class RestData {
 					if (rowsColList.get(i) !=null)
 						{
 						String colName = getColName(rowsColList,i);
-						if (eachRow.get(colName)==null)
+						JsonNode data = eachRow.get(colName);
+						if (colName.indexOf("FK-") > -1)
+						{
+							data = getDataFromFGNode(eachRow,colName);
+						}
+							
+						if (data==null)
 							field.set(dB, null);
 						else
 						{
-							if (isNotABinary(eachRow.get(colName)))
+							if (isNotABinary(data))
 							{
-								String value = eachRow.get(colName).asText();
+								String value = data.asText();
 								if (value.equals("null"))
 									value= "";
 								field.set(dB, value);
@@ -217,7 +223,7 @@ public class RestData {
 							else
 							{
 								
-								JsonNode binaryData= eachRow.get(colName);
+								JsonNode binaryData= data;
 								String url = binaryData.get("url").asText();
 								keepStreaminDb(dB, url,preConfParam );
 							}
@@ -238,6 +244,22 @@ public class RestData {
 
 		return dB;
 	}
+	private static JsonNode getDataFromFGNode(JsonNode eachRow, String colName) {
+		while (true)
+		{
+		String fkNodeName = colName.substring(0, colName.indexOf("."));
+		JsonNode node = eachRow.get(fkNodeName);
+		if (node == null)
+			return null;
+		colName = colName.substring(colName.indexOf(".")+1);
+		if (colName.indexOf("FK-") == -1)
+			{
+			return node.get(colName);
+			}
+		eachRow = node;
+		}
+	}
+
 	private static void keepStreaminDb(DynamicDBean dB, String url, String preConfParam) {
 		try {
 			InputStream inputStream = JSonClient.getStream(url, preConfParam);

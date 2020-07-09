@@ -2,6 +2,8 @@ package coop.intergal.ui.components;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -59,11 +61,15 @@ public class QueryButtonsBar extends PolymerTemplate<TemplateModel> {
 	}
 
 	public Registration addSearchListener(ComponentEventListener<SearchEvent> listener) {
-	return bSearch.addClickListener(e -> listener.onComponentEvent(new SearchEvent(this, true)));
+		bSearch.getElement().setAttribute("title", "ALT + B (buscar)") ;
+		bSearch.addClickShortcut(Key.KEY_B, KeyModifier.ALT); 
+		return bSearch.addClickListener(e -> listener.onComponentEvent(new SearchEvent(this, true)));
 }
 
 	public Registration addClearSearchListener(ComponentEventListener<ClearSearchEvent> listener) {
-	return bCleanSearch.addClickListener(e -> listener.onComponentEvent(new ClearSearchEvent(this, true)));
+		bCleanSearch.getElement().setAttribute("title", "ALT + C (limpiar búsqeda)") ;
+		bCleanSearch.addClickShortcut(Key.KEY_C, KeyModifier.ALT); 
+		return bCleanSearch.addClickListener(e -> listener.onComponentEvent(new ClearSearchEvent(this, true)));
 }
 //	public Registration addSaveListener(ComponentEventListener<SaveEvent> listener) {
 //		return save.addClickListener(e -> listener.onComponentEvent(new SaveEvent(this, true)));

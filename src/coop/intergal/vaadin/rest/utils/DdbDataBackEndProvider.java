@@ -282,9 +282,12 @@ private long sizeBE;
 				boolean newProduct = firstBean.getCol0()== null ;
 		        
 		        DataService.get().updateDynamicDBean(ResourceTobeSave, beansToSaveAndRefresh);
+		        boolean hashasError = false;
+		        if (beansToSaveAndRefresh.get("ERROR") != null)
+		        	hashasError = true;
 		        if (newProduct) {
 		            refreshAll();
-		        } else {
+		        } else if (hashasError == false){
 		            refreshItem(firstBean);
 		        }
 //				return selectedRow;
