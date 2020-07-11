@@ -340,7 +340,7 @@ public class JSonClient {
 		 	   		   baseURL=urlHost+baseURL.substring(baseURL.indexOf("/rest/"));
 		 	   	   }
 		 	   	   /**Imprimimos los valores*/
-		 	   	   printLog("host name "+ hostName +" baseUrl: "+baseURL);
+		 	   	   printLog("host name: "+ hostName +" baseUrl: "+baseURL);
 			   	   }
 		  } catch (FileNotFoundException e) {
 			  printLog("Error, El archivo no exite");
