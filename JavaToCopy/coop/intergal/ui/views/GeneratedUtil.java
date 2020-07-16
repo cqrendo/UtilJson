@@ -249,10 +249,12 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				String[] rowField = itRowsFieldList.next();
 				String filedName = rowField[0];
 				boolean isReadOnly = isReadOnly( rowField [1]);
+				boolean isRequired = isRequired( rowField [1]);
 				String label = rowField[6];
 				String fieldNameInUI = rowField[2];
 				String idFieldType = rowField[3];
 				String fieldWidth = rowField[7];
+				String fieldSize = rowField[13];
 				String classNames =  rowField[8];
 				String classNamesForm = ""; 
 				String classNamesItem = ""; 
@@ -359,12 +361,24 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
 					tf.setWidth(fieldWidth);
+					if (fieldSize.length() > 0)						
+						tf.setMaxLength(new Integer(fieldSize));
+					tf.setRequired(isRequired);
 				}
 				i++;
 				
 			}
 			return form;
 	    }
+	private boolean isRequired(String params) {
+		if (params == null)
+			return false;
+		if (params.indexOf("#REQ#")>-1)
+			return true;
+		else 
+			return false;
+	}
+
 	private ResponsiveStep calculateResponsiveStep(int i) {
 		int em = i * 22;
 		String strEm =  em +"";

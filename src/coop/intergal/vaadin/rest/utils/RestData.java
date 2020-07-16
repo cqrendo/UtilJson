@@ -445,7 +445,7 @@ public class RestData {
 						int i = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[13];
+							String[] fieldArr  = new String[14];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -456,6 +456,8 @@ public class RestData {
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 								fieldArr[1] = fieldArr[1]+"#CNoEDT#";
+							if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
+								fieldArr[1] = fieldArr[1]+"#REQ#";
 							if ( col.get("FieldNameInUI").asText().isEmpty())
 								fieldArr[2] = "col"+i;	
 							else
@@ -512,7 +514,7 @@ public class RestData {
 							else
 								fieldArr[11] = col.get("titleGrid").asText();
 							fieldArr[12] = ""; // is only used for query fields
-
+							fieldArr[13] = ""; // is only used for Form fields
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -571,7 +573,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[13];
+						String[] fieldArr  = new String[14];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -624,6 +626,10 @@ public class RestData {
 							fieldArr[12] = ""; // is only used for query fields
 //						else
 //							fieldArr[12] = col.get("cssStyleQueryField").asText();
+						if ( col.get("fieldSize").asText().isEmpty() || col.get("fieldSize").asText().equals("null") )
+							fieldArr[13] = "";
+						else
+							fieldArr[13] = col.get("fieldSize").asText();	
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -661,7 +667,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[13];
+			String[] fieldArr  = new String[14];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -678,6 +684,7 @@ public class RestData {
 			fieldArr[10] = "";
 			fieldArr[11] = "";
 			fieldArr[12] = "";
+			fieldArr[13] = "";
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
 			rowsColList.add(fieldArr);
