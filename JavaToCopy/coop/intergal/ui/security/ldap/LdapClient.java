@@ -102,13 +102,13 @@ public class LdapClient {
 //        attributes.put(attribute);
        
 
-        Attribute sn = new BasicAttribute("sn");
-        sn.add("Steve2");
-        attributes.put(sn);
- 
-        Attribute cn = new BasicAttribute("cn");
-        cn.add("Jobs");
-        attributes.put(cn);
+//        Attribute sn = new BasicAttribute("sn");
+//        sn.add("Steve2");
+//        attributes.put(sn);
+// 
+//        Attribute cn = new BasicAttribute("cn");
+//        cn.add("Jobs");
+//        attributes.put(cn);
         
 //       Attribute uid = new BasicAttribute("uid");
 //       uid.add("bob2");

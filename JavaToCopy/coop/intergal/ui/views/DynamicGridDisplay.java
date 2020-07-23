@@ -104,6 +104,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 	@Id("buttons")
 	private FormButtonsBar buttons;
 	private String apiname;
+	private boolean cache = true;
 //	@Id("splitQryAndResult")
 //	private SplitLayout splitQryAndResult;
 
@@ -235,7 +236,14 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 			resourceName = queryParameters.getParameters().get("resourceName").get(0);
 			if (queryParameters.getParameters().get("apiname") != null)
 				apiname = queryParameters.getParameters().get("apiname").get(0);
-
+			if (queryParameters.getParameters().get("cache") != null)
+				{
+				String cacheStr = queryParameters.getParameters().get("cache").get(0);
+				if (cacheStr.equals("false"))
+					cache = false;
+				else
+					cache = true;
+				}
 			//*** PACKAGE_VIEWS is used when the class is no generic for several projects. and corresponds a particular class for the form
 			queryFormClassName = queryParameters.getParameters().get("queryFormClassName").get(0);
 			displayFormClassName= queryParameters.getParameters().get("displayFormClassName").get(0);
@@ -310,6 +318,8 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 			}
 		}
 		grid.setFilter(filter);
+		System.out.println("DynamicGridDisplay.beforeEnter() CACHE "+ cache);
+		grid.setCache(cache);
 		grid.setupGrid(false, true);
 //		divGrid.add(grid );
 		buttons.setVisible(false);

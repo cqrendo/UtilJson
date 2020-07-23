@@ -167,6 +167,7 @@ private Button deleteRow;
 private FormButtonsBar buttonsForm;
 private boolean hasSideDisplay = true;
 private boolean autoSaveGrid = true;
+private boolean cache = true;
 
 
 //	@Autowired()
@@ -179,6 +180,14 @@ private boolean autoSaveGrid = true;
 //		setupGrid();
 ////		presenter.setView(this);
 //	}
+
+public boolean isCache() {
+	return cache;
+}
+
+public void setCache(boolean cache) {
+	this.cache = cache;
+}
 
 public void setupGrid() { // by Default the grid is not editable, to be editable, call setupGrid(true)
 	setupGrid(false, false);
@@ -211,7 +220,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 //		Crud<DynamicDBean> crud = new Crud<>();
 //		crud.setDataProvider(dataProvider);
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
-		rowsColListGrid = dataProvider.getRowsColList();
+		rowsColListGrid = dataProvider.getRowsColList(cache );
 		newRow.addClickListener(e -> insertBeanInList());
 		deleteRow.addClickListener(e -> deleteBeanFromList());
 //		grid.removeAllColumns();
@@ -686,6 +695,7 @@ private boolean isBoolean(String header, String colType) {
 			if (resourceSubGrid != null)
 			{
 				DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
+				subDynamicViewGrid.setCache(cache);
 				subDynamicViewGrid.setButtonsRowVisible(true);
 	//			subDynamicViewGrid.getElement().getStyle().set("height","100%");
 				subDynamicViewGrid.setResourceName(resourceSubGrid);

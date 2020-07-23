@@ -1,4 +1,4 @@
-package org.vaadin.intergal.validation.constrains;
+package org.vaadin.intergal.validation;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

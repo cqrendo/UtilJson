@@ -445,7 +445,7 @@ public class RestData {
 						int i = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[14];
+							String[] fieldArr  = new String[15];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -456,8 +456,8 @@ public class RestData {
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 								fieldArr[1] = fieldArr[1]+"#CNoEDT#";
-							if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
-								fieldArr[1] = fieldArr[1]+"#REQ#";
+//							if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
+//								fieldArr[1] = fieldArr[1]+"#REQ#";
 							if ( col.get("FieldNameInUI").asText().isEmpty())
 								fieldArr[2] = "col"+i;	
 							else
@@ -515,6 +515,7 @@ public class RestData {
 								fieldArr[11] = col.get("titleGrid").asText();
 							fieldArr[12] = ""; // is only used for query fields
 							fieldArr[13] = ""; // is only used for Form fields
+							fieldArr[14] = ""; // is only used for Form fields
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -530,7 +531,9 @@ public class RestData {
 							if (ident !=null) 
 								{
 								JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam); 
-								JSonClient.keepJoinConditionSubResources(resource); 
+								if (resource.get("statusCode") != null && resource.get("statusCode").asInt() != 500)  // TODO check why sme times you get 500, by example when you do 	DynamicDBean dynamicDBean = RestData.getOneRow(RESOURCE_FIELD_TEMPLATE,filter, AppConst.PRE_CONF_PARAM_METADATA, null); in consrain.java
+
+									JSonClient.keepJoinConditionSubResources(resource); 
 								}
 							}
 					}
@@ -573,10 +576,12 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[14];
+						String[] fieldArr  = new String[15];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
+						if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
+							fieldArr[1] = fieldArr[1]+"#REQ#";
 						if ( col.get("FieldNameInUI").asText().isEmpty())
 							fieldArr[2] = "col"+i;	
 						else
@@ -630,6 +635,11 @@ public class RestData {
 							fieldArr[13] = "";
 						else
 							fieldArr[13] = col.get("fieldSize").asText();	
+						if ( col.get("validationRuleName").asText().isEmpty() || col.get("validationRuleName").asText().equals("null") )
+							fieldArr[14] = "";
+						else
+							fieldArr[14] = col.get("validationRuleName").asText();	
+							
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -667,7 +677,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[14];
+			String[] fieldArr  = new String[15];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -685,6 +695,7 @@ public class RestData {
 			fieldArr[11] = "";
 			fieldArr[12] = "";
 			fieldArr[13] = "";
+			fieldArr[14] = "";
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
 			rowsColList.add(fieldArr);
@@ -774,7 +785,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[13];
+						String[] fieldArr  = new String[15];
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -829,6 +840,10 @@ public class RestData {
 							fieldArr[12] = col.get("cssStyleQueryField").asText();
 						rowsFIeldQueryList.add(fieldArr);
 						i++;
+						fieldArr[13] = ""; // is only used for Form fields
+						fieldArr[14] = ""; // is only used for Form fields
+
+
 					}
 					// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
 					if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself

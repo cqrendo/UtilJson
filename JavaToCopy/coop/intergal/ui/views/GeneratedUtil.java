@@ -3,6 +3,7 @@ package coop.intergal.ui.views;
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
 
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -12,6 +13,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+
+import org.vaadin.intergal.validation.DynValidator;
+import org.vaadin.intergal.validation.ValidationMetadata;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.AttachEvent;
@@ -30,6 +34,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.DomEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -140,11 +145,25 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //			rowsFieldList = dataProvider.getRowsFieldList(cache);
 		    if (bean != null)
 				binder.setBean(bean);
-
+		  
 			Iterator<String[]> itRowsFieldList = rowsFieldList.iterator();
 			if (form == null)
 				form = new FormLayout();
 			form.removeAll();
+			Div statusLabel = new Div();
+			statusLabel.getElement().getStyle().set("color", "var(--lumo-error-text-color)");
+			statusLabel.getElement().getStyle().set("white-space", "nowrap");
+			statusLabel.getElement().getStyle().set("position","absolute");
+			statusLabel.getElement().getStyle().set("background-color","azure");
+			statusLabel.getElement().getStyle().set("left","100px");
+			statusLabel.getElement().getStyle().set("top","100px");
+			binder.setStatusLabel(statusLabel);
+			//with error
+			if (isQuery == false)
+			{
+				FormLayout.FormItem itemSL = form.addFormItem(statusLabel,".");
+				form.setColspan(itemSL, 40);
+			}	
 			form.setResponsiveSteps(
 //				new ResponsiveStep("31em",1),
 //				new ResponsiveStep("32em",2),
@@ -247,7 +266,9 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //				Label label = new Label(itRowsColList.next()[0]);
 //				label.setWidth("500px");
 				String[] rowField = itRowsFieldList.next();
-				String filedName = rowField[0];
+				String fieldName = rowField[0];
+				if (fieldName.equals("BAJA"))
+					System.out.println("STOP DEBUG");	
 				boolean isReadOnly = isReadOnly( rowField [1]);
 				boolean isRequired = isRequired( rowField [1]);
 				String label = rowField[6];
@@ -255,6 +276,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				String idFieldType = rowField[3];
 				String fieldWidth = rowField[7];
 				String fieldSize = rowField[13];
+				String validationRuleName = rowField[14];
 				String classNames =  rowField[8];
 				String classNamesForm = ""; 
 				String classNamesItem = ""; 
@@ -282,7 +304,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 		
 				nRow ++;
 				
-				System.out.println("DetailsPreview.createDetails()" +" filedName " + filedName + " "+classNames  );
+				System.out.println("DetailsPreview.createDetails()" +" filedName " + fieldName + " "+classNames + " isRequired " +isRequired + " validationRuleName "+validationRuleName);
 
 				if( fieldWidth.isEmpty())
 					fieldWidth = "10";
@@ -301,10 +323,13 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				}
 				
 				TextField tf = new TextField();//itRowsColList.next()[0]);
+				tf.setValueChangeMode(ValueChangeMode.EAGER);  
+				tf.setRequired(true);//(isRequired);
+
 				tf.setId("tf"+fieldNameInUI);
 				tf.setReadOnly(isReadOnly);
 				tf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-				if (filedName.equals("#SPACE#"))
+				if (fieldName.equals("#SPACE#"))
 				{
 					Span s = new Span();
 					FormLayout.FormItem item = form.addFormItem(s, label );
@@ -333,7 +358,28 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				}
 				else
 				{
-					binder.bind(tf, fieldNameInUI);
+			//		binder.bind(tf, fieldNameInUI);
+					if (validationRuleName.length() > 1 && isQuery == false)
+						{
+						binder.withValidator(
+							new DynValidator<>("org.vaadin.intergal.validation.Constraints.validateFromBackEnd#"+validationRuleName,
+									ValidationMetadata.of(DynamicDBean.class)));
+						}
+					if (isRequired && isQuery == false)
+					{
+						binder.forField(tf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
+								ValidationMetadata.of(String.class)))
+								.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+
+					}
+					else
+					{
+						binder.bind(tf, fieldNameInUI);
+//					binder.forField(tf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.minLength#4",
+//							ValidationMetadata.of(String.class)))
+//							.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+					}
+//					binder.forField(tf).bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
 //				form.add(fi);
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
@@ -363,13 +409,24 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					tf.setWidth(fieldWidth);
 					if (fieldSize.length() > 0)						
 						tf.setMaxLength(new Integer(fieldSize));
-					tf.setRequired(isRequired);
-				}
+					}
 				i++;
 				
 			}
+
+//			[part="error-message"] {white-space: nowrap;}
+
+//			form.add(statusLabel);
 			return form;
 	    }
+	public Binder<DynamicDBean> getBinder() {
+		return binder;
+	}
+
+	public void setBinder(Binder<DynamicDBean> binder) {
+		this.binder = binder;
+	}
+
 	private boolean isRequired(String params) {
 		if (params == null)
 			return false;
@@ -448,9 +505,12 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
 			}
 		}
 //		queryFormForPickClassName = queryFormForPickClassName;
+		if (queryFormForPickClassName.equals("null"))
+			return null;
 		if (queryFormForPickClassName.startsWith("coop.intergal.ui.views") == false)
 			queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;
 	
+
 		DynamicViewGrid grid = dynamicGridForPick.getGrid();
 		Class<?> dynamicQuery = Class.forName(queryFormForPickClassName);
 		Object queryForm = dynamicQuery.newInstance();

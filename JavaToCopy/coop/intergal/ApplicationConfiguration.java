@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.vaadin.intergal.validation.ValidationService;
 import org.vaadin.intergal.validation.ValidationServiceProvider;
-import org.vaadin.intergal.validation.constrains.ValidationServiceImpl;
+import org.vaadin.intergal.validation.ValidationServiceImpl;
 
 @Configuration
 public class ApplicationConfiguration {
