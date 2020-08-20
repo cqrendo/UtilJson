@@ -199,7 +199,7 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 			rowsFieldList = dataProvider.getRowsFieldList(cache);
 			if (form == null)
 				form = new FormLayout();
-			Component details = generatedUtil.createDetails(rowsFieldList,form, false );
+			Component details = generatedUtil.createDetails(rowsFieldList,form, false, cache );
 			title = generatedUtil.getTitle();
 			return details;
 	}

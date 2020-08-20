@@ -52,6 +52,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
+import coop.intergal.ui.utils.converters.DecimalFormatter;
 import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
@@ -135,6 +136,7 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 	
 
 	private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
+	private DecimalFormatter decimalFormatter = new DecimalFormatter();
 
 	private String resourceName;
 	private String title;
@@ -228,7 +230,8 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 	//       addColumn(Customer::getId, new NumberRenderer()).setCaption("Id");
 		for (int i=0;i<numberOFCols; i++)
 		{
-			Column<DynamicDBean> col = addFormatedColumn(i, isGridEditable);
+		//	Column<DynamicDBean> col = addFormatedColumn(i, isGridEditable);
+			Column<DynamicDBean> col = GeneratedUtil.addFormatedColumn(i, rowsColListGrid, this, grid, isGridEditable);
 			if (col != null)
 				col.setAutoWidth(true);
 		}
@@ -308,8 +311,7 @@ public DdbDataBackEndProvider getDataProvider() {
 	public void setDataProvider(DdbDataBackEndProvider dataProvider) {
 		this.dataProvider = dataProvider;
 	}
-	private Column<DynamicDBean> addFormatedColumn(int i, boolean isGridEditable) {
-//		String colName = "col"+i;
+	private Column<DynamicDBean> addFormatedColumnOLD2(int i, boolean isGridEditable) {
 		String[] colData = rowsColListGrid.get(i);
 		String colName = colData[2];
 		String colType = colData[3];
@@ -374,45 +376,41 @@ public DdbDataBackEndProvider getDataProvider() {
 						.setTextAlign(ColumnTextAlign.END).setResizable(true);
 						}
 
-			}  else if (isBoolean(header,colType)) {
+			} else if (isDecimal(header,colType)) {
+				if (header.indexOf("#")>0)
+					header = header.substring(2);
+				if (isCOlEditable  && isGridEditable) 
+					if (isNotAParentField)
+					{
+						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),2))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+					}
+					else
+					{
+						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),2))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+					}
+				else
+					if (isNotAParentField)
+						{
+						col = grid.addColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),2))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+						}
+					else
+						{
+						col = grid.addColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),2))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+						}
+
+			} 
+			else if (isBoolean(header,colType)) {
 				if (header.indexOf("#")>0)
 					header = header.substring(2);
 				if (isCOlEditable  && isGridEditable) {
 					col = grid.addEditColumn(d -> d.getColBoolean(colName)?//"Si":"No")
 							TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NO", AppConst.PRE_CONF_PARAM))
-//	                .checkbox((item, newValue) ->
-//	                        item.setColBoolean(newValue,colName))
 					.checkbox((item, newValue) -> colChanged(item,colName,newValue))		
 					.setHeader(header);
-//					col = grid.addEditColumn(d -> d.getColBoolean(colName)).checkbox((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header);
-//			        col = grid.addEditColumn(d -> d.getColBoolean(colName), d->d.isX1111X()?"SI":"NO")
-//			                .checkbox((item, newValue) -> item.setColBoolean(newValue,colName));			
-//					col = grid.addEditColumn(b -> b.getColBoolean(colName), new IconRenderer<>(
-//			        obj -> obj.getColBoolean(colName) ? 
-//			                VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create()))
-//			        .checkbox(DynamicDBean::setColBoolean);
-//
-//		V14			gridPro.addEditColumn(b -> b.isBoolean(), new IconRenderer<>(
-//					        obj -> obj.isBoolean() ? 
-//					                VaadinIcon.CHECK.create() : VaadinIcon.CLOSE.create()))
-//					        .checkbox(Bean::setAtHome);
-//					grid.addEditColumn(new IconRenderer<DynamicDBean>(obj -> {
-//						if (obj.getColBoolean(colName)) {
-//						return VaadinIcon.CHECK.create();
-//						} else {
-//						return VaadinIcon.CLOSE.create();
-//						}
-//						}, obj->"")).checkbox((item, newValue) -> colChanged(item,colName,newValue));
-						 
-//					if (isNotAParentField)
-//					{
-//						grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
-//						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
-//					}
-//					else
-//					{
-//						grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
-//						.setTextAlign(ColumnTextAlign.END).setResizable(true);
 					}
 				else
 					if (isNotAParentField)
@@ -441,14 +439,6 @@ public DdbDataBackEndProvider getDataProvider() {
 						col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header).setResizable(true);				
 				else if (isGridEditable && isCOlEditable == false ) 
 				{
-				//	 grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).getElement());
-				//	 grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true);
-					//	 Grid<String> grid = new Grid<>();
-//					 grid.addColumn(d-> new ComponentRenderer<Label,String>(c->{
-//					 Label l = new Label(d.getCol(colName));
-//					 l.getElement().addEventListener("click", ev->System.out.println("clicked"));
-//					 return l;
-//					 })).setResizable(true);;
 					if (isNotAParentField)
 						{
 						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
@@ -463,8 +453,6 @@ public DdbDataBackEndProvider getDataProvider() {
 							 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
 						
 					}
-				//	 grid.setItems("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
-		//			 add(grid);
 				}	
 				else
 				{
@@ -491,7 +479,7 @@ public DdbDataBackEndProvider getDataProvider() {
 
 // ****** the isType, are prefix that determines the type ( D# = data; C# = currency) this prefix are fill in the labels names, by example ResourceBundle...
 
-private Object pickParent(String colName, DynamicDBean item) {
+public Object pickParent(String colName, DynamicDBean item) {
 	System.out.println("clicked "+colName + item.getCol(colName));
 //	return null;
 	try {
@@ -568,6 +556,11 @@ private boolean isCurrency(String header, String colType) {
 	if (header.startsWith("C#")) // when there is nmot the type defined in FiledTemplate it can be defined in the name with the prefix "d#"
 		return true; 
 	if (colType.equals("3"))
+		return true;
+	return false;
+}
+private boolean isDecimal(String header, String colType) {
+	if (colType.equals("6"))
 		return true;
 	return false;
 }
@@ -1118,7 +1111,7 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 		return "999999";
 	}
 
-	private Object colChanged(DynamicDBean item, String colName, String newValue) {
+	public Object colChanged(DynamicDBean item, String colName, String newValue) {
 //		System.out.println("DynamicViewGrid.colChanged()..."+  "...colName "+ colName +"...newValue "+ newValue+"...item " + item.getRowJSon() + "...newValue "+ newValue);
 		if (colName != null) // is call by the acceptPick
 			item.setCol(newValue, colName );
@@ -1134,7 +1127,7 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 		rowIsInserted = item;
 		return null;
 	}
-	private Object colChanged(DynamicDBean item, String colName, Boolean newValue) {
+	public Object colChanged(DynamicDBean item, String colName, Boolean newValue) {
 		
 		String newValueStr = "false";
 		if (newValue)

@@ -1,26 +1,34 @@
 package coop.intergal.ui.utils.converters;
 
+import java.math.BigInteger;
+
 import com.vaadin.flow.templatemodel.ModelEncoder;
 
 import coop.intergal.ui.dataproviders.DataProviderUtil;
 import coop.intergal.ui.utils.FormattingUtils;
 
 
-public class CurrencyFormatter implements ModelEncoder<Integer, String> {
+public class DecimalFormatter implements ModelEncoder<BigInteger, String> {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Override
-	public String encode(Integer modelValue) {
-		return DataProviderUtil.convertIfNotNull(modelValue, FormattingUtils::formatAsCurrency);
+	public String encode(BigInteger modelValue) {
+		return DataProviderUtil.convertIfNotNull(modelValue, FormattingUtils::formatAs2Decimal);
 	}
 
 	@Override
-	public Integer decode(String presentationValue) {
+	public BigInteger decode(String presentationValue) {
 		throw new UnsupportedOperationException();
 	}
 
-	public static Integer getCents(String col) {
-		if (col == null)
+	public BigInteger getCents(String col, int nDecimals) {
+		if (col == null || col.equals("null") == true || col.equals("") == true)
 			return null;
+		col = col.format("%."+nDecimals+"f",Double.valueOf(col));
 		col=col.replace(",","."); // change , for .
 		int idxE = col.indexOf("€"); // take off € sign 
 		if (idxE > -1)
@@ -37,7 +45,14 @@ public class CurrencyFormatter implements ModelEncoder<Integer, String> {
 		}
 		else if (idXOfPoint > -1)
 			cents = col.substring(0, col.indexOf(".")) +  col.substring(col.indexOf(".")+1); // take off "."
-		return new Integer (cents);
+		String nDecimalsStr = "0";  // trick0001 the number of decimals are add at the end of the number, to be pass inside the value , instead of a external parameter 
+		if (nDecimals < 10 )
+			nDecimalsStr = nDecimalsStr + nDecimals;
+		else
+			nDecimalsStr = nDecimals+"";
+		cents = cents + nDecimalsStr;
+		
+		return new BigInteger (cents);
 
 	}
 }

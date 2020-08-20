@@ -18,4 +18,9 @@ public class DataProviderUtil {
 	public static <T> ItemLabelGenerator<T> createItemLabelGenerator(Function<T, String> converter) {
 		return item -> convertIfNotNull(item, converter, () -> "");
 	}
+
+//	public static String convertIfNotNull(Long modelValue, Object converter) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 }

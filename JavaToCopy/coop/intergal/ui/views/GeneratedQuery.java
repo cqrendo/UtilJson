@@ -162,7 +162,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		rowsQueryFieldList = dataProvider.getRowsQueryFieldList(cache);		
 //		queryButtonsBar.addSearchListener(e -> createFilterFromQryForm());
 //		queryButtonsBar.addClearSearchListener(e -> cleanQryForm());//System.out.println("PedidoProveedorQuery.beforeEnter() BUSCAR>>>>"));
-		return generatedUtil.createDetails(rowsQueryFieldList, form, true);
+		return generatedUtil.createDetails(rowsQueryFieldList, form, true, cache);
 }
 
 

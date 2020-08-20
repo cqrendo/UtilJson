@@ -531,7 +531,7 @@ public class RestData {
 							if (ident !=null) 
 								{
 								JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam); 
-								if (resource.get("statusCode") != null && resource.get("statusCode").asInt() != 500)  // TODO check why sme times you get 500, by example when you do 	DynamicDBean dynamicDBean = RestData.getOneRow(RESOURCE_FIELD_TEMPLATE,filter, AppConst.PRE_CONF_PARAM_METADATA, null); in consrain.java
+								if ((resource.get("statusCode") != null && resource.get("statusCode").asInt() != 500) || resource.get("statusCode") == null)  // TODO check why sme times you get 500, by example when you do 	DynamicDBean dynamicDBean = RestData.getOneRow(RESOURCE_FIELD_TEMPLATE,filter, AppConst.PRE_CONF_PARAM_METADATA, null); in consrain.java
 
 									JSonClient.keepJoinConditionSubResources(resource); 
 								}
@@ -582,6 +582,8 @@ public class RestData {
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
 						if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#REQ#";
+						if ( col.get("parentResource") != null && col.get("parentResource").asText().trim().length() > 1 && col.get("parentResource").asText().trim().equals("null")== false) 
+							fieldArr[1] = fieldArr[1]+"#PCK#";
 						if ( col.get("FieldNameInUI").asText().isEmpty())
 							fieldArr[2] = "col"+i;	
 						else

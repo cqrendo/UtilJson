@@ -3,6 +3,7 @@ package coop.intergal.ui.views;
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -16,24 +17,39 @@ import java.util.regex.Pattern;
 
 import org.vaadin.intergal.validation.DynValidator;
 import org.vaadin.intergal.validation.ValidationMetadata;
+import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.FormItem;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.textfield.BigDecimalField;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
+import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.dom.DomEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -51,7 +67,9 @@ import coop.intergal.ui.util.FontSize;
 import coop.intergal.ui.util.LumoStyles;
 import coop.intergal.ui.util.TextColor;
 import coop.intergal.ui.util.UIUtils;
+import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
+import coop.intergal.ui.utils.converters.DecimalFormatter;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
@@ -59,6 +77,7 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 //@Route(value = "gridDetails", layout = MainLayout.class)
 @CssImport(value = "./styles/monbusstyle.css")
 @CssImport(value = "./styles/monbusstyle-form-item.css", themeFor = "vaadin-form-item")
+@Uses(NumberField.class) 
 public class GeneratedUtil  {//, AfterNavigationListener {
 
 
@@ -78,7 +97,9 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //	private ArrayList<String[]> rowsColList;
 //	private ArrayList<String[]> rowsFieldList;
 //	private ArrayList<String[]> rowsColListGrid;
-	private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
+	private static CurrencyFormatter currencyFormatter = new CurrencyFormatter();
+	private static DecimalFormatter decimalFormatter = new DecimalFormatter();
+
 	private Hashtable<String, DynamicDBean> beansToSaveAndRefresh = new Hashtable<String, DynamicDBean>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
 
 	private String title;
@@ -116,31 +137,9 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 	}
 
    
-  
-    private boolean isCurrency(String header, String colType) {
-    	if (header.startsWith("C#")) // when there is nmot the type defined in FiledTemplate it can be defined in the name with the prefix "d#"
-    		return true; 
-    	if (colType.equals("3"))
-    		return true;
-    	return false;
-    }
-
-
-    private boolean isDate(String header, String colType) {
-    	if (header.startsWith("D#")) // when there is nmot the type defined in FiledTemplate it can be defined in the name with the prefix "d#"
-    		return true; 
-    	if (colType.equals("1"))
-    		return true;
-    	return false;
-    }
-    private boolean isBoolean(String header, String colType) {
-    	if (colType.equals("4"))
-    		return true;
-    	return false;
-    }
  
  
-    public Component createDetails(ArrayList<String[]> rowsFieldList, FormLayout form, Boolean isQuery ) {
+    public Component createDetails(ArrayList<String[]> rowsFieldList, FormLayout form, Boolean isQuery, Boolean cache ) {
  			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
 //			rowsFieldList = dataProvider.getRowsFieldList(cache);
 		    if (bean != null)
@@ -157,11 +156,12 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 			statusLabel.getElement().getStyle().set("background-color","azure");
 			statusLabel.getElement().getStyle().set("left","100px");
 			statusLabel.getElement().getStyle().set("top","100px");
+			statusLabel.getElement().getStyle().set("padding","0px 10px");
 			binder.setStatusLabel(statusLabel);
 			//with error
 			if (isQuery == false)
 			{
-				FormLayout.FormItem itemSL = form.addFormItem(statusLabel,".");
+				FormLayout.FormItem itemSL = form.addFormItem(statusLabel,"");
 				form.setColspan(itemSL, 40);
 			}	
 			form.setResponsiveSteps(
@@ -270,10 +270,14 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				if (fieldName.equals("BAJA"))
 					System.out.println("STOP DEBUG");	
 				boolean isReadOnly = isReadOnly( rowField [1]);
+				boolean isPick = isPick (rowField [1]);
 				boolean isRequired = isRequired( rowField [1]);
 				String label = rowField[6];
 				String fieldNameInUI = rowField[2];
-				String idFieldType = rowField[3];
+				String idFieldTypeStr = rowField[3];
+				int idFieldType = 0;
+				if ( idFieldTypeStr.isEmpty() == false)
+					idFieldType = new Integer (idFieldTypeStr);
 				String fieldWidth = rowField[7];
 				String fieldSize = rowField[13];
 				String validationRuleName = rowField[14];
@@ -304,7 +308,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 		
 				nRow ++;
 				
-				System.out.println("DetailsPreview.createDetails()" +" filedName " + fieldName + " "+classNames + " isRequired " +isRequired + " validationRuleName "+validationRuleName);
+				System.out.println("DetailsPreview.createDetails()" +" filedName " + fieldName + " "+classNames + " isRequired " +isRequired + " validationRuleName "+validationRuleName + " idFieldType "+ idFieldType);
 
 				if( fieldWidth.isEmpty())
 					fieldWidth = "10";
@@ -323,8 +327,8 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				}
 				
 				TextField tf = new TextField();//itRowsColList.next()[0]);
-				tf.setValueChangeMode(ValueChangeMode.EAGER);  
-				tf.setRequired(true);//(isRequired);
+		//		tf.setValueChangeMode(ValueChangeMode.EAGER);  
+		//		tf.setRequired(true);//(isRequired);
 
 				tf.setId("tf"+fieldNameInUI);
 				tf.setReadOnly(isReadOnly);
@@ -337,7 +341,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
 				}
-				else if (idFieldType.equals("1") && isQuery == false) // is Date
+				else if (idFieldType == 1 && isQuery == false) // is Date
 				{
 					DatePicker dp = new DatePicker();
 					dp.getElement().setAttribute("theme", "small");
@@ -356,29 +360,133 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					form.setColspan(item, colspan);
 					dp.setWidth(fieldWidth);
 				}
-				else
+				else if (idFieldType == 5 && isQuery == false) // is Number
 				{
-			//		binder.bind(tf, fieldNameInUI);
-					if (validationRuleName.length() > 1 && isQuery == false)
-						{
-						binder.withValidator(
-							new DynValidator<>("org.vaadin.intergal.validation.Constraints.validateFromBackEnd#"+validationRuleName,
-									ValidationMetadata.of(DynamicDBean.class)));
-						}
-					if (isRequired && isQuery == false)
+					IntegerField nf = new IntegerField();
+//					nf.setValueChangeMode(ValueChangeMode.EAGER); 
+					nf.setId("tf"+fieldNameInUI);
+					nf.getElement().setAttribute("theme", "small");
+					nf.setReadOnly(isReadOnly);
+					boolean isRightLabel = false;
+//					if (label.endsWith("#"))isRightLabel = true;
+					Div l = alingLabel(label); 
+//					setValidators(null, nf, fieldNameInUI, validationRuleName, isRequired, isQuery, cache);
+					setBeanValidators(validationRuleName, isQuery, cache) ;
+					if (isRequired && isQuery == false && fieldSize.length() == 0)
 					{
-						binder.forField(tf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
-								ValidationMetadata.of(String.class)))
-								.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+						binder.forField(nf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
+								ValidationMetadata.of(Integer.class)))
+								.bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+//						binder.forField(nf).withValidator(new Validator<Integer>() {
+//				            @Override
+//				            public ValidationResult apply(Integer integer, ValueContext valueContext) {
+//				                System.out.println("Got " + integer);
+//				                return ValidationResult.ok();
+//				            }
+//				        }).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));//.bind("col9");
+					}
+					if (fieldSize.length() > 0 && isQuery == false)	
+					{
+	//					nf.setMax(100);
+						binder.forField(nf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.lessThan#"+getMaxValueForNumber(fieldSize)+";"+isRequired,
+								ValidationMetadata.of(Integer.class)))
+								.bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 
 					}
+					
 					else
 					{
-						binder.bind(tf, fieldNameInUI);
-//					binder.forField(tf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.minLength#4",
-//							ValidationMetadata.of(String.class)))
-//							.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+					
+					}	
+//********
+					
+					FormLayout.FormItem item = form.addFormItem(nf, l );
+//					if (isRightLabel)
+//						item.addClassName("filabelright");
+//					else
+					item = addClassNames(item, classNamesItem);
+					item.setId(fieldNameInUI);
+					form.setColspan(item, colspan);
+					nf.setWidth(fieldWidth);
+				}
+				else if (idFieldType > 100 && isQuery == false) // is Decimal
+				{
+//					BigDecimalField bdf = new BigDecimalField();
+					int nDecimals = idFieldType - 100 ; 
+					TextField bdf = new TextField();
+					new NumeralFieldFormatter(".", ",", nDecimals).extend(bdf);
+//					nf.setValueChangeMode(ValueChangeMode.EAGER); 
+					bdf.setId("tf"+fieldNameInUI);
+					bdf.getElement().setAttribute("theme", "small");
+					bdf.setReadOnly(isReadOnly);
+//					bdf.set
+					boolean isRightLabel = false;
+//					if (label.endsWith("#"))isRightLabel = true;
+					Div l = alingLabel(label); 
+//					setValidators(null, nf, fieldNameInUI, validationRuleName, isRequired, isQuery, cache);
+					setBeanValidators(validationRuleName, isQuery, cache) ;
+					if (isRequired && isQuery == false && fieldSize.length() == 0)
+					{
+						binder.forField(bdf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
+						ValidationMetadata.of(String.class)))
+						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
+
+//						binder.forField(bdf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
+//								ValidationMetadata.of(BigDecimal.class)))
+//								.bind(d-> d.getColBigDecimal(fieldNameInUI), (d,v)-> d.setColBigDecimal(v,fieldNameInUI));
 					}
+//		decimals doesn't apply max length, the numer of decimal already linits			else if (fieldSize.length() > 0 && isQuery == false)
+//					{
+//						binder.forField(bdf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.lessThan#"+getMaxValueForNumber(fieldSize)+";"+isRequired,
+//						ValidationMetadata.of(String.class)))
+//						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
+//
+//
+//					}
+					
+					else
+					{
+//						binder.bind(tf, fieldNameInUI);
+						binder.forField(bdf).bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
+//						binder.forField(bdf).bind(d-> d.getColBigDecimal(fieldNameInUI), (d,v)-> d.setColBigDecimal(v,fieldNameInUI));
+					
+					}	
+//********
+					
+					FormLayout.FormItem item = form.addFormItem(bdf, l );
+//					if (isRightLabel)
+//						item.addClassName("filabelright");
+//					else
+					item = addClassNames(item, classNamesItem);
+					item.setId(fieldNameInUI);
+					form.setColspan(item, colspan);
+					bdf.setWidth(fieldWidth);
+				}
+				else // is Text
+				{
+			//		binder.bind(tf, fieldNameInUI);
+//					setValidators(tf,null, fieldNameInUI, validationRuleName, isRequired, isQuery, cache);
+					setBeanValidators(validationRuleName, isQuery, cache) ;
+//					if (validationRuleName.length() > 1 && isQuery == false)
+//					{
+//					binder.withValidator(
+//						new DynValidator<>("org.vaadin.intergal.validation.Constraints.validateFromBackEnd#"+validationRuleName+","+cache,
+//								ValidationMetadata.of(DynamicDBean.class)));
+//					}
+					if (isRequired && isQuery == false )
+					{	
+					binder.forField(tf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
+							ValidationMetadata.of(String.class)))
+							.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+
+					}
+					else 
+					{		
+					binder.bind(tf, fieldNameInUI);
+					}
+	
+					// *****
 //					binder.forField(tf).bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
 //				form.add(fi);
 					boolean isRightLabel = false;
@@ -399,9 +507,11 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 						item.getElement().setAttribute("title","Ayuda busqueda...."); 
 						classNamesItem = classNamesItemQuery; 
 						}
-					if (isReadOnly)
+					if (isPick)
 					{
 						tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldNameInUI, tf));
+						Icon edit = new Icon(VaadinIcon.DOWNLOAD_ALT);
+						tf.setSuffixComponent(edit);
 					}
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
@@ -419,6 +529,27 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //			form.add(statusLabel);
 			return form;
 	    }
+	private String getMaxValueForNumber(String fieldSize) {
+		Integer size = new Integer(fieldSize);
+		String space = new String(new char[size]).replace('\0', '9');
+		return space;
+	}
+
+	private void setBeanValidators(String validationRuleName,Boolean isQuery, Boolean cache) {
+		if (validationRuleName.length() > 1 && isQuery == false)
+		{
+		binder.withValidator(
+			new DynValidator<>("org.vaadin.intergal.validation.Constraints.validateFromBackEnd#"+validationRuleName+","+cache,
+					ValidationMetadata.of(DynamicDBean.class)));
+		}
+		
+		
+//	binder.forField(tf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.minLength#4",
+//			ValidationMetadata.of(String.class)))
+//			.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+		
+	}
+
 	public Binder<DynamicDBean> getBinder() {
 		return binder;
 	}
@@ -478,6 +609,16 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 		if (params == null)
 			return false;
 		if (params.indexOf("#CNoEDT#")>-1)
+			return true;
+		else 
+			return false;
+			
+	}
+	private boolean isPick(String params) {
+		
+		if (params == null)
+			return false;
+		if (params.indexOf("#PCK#")>-1)
 			return true;
 		else 
 			return false;
@@ -576,5 +717,198 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
 		dialogForPick.close();
 		return null;
 	}
+	// ******* COLUMNS ********
+	public static Column<DynamicDBean> addFormatedColumn(int i, ArrayList<String[]> rowsColListGrid, DynamicViewGrid dynamicViewGrid, GridPro<DynamicDBean> grid, boolean isGridEditable) {  // for now grid is not editable , then was copy and adapted from DynamicViewGrid
+//		String colName = "col"+i;
+		
+		String[] colData = rowsColListGrid.get(i);
+		String colName = colData[2];
+		String idFieldTypeStr = colData[3];
+		int idFieldType = 0;
+		if ( idFieldTypeStr.isEmpty() == false)
+			idFieldType = new Integer (idFieldTypeStr);
+		String colHeader = colData[6];
+		grid.setId(colData[11]); // contents titla for grid 
+		Column<DynamicDBean> col = null;
+		boolean isNotAParentField = colData[1].indexOf("#SORT")>-1; // parent field for now can not be use as sort column
+		boolean isCOlEditable = true;;
+		if (colData[1].indexOf("#CNoEDT#")>-1)
+			isCOlEditable = false;
+		if (colData[1].indexOf("#SIG#")>-1) { // #SIG# = Show In Grid
+//			String header = TranslateResource.getFieldLocale(colData[0], preConfParam);
+			String header = colHeader;
+			if (isDate(header, idFieldType)) { /// ********** DATE **************
+				if (header.indexOf("#")>0)
+					header = header.substring(2); // to avoid date typ indicator "D#"
+				if (isCOlEditable)//) && isGridEditable)
+//					if (isNotAParentField)
+//						grid.addEditColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+//						.setResizable(true).setSortProperty(colData[0]);
+//					else
+//						grid.addEditColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
+//						.setResizable(true);
+					System.err.println(" REVISAR ESTE CODIGO AL MIGRAR A 14 da error");
+				else
+					if (isNotAParentField)
+						col = grid.addColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).setHeader(header).setSortProperty(colData[0])
+						.setResizable(true).setSortProperty(colData[0]);
+					else
+						col = grid.addColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).setHeader(header).setSortProperty(colData[0])
+						.setResizable(true);
+						
+				
+//		grid.addColumn(d ->d.getCol(i)).setHeader(header).setResizable(true);
+			} else if (isCurrency(header,idFieldType)) { //// ********** CURRENCY *********
+				if (header.indexOf("#")>0)
+					header = header.substring(2);
+				if (isCOlEditable  && isGridEditable) 
+					if (isNotAParentField)
+					{
+						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+					}
+					else
+					{
+						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+					}
+				else
+				if (isNotAParentField)
+						{
+						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+						}
+					else
+						{
+						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+						}
+
+			}
+			else if (isDecimal(header,idFieldType)) { //// ********** decimal *********
+				if (header.indexOf("#")>0)
+					header = header.substring(2);
+				int ndecimals = idFieldType - 100;
+				if (isCOlEditable  && isGridEditable) 
+					if (isNotAParentField)
+					{
+						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+					}
+					else
+					{
+						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+					}
+				else
+				if (isNotAParentField)
+						{
+						col = grid.addColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+						}
+					else
+						{
+						col = grid.addColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName), ndecimals))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+						}
+
+			}else if (isBoolean(header,idFieldType)) {  /// ****** BOOLEAN ************
+				if (header.indexOf("#")>0)
+					header = header.substring(2);
+				if (isCOlEditable  && isGridEditable) {
+					col = grid.addEditColumn(d -> d.getColBoolean(colName)?//"Si":"No")
+							TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NO", AppConst.PRE_CONF_PARAM))
+					.checkbox((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue))		
+					.setHeader(header);
+					}
+				else
+
+					if (isNotAParentField)
+						{
+						col = grid.addColumn(d -> d.getColBoolean(colName)?//"Si":"No")
+								TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))		
+								.setHeader(header)
+//						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
+						}
+					else
+						{
+						col = grid.addColumn(d -> d.getColBoolean(colName)?//"Si":"No")
+								TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))		
+								.setHeader(header)
+//						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
+						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+						}
+
+				}	
+				else
+					if ((isCOlEditable && isGridEditable))
+						if (isNotAParentField)						
+							col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header).setResizable(true).setSortProperty(colData[0]);
+						else
+							col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header).setResizable(true);				
+					else if (isGridEditable && isCOlEditable == false ) 
+					{
+						if (isNotAParentField)
+							{
+							col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+							}
+						else {
+							col = grid.addColumn(new ComponentRenderer<Label,DynamicDBean>(item->{
+								 Label l = new Label("Buscar....");
+								 if (item.getCol(colName) != null && item.getCol(colName).isEmpty() == false)
+									 l = new Label(item.getCol(colName));
+								 l.getElement().addEventListener("click", ev->dynamicViewGrid.pickParent(colName, item));
+								 return l;
+								 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
+							
+						}
+					}	
+					else
+					{
+					if (isNotAParentField)
+						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+					else 
+						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true) ;
+				}
+		}
+		if (col !=null)
+			{
+				if (colName.equals("col0"))
+					System.out.println("DynamicViewGrid.addFormatedColumn()");
+				col.setKey(colName);
+				System.out.println("DynamicViewGrid.addFormatedColumn() Header" + colName);
+			}
+		return col;
+	}
+	  
+    private static boolean isDate(String header, int idFieldType) {
+    	if (header.startsWith("D#")) // when there is nmot the type defined in FiledTemplate it can be defined in the name with the prefix "d#"
+    		return true; 
+    	if (idFieldType== 1)
+    		return true;
+    	return false;
+    }
+    private static boolean isBoolean(String header, int idFieldType) {
+    	if (idFieldType == 4)
+    		return true;
+    	return false;
+    }
+
+    private static boolean isCurrency(String header, int idFieldType) {
+    	if (header.startsWith("C#")) // when there is nmot the type defined in FiledTemplate it can be defined in the name with the prefix "d#"
+    		return true; 
+    	if (idFieldType==3)
+    		return true;
+    	return false;
+    }
+    private static boolean isDecimal(String header, int idFieldType) {
+    	if (idFieldType > 100)
+    		return true;
+    	return false;
+    }
+
+
+  
  
 }

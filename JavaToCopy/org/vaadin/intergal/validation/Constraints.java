@@ -1,5 +1,7 @@
 package org.vaadin.intergal.validation;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -46,6 +48,21 @@ public class Constraints {
 	}
 
 	public static String greaterThan(Integer value, ValidationMetadata<?> metadata, String arg) {
+		boolean req = false;
+		int separatorPos = arg.indexOf(";");
+		if (separatorPos > -1)
+		{
+			String reqStr = arg.substring(separatorPos+1);	
+			arg = arg.substring(0,separatorPos );
+			if (reqStr.equals("true"))
+				req = true;
+		}
+		if ( req)
+		{
+			String result = isRequired(value, metadata);
+			if (result != null)
+				return result;
+		}
 		int limit = Integer.parseInt(arg);
 		if (value == null || value > limit) {
 			return null;
@@ -55,6 +72,21 @@ public class Constraints {
 	}
 
 	public static String lessThan(Integer value, ValidationMetadata<?> metadata, String arg) {
+		boolean req = false;
+		int separatorPos = arg.indexOf(";");
+		if (separatorPos > -1)
+		{
+			String reqStr = arg.substring(separatorPos+1);	
+			arg = arg.substring(0,separatorPos );
+			if (reqStr.equals("true"))
+				req = true;
+		}
+		if ( req)
+		{
+			String result = isRequired(value, metadata);
+			if (result != null)
+				return result;
+		}	
 		int limit = Integer.parseInt(arg);
 		if (value == null || value < limit) {
 			return null;
@@ -62,6 +94,33 @@ public class Constraints {
 			return formatMessage(metadata, "debe ser menor a " + limit);
 		}
 	}
+	public static String lessThan(String valueStr, ValidationMetadata<?> metadata, String arg) {
+		boolean req = false;
+		int separatorPos = arg.indexOf(";");
+		if (separatorPos > -1)
+		{
+			String reqStr = arg.substring(separatorPos+1);	
+			arg = arg.substring(0,separatorPos );
+			if (reqStr.equals("true"))
+				req = true;
+		}
+		valueStr = valueStr.replace(",",".");
+		Double  value = new Double (valueStr);
+		if ( req)
+		{
+			String result = isRequired(valueStr, metadata);
+			if (result != null)
+				return result;
+		}	
+		Double limit = new Double (arg);
+		
+		if (value == null || value > limit) {
+			return null;
+		} else {
+			return formatMessage(metadata, "debe ser menor a " + limit);
+		}
+	}
+
 
 	public static String minLength(String value, ValidationMetadata<?> metadata, String arg) {
 		int length = Integer.parseInt(arg);
@@ -73,12 +132,44 @@ public class Constraints {
 	}
 	public static String isRequired(String value, ValidationMetadata<?> metadata) {
 	//	int length = Integer.parseInt(arg);
+	//	System.out.println("Got (String) " + value);
 		if (value == null || value.length() >= 1) {
 			return null;
 		} else {
 			return formatMessage(metadata, "Requerido");
 		}
 	}
+	public static String isRequired(Double value, ValidationMetadata<?> metadata) {
+	//	int length = Integer.parseInt(arg);
+		if (value == null || value >= 0) {
+			return null;
+		} else {
+			return formatMessage(metadata, "Requerido");
+		}
+	}
+	public static String isRequired(BigDecimal value, ValidationMetadata<?> metadata) {
+	//	int length = Integer.parseInt(arg);
+		if (value == null) 
+			return formatMessage(metadata, "Requerido");
+		if (value.doubleValue() > 0) 
+			return null;
+		else {
+			return formatMessage(metadata, "Requerido");
+		}
+	}
+	public static String isRequired(Integer value, ValidationMetadata<?> metadata) {
+	//	int length = Integer.parseInt(arg);
+	//	if (value == null || value >= 0) {
+	//	 System.out.println("Got (a) " + value);
+		if (value == null) {
+			return formatMessage(metadata, "Requerido");
+		} else if (value >= 0) {
+			return null;
+		} else {
+			return formatMessage(metadata, "Requerido");
+		}
+	}
+
 
 	public static String notInFuture(LocalDate value, ValidationMetadata<?> metadata) {
 		if (value == null || value.compareTo(LocalDate.now()) <= 0) {
@@ -106,10 +197,14 @@ public class Constraints {
 			return "La fecha de inicio debe ser anterior a la fecha de finalizacion";
 		}
 	}
-	public static String validateFromBackEnd(DynamicDBean bean, ValidationMetadata<?> metadata, String validationName) {
+	public static String validateFromBackEnd(DynamicDBean bean, ValidationMetadata<?> metadata, String validationNameANDcache) {
 		//Por simplicidad se ignora el argumento
 		//El validador debería extraer los valores de interés a partir del parámetro delconstraint
-		String Result = validateFromBackEnd(bean,validationName);
+		Boolean cache = true;
+		if (validationNameANDcache.substring(validationNameANDcache.indexOf(",")).equals(",false"))
+				cache = false;			
+		String validationName = validationNameANDcache.substring(0, validationNameANDcache.indexOf(","));
+		String Result = validateFromBackEnd(bean,validationName, cache);
 		if (Result.equals("OK") ) {
 			return null;
 		} else {
@@ -117,11 +212,11 @@ public class Constraints {
 		}
 	}
 
-	private static String validateFromBackEnd(DynamicDBean bean, String validationName) {
+	private static String validateFromBackEnd(DynamicDBean bean, String validationName, Boolean cache) {
 		ScriptEngineManager manager = new ScriptEngineManager();
 		ScriptEngine engine = manager.getEngineByName("JavaScript");
 		String resourceName  = bean.getResourceName();
-		String[] jSStringAndErrorTest = getJSFromBackEnd(resourceName,validationName);
+		String[] jSStringAndErrorTest = getJSFromBackEnd(resourceName,validationName, cache);
 		if (jSStringAndErrorTest == null)
 			return "ERROR en Validación, \"Nombre Validación BR\" ("+validationName+") no existe para la tabla ("+getTableNameFromResourceName(resourceName)+") correspondiente";
 		String jSStringToProcess = createUsableJS(jSStringAndErrorTest[0], validationName, resourceName);
@@ -137,6 +232,7 @@ public class Constraints {
 		} catch (ScriptException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return "ERROR en Validación, \"Nombre Validación BR\" ("+validationName+") ->"+e.getMessage();
 		} // prints
 		return resultStr;
 	}
@@ -149,18 +245,18 @@ public class Constraints {
 			String field = tokens[i];
 			String fieldNameInUI = fieldNAmeAndFieldinUI.get(resourceName+"#"+field);
 			String value = bean.getCol(fieldNameInUI);
-			values = values + value + "',";
+			values = values + value + "','";
 			i ++;
 		}
-		return values.substring(0, values.length()-1); // excludes last ","
+		return values.substring(0, values.length()-2); // excludes last ",'"
 	}
 
-	private static String[] getJSFromBackEnd(String resourceName, String validationName) {
+	private static String[] getJSFromBackEnd(String resourceName, String validationName, boolean cache) {
 		try {
 			String filter="\"name\"='"+validationName+"' AND \"entity_name\"='main:"+getTableNameFromResourceName(resourceName)+"'";
 //			String q = "random word £500 bank $";
 			String filterEncode = URLEncoder.encode(filter, StandardCharsets.UTF_8.toString());
-			JsonNode rowRules = JSonClient.get("LACAdmin:rules",filterEncode,false,AppConst.PRE_CONF_PARAM_METADATA,1+"");
+			JsonNode rowRules = JSonClient.get("LACAdmin:rules",filterEncode,cache,AppConst.PRE_CONF_PARAM_METADATA,1+"");
 			for (JsonNode eachRow : rowRules)  {
 				String[] s = new String[]{eachRow.get("rule_text1").asText(), eachRow.get("rule_text2").asText()};
 				return s;
@@ -221,7 +317,7 @@ public class Constraints {
 		
 	}
 
-	private static String getColNameinUI(String resourceName, String field) {
+	private static String getColNameinUIOLD(String resourceName, String field) {
 		String filter =  "tableName='"+resourceName+"'%20AND%20fieldName='"+field+"'";
 //		ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 //		String[] fieldArr  = new String[1];
@@ -232,6 +328,28 @@ public class Constraints {
 		else
 			return "colNOTFOUND";
 	}
+	private static String getColNameinUI(String resourceName, String field) {
+		try {
+			String filter =  "tableName='"+resourceName+"' AND fieldName='"+field+"'";
+//			String q = "random word £500 bank $";
+			String filterEncode = URLEncoder.encode(filter, StandardCharsets.UTF_8.toString());
+			JsonNode rowFT = JSonClient.get("main:FieldTemplate",filterEncode,true,AppConst.PRE_CONF_PARAM_METADATA,1+""); // normally cache is optional nut in this case , is very unlikely that this data NmaeinUI is changed
+			for (JsonNode eachRow : rowFT)  {
+				return eachRow.get("FieldNameInUI").asText();
+			}
+			
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		String[] s = new String[]{"if (row.ALQUILADO==\"S\" || row.ALQUILADO==\"N\" || !row.ALQUILADO || row.ALQUILADO==\" \")\r\n" + 
+//				"    return true;\r\n" + 
+//				"else\r\n" + 
+//				"    return false;","ALQ. sólo admite los valores S, N o blanco" };
+		return "colNOTFOUND";
+	}
+
 
 	public static String valueInList(String value, ValidationMetadata<?> metadata, String arg) {
 		if (value == null || Arrays.asList(arg.split(",")).contains(value)) {

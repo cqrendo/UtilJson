@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.NativeButton;
@@ -351,10 +352,11 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 			if (o instanceof Field)
 			{
 //				Field<?> field = (Field<?>) o ; // TODO porque FK- tiene id Nulo?
+				int colType = getColType(rowsColList,i);
 				if (field.getName() != null && value != null && value.equals("null") == false && value.toString().equals("") == false 
 						&& value.toString().length() > 0 ) //&& field.getCaption().startsWith("HIDE @ FIELD") == false) // the Hide fields are not send in the data to PUT 
 				{
-					int colType = getColType(rowsColList,i);
+					
 					//					System.err.println("FIELD......."+field.getId() + " VALUE.... "+ (String) field.getValue());
 					if (field.getName().startsWith("col") == false) // all the "normal" fields starts with col (col0, col1.....) 
 					{
@@ -405,6 +407,13 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 				}
 				else if(field.getName() != null && field.getName().startsWith("col") == true)  // even there is not data i must continue to keep syncronice col1, col2... 
 				{
+					if((value == null || value.toString().equals("") ==  true) && getColName(rowsColList,i).equals("null") == false && getColName(rowsColList,i).startsWith("FK-") == false)// && isCheckBox(o) == false)// to process when you empty the field
+					{
+						if (value == null || colType == 5)
+							newEntityinfo.put(getColName(rowsColList,i), NullNode.getInstance()); 
+						else
+							newEntityinfo.put(getColName(rowsColList,i), (String) ""); 
+					}
 					i++;
 				}
 					

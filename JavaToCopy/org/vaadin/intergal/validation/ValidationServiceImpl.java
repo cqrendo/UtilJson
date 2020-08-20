@@ -47,7 +47,7 @@ public class ValidationServiceImpl implements ValidationService {
 
 		Method method;
 		try {
-			method = lookupMethod(className, methodName, metadata.getValueType(), ss.length + 1);
+				method = lookupMethod(className, methodName, metadata.getValueType(), ss.length + 1);
 		} catch (Exception e) {
 			throw new UndeclaredThrowableException(e);
 		}
@@ -56,9 +56,9 @@ public class ValidationServiceImpl implements ValidationService {
 	}
 
 	private String invoke(Method method, Object value, ValidationMetadata<?> metadata, Object arg) {
-		if (value == null) {
-			return null;
-		}
+//		if (value == null) {
+//			return null;
+//		}
 		Object args[] = arg == null ? new Object[] { value, metadata } : new Object[] { value, metadata, arg };
 		try {
 			return (String) method.invoke(null, args);

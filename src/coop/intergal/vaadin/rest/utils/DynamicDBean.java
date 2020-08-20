@@ -3,6 +3,7 @@ package coop.intergal.vaadin.rest.utils;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1245,6 +1246,56 @@ public class DynamicDBean {// extends AbstractEntity{/**
 
 		return null;//col3Date;
 	}
+	public void setCol(String v, String colName) {
+		Object dbean = this;
+		try {
+			String methodName = "setCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "setC" + colName.substring(1);
+			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
+			setColX.invoke(dbean,v+"");
+		} catch (NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public Double getColDouble(String colName) {
+//		System.out.println("DynamicDBean.getCol()" +i);
+		Object dbean = this;
+		try {
+//			Method setColXDate = ((DynamicDBean.class)).getMethod("setCol"+i+"Date", new Class[] {java.util.Date.class} );
+			String methodName = "getCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "getC" + colName.substring(1);
+			Method getColX = ((DynamicDBean.class)).getMethod(methodName );
+			if ( getColX.invoke(dbean).equals("null"))
+				return null;
+			return Double.valueOf((String) getColX.invoke(dbean));
+		} catch (NoSuchMethodException | SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;//col3Date;
+	}
 	public void setColDate(Date colDate, String colName ) {
 		Object dbean = this;
 		try {
@@ -1360,6 +1411,8 @@ public class DynamicDBean {// extends AbstractEntity{/**
 				int postPoint = colValue.indexOf(".");
 				if (postPoint > -1)
 					colValue = colValue.substring(0,postPoint ) + colValue.substring(postPoint + 1);
+				if ( colValue.equals("null"))
+					return null;
 				return new Integer (colValue);		
 		
 		}
@@ -1383,8 +1436,7 @@ public class DynamicDBean {// extends AbstractEntity{/**
 		return null;
 	}
 
-	public void setColInteger(Integer v, String colName) {
-		Object dbean = this;
+	public void setColInteger(Integer v, String colName) {		Object dbean = this;
 		try {
 			String methodName = "setCol" + colName;
 			if (colName.startsWith("col"))
@@ -1490,7 +1542,57 @@ public class DynamicDBean {// extends AbstractEntity{/**
 		return null;
 	}
 
-	public void setCol(String v, String colName) {
+
+	public void setColDouble(Double v, String colName) {
+		Object dbean = this;
+		try {
+			String methodName = "setCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "setC" + colName.substring(1);
+			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
+			setColX.invoke(dbean,v+"");
+		} catch (NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public BigDecimal getColBigDecimal(String colName) {
+		Object dbean = this;
+		try {
+//			Method setColXDate = ((DynamicDBean.class)).getMethod("setCol"+i+"Date", new Class[] {java.util.Date.class} );
+			String methodName = "getCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "getC" + colName.substring(1);
+			Method getColX = ((DynamicDBean.class)).getMethod(methodName );
+			if ( getColX.invoke(dbean).equals("null"))
+				return null;
+			return new BigDecimal ((String) getColX.invoke(dbean));
+		} catch (NoSuchMethodException | SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+	public void setColBigDecimal(BigDecimal v, String colName) {
 		Object dbean = this;
 		try {
 			String methodName = "setCol" + colName;
@@ -1547,6 +1649,64 @@ public class DynamicDBean {// extends AbstractEntity{/**
 	{
 		return true;
 	}
+
+	public String getColDecimalPoint(String colName, int nDecimals) { 
+//		System.out.println("DynamicDBean.getCol()" +i);
+		Object dbean = this;
+		try {
+//			Method setColXDate = ((DynamicDBean.class)).getMethod("setCol"+i+"Date", new Class[] {java.util.Date.class} );
+			String methodName = "getCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "getC" + colName.substring(1);
+			Method getColX = ((DynamicDBean.class)).getMethod(methodName );
+			String value = ((String) getColX.invoke(dbean));
+			value = String.format("%."+nDecimals+"f",Double.valueOf(value));
+			return value.replace(".",",");
+		} catch (NoSuchMethodException | SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;//col3Date;
+	}
+
+	public void setColDecimalPoint(String v, String colName) {
+		System.out.println("DynamicDBean.setColDecimalPoint() VALUE "+ v);
+		v = v.replace(("."), "");
+		v = v.replace((","), ".");
+		System.out.println("DynamicDBean.setColDecimalPoint() VALUE "+ v);
+		Object dbean = this;
+		try {
+			String methodName = "setCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "setC" + colName.substring(1);
+			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
+			setColX.invoke(dbean,v+"");
+		} catch (NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
 
 	
 }
