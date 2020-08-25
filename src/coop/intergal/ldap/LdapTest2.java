@@ -1,5 +1,6 @@
 package coop.intergal.ldap;
  
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -11,25 +12,57 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.ModificationItem;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  
 public class LdapTest2 {
  
     public void run() {
         try {
             DirContext context = getContext();
-            String name = "uid=bobx,ou=people";
+            String name = "uid=user,ou=people";
 //            createLDAPObject(context, name);
 //            createAttribute(context, name, "displayName", "JOBS");
-            viewAttribute(context, name, "displayName");
-            updateAttribute(context, name, "displayName", "STEVE");
-            viewAttribute(context, name, "displayName");
+            System.out.println("result "+changePassword(name , "admin2", "admin3"));
+//            viewAttribute(context, name, "displayName");
+//            updateAttribute(context, name, "displayName", "STEVE");
+//            viewAttribute(context, name, "displayName");
     //        removeAttribute(context, name, "displayName");
     //        removeLDAPObject(context, name);
         } catch (NamingException e) {
             e.printStackTrace();
-        }
+        } catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
- 
+    public static String changePassword(String name , String oldPass, String newPass) throws NamingException, UnsupportedEncodingException {
+    	DirContext context = getContext();
+    	//
+    	ModificationItem[] mods = new ModificationItem[1];
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		Attributes attrs = context.getAttributes(name);
+		byte[] v = (byte[]) attrs.get("userPassword").get();
+		String saveOldPass = (String) new String(v);
+		// Test the new password
+         // Test the bind - if this fails, an exception is thrown
+ 		Attribute oldUserPassword = new BasicAttribute("userPassword");
+ //		String encodeOldPass = encoder.encode(oldPass);
+		boolean isSavedPass = encoder.matches(oldPass,saveOldPass);
+//		BasicAttribute pon = new BasicAttribute("userPassword", ("\"" + oldPass + "\"").getBytes("UTF-16LE"));
+		if (isSavedPass)
+		{
+			oldUserPassword.add(encoder.encode(newPass));
+			mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, oldUserPassword);
+			context.modifyAttributes(name, mods);
+			return "OK";
+		}
+		else
+		{
+			return "WRONG OLD PASSWORD";
+		}
+  	//
+    }
     private void removeLDAPObject(DirContext context, String name) throws NamingException {
         context.destroySubcontext(name);
     }
@@ -112,7 +145,7 @@ public class LdapTest2 {
         System.out.println(attrName + ":" + attrs.get(attrName).get());
     }
  
-    private DirContext getContext() throws NamingException {
+    private static DirContext getContext() throws NamingException {
         Properties properties = new Properties();
         properties.put(Context.INITIAL_CONTEXT_FACTORY,
                 "com.sun.jndi.ldap.LdapCtxFactory");

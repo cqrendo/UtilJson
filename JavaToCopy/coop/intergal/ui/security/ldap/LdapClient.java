@@ -1,5 +1,6 @@
 package coop.intergal.ui.security.ldap;
  
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -137,6 +138,29 @@ public class LdapClient {
  //      attributes.put("telephoneNumber", "1234");
         context.createSubcontext(name, attributes);
     }
+    public static String changePassword(String name , String oldPass, String newPass, Boolean force) throws NamingException, UnsupportedEncodingException {
+    	DirContext context = getContext();
+    	//
+    	ModificationItem[] mods = new ModificationItem[1];
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		Attributes attrs = context.getAttributes(name);
+		byte[] v = (byte[]) attrs.get("userPassword").get();
+		String saveOldPass = (String) new String(v);
+ 		Attribute oldUserPassword = new BasicAttribute("userPassword");
+		boolean isSavedPass = encoder.matches(oldPass,saveOldPass);
+		if (isSavedPass || force)
+		{
+			oldUserPassword.add(encoder.encode(newPass));
+			mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, oldUserPassword);
+			context.modifyAttributes(name, mods);
+			return "OK";
+		}
+		else
+		{
+			return "WRONG OLD PASSWORD";
+		}
+  	//
+    }
  
     private void removeAttribute(DirContext context, String name , String attrName) throws NamingException {
         Attribute attribute = new BasicAttribute(attrName);
@@ -144,6 +168,7 @@ public class LdapClient {
         item[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE, attribute);
         context.modifyAttributes(name, item);
     }
+
  
     private void createAttribute(DirContext context, String name , String attrName, Object attrValue) throws NamingException {
         Attribute attribute = new BasicAttribute(attrName, attrValue);

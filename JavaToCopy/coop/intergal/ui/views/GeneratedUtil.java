@@ -2,6 +2,7 @@ package coop.intergal.ui.views;
 
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -908,6 +909,50 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
     	return false;
     }
 
+	public static void fillDefaultValues(DynamicDBean bean) {  
+		ArrayList<String[]> rowsColList = bean.getRowsColList();
+//		rowsColList.
+		
+		Field[] fields = bean.getClass().getDeclaredFields();
+		int i=0;
+	//	JsonNode eachRow =  lTxsumary.get(0); // VER EN TAbeEL como gestiona que el resultado traiga varias tablas
+	//	dB.setRowJSon(eachRow); 
+		for(Field field : fields )  
+		{
+//			field.setInt(eachRow.get("code_customer").asInt());
+			try {
+				if (field.getName().equals("col"+i) && i < rowsColList.size())
+					{
+					field.setAccessible(true);
+	//				String colName = getColName(rowsColList,i);
+					String defaultValue = getDefaultValue(rowsColList,i);
+					if (defaultValue != null && ! defaultValue.equals("null") && defaultValue.length() > 0)
+						field.set(bean, defaultValue);
+					i++;
+					}
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (i>rowsColList.size()) 
+				break;
+		}
+	}
+	private static String getDefaultValue(ArrayList<String[]> rowsColList, int i) {
+		String colNameInCL = rowsColList.get(i)[2];
+		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
+			return rowsColList.get(i)[5];
+		else // otherwise it searchs
+		{
+			for (String[] row : rowsColList) // search for col.. to get his column name
+			{
+				if (row[2].equals("col"+i))
+					return row[5];
+			}
+				
+			return "null";
+		}
+	}
 
   
  

@@ -784,7 +784,7 @@ private boolean isBoolean(String header, String colType) {
 			bean.setResourceName(resourceName);
 			bean.setRowsColList(rowsColListGrid);
 			bean.setPreConfParam(AppConst.PRE_CONF_PARAM);
-			fillDefaultValues(bean);
+			GeneratedUtil.fillDefaultValues(bean);
 			selectedRow = bean;
 			keepRowBeforChanges = RestData.copyDatabean(bean);
 //			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
@@ -833,51 +833,7 @@ private boolean isBoolean(String header, String colType) {
 			e.printStackTrace();
 		}
 	}
-	private void fillDefaultValues(DynamicDBean bean) {
-		ArrayList<String[]> rowsColList = bean.getRowsColList();
-//		rowsColList.
-		
-		Field[] fields = bean.getClass().getDeclaredFields();
-		int i=0;
-	//	JsonNode eachRow =  lTxsumary.get(0); // VER EN TAbeEL como gestiona que el resultado traiga varias tablas
-	//	dB.setRowJSon(eachRow); 
-		for(Field field : fields )  
-		{
-//			field.setInt(eachRow.get("code_customer").asInt());
-			try {
-				if (field.getName().equals("col"+i) && i < rowsColList.size())
-					{
-					field.setAccessible(true);
-	//				String colName = getColName(rowsColList,i);
-					String defaultValue = getDefaultValue(rowsColList,i);
-					if (defaultValue != null && ! defaultValue.equals("null") && defaultValue.length() > 0)
-						field.set(bean, defaultValue);
-					i++;
-					}
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (i>rowsColList.size()) 
-				break;
-		}
-	}
 
-	private String getDefaultValue(ArrayList<String[]> rowsColList, int i) {
-		String colNameInCL = rowsColList.get(i)[2];
-		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
-			return rowsColList.get(i)[5];
-		else // otherwise it searchs
-		{
-			for (String[] row : rowsColList) // search for col.. to get his column name
-			{
-				if (row[2].equals("col"+i))
-					return row[5];
-			}
-				
-			return "null";
-		}
-	}
 
 	
 private String getColName(ArrayList<String[]> rowsColList, int i) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
