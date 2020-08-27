@@ -19,7 +19,7 @@ import com.vaadin.flow.server.StreamResource;
 
 //@Entity
 //@Bean
-public class DynamicDBean {// extends AbstractEntity{/**
+public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to create a simpler DataBean for combos or other simple components
 	private static final long serialVersionUID = 1L;
 // implements Serializable {
 //	private static final long serialVersionUID = 1L;

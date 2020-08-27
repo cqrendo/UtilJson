@@ -30,8 +30,11 @@ import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.data.binder.Binder;
@@ -49,6 +52,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.metadata.ui.views.dev.lac.FieldTemplateComboRelatedForPick;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
@@ -478,6 +482,79 @@ public DdbDataBackEndProvider getDataProvider() {
 
 
 // ****** the isType, are prefix that determines the type ( D# = data; C# = currency) this prefix are fill in the labels names, by example ResourceBundle...
+
+	public Object pickParentComboTwinFormT (String colName, DynamicDBean item) {
+		System.out.println("clicked "+colName + item.getCol(colName));
+//		return null;
+		if (item.getCol10() == null || item.getCol10().isEmpty())
+		{
+			showError("campo \"recurso Padre\" sin rellenar");
+			return null;
+		}
+		try {
+		FieldTemplateComboRelatedForPick fieldTemplateComboRelatedForPick = new FieldTemplateComboRelatedForPick(item.getCol6(),item.getCol10()); //col6 = tableName (ChildReource) col19=parentResource
+		String queryFormForPickClassName = null;
+//		Object queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
+		DynamicDBean currentRow = item;
+		String filter="tableName='"+currentRow.getResourceName()+"'%20AND%20FieldNameInUI='"+colName+"'";
+		String parentResource = "";
+		
+		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,"metadata","1");
+		for (JsonNode eachRow : rowsList)  {
+			if (eachRow.size() > 0)
+			{
+				parentResource = eachRow.get("parentResource").asText();
+				pickMapFields =  eachRow.get("pickMapFields").asText();
+				queryFormForPickClassName =  eachRow.get("queryFormForPickClassName").asText();
+			}
+		}
+		queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;
+//		DynamicViewGrid grid = dynamicGridForPick.getGrid();
+//		Class<?> dynamicQuery = Class.forName(queryFormForPickClassName);
+//		Object queryForm = dynamicQuery.newInstance();
+//		Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
+//		setGrid.invoke(queryForm,grid);
+//		dynamicGridForPick.getDivQuery().add((Component)queryForm);
+
+		
+//		grid.setButtonsRowVisible(false);
+//		grid.setResourceName(parentResource);
+//		grid.setupGrid();
+//			subDynamicViewGrid.getElement().getStyle().set("height","100%");
+//		subDynamicViewGrid.setResourceName(resourceSubGrid);
+//		if (resourceSubGrid.indexOf(".")> -1)
+//			subDynamicViewGrid.setFilter(componFKFilter(bean, resourceSubGrid));
+//		subDynamicViewGrid.setupGrid();
+//		dynamicGridForPick.setRowsColList(currentRow.getRowsColList());
+		dialogForPick = new Dialog();
+		dialogForPick.setWidth(AppConst.DEFAULT_PICK_DIALOG_WITHD);
+		dialogForPick.setHeight(AppConst.DEFAULT_PICK_DIALOG_HEIGHT);
+		dialogForPick.add(fieldTemplateComboRelatedForPick);
+		dialogForPick.open();
+//		String mapedCols = fieldTemplateComboRelatedForPick.getMapedCols();
+		fieldTemplateComboRelatedForPick.addAcceptPickListener(e -> fillDataForPickAndAcceptComboMap(e.getSource(), dialogForPick,currentRow ));
+
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+private Object fillDataForPickAndAcceptComboMap(FieldTemplateComboRelatedForPick fieldTemplateComboRelatedForPick, Dialog dialogForPick2, DynamicDBean currentRow) {
+
+	String mapedCols = fieldTemplateComboRelatedForPick.getMapedCols();
+	currentRow.setCol(mapedCols, "col11");	//	col11 =pickMapFields	
+	if (currentRow.getCol12() == null || currentRow.getCol12().isEmpty())
+		currentRow.setCol12("coop.intergal.ui.views.GeneratedQuery"); // col12 = queryFormForPickClassName
+	dataProvider.refresh(currentRow);
+//	binder.setBean(currentRow);
+	colChanged(currentRow, null, "");
+	dialogForPick.close();
+	return null;
+
+}
 
 public Object pickParent(String colName, DynamicDBean item) {
 	System.out.println("clicked "+colName + item.getCol(colName));
@@ -1243,7 +1320,16 @@ private String getColName(ArrayList<String[]> rowsColList, int i) { // normally 
 		this.autoSaveGrid = autoSaveGrid;
 	}
 	
-
+	public void showError(String error) {
+		Label content = new Label(error);
+		NativeButton buttonInside = new NativeButton("Cerrar");
+		Notification notification = new Notification(content, buttonInside);
+//		notification.setDuration(3000);
+		buttonInside.addClickListener(event -> notification.close());
+		notification.setPosition(Position.MIDDLE);
+		notification.open();
+			
+		}
 //	@Override
 //	protected CrudEntityPresenter<DynamicDBean> getPresenter() {
 //		// TODO Auto-generated method stub

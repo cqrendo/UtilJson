@@ -456,6 +456,13 @@ public class RestData {
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 								fieldArr[1] = fieldArr[1]+"#CNoEDT#";
+							if ( col.get("parentResource") != null && col.get("parentResource").asText().trim().length() > 1 && col.get("parentResource").asText().trim().equals("null")== false) 
+							{
+								fieldArr[1] = fieldArr[1]+"#PCK#";
+			
+							}
+							if (fieldArr[0].equals("pickMapFields"))  // is a field with a special PICK
+								fieldArr[1] = fieldArr[1]+"#PCK#FOR#pickMapFields";
 //							if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
 //								fieldArr[1] = fieldArr[1]+"#REQ#";
 							if ( col.get("FieldNameInUI").asText().isEmpty())

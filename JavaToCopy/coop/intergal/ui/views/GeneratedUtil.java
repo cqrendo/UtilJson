@@ -615,11 +615,20 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 			return false;
 			
 	}
-	private boolean isPick(String params) {
+	private static boolean isPick(String params) {
 		
 		if (params == null)
 			return false;
 		if (params.indexOf("#PCK#")>-1)
+			return true;
+		else 
+			return false;
+			
+	}
+    private static boolean isPIckFor(String params, String forV) {
+		if (params == null)
+			return false;
+		if (params.indexOf(forV)>-1)
 			return true;
 		else 
 			return false;
@@ -729,6 +738,7 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
 		if ( idFieldTypeStr.isEmpty() == false)
 			idFieldType = new Integer (idFieldTypeStr);
 		String colHeader = colData[6];
+		boolean isPick = isPick (colData [1]);
 		grid.setId(colData[11]); // contents titla for grid 
 		Column<DynamicDBean> col = null;
 		boolean isNotAParentField = colData[1].indexOf("#SORT")>-1; // parent field for now can not be use as sort column
@@ -850,10 +860,20 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
 							col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header).setResizable(true);				
 					else if (isGridEditable && isCOlEditable == false ) 
 					{
-						if (isNotAParentField)
+						if (isNotAParentField && isPick == false)
 							{
 							col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
 							}
+						else if (isPIckFor(colData [1],"pickMapFields")){
+							col = grid.addColumn(new ComponentRenderer<Label,DynamicDBean>(item->{
+								 Label l = new Label("Buscar....");
+								 if (item.getCol(colName) != null && item.getCol(colName).isEmpty() == false)
+									 l = new Label(item.getCol(colName));
+								 l.getElement().addEventListener("click", ev->dynamicViewGrid.pickParentComboTwinFormT(colName, item));
+								 return l;
+								 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
+							
+						}
 						else {
 							col = grid.addColumn(new ComponentRenderer<Label,DynamicDBean>(item->{
 								 Label l = new Label("Buscar....");
@@ -883,7 +903,9 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
 		return col;
 	}
 	  
-    private static boolean isDate(String header, int idFieldType) {
+
+
+	private static boolean isDate(String header, int idFieldType) {
     	if (header.startsWith("D#")) // when there is nmot the type defined in FiledTemplate it can be defined in the name with the prefix "d#"
     		return true; 
     	if (idFieldType== 1)

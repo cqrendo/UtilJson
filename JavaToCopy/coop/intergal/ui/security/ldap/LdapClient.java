@@ -75,7 +75,7 @@ public class LdapClient {
         context.destroySubcontext(name);
     }
  
-    public static void createLDAPUser(String name, String password, Hashtable<String, String> fieldsAndData ) throws NamingException {
+    public static void createLDAPUser(String name, String password, Hashtable<String, String> fieldsAndData, String snvalue, String cnvalue ) throws NamingException {
     	DirContext context = getContext();
         Attributes attributes = new BasicAttributes();
  
@@ -103,13 +103,13 @@ public class LdapClient {
 //        attributes.put(attribute);
        
 
-//        Attribute sn = new BasicAttribute("sn");
-//        sn.add("Steve2");
-//        attributes.put(sn);
-// 
-//        Attribute cn = new BasicAttribute("cn");
-//        cn.add("Jobs");
-//        attributes.put(cn);
+        Attribute sn = new BasicAttribute("sn");
+        sn.add(snvalue);
+        attributes.put(sn);
+ 
+        Attribute cn = new BasicAttribute("cn");
+        cn.add(cnvalue);
+        attributes.put(cn);
         
 //       Attribute uid = new BasicAttribute("uid");
 //       uid.add("bob2");
