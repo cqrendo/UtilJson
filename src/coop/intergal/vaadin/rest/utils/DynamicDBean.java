@@ -13,15 +13,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.JsonNode;
-//@Entity
-//@Component
-import com.vaadin.flow.server.StreamResource;
 
 //@Entity
 //@Bean
-public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to create a simpler DataBean for combos or other simple components
-	private static final long serialVersionUID = 1L;
-// implements Serializable {
+public class DynamicDBean {// implements Serializable {
 //	private static final long serialVersionUID = 1L;
 
 	private String preConfParam;
@@ -145,12 +140,48 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 	private String col108;
 	private String col109;
 	private String col110;
+	private String col111;
+	private String col112;
+	private String col113;
+	private String col114;
+	private String col115;
+	private String col116;
+	private String col117;
+	private String col118;
+	private String col119;
+	private String col120;
+	private String col121;
+	private String col122;
+	private String col123;
+	private String col124;
+	private String col125;
+	private String col126;
+	private String col127;
+	private String col128;
+	private String col129;
+	private String col130;
+	private String col131;
+	private String col132;
+	private String col133;
+	private String col134;
+	private String col135;
+	private String col136;
+	private String col137;
+	private String col138;
+	private String col139;
+	private String col140;
+	private String col151;
+	private String col152;
+	private String col153;
+	private String col154;
+	private String col155;
+	private String col156;
+	private String col157;
+	private String col158;
+	private String col159;
+	private String col150;
 	
-/// RestData Only process until here, if more that 100 fields are need then RestData Must be adapted 
-	private Date col2Date;
-	private Date col3Date;
-	private Date col4Date;
-	private Date col10Date;
+/// RestData Only process until here, if more that 150 fields are need then RestData Must be adapted 
 	public boolean isNew() {
 		return col0 == null;
 	}
@@ -321,19 +352,18 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 	//			return formatter.parse(col2).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 				return formatter.parse(col2);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		return null;//col3Date;
 	}
 
 
-	public void setCol2Date(Date col2Date) {
-		this.col2Date = col2Date;
-	}
-	public void setCol10Date(Date col10Date) {
-		this.col10Date = col10Date;
-	}
+//	public void setCol2Date(Date col2Date) {
+//		this.col2Date = col2Date;
+//	}
+//	public void setCol10Date(Date col10Date) {
+//		this.col10Date = col10Date;
+//	}
 	public Date getCol3Date() {
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		if (col3 != null)
@@ -347,9 +377,9 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 	}
 
 
-	public void setCol3Date(Date col3Date) {
-		this.col3Date = col3Date;
-	}
+//	public void setCol3Date(Date col3Date) {
+//		this.col3Date = col3Date;
+//	}
 	public Date getCol4Date() {
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		if (col4 != null)
@@ -363,9 +393,9 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 	}
 
 
-	public void setCol4Date(Date col4Date) {
-		this.col4Date = col4Date;
-	}
+//	public void setCol4Date(Date col4Date) {
+//		this.col4Date = col4Date;
+//	}
 
 	public String getCol5() {
 		return col5;
@@ -1207,6 +1237,326 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 		this.col110 = col110;
 	}
 
+	public String getCol111() {
+		return col111;
+	}
+
+	public void setCol111(String col111) {
+		this.col111 = col111;
+	}
+
+	public String getCol112() {
+		return col112;
+	}
+
+	public void setCol112(String col112) {
+		this.col112 = col112;
+	}
+
+	public String getCol113() {
+		return col113;
+	}
+
+	public void setCol113(String col113) {
+		this.col113 = col113;
+	}
+
+	public String getCol114() {
+		return col114;
+	}
+
+	public void setCol114(String col114) {
+		this.col114 = col114;
+	}
+
+	public String getCol115() {
+		return col115;
+	}
+
+	public void setCol115(String col115) {
+		this.col115 = col115;
+	}
+
+	public String getCol116() {
+		return col116;
+	}
+
+	public void setCol116(String col116) {
+		this.col116 = col116;
+	}
+
+	public String getCol117() {
+		return col117;
+	}
+
+	public void setCol117(String col117) {
+		this.col117 = col117;
+	}
+
+	public String getCol118() {
+		return col118;
+	}
+
+	public void setCol118(String col118) {
+		this.col118 = col118;
+	}
+
+	public String getCol119() {
+		return col119;
+	}
+
+	public void setCol119(String col119) {
+		this.col119 = col119;
+	}
+
+	public String getCol120() {
+		return col120;
+	}
+
+	public void setCol120(String col120) {
+		this.col120 = col120;
+	}
+
+	public String getCol121() {
+		return col121;
+	}
+
+	public void setCol121(String col121) {
+		this.col121 = col121;
+	}
+
+	public String getCol122() {
+		return col122;
+	}
+
+	public void setCol122(String col122) {
+		this.col122 = col122;
+	}
+
+	public String getCol123() {
+		return col123;
+	}
+
+	public void setCol123(String col123) {
+		this.col123 = col123;
+	}
+
+	public String getCol124() {
+		return col124;
+	}
+
+	public void setCol124(String col124) {
+		this.col124 = col124;
+	}
+
+	public String getCol125() {
+		return col125;
+	}
+
+	public void setCol125(String col125) {
+		this.col125 = col125;
+	}
+
+	public String getCol126() {
+		return col126;
+	}
+
+	public void setCol126(String col126) {
+		this.col126 = col126;
+	}
+
+	public String getCol127() {
+		return col127;
+	}
+
+	public void setCol127(String col127) {
+		this.col127 = col127;
+	}
+
+	public String getCol128() {
+		return col128;
+	}
+
+	public void setCol128(String col128) {
+		this.col128 = col128;
+	}
+
+	public String getCol129() {
+		return col129;
+	}
+
+	public void setCol129(String col129) {
+		this.col129 = col129;
+	}
+
+	public String getCol130() {
+		return col130;
+	}
+
+	public void setCol130(String col130) {
+		this.col130 = col130;
+	}
+
+	public String getCol131() {
+		return col131;
+	}
+
+	public void setCol131(String col131) {
+		this.col131 = col131;
+	}
+
+	public String getCol132() {
+		return col132;
+	}
+
+	public void setCol132(String col132) {
+		this.col132 = col132;
+	}
+
+	public String getCol133() {
+		return col133;
+	}
+
+	public void setCol133(String col133) {
+		this.col133 = col133;
+	}
+
+	public String getCol134() {
+		return col134;
+	}
+
+	public void setCol134(String col134) {
+		this.col134 = col134;
+	}
+
+	public String getCol135() {
+		return col135;
+	}
+
+	public void setCol135(String col135) {
+		this.col135 = col135;
+	}
+
+	public String getCol136() {
+		return col136;
+	}
+
+	public void setCol136(String col136) {
+		this.col136 = col136;
+	}
+
+	public String getCol137() {
+		return col137;
+	}
+
+	public void setCol137(String col137) {
+		this.col137 = col137;
+	}
+
+	public String getCol138() {
+		return col138;
+	}
+
+	public void setCol138(String col138) {
+		this.col138 = col138;
+	}
+
+	public String getCol139() {
+		return col139;
+	}
+
+	public void setCol139(String col139) {
+		this.col139 = col139;
+	}
+
+	public String getCol140() {
+		return col140;
+	}
+
+	public void setCol140(String col140) {
+		this.col140 = col140;
+	}
+
+	public String getCol151() {
+		return col151;
+	}
+
+	public void setCol151(String col151) {
+		this.col151 = col151;
+	}
+
+	public String getCol152() {
+		return col152;
+	}
+
+	public void setCol152(String col152) {
+		this.col152 = col152;
+	}
+
+	public String getCol153() {
+		return col153;
+	}
+
+	public void setCol153(String col153) {
+		this.col153 = col153;
+	}
+
+	public String getCol154() {
+		return col154;
+	}
+
+	public void setCol154(String col154) {
+		this.col154 = col154;
+	}
+
+	public String getCol155() {
+		return col155;
+	}
+
+	public void setCol155(String col155) {
+		this.col155 = col155;
+	}
+
+	public String getCol156() {
+		return col156;
+	}
+
+	public void setCol156(String col156) {
+		this.col156 = col156;
+	}
+
+	public String getCol157() {
+		return col157;
+	}
+
+	public void setCol157(String col157) {
+		this.col157 = col157;
+	}
+
+	public String getCol158() {
+		return col158;
+	}
+
+	public void setCol158(String col158) {
+		this.col158 = col158;
+	}
+
+	public String getCol159() {
+		return col159;
+	}
+
+	public void setCol159(String col159) {
+		this.col159 = col159;
+	}
+
+	public String getCol150() {
+		return col150;
+	}
+
+	public void setCol150(String col150) {
+		this.col150 = col150;
+	}
+
 	public String getCol53() {
 		return col53;
 	}
@@ -1231,16 +1581,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			Method getColX = ((DynamicDBean.class)).getMethod(methodName );
 			return (String) getColX.invoke(dbean);
 		} catch (NoSuchMethodException | SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -1255,16 +1601,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
 			setColX.invoke(dbean,v+"");
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -1281,16 +1623,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 				return null;
 			return Double.valueOf((String) getColX.invoke(dbean));
 		} catch (NoSuchMethodException | SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -1306,16 +1644,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			setColX.invoke(dbean,df.format(colDate));
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 //		Method getColX = ((DynamicDBean.class)).getMethod("setCol"+i);
@@ -1335,19 +1669,14 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 4) // 4 is the length of null, and not date is so short
 			return formatter.parse((String) getColX.invoke(dbean)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchMethodException | SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -1375,22 +1704,16 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 		}
 		}
 			 catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		return null;//col3Date;
@@ -1418,19 +1741,14 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 		}
 		}
 			 catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		return null;
@@ -1444,16 +1762,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
 			setColX.invoke(dbean,v+"");
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -1466,16 +1780,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
 			setColX.invoke(dbean,v);
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1500,19 +1810,14 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 		}
 		}
 			 catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		return false;
@@ -1527,16 +1832,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
 			setColX.invoke(dbean,v);
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1552,16 +1853,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
 			setColX.invoke(dbean,v+"");
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -1577,16 +1874,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 				return null;
 			return new BigDecimal ((String) getColX.invoke(dbean));
 		} catch (NoSuchMethodException | SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -1601,16 +1894,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
 			setColX.invoke(dbean,v+"");
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -1627,16 +1916,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
 			setColX.invoke(dbean,value);
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1663,16 +1948,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			value = String.format("%."+nDecimals+"f",Double.valueOf(value));
 			return value.replace(".",",");
 		} catch (NoSuchMethodException | SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -1692,16 +1973,12 @@ public class DynamicDBean {// extends AbstractEntity{/**  // TODO @@ consider to
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
 			setColX.invoke(dbean,v+"");
 		} catch (NoSuchMethodException | SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

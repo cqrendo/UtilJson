@@ -419,7 +419,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 				{
 					if((value == null || value.toString().equals("") ==  true) && colName.equals("null") == false && colName.startsWith("FK-") == false)// && isCheckBox(o) == false)// to process when you empty the field
 					{
-						if (value == null || colType == 5)
+						if (value == null || colType == 5 || colType == 4) // 5 number , 4 = boolean
 							newEntityinfo.put(colName, NullNode.getInstance()); 
 						else
 							newEntityinfo.put(colName, (String) ""); 
