@@ -510,7 +510,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 						}
 					if (isPick)
 					{
-						tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldNameInUI, tf));
+						tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldNameInUI, tf, cache));
 						Icon edit = new Icon(VaadinIcon.DOWNLOAD_ALT);
 						tf.setSuffixComponent(edit);
 					}
@@ -635,7 +635,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 			
 	}
 
-private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
+private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, boolean cache) {
 		
 		try {
 		DynamicGridForPick dynamicGridForPick = new DynamicGridForPick(); 
@@ -646,7 +646,7 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
 		String filter="tableName='"+resourceName+"'%20AND%20FieldNameInUI='"+fieldName+"'";
 		String parentResource = "";
 		
-		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,"metadata","1");
+		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,cache,"metadata","1");
 		for (JsonNode eachRow : rowsList)  {
 			if (eachRow.size() > 0)
 			{

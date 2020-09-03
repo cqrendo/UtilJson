@@ -271,8 +271,8 @@ public class FieldTemplateComboRelatedForPick extends PolymerTemplate<TemplateMo
 		
 //		comboTopCustomer
 //		Collection<DynamicDBean> countriesData = ExampleUtil.getCountriesData();
-		String filterChild = "tableName='"+chldTable+"'";
-		String filterParent = "tableName='"+parentTable+"'";
+		String filterChild = "tableName='"+chldTable+"'%20AND%20fieldName%3C%3E'%23SPACE%23'&order=fieldName"; //.> AND fieldName<>'%23SPACE%23'&order=fieldName"
+		String filterParent = "tableName='"+parentTable+"'%20AND%20fieldName%3C%3E'%23SPACE%23'&order=fieldName";
 //		dataProvider.setFilter(filter);
 		ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 		String[] fieldArr  = new String[3];
