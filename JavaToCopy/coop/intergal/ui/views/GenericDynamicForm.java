@@ -140,7 +140,7 @@ private String pickMapFields;
 						IntegerField nf = ((IntegerField) fieldObj);
 //						nf.setValueChangeMode(ValueChangeMode.EAGER); 
 //						nf.setId("tf"+fieldNameInUI);
-						nf.getElement().setAttribute("theme", "small");
+//						nf.getElement().setAttribute("theme", "small");
 						nf.setReadOnly(isReadOnly);
 						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					}	
