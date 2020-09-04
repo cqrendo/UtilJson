@@ -98,7 +98,7 @@ private String pickMapFields;
 					Field field = ((class1)).getDeclaredField(fieldName);//.get(instancia);
 					field.setAccessible(true);
 					Object fieldObj = field.get(object);
-					if (rowCol[3].isEmpty())
+					if (rowCol[3].isEmpty() || rowCol[3].equals("0"))  // is Text Field
 					{
 						TextField tf = ((TextField) fieldObj);
 						tf.setReadOnly(isReadOnly);
