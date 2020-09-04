@@ -15,6 +15,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 
@@ -89,6 +90,11 @@ private String pickMapFields;
 		{
 			String[] rowCol = itRowsColList.next();
 			String fieldName = rowCol [2];
+			String idFieldTypeStr = rowCol [3];
+			String fieldNameInUI = rowCol [2];
+			int idFieldType = 0;
+			if ( idFieldTypeStr.isEmpty() == false)
+				idFieldType = new Integer (idFieldTypeStr);
 			boolean isReadOnly = isReadOnly( rowCol [1]);
 			if (!fieldName.isEmpty())
 			try {
@@ -98,7 +104,7 @@ private String pickMapFields;
 					Field field = ((class1)).getDeclaredField(fieldName);//.get(instancia);
 					field.setAccessible(true);
 					Object fieldObj = field.get(object);
-					if (rowCol[3].isEmpty() || rowCol[3].equals("0"))  // is Text Field
+					if (idFieldType == 0)  // is Text Field
 					{
 						TextField tf = ((TextField) fieldObj);
 						tf.setReadOnly(isReadOnly);
@@ -129,6 +135,15 @@ private String pickMapFields;
 					{
 						binder.forField((Checkbox) fieldObj).bind(d -> d.getColBoolean(fieldName), (d,v)-> d.setColBoolean(v,fieldName));//DynamicDBean::setCol2Date);				
 					}
+					else if (idFieldType == 5 ) // is Number
+					{
+						IntegerField nf = ((IntegerField) fieldObj);
+//						nf.setValueChangeMode(ValueChangeMode.EAGER); 
+//						nf.setId("tf"+fieldNameInUI);
+						nf.getElement().setAttribute("theme", "small");
+						nf.setReadOnly(isReadOnly);
+						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+					}	
 				}
 					
 			} catch (NoSuchFieldException | SecurityException e) {
