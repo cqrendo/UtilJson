@@ -145,7 +145,7 @@ public class DynamicGridRowCard extends PolymerTemplate<TemplateModel> implement
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
 		rowsColList = dataProvider.getRowsColList();
 //		grid.removeAllColumns();
-		int numberOFCols = rowsColList.size();//length;
+		int numberOFCols = rowsColList.size();//length;  // TODO Check is work possible use of maxNumberOfFields
 	//       addColumn(Customer::getId, new NumberRenderer()).setCaption("Id");
 //		for (int i=0;i<numberOFCols; i++)
 //		{

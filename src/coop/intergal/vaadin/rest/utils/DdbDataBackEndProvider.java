@@ -279,13 +279,13 @@ private long sizeBE;
 
 			public void save(String ResourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
 				DynamicDBean firstBean = beansToSaveAndRefresh.get(ResourceTobeSave);
-				boolean newProduct = firstBean.getCol0()== null ;
+				boolean newRow = firstBean.getRowJSon()== null ; // when RowJson is not Fill is a new row
 		        
 		        DataService.get().updateDynamicDBean(ResourceTobeSave, beansToSaveAndRefresh);
 		        boolean hashasError = false;
 		        if (beansToSaveAndRefresh.get("ERROR") != null)
 		        	hashasError = true;
-		        if (newProduct) {
+		        if (newRow) {
 		            refreshAll();
 		        } else if (hashasError == false){
 		            refreshItem(firstBean);

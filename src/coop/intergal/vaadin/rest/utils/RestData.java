@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,9 +26,12 @@ public class RestData {
 
 
 	private static final boolean CACHE_TRUE = true;
+	static Hashtable<String, String> keepFieldName = new Hashtable<String, String>();
 
 	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filter, boolean cache, Boolean hasNewRow) {
 
+		if (cache == false)
+			keepFieldName.clear();
 		if (resourceName  == null ||  resourceName.trim().length() == 0)
 		{
 // yolaqr			throw new UserFriendlyDataException("NO hay tabla seleccionada, revise el link"); //"XesbentaLAC"
@@ -59,7 +63,7 @@ public class RestData {
 	//		String[] rowsColList = new String[] { "code_customer", "name_customer", "cif" , "amount_un_disbursed_payments"};
 			if (hasNewRow)
 			{
-				DynamicDBean d = fillRowDefaultValues(rowsColList);
+				DynamicDBean d = fillRowDefaultValues(rowsColList, resourceName);
 				d.setResourceName(resourceName);
 				d.setPreConfParam(preConfParam);
 				d.setFilter(filter); // for newRows fill data from filter normally parent data
@@ -84,7 +88,7 @@ public class RestData {
 			String col1name = rowsColList.get(0)[0]; 
 			if ( rowsList.get(col1name) != null) // it means that the result is only one row, not an array, then no loop  
 			{
-				DynamicDBean d = fillRow(rowsList, rowsColList, preConfParam);//, cols.get(0)); 
+				DynamicDBean d = fillRow(rowsList, rowsColList, preConfParam, resourceName);//, cols.get(0)); 
 				d.setResourceName(resourceName);
 				d.setPreConfParam(preConfParam);
 				d.setFilter(filter);
@@ -103,7 +107,7 @@ public class RestData {
 //				System.out.println("RestData.getResourceData() col1name "+ col1name +" "+ eachRow.get(col1name));
 				if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
 				{
-					DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam);//, cols.get(0)); 
+					DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam, resourceName);//, cols.get(0)); 
 					d.setResourceName(resourceName);
 					d.setPreConfParam(preConfParam);
 					d.setFilter(filter);
@@ -120,7 +124,7 @@ public class RestData {
 		return customerList;
 	}
 
-	private static DynamicDBean fillRowDefaultValues(ArrayList<String[]> rowsColList) {
+	private static DynamicDBean fillRowDefaultValues(ArrayList<String[]> rowsColList, String resourceName) {
 		// TODO Auto-generated method stub
 		DynamicDBean dB = new DynamicDBean();
 //		dB.setRowJSon(eachRow);
@@ -132,14 +136,20 @@ public class RestData {
 //		aliasField.set(userInstance, "Pepe");
 		Field[] fields = dB.getClass().getDeclaredFields();
 		int i=0;
+		int maxNumberOfFields = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE;
+		String maxNumberOfFieldsSTR = rowsColList.get(0)[15];
+		if (maxNumberOfFieldsSTR.length() > 0)
+			maxNumberOfFields = new Integer(maxNumberOfFieldsSTR);
 		for(Field field : fields )  
 		{
 //			field.setInt(eachRow.get("code_customer").asInt());
 			try {
-				if (field.getName().equals("col"+i) && i < rowsColList.size())
+				if (field.getName().equals("col"+i) && i < maxNumberOfFields)//rowsColList.size())
 					{
 					field.setAccessible(true);
-					if (rowsColList.get(i) !=null)
+					String colName = getColName(rowsColList,i,resourceName);
+					if ("null".equals(colName) == false)
+//					if (rowsColList.get(i) !=null)
 						{
 				//		String colName = getColName(rowsColList,i);
 						String defaultValue = getDefaultValue(rowsColList,i);
@@ -159,7 +169,7 @@ public class RestData {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (i>rowsColList.size()) 
+			if (i>maxNumberOfFields)//rowsColList.size()) 
 				break;
 		}
 //		c.setCodeCustomer(eachRow.get("code_customer").asInt());
@@ -169,9 +179,9 @@ public class RestData {
 		return dB;
 	}
 
-	private static DynamicDBean fillRow(JsonNode eachRow, ArrayList<String[]> rowsColList, String preConfParam) {// JsonNode cols) {
+	private static DynamicDBean fillRow(JsonNode eachRow, ArrayList<String[]> rowsColList, String preConfParam, String resourceName) {// JsonNode cols) {
 //		Class dynamicDBeanClass = Class.forName("coop.intergal.xespropan.production.samples.backend.data.DynamicDBean");
-		
+		System.out.println("RestData.fillRow()");
 		DynamicDBean dB = new DynamicDBean();
 		dB.setRowJSon(eachRow);
 		dB.setRowsColList(rowsColList); // TODO instead of put in each row, think in a way for only once (maybe row o) 
@@ -192,17 +202,23 @@ public class RestData {
 //		aliasField.set(userInstance, "Pepe");
 		Field[] fields = dB.getClass().getDeclaredFields();
 		int i=0;
+		int maxNumberOfFields = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE;
+		String maxNumberOfFieldsSTR = rowsColList.get(0)[15];
+		if (maxNumberOfFieldsSTR.length() > 0)
+			maxNumberOfFields = new Integer(maxNumberOfFieldsSTR);
+		dB.setMaxColNumber(maxNumberOfFields);
 		for(Field field : fields )  
 		{
 //			System.out.println("RestData.fillRow() field "+ field.getName());
 //			field.setInt(eachRow.get("code_customer").asInt());
 			try {
-				if (field.getName().equals("col"+i) && i < rowsColList.size())
+				if (field.getName().equals("col"+i) && i <= maxNumberOfFields)//rowsColList.size())//maxNumberOfFields)
 					{
 					field.setAccessible(true);
-					if (rowsColList.get(i) !=null)
+					String colName = getColName(rowsColList,i, resourceName);
+					if ("null".equals(colName) == false)
 						{
-						String colName = getColName(rowsColList,i);
+						
 						JsonNode data = eachRow.get(colName);
 						if (colName.indexOf("FK-") > -1)
 						{
@@ -235,7 +251,7 @@ public class RestData {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (i>rowsColList.size()) 
+			if (i>maxNumberOfFields) 
 				break;
 		}
 //		c.setCodeCustomer(eachRow.get("code_customer").asInt());
@@ -284,24 +300,42 @@ public class RestData {
 		return true;
 	}
 
-	private static String getColName(ArrayList<String[]> rowsColList, int i) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
-		String colNameInCL = rowsColList.get(i)[2];
-		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
+	private static String getColName(ArrayList<String[]> rowsColList, int i, String resourceName) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
+		String colNameInCL ="null";
+		String colNameInUI = "col"+i;
+		String resourceAndFieldNinUI = resourceName + "&" + colNameInUI;
+		if (keepFieldName.get(resourceAndFieldNinUI) != null)
+		{
+			System.out.println("RestData.getColName() FOUND IN HASHTABLE");
+			return keepFieldName.get(resourceAndFieldNinUI);
+		}
+		if (rowsColList.size() > i)
+			colNameInCL = rowsColList.get(i)[2];
+		if ( colNameInCL.equals(colNameInUI) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
 			return rowsColList.get(i)[0];
 		else // otherwise it searches
 		{
 //			System.out.println("RestData.getColName() ----> Fields witn col... not in order "+ "col"+i );
+			int cont = 0;
 			for (String[] row : rowsColList) // search for col.. to get his column name
 			{
-				if (row[2].equals("col"+i))
+				cont ++;
+				if (row[2].equals(colNameInUI))
+				{
+					System.out.println("FOUND... "+ row[2] ) ;
+					keepFieldName.put(resourceAndFieldNinUI,row[0] );
 					return row[0];
+				}	
+				System.out.println("RestData.getColName() search colname row[2] "+ row[2] + " "+ colNameInUI +" "+ new Date() + " paso:"+ cont);
 			}
-				
+			keepFieldName.put(resourceAndFieldNinUI,"null" );	
 			return "null";
 		}
 	}
 	private static String getDefaultValue(ArrayList<String[]> rowsColList, int i) {
-		String colNameInCL = rowsColList.get(i)[2];
+		String colNameInCL ="null";
+		if (rowsColList.size() > i)
+			colNameInCL = rowsColList.get(i)[2];
 		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
 			return rowsColList.get(i)[5];
 		else // otherwise it searchs
@@ -390,7 +424,7 @@ public class RestData {
 			for (JsonNode eachRow : rowsList)  {
 				if (eachRow.get(rowsColList.get(0)[0]) !=null)
 				{
-					DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam);//, cols.get(0)); 
+					DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam, resourceName);//, cols.get(0)); 
 					d.setResourceName(resourceName);
 					d.setPreConfParam(preConfParam);
 					d.setFilter(filter);
@@ -443,9 +477,10 @@ public class RestData {
 					{
 						rowsColList = new ArrayList<String[]>();
 						int i = 0;
+						int maxColNumber = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[15];
+							String[] fieldArr  = new String[16];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -523,6 +558,11 @@ public class RestData {
 							fieldArr[12] = ""; // is only used for query fields
 							fieldArr[13] = ""; // is only used for Form fields
 							fieldArr[14] = ""; // is only used for Form fields
+							
+							if ( col.get("maxColNumber").asText().isEmpty() || col.get("maxColNumber").asText().equals("null") )
+								fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
+							else
+								fieldArr[15] = col.get("maxColNumber").asText();
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -583,7 +623,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[15];
+						String[] fieldArr  = new String[16];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -648,7 +688,10 @@ public class RestData {
 							fieldArr[14] = "";
 						else
 							fieldArr[14] = col.get("validationRuleName").asText();	
-							
+						if ( col.get("maxColNumber").asText().isEmpty() || col.get("maxColNumber").asText().equals("null") )
+							fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
+						else
+							fieldArr[15] = col.get("maxColNumber").asText();	
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -686,7 +729,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[15];
+			String[] fieldArr  = new String[16];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -705,6 +748,7 @@ public class RestData {
 			fieldArr[12] = "";
 			fieldArr[13] = "";
 			fieldArr[14] = "";
+			fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
 			rowsColList.add(fieldArr);
@@ -794,7 +838,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[15];
+						String[] fieldArr  = new String[16];
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -847,12 +891,14 @@ public class RestData {
 							fieldArr[12] =AppConst.DEFAULT_CSS_STYLE_QRY_FIELD;
 						else
 							fieldArr[12] = col.get("cssStyleQueryField").asText();
-						rowsFIeldQueryList.add(fieldArr);
-						i++;
 						fieldArr[13] = ""; // is only used for Form fields
 						fieldArr[14] = ""; // is only used for Form fields
-
-
+						if ( col.get("maxColNumber").asText().isEmpty() || col.get("maxColNumber").asText().equals("null") )
+							fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
+						else
+							fieldArr[15] = col.get("maxColNumber").asText();
+						rowsFIeldQueryList.add(fieldArr);
+						i++;
 					}
 					// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
 					if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself

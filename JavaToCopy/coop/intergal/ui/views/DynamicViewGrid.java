@@ -21,6 +21,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -65,6 +66,9 @@ import coop.intergal.vaadin.rest.utils.RestData;
 //@Tag("dynamic-view-grid")
 @Tag("dynamic-grid")
 @JsModule("./src/views/generic/dynamic-grid.js")
+//@CssImport(
+//	    themeFor = "vaadin-grid",
+//	    value = "./styles/dynamic-grid-row-background-color.css")
 //@Route(value = PAGE_DYNAMIC)//, layout = MainView.class)
 //@PageTitle(AppConst.TITLE_PRODUCTS)
 //@Secured(Role.ADMIN)
@@ -222,10 +226,11 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
         		+ "    const itemToSelect = this._cache.getItemForIndex(currentIndex + delta)\r\n"
         		+ "    itemToSelect && this.$connector.doSelection([itemToSelect], true);\r\n" + "  }\r\n"
         		+ "}.bind(this));");
-
+        grid.setClassNameGenerator(row-> getRowStyleName(row));
 //		Crud<DynamicDBean> crud = new Crud<>();
 //		crud.setDataProvider(dataProvider);
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
+        
 		rowsColListGrid = dataProvider.getRowsColList(cache );
 		newRow.addClickListener(e -> insertBeanInList());
 		deleteRow.addClickListener(e -> deleteBeanFromList());
@@ -262,6 +267,18 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 //		grid.getColumns().forEach(column -> column.setAutoWidth(true));
 
 }
+
+private String getRowStyleName(DynamicDBean row) {
+		String valueStr = row.getCol0(); 
+		int value = 0;
+		if (valueStr != null || valueStr.equals("null") == false )
+		{   
+			value = new Integer(row.getCol0());
+			if (value > 5 )
+				return "warn";
+		}	
+		return null;
+	}
 
 private Object deleteBeanFromList() {
 	System.out.println("DynamicViewGrid.deleteBeanFromList()");
@@ -913,21 +930,21 @@ private boolean isBoolean(String header, String colType) {
 
 
 	
-private String getColName(ArrayList<String[]> rowsColList, int i) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
-	String colNameInCL = rowsColList.get(i)[2];
-	if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
-		return rowsColList.get(i)[0];
-	else // otherwise it searchs
-	{
-		for (String[] row : rowsColList) // search for col.. to get his column name
-		{
-			if (row[2].equals("col"+i))
-				return row[0];
-		}
-			
-		return "null";
-	}
-}
+//private String getColName(ArrayList<String[]> rowsColList, int i) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
+//	String colNameInCL = rowsColList.get(i)[2];
+//	if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
+//		return rowsColList.get(i)[0];
+//	else // otherwise it searchs
+//	{
+//		for (String[] row : rowsColList) // search for col.. to get his column name
+//		{
+//			if (row[2].equals("col"+i))
+//				return row[0];
+//		}
+//			
+//		return "null";
+//	}
+//}
 
 	private String extractResourceSubGrid(DynamicDBean bean, int idx) {
 		// TODO Auto-generated method stub CR-entradas_cab.List-entradas_lin/

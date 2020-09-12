@@ -29,6 +29,7 @@ public class DynamicDBean {// implements Serializable {
 	private byte[] bytes;  // is use to save data into LAC read in a upload  
 	JsonNode rowColTypeList;
 	private ArrayList<String[]> rowsColList = new ArrayList<String[]>();
+	private int maxColNumber ;
 	private String col0;
 	private String col1;
 	private String col2;
@@ -286,7 +287,15 @@ public class DynamicDBean {// implements Serializable {
 	public DynamicDBean() {
 	}
 	
-    public String getCol1() {
+    public int getMaxColNumber() {
+		return maxColNumber;
+	}
+
+	public void setMaxColNumber(int maxColNumber) {
+		this.maxColNumber = maxColNumber;
+	}
+
+	public String getCol1() {
 		return col1;
 	}
 

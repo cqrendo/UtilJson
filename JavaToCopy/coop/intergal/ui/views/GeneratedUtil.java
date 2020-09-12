@@ -939,11 +939,15 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 		int i=0;
 	//	JsonNode eachRow =  lTxsumary.get(0); // VER EN TAbeEL como gestiona que el resultado traiga varias tablas
 	//	dB.setRowJSon(eachRow); 
+		int maxNumberOfFields = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE;
+		String maxNumberOfFieldsSTR = rowsColList.get(0)[15];
+		if (maxNumberOfFieldsSTR.length() > 0)
+			maxNumberOfFields = new Integer(maxNumberOfFieldsSTR);
 		for(Field field : fields )  
 		{
 //			field.setInt(eachRow.get("code_customer").asInt());
 			try {
-				if (field.getName().equals("col"+i) && i < rowsColList.size())
+				if (field.getName().equals("col"+i) && i < maxNumberOfFields)
 					{
 					field.setAccessible(true);
 	//				String colName = getColName(rowsColList,i);
@@ -956,7 +960,7 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (i>rowsColList.size()) 
+			if (i>maxNumberOfFields) 
 				break;
 		}
 	}

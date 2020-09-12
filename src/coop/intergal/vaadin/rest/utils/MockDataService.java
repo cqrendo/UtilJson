@@ -341,7 +341,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		int i=0; 
 		for(Field field : fields )  
 		{
-			if (i >= rowsColList.size()) // the max attributes are put are number of columns in resource. 
+			if (i >= dB.getMaxColNumber())//rowsColList.size()) // the max attributes are put are number of columns in resource. 
 				break;
 //		while (fieldList.hasNext())
 //		{
@@ -536,7 +536,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		{
 //			field.setInt(eachRow.get("code_customer").asInt());
 			try {
-				if (field.getName().equals("col"+i) && i < rowsColList.size())
+				if (field.getName().equals("col"+i) && i < dB.getMaxColNumber())//rowsColList.size())
 					{
 					field.setAccessible(true);
 					String colName = "";
@@ -556,7 +556,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (i>rowsColList.size()) 
+			if (i>dB.getMaxColNumber())//rowsColList.size()) 
 				break;
 		}
 	}
