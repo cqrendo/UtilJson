@@ -67,6 +67,14 @@ public class RestData {
 				d.setResourceName(resourceName);
 				d.setPreConfParam(preConfParam);
 				d.setFilter(filter); // for newRows fill data from filter normally parent data
+				int maxNumberOfFields = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE;
+				String maxNumberOfFieldsSTR = "";
+				if (rowsColList.size() > 15)
+					maxNumberOfFieldsSTR = rowsColList.get(0)[15];				
+				System.out.println("RestData.fillRow() maxNumberOfFieldsSTR <<"+  maxNumberOfFieldsSTR + ">>");
+				if (maxNumberOfFieldsSTR.length() > 0)
+					maxNumberOfFields = new Integer(maxNumberOfFieldsSTR);
+				d.setMaxColNumber(maxNumberOfFields);
 				customerList.add(d);
 				int pagesizeInt = new Integer(pagesize);
 				if (pagesizeInt > 0)
@@ -181,7 +189,7 @@ public class RestData {
 
 	private static DynamicDBean fillRow(JsonNode eachRow, ArrayList<String[]> rowsColList, String preConfParam, String resourceName) {// JsonNode cols) {
 //		Class dynamicDBeanClass = Class.forName("coop.intergal.xespropan.production.samples.backend.data.DynamicDBean");
-		System.out.println("RestData.fillRow()");
+//		System.out.println("RestData.fillRow()");
 		DynamicDBean dB = new DynamicDBean();
 		dB.setRowJSon(eachRow);
 		dB.setRowsColList(rowsColList); // TODO instead of put in each row, think in a way for only once (maybe row o) 
@@ -203,7 +211,11 @@ public class RestData {
 		Field[] fields = dB.getClass().getDeclaredFields();
 		int i=0;
 		int maxNumberOfFields = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE;
-		String maxNumberOfFieldsSTR = rowsColList.get(0)[15];
+		String maxNumberOfFieldsSTR = "";
+		if (rowsColList.size() > 15)
+			maxNumberOfFieldsSTR = rowsColList.get(0)[15];
+		
+//		System.out.println("RestData.fillRow() maxNumberOfFieldsSTR <<"+  maxNumberOfFieldsSTR + ">>");
 		if (maxNumberOfFieldsSTR.length() > 0)
 			maxNumberOfFields = new Integer(maxNumberOfFieldsSTR);
 		dB.setMaxColNumber(maxNumberOfFields);
@@ -301,17 +313,17 @@ public class RestData {
 	}
 
 	private static String getColName(ArrayList<String[]> rowsColList, int i, String resourceName) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
-		String colNameInCL ="null";
-		String colNameInUI = "col"+i;
-		String resourceAndFieldNinUI = resourceName + "&" + colNameInUI;
+		String colNameInUIinColList ="null";
+		String colNameInUIGenByI = "col"+i;
+		String resourceAndFieldNinUI = resourceName + "&" + colNameInUIGenByI;
 		if (keepFieldName.get(resourceAndFieldNinUI) != null)
 		{
-			System.out.println("RestData.getColName() FOUND IN HASHTABLE");
+//			System.out.println("RestData.getColName() FOUND IN HASHTABLE");
 			return keepFieldName.get(resourceAndFieldNinUI);
 		}
 		if (rowsColList.size() > i)
-			colNameInCL = rowsColList.get(i)[2];
-		if ( colNameInCL.equals(colNameInUI) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
+			colNameInUIinColList = rowsColList.get(i)[2];
+		if ( colNameInUIinColList.equals(colNameInUIGenByI) || colNameInUIinColList.isEmpty() ) // if colinIU = col... then return colName 
 			return rowsColList.get(i)[0];
 		else // otherwise it searches
 		{
@@ -320,13 +332,13 @@ public class RestData {
 			for (String[] row : rowsColList) // search for col.. to get his column name
 			{
 				cont ++;
-				if (row[2].equals(colNameInUI))
+				if (row[2].equals(colNameInUIGenByI))
 				{
-					System.out.println("FOUND... "+ row[2] ) ;
+//					System.out.println("FOUND... "+ row[2] ) ;
 					keepFieldName.put(resourceAndFieldNinUI,row[0] );
 					return row[0];
 				}	
-				System.out.println("RestData.getColName() search colname row[2] "+ row[2] + " "+ colNameInUI +" "+ new Date() + " paso:"+ cont);
+//				System.out.println("RestData.getColName() search colname row[2] "+ row[2] + " "+ colNameInUI +" "+ new Date() + " paso:"+ cont);
 			}
 			keepFieldName.put(resourceAndFieldNinUI,"null" );	
 			return "null";

@@ -53,6 +53,7 @@ public class AppConst {   // @@ TODO this class for now is copy and represents t
 	public static final String STYLES_FORM_ITEM_CSS= "./styles/monbusstyle-form-item.css";
 	public static final String QUERY_FIELD_DEFAULT_SIZE = "25#25";
 	public static final String DEFAULT_CSS_STYLE_QRY_FIELD =  ".labelM";
+	public static final int MAX_NUMBER_OF_FIELDS_PER_TABLE = 150;
 
 	// Mutable for testing.
 	public static int NOTIFICATION_DURATION = 4000;

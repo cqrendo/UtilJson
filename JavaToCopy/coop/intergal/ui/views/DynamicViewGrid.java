@@ -226,7 +226,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
         		+ "    const itemToSelect = this._cache.getItemForIndex(currentIndex + delta)\r\n"
         		+ "    itemToSelect && this.$connector.doSelection([itemToSelect], true);\r\n" + "  }\r\n"
         		+ "}.bind(this));");
-        grid.setClassNameGenerator(row-> getRowStyleName(row));
+//        grid.setClassNameGenerator(row-> getRowStyleName(row));
 //		Crud<DynamicDBean> crud = new Crud<>();
 //		crud.setDataProvider(dataProvider);
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);

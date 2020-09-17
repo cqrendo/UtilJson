@@ -349,32 +349,39 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 			try {
 				field.setAccessible(true);
 				Object value = field.get(dB);
+				if (value != null && value.equals("M-2"))
+					System.out.println("MockDataService.putValuesOnObject() DEBUG");
 			if (o instanceof Field)
 			{
 				System.err.println("FIELD......."+field.getName() + " VALUE.... "+ value);
 				
 //				Field<?> field = (Field<?>) o ; // TODO porque FK- tiene id Nulo?
 				int colType = 0;
-				String colName = "";
+				String colNameInUI = field.getName();
+				String colNameInTable = null;
 				String[] colNameAndType = new String[2];
-				if (field.getName().startsWith("col") == true)
-					{		
-					colNameAndType = getColNameAndType(rowsColList,i);
+				
+				boolean isAlreadyFill = false;
+				if (colNameInUI.startsWith("col") == true)
+					{
+					int iFromColname = new Integer (colNameInUI.substring(3));
+					colNameAndType = getColNameAndType(rowsColList,iFromColname);
 					if (isNumeric(colNameAndType[0]))
 						colType = new Integer (colNameAndType[0]);
-					colName = colNameAndType[1];
+					colNameInTable = colNameAndType[1];
+					isAlreadyFill = newEntityinfo.asText().indexOf("\""+colNameInTable+"\"") > -1; // to avoid clean FK Data 
 					}
-				if (field.getName() != null && value != null && value.equals("null") == false && value.toString().equals("") == false 
-						&& value.toString().length() > 0 ) //&& field.getCaption().startsWith("HIDE @ FIELD") == false) // the Hide fields are not send in the data to PUT 
+				if (colNameInUI != null && colNameInTable !=null && value != null && value.equals("null") == false && value.toString().equals("") == false 
+						&& value.toString().length() > 0  && isAlreadyFill == false) //&& field.getCaption().startsWith("HIDE @ FIELD") == false) // the Hide fields are not send in the data to PUT 
 				{
 					
-					if (field.getName().startsWith("col") == false) // all the "normal" fields starts with col (col0, col1.....) 
+					if (colNameInUI.startsWith("col") == false) // all the "normal" fields starts with col (col0, col1.....) 
 					{
 						// do Nothing the rowJSon is not a field
 					}
 					else
 						
-						if (colName.startsWith("FK-")) // Parent and Grand parent fields --> even doesn't have value must be fill to get filters from possible grant parents
+						if (colNameInUI != null && colNameInTable.startsWith("FK-")) // Parent and Grand parent fields --> even doesn't have value must be fill to get filters from possible grant parents
 						{
 							//				setFKIdsForFilter(field.getId(), (String) field.getValue()); 
 						}
@@ -384,45 +391,46 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 							{
 								DateFormat fechaIni = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 								if (value != null)
-									newEntityinfo.put(colName,fechaIni.format(value) );
+									newEntityinfo.put(colNameInTable,fechaIni.format(value) );
 							}
 							else
 								if (isCheckBox(o) || value.equals("true") ||  value.equals("false") )	
 								{
 									if (value.equals("true")) 
-										newEntityinfo.put(colName, (Boolean) true);  
+										newEntityinfo.put(colNameInTable, (Boolean) true);  
 									else if (  value.equals("false") )
-										newEntityinfo.put(colName, (Boolean) false);  
+										newEntityinfo.put(colNameInTable, (Boolean) false);  
 									else
-										newEntityinfo.put(colName, (Boolean) value);  
+										newEntityinfo.put(colNameInTable, (Boolean) value);  
 								}
 								else
 									if (isInteger(o))	
 									{
 										//			((AbstractField<String>) field).setConverter(new StringToIntegerConverter());
 
-										newEntityinfo.put(colName, (Integer) delPoints((String) rowsColList.get(i)[0]));  
+										newEntityinfo.put(colNameInTable, (Integer) delPoints((String) rowsColList.get(i)[0]));  
 									}
 									else // normal fields that belongs to row
-										if (rowsColList.get(i)[0].length() > 0)
+									//	if (rowsColList.get(i)[0].length() > 0)
+										if ("null".equals(colNameInTable) == false)
 										{
 											if (colType == 3) // is currency
 												value = cleanCurrencySymbols(value);
-											newEntityinfo.put(colName, (String) ""+value);  
+											newEntityinfo.put(colNameInTable, (String) ""+value);  
 										}
 										else
-											newEntityinfo.put(colName, "");
+											newEntityinfo.put(colNameInTable, "");
 							i++;
 						}
 				}
-				else if(field.getName() != null && field.getName().startsWith("col") == true)  // even there is not data i must continue to keep syncronice col1, col2... 
+				else if(colNameInUI != null && colNameInTable !=null && colNameInUI.startsWith("col") == true && isAlreadyFill)  // FILL NULLS
 				{
-					if((value == null || value.toString().equals("") ==  true) && colName.equals("null") == false && colName.startsWith("FK-") == false)// && isCheckBox(o) == false)// to process when you empty the field
+					if((value == null || value.toString().equals("") ==  true) && colNameInUI.equals("null") == false && colNameInUI.startsWith("FK-") == false)// && isCheckBox(o) == false)// to process when you empty the field
 					{
 						if (value == null || colType == 5 || colType == 4) // 5 number , 4 = boolean
-							newEntityinfo.put(colName, NullNode.getInstance()); 
+							newEntityinfo.put(colNameInTable, NullNode.getInstance()); 
 						else
-							newEntityinfo.put(colName, (String) ""); 
+							newEntityinfo.put(colNameInTable, (String) ""); 
 					}
 					i++;
 				}
@@ -463,9 +471,15 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 //		}
 //	}
 	private String[] getColNameAndType(ArrayList<String[]> rowsColList, int i) { // normally the col.. is syncronice with i secuence, but is rowColList have some fields not in natural position then must be search the name in other way
-		String colNameInCL = rowsColList.get(i)[2];
+		String colNameInUIinColList ="null";
+		String colNameInUIGenByI = "col"+i;
+		if (rowsColList.size() > i)
+			colNameInUIinColList = rowsColList.get(i)[2];
+	
+//		String colNameInCL = rowsColList.get(i)[2];
+		
 		String[] data  = new String[2];
-		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
+		if ( colNameInUIinColList.equals(colNameInUIGenByI) || colNameInUIinColList.isEmpty() ) // if colinIU = col... then return colName 
 		{
 			data [1] =  rowsColList.get(i)[0]; // 0 = fieldName
 			data [0] =	rowsColList.get(i)[3]; // 3 = fieldType
@@ -475,7 +489,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		{
 			for (String[] row : rowsColList) // search for col.. to get his column name
 			{
-				if (row[2].equals("col"+i))
+				if (row[2].equals(colNameInUIGenByI))
 				{
 					data [1] = row[0];// 0 = fieldName
 					data [0] = row[3];// 3 = fieldType
