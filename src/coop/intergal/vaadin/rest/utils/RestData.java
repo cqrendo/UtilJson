@@ -84,7 +84,8 @@ public class RestData {
 			if (rowsList.get("statusCode") != null)
 			{
 				String errorMsg = rowsList.get("errorMessage").asText();
-			//	showError(errorMsg);  doesn't work in this scope, 
+		
+				//	showError(errorMsg);  doesn't work in this scope, 
 				System.err.println("*********** ERROR ******* "+errorMsg);
 				DynamicDBean d = new DynamicDBean();
 				d.setCol0("##ERROR## "+ errorMsg);
@@ -94,6 +95,12 @@ public class RestData {
 			else
 			{
 			String col1name = rowsColList.get(0)[0]; 
+			int i = 0;
+			while (col1name.equals("#SPACE#"))  // to get the first real field
+			{
+				col1name = rowsColList.get(i)[0];
+				i ++;
+			}
 			if ( rowsList.get(col1name) != null) // it means that the result is only one row, not an array, then no loop  
 			{
 				DynamicDBean d = fillRow(rowsList, rowsColList, preConfParam, resourceName);//, cols.get(0)); 
@@ -106,7 +113,7 @@ public class RestData {
 			{	
 			for (JsonNode eachRow : rowsList)  {
 				
-				int i = 0;
+				i = 0;
 				while (col1name.equals("#SPACE#"))  // to get the first real field
 				{
 					col1name = rowsColList.get(i)[0];
@@ -125,7 +132,6 @@ public class RestData {
 		}
 		}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}// preConfParam, null);//globalVars.getPagesize());
 		System.out.println("RestData.getResourceCustomer() after FILL LIST "+ resourceName + " Filter:" +filter + " " + new Date());
@@ -483,8 +489,10 @@ public class RestData {
 //						genericResourceName = resourceName.substring(0, indx__);
 //					String tableNameToSearch = genericResourceName+variant;
 					String tableNameToSearch = genericResourceName;
+					String filter = "tableName='"+tableNameToSearch+"'%20AND%20isDataField=true&order=colOrder";
+
 					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch  + " "+ new Date());
-					cols = JSonClient.get("CR-FieldTemplate","tableName='"+tableNameToSearch+"'&order=colOrder", cache, AppConst.PRE_CONF_PARAM_METADATA);
+					cols = JSonClient.get("CR-FieldTemplate",filter, cache, AppConst.PRE_CONF_PARAM_METADATA);
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
 						rowsColList = new ArrayList<String[]>();

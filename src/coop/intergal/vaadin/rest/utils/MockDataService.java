@@ -423,7 +423,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 							i++;
 						}
 				}
-				else if(colNameInUI != null && colNameInTable !=null && colNameInUI.startsWith("col") == true && isAlreadyFill)  // FILL NULLS
+				else if(colNameInUI != null && colNameInTable !=null && colNameInUI.startsWith("col") == true && isAlreadyFill == false)  // FILL NULLS
 				{
 					if((value == null || value.toString().equals("") ==  true) && colNameInUI.equals("null") == false && colNameInUI.startsWith("FK-") == false)// && isCheckBox(o) == false)// to process when you empty the field
 					{

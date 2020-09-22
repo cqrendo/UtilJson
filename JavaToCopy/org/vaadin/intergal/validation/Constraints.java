@@ -87,7 +87,7 @@ public class Constraints {
 			if (result != null)
 				return result;
 		}	
-		int limit = Integer.parseInt(arg);
+		Long limit = new Long (arg);
 		if (value == null || value < limit) {
 			return null;
 		} else {

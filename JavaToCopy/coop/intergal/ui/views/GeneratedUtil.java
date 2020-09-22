@@ -268,7 +268,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //				label.setWidth("500px");
 				String[] rowField = itRowsFieldList.next();
 				String fieldName = rowField[0];
-				if (fieldName.equals("BAJA"))
+				if (fieldName.equals("NOMBRE_BASE"))
 					System.out.println("STOP DEBUG");	
 				boolean isReadOnly = isReadOnly( rowField [1]);
 				boolean isPick = isPick (rowField [1]);
@@ -751,7 +751,7 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 			if (isDate(header, idFieldType)) { /// ********** DATE **************
 				if (header.indexOf("#")>0)
 					header = header.substring(2); // to avoid date typ indicator "D#"
-				if (isCOlEditable)//) && isGridEditable)
+				if (isCOlEditable && isGridEditable)
 //					if (isNotAParentField)
 //						grid.addEditColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
 //						.setResizable(true).setSortProperty(colData[0]);
