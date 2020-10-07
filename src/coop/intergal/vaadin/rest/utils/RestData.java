@@ -119,6 +119,13 @@ public class RestData {
 					col1name = rowsColList.get(i)[0];
 					i ++;
 				}
+				while (isNotCombined(col1name, eachRow)) // combined fields, doesn't exist always
+				{
+					i++;
+					col1name = rowsColList.get(i)[0];
+					
+				}
+					
 //				System.out.println("RestData.getResourceData() col1name "+ col1name +" "+ eachRow.get(col1name));
 				if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
 				{
@@ -136,6 +143,20 @@ public class RestData {
 		}// preConfParam, null);//globalVars.getPagesize());
 		System.out.println("RestData.getResourceCustomer() after FILL LIST "+ resourceName + " Filter:" +filter + " " + new Date());
 		return customerList;
+	}
+
+	private static boolean isNotCombined(String col1name, JsonNode eachRow) {
+		JsonNode metadata = eachRow.get("@metadata");
+		JsonNode combined = metadata.get("combined");// TODO Auto-generated method stub
+		if (combined == null)
+			return false;
+		for (JsonNode eachfield : combined) 
+		{
+			if (col1name.equals(eachfield.asText()))
+					return true;
+		}
+		
+		return false;
 	}
 
 	private static DynamicDBean fillRowDefaultValues(ArrayList<String[]> rowsColList, String resourceName) {
@@ -500,7 +521,7 @@ public class RestData {
 						int maxColNumber = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[16];
+							String[] fieldArr  = new String[17];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -583,6 +604,7 @@ public class RestData {
 								fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
 							else
 								fieldArr[15] = col.get("maxColNumber").asText();
+							fieldArr[16] = ""; // is only used for Form fields
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -643,7 +665,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[16];
+						String[] fieldArr  = new String[17];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -712,6 +734,11 @@ public class RestData {
 							fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
 						else
 							fieldArr[15] = col.get("maxColNumber").asText();	
+						if ( col.get("toolTip").asText().isEmpty() || col.get("toolTip").asText().equals("null") )
+							fieldArr[16] = "";
+						else
+							fieldArr[16] = col.get("toolTip").asText();	
+
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -749,7 +776,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[16];
+			String[] fieldArr  = new String[17];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -769,6 +796,7 @@ public class RestData {
 			fieldArr[13] = "";
 			fieldArr[14] = "";
 			fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
+			fieldArr[16] = ""; // is only used for Form fields
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
 			rowsColList.add(fieldArr);
@@ -858,7 +886,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[16];
+						String[] fieldArr  = new String[17];
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -918,6 +946,7 @@ public class RestData {
 						else
 							fieldArr[15] = col.get("maxColNumber").asText();
 						rowsFIeldQueryList.add(fieldArr);
+						fieldArr[16] = ""; // is only used for Form fields
 						i++;
 					}
 					// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here

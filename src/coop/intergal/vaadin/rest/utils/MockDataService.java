@@ -22,6 +22,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.data.provider.QuerySortOrder;
 
+import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
 
@@ -338,10 +339,15 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		ArrayList<String[]> rowsColList = dB.getRowsColList();
 //		Iterator<String[]> itRowsColList = rowsColList.iterator();
 		
-		int i=0; 
+		int i=0;
+		int maxColNumber = dB.getMaxColNumber();
+		if (maxColNumber == 0)
+			maxColNumber = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE;
+			
 		for(Field field : fields )  
 		{
-			if (i >= dB.getMaxColNumber())//rowsColList.size()) // the max attributes are put are number of columns in resource. 
+			
+			if (i >= maxColNumber)//rowsColList.size()) // the max attributes are put are number of columns in resource. 
 				break;
 //		while (fieldList.hasNext())
 //		{
@@ -369,7 +375,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 					if (isNumeric(colNameAndType[0]))
 						colType = new Integer (colNameAndType[0]);
 					colNameInTable = colNameAndType[1];
-					isAlreadyFill = newEntityinfo.asText().indexOf("\""+colNameInTable+"\"") > -1; // to avoid clean FK Data 
+					isAlreadyFill = newEntityinfo.get(colNameInTable) !=null; // to avoid clean FK Data 
 					}
 				if (colNameInUI != null && colNameInTable !=null && value != null && value.equals("null") == false && value.toString().equals("") == false 
 						&& value.toString().length() > 0  && isAlreadyFill == false) //&& field.getCaption().startsWith("HIDE @ FIELD") == false) // the Hide fields are not send in the data to PUT 

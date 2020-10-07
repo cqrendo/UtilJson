@@ -330,7 +330,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				TextField tf = new TextField();//itRowsColList.next()[0]);
 		//		tf.setValueChangeMode(ValueChangeMode.EAGER);  
 		//		tf.setRequired(true);//(isRequired);
-
+				tf.setTitle("TOOL TIP \n  <br/> linea 2  zxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxxxxxxxx xxxxxxxxxx zzzzzzzzzzzzz cccccccccccc ssssssssssss zzzzzzzzzzzz eeeeeeeeeeeeeee xxxxxxxx");
 				tf.setId("tf"+fieldNameInUI);
 				tf.setReadOnly(isReadOnly);
 				tf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -967,14 +967,17 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 		}
 	}
 	private static String getDefaultValue(ArrayList<String[]> rowsColList, int i) {
-		String colNameInCL = rowsColList.get(i)[2];
-		if ( colNameInCL.equals("col"+i) || colNameInCL.isEmpty() ) // if colinIU = col... then return colName 
+		String colNameInUIinColList ="null";
+		String colNameInUIGenByI = "col"+i;
+		if (rowsColList.size() > i)
+			colNameInUIinColList = rowsColList.get(i)[2];
+		if ( colNameInUIinColList.equals(colNameInUIGenByI) || colNameInUIinColList.isEmpty() ) // if colinIU = col... then return colName 
 			return rowsColList.get(i)[5];
 		else // otherwise it searchs
 		{
 			for (String[] row : rowsColList) // search for col.. to get his column name
 			{
-				if (row[2].equals("col"+i))
+				if (row[2].equals(colNameInUIGenByI))
 					return row[5];
 			}
 				
