@@ -286,6 +286,9 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				String classNamesForm = ""; 
 				String classNamesItem = ""; 
 				String classNamesItemQuery = rowField[12];
+		//		String toolTip = "Some very looooooooooooooooooooooooooooooooooooooong text \nSecond line \nThird line";rowField[16].toString();;
+				String toolTip = rowField[16].toString();
+				
 				String [] tokens = classNames.split(Pattern.quote("."));
 				int iii = 0;
 				while (tokens.length > iii)
@@ -330,7 +333,11 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				TextField tf = new TextField();//itRowsColList.next()[0]);
 		//		tf.setValueChangeMode(ValueChangeMode.EAGER);  
 		//		tf.setRequired(true);//(isRequired);
-				tf.setTitle("TOOL TIP \n  <br/> linea 2  zxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxxxxxxxx xxxxxxxxxx zzzzzzzzzzzzz cccccccccccc ssssssssssss zzzzzzzzzzzz eeeeeeeeeeeeeee xxxxxxxx");
+				if (toolTip != null && toolTip.length() >0 )
+				{
+					toolTip = toolTip.replace("</CR>", "\n");
+					tf.setTitle(toolTip);
+				}	
 				tf.setId("tf"+fieldNameInUI);
 				tf.setReadOnly(isReadOnly);
 				tf.addThemeVariants(TextFieldVariant.LUMO_SMALL);

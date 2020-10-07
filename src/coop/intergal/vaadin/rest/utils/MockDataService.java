@@ -347,7 +347,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		for(Field field : fields )  
 		{
 			
-			if (i >= maxColNumber)//rowsColList.size()) // the max attributes are put are number of columns in resource. 
+			if (i > maxColNumber)//rowsColList.size()) // the max attributes are put are number of columns in resource. 
 				break;
 //		while (fieldList.hasNext())
 //		{
