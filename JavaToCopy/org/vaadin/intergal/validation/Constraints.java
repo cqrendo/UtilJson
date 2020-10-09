@@ -211,6 +211,20 @@ public class Constraints {
 			return Result;
 		}
 	}
+	public static String warningFromBackEnd(DynamicDBean bean, ValidationMetadata<?> metadata, String validationNameANDcache) {
+		//Por simplicidad se ignora el argumento
+		//El validador debería extraer los valores de interés a partir del parámetro delconstraint
+		Boolean cache = true;
+		if (validationNameANDcache.substring(validationNameANDcache.indexOf(",")).equals(",false"))
+				cache = false;			
+		String validationName = validationNameANDcache.substring(0, validationNameANDcache.indexOf(","));
+		String Result = warningFromBackEnd(bean,validationName, cache);
+		if (Result.equals("OK") ) {
+			return null;
+		} else {
+			return Result;
+		}
+	}
 
 	private static String validateFromBackEnd(DynamicDBean bean, String validationName, Boolean cache) {
 		ScriptEngineManager manager = new ScriptEngineManager();
@@ -229,6 +243,30 @@ public class Constraints {
 				resultStr="OK";
 			else
 				resultStr=jSStringAndErrorTest[1];
+		} catch (ScriptException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "ERROR en Validación, \"Nombre Validación BR\" ("+validationName+") ->"+e.getMessage();
+		} // prints
+		return resultStr;
+	}
+	private static String warningFromBackEnd(DynamicDBean bean, String validationName, Boolean cache) {
+		ScriptEngineManager manager = new ScriptEngineManager();
+		ScriptEngine engine = manager.getEngineByName("JavaScript");
+		String resourceName  = bean.getResourceName();
+		String[] jSStringAndErrorTest = getJSFromBackEnd(resourceName,validationName, cache);
+		if (jSStringAndErrorTest == null)
+			return "ERROR en Validación, \"Nombre Validación BR\" ("+validationName+") no existe para la tabla ("+getTableNameFromResourceName(resourceName)+") correspondiente";
+		String jSStringToProcess = createUsableJS(jSStringAndErrorTest[0], validationName, resourceName);
+		String callJS = "valida("+getValuesFromBean(bean,resourceName, validationName)+")";
+		String resultStr = "No validado";
+		try {
+			engine.eval(jSStringToProcess) ;
+			Boolean result = (Boolean) engine.eval(callJS);
+			if (result)
+				resultStr="OK";
+			else
+				resultStr="WARNING"+jSStringAndErrorTest[1];
 		} catch (ScriptException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

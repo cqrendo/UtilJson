@@ -45,6 +45,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ErrorLevel;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
@@ -396,15 +397,22 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					if (fieldSize.length() > 0 && isQuery == false)	
 					{
 	//					nf.setMax(100);
-						binder.forField(nf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.lessThan#"+getMaxValueForNumber(fieldSize)+";"+isRequired,
+						System.out.println("****** FIELD WITH WARNING "+ nf.getId());
+						binder.forField(nf)
+						
+						.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.lessThan#"+getMaxValueForNumber(fieldSize)+";"+isRequired,
 								ValidationMetadata.of(Integer.class)))
+//						.withValidator(e -> {
+//					         return e == 0;
+//					      }, "Maybe you should enter more than 5 characters", ErrorLevel.WARNING)
 								.bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 
 					}
 					
 					else
 					{
-						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+						binder.forField(nf)
+						.bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					
 					}	
 //********
@@ -546,9 +554,14 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 	private void setBeanValidators(String validationRuleName,Boolean isQuery, Boolean cache) {
 		if (validationRuleName.length() > 1 && isQuery == false)
 		{
-		binder.withValidator(
-			new DynValidator<>("org.vaadin.intergal.validation.Constraints.validateFromBackEnd#"+validationRuleName+","+cache,
-					ValidationMetadata.of(DynamicDBean.class)));
+			if (validationRuleName.startsWith("Warning"))
+				binder.withValidator(
+					new DynValidator<>("org.vaadin.intergal.validation.Constraints.warningFromBackEnd#"+validationRuleName+","+cache,
+							ValidationMetadata.of(DynamicDBean.class)));
+			else			
+				binder.withValidator(
+					new DynValidator<>("org.vaadin.intergal.validation.Constraints.validateFromBackEnd#"+validationRuleName+","+cache,
+							ValidationMetadata.of(DynamicDBean.class)));
 		}
 		
 		

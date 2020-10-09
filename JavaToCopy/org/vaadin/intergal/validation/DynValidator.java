@@ -1,5 +1,6 @@
 package org.vaadin.intergal.validation;
 
+import com.vaadin.flow.data.binder.ErrorLevel;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
@@ -31,7 +32,10 @@ public class DynValidator<T> implements Validator<T> {
 	public ValidationResult apply(T value, ValueContext context) {
 		String errorMessage = constraint.apply(value);
 		if (errorMessage != null) {
-			return ValidationResult.error(errorMessage);
+			if (errorMessage.startsWith("WARNING"))
+				return ValidationResult.create(errorMessage.substring(7), ErrorLevel.WARNING);
+			else
+				return ValidationResult.error(errorMessage);
 		} else {
 			return ValidationResult.ok();
 		}

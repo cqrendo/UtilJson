@@ -259,7 +259,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 							setFKIdsForFilter(rowCol[4], value);
 							}	
 
-						else if (rowCol[3].isEmpty()) {
+						else if (rowCol[3].isEmpty() || rowCol[3].equals("0")) { // text field 
 								String value = getValueFromField(form, id, fieldObj, isGeneratedForm);								
 								if (!value.isEmpty()) {
 									value=addAutoComodin(value);
@@ -272,7 +272,22 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 									else
 										filter = rowCol[0] + determineOperator(value);
 								}
-						}  
+						} 
+						else if (rowCol[3].equals("5")) { // number field 
+							String value = getValueFromField(form, id, fieldObj, isGeneratedForm);								
+							if (!value.isEmpty()) {
+						//		value=addAutoComodin(value);
+								System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
+									+ " valor :" + value + "");
+							// filter=componefilter(filter, rowCol[0], ((TextField) fieldObj).getValue());
+								if (filter.length() > 1)
+									filter = filter + "%20AND%20" + rowCol[0]
+											+ componeNumberFilte(value);// determineOperator(value);
+								else
+									filter = rowCol[0] + componeNumberFilte(value);// determineOperator(value);
+							}
+					}  
+
 						else if (rowCol[3].equals("1")) // is Date
 							{
 							String value = getValueFromField(form, id, fieldObj, isGeneratedForm);
@@ -326,6 +341,13 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 			filter = parentKeys;
 		System.err.println("filter------" + filter);
 		return filter;
+	}
+
+	private String componeNumberFilte(String value) {
+		if (value.indexOf(":")> 0)  // is a range
+			return componeNumberRange(value);
+		else
+			return determineOperator(value);
 	}
 
 	private String getValueFromField(FormLayout form, String id, Object fieldObj, boolean isGeneratedForm) {
@@ -738,6 +760,14 @@ private void clearField(FormLayout form, String id) {
 		}
 
 		return "='" + value + "'";
+	}
+	private String componeNumberRange(String value) { // determines to use = like or > <
+		value = value.trim(); // deletes extra blanks pre and post
+		int posColon = value.indexOf(":");
+		String fromNumber = value.substring(0,posColon );
+		String toNumber = value.substring(posColon+1 );
+		
+		return "%20BETWEEN%20" + fromNumber + "%20AND%20" + toNumber ;
 	}
 
 }
