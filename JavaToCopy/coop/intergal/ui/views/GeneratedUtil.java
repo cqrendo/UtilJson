@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 import org.vaadin.intergal.validation.DynValidator;
@@ -23,6 +24,7 @@ import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
@@ -46,6 +48,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ErrorLevel;
+import com.vaadin.flow.data.binder.StatusChangeEvent;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
@@ -72,6 +75,7 @@ import coop.intergal.ui.util.UIUtils;
 import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.ui.utils.converters.DecimalFormatter;
+import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
@@ -160,6 +164,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 			statusLabel.getElement().getStyle().set("top","100px");
 			statusLabel.getElement().getStyle().set("padding","0px 10px");
 			binder.setStatusLabel(statusLabel);
+//			binder.addStatusChangeListener(e -> showWarning(e));
 			//with error
 			if (isQuery == false)
 			{
@@ -501,7 +506,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					{		
 					binder.bind(tf, fieldNameInUI);
 					}
-	
+//					setFieldWarningValidators(validationRuleName,isQuery, tf);
 					// *****
 //					binder.forField(tf).bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
 //				form.add(fi);
@@ -545,6 +550,32 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //			form.add(statusLabel);
 			return form;
 	    }
+	private Object showWarning(StatusChangeEvent e) {
+//		((Object) e).getFieldValidationStatuses();
+//		List<ValidationResult> listErrors = e.getBinder(),
+//	    	List<ValidationResult> listErrors = binder.validate().getValidationErrors();
+//	    	boolean isWarning = false;
+//	    	if (listErrors != null )
+//	    		{
+//	    		Iterator<ValidationResult> itErrors = listErrors.iterator();
+//	    		if (itErrors.hasNext())
+//	    			{
+//	    			ValidationResult error = itErrors.next();
+//	    			String errorMsg = error.getErrorMessage();
+//	    			if (errorMsg.startsWith("Aviso"))
+//	    				{
+//	    				isWarning = true;
+//	    	//			Div statusLabel = new Div();
+//	    				}
+//	    			}
+//	    		}
+//	    	if (isWarning ) {
+//	    		DataService.get().showError("NO se puede salvar hay errores en el formulario");	
+//	    	}
+		System.out.println("GeneratedUtil.showWarning()" );
+		return null;
+	}
+
 	private String getMaxValueForNumber(String fieldSize) {
 		Integer size = new Integer(fieldSize);
 		String space = new String(new char[size]).replace('\0', '9');
@@ -563,8 +594,30 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					new DynValidator<>("org.vaadin.intergal.validation.Constraints.validateFromBackEnd#"+validationRuleName+","+cache,
 							ValidationMetadata.of(DynamicDBean.class)));
 		}
+	}
 		
-		
+		private void setFieldWarningValidators(String validationRuleName,Boolean isQuery, TextField tf) {
+
+			if (validationRuleName.length() > 1 && isQuery == false)
+			{
+				if (validationRuleName.startsWith("Warning"))
+				{
+					AtomicReference<String> ref = new AtomicReference<>();
+//				    TextField tf = new TextField();
+				    Binder<AtomicReference<String>> binder = new Binder<>();
+				    binder.forField(tf).withValidationStatusHandler(ev->{
+				    ev.getValidationResults().stream().filter(r->r.getErrorLevel().isPresent() && r.getErrorLevel().get()==ErrorLevel.WARNING).forEach(r->System.out.println(r.getErrorMessage()));
+				    })
+				    .withValidator((value,ctx) -> ValidationResult.create("WARNING , you wrote: "+value, ErrorLevel.WARNING))
+				    .bind(AtomicReference::get, AtomicReference::set);
+					
+//					binder.forField(textField).withValidationStatusHandler(ev->{	
+//						ev.getValidationResults().stream().filter(r->r.getErrorLevel().isPresent() && r.getErrorLevel().get()==ErrorLevel.WARNING).forEach(warning->{
+//					System.out.println("WARNING: "+warning.getErrorMessage());
+//					});
+//					});//./*addValidator, etc*/
+				}
+			}	
 //	binder.forField(tf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.minLength#4",
 //			ValidationMetadata.of(String.class)))
 //			.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));

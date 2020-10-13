@@ -5,6 +5,8 @@ import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
 
+import coop.intergal.vaadin.rest.utils.DataService;
+
 /**
  * Implementación de Binder.Validator que delega en el servicio de validación
  */
@@ -33,7 +35,10 @@ public class DynValidator<T> implements Validator<T> {
 		String errorMessage = constraint.apply(value);
 		if (errorMessage != null) {
 			if (errorMessage.startsWith("WARNING"))
-				return ValidationResult.create(errorMessage.substring(7), ErrorLevel.WARNING);
+			{
+				DataService.get().showError(errorMessage.substring(7));
+				return ValidationResult.ok();//ValidationResult.create(errorMessage.substring(7), ErrorLevel.WARNING);
+			}
 			else
 				return ValidationResult.error(errorMessage);
 		} else {
