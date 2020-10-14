@@ -113,21 +113,20 @@ public class RestData {
 			{	
 			for (JsonNode eachRow : rowsList)  {
 				
-				i = 0;
-				while (col1name.equals("#SPACE#"))  // to get the first real field
-				{
-					col1name = rowsColList.get(i)[0];
-					i ++;
-				}
-				while (isNotCombined(col1name, eachRow)) // combined fields, doesn't exist always
-				{
-					i++;
-					col1name = rowsColList.get(i)[0];
-					
-				}
+//				i = 0;
+//				while (col1name.equals("#SPACE#"))  // to get the first real field
+//				{
+//					col1name = rowsColList.get(i)[0];
+//					i ++;
+//				}
+//				while (isNotCombined(col1name, eachRow)) // combined fields, doesn't exist always
+//				{
+//					i++;
+//					col1name = rowsColList.get(i)[0];					
+//				}
 					
 //				System.out.println("RestData.getResourceData() col1name "+ col1name +" "+ eachRow.get(col1name));
-				if (eachRow.get(col1name) !=null) // when are more rows than a pagesize it comes a row with out data TODO handle this page
+				if (isARealRow(eachRow)) // when are more rows than a pagesize it comes a row with out data TODO handle this page
 				{
 					DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam, resourceName);//, cols.get(0)); 
 					d.setResourceName(resourceName);
@@ -145,18 +144,30 @@ public class RestData {
 		return customerList;
 	}
 
-	private static boolean isNotCombined(String col1name, JsonNode eachRow) {
+	private static boolean isARealRow(JsonNode eachRow) {
 		JsonNode metadata = eachRow.get("@metadata");
-		JsonNode combined = metadata.get("combined");// TODO Auto-generated method stub
+		if (metadata == null) // not always a row comes with @metadata
+			return true;
+		if (metadata.get("next_batch") == null && metadata.get("previous_batch") == null)
+			return true;
+		else
+			return false;
+	}
+
+	private static boolean isCombined(String col1name, JsonNode eachRow) {
+		JsonNode metadata = eachRow.get("@metadata");
+		JsonNode combined = metadata.get("combined");
 		if (combined == null)
 			return false;
+//		if (marks.indexOf("#SIG#"))
+//			return true;
 		for (JsonNode eachfield : combined) 
 		{
 			if (col1name.equals(eachfield.asText()))
 					return true;
 		}
 		
-		return false;
+		return true;
 	}
 
 	private static DynamicDBean fillRowDefaultValues(ArrayList<String[]> rowsColList, String resourceName) {
