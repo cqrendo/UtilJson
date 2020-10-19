@@ -72,21 +72,21 @@ public class Constraints {
 	}
 
 	public static String lessThan(Integer value, ValidationMetadata<?> metadata, String arg) {
-		boolean req = false;
-		int separatorPos = arg.indexOf(";");
-		if (separatorPos > -1)
-		{
-			String reqStr = arg.substring(separatorPos+1);	
-			arg = arg.substring(0,separatorPos );
-			if (reqStr.equals("true"))
-				req = true;
-		}
-		if ( req)
-		{
-			String result = isRequired(value, metadata);
-			if (result != null)
-				return result;
-		}	
+//		boolean req = false;
+//		int separatorPos = arg.indexOf(";");
+//		if (separatorPos > -1)
+//		{
+//			String reqStr = arg.substring(separatorPos+1);	
+//			arg = arg.substring(0,separatorPos );
+//			if (reqStr.equals("true"))
+//				req = true;
+//		}
+//		if ( req)
+//		{
+//			String result = isRequired(value, metadata);
+//			if (result != null)
+//				return result;
+//		}	
 		Long limit = new Long (arg);
 		if (value == null || value < limit) {
 			return null;
@@ -95,23 +95,23 @@ public class Constraints {
 		}
 	}
 	public static String lessThan(String valueStr, ValidationMetadata<?> metadata, String arg) {
-		boolean req = false;
-		int separatorPos = arg.indexOf(";");
-		if (separatorPos > -1)
-		{
-			String reqStr = arg.substring(separatorPos+1);	
-			arg = arg.substring(0,separatorPos );
-			if (reqStr.equals("true"))
-				req = true;
-		}
+//		boolean req = false;
+//		int separatorPos = arg.indexOf(";");
+//		if (separatorPos > -1)
+//		{
+//			String reqStr = arg.substring(separatorPos+1);	
+//			arg = arg.substring(0,separatorPos );
+//			if (reqStr.equals("true"))
+//				req = true;
+//		}
 		valueStr = valueStr.replace(",",".");
 		Double  value = new Double (valueStr);
-		if ( req)
-		{
-			String result = isRequired(valueStr, metadata);
-			if (result != null)
-				return result;
-		}	
+//		if ( req)
+//		{
+//			String result = isRequired(valueStr, metadata);
+//			if (result != null)
+//				return result;
+//		}	
 		Double limit = new Double (arg);
 		
 		if (value == null || value > limit) {

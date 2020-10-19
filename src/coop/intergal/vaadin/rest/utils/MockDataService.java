@@ -21,6 +21,7 @@ import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.data.provider.QuerySortOrder;
+import com.vaadin.flow.server.VaadinSession;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
@@ -252,8 +253,9 @@ public static String bytesToHex(byte[] in) {
 }
 
 public void showError(String error) {
-	Label content = new Label(error);
-	NativeButton buttonInside = new NativeButton("Cerrar");
+	Label content = new Label(transalateError(error) + " ");
+	System.out.println("MockDataService.showError()"+error);
+	NativeButton buttonInside = new NativeButton(" Cerrar ");
 	Notification notification = new Notification(content, buttonInside);
 //	notification.setDuration(3000);
 	buttonInside.addClickListener(event -> notification.close());
@@ -261,6 +263,47 @@ public void showError(String error) {
 	notification.open();
 		
 	}
+private String transalateError(String error) {
+	if  ( error.startsWith("Parent main:"))
+		return transErrorParentMIssing(error);
+	else if ( error.indexOf("Duplicate entry") > 1)
+		return "Registro duplicado" ;
+	else if (error.startsWith("Validation violation:"))	
+		return error.substring(21);
+	return error;
+}
+
+private String transErrorParentMIssing(String error) {
+	try {
+		int idxStar = error.indexOf("child main:")+ 11;
+		String parentTable = error.substring(idxStar);
+		String filter = "tableName%20like%20('CR-"+parentTable + "%25')" ;
+		Object cacheStr = VaadinSession.getCurrent().getAttribute("cache");
+		boolean cache = true ;
+		if (cacheStr != null && cacheStr.equals("false"))
+			cache = true;
+		JsonNode rowsList = JSonClient.get("FormTemplate",filter,cache,AppConst.PRE_CONF_PARAM_METADATA,1+"");
+		for (JsonNode eachRow : rowsList)  {
+			String name = eachRow.get("name").asText();
+			int idxTitle = name.indexOf("-")+ 2;
+			if (idxTitle > -1)
+			{
+				name = name.substring(idxTitle);
+				int idxSpace = name.indexOf(" ");
+				if (idxSpace == -1)
+					idxSpace = name.length();
+				return "El valor introducido no existe en " + name.substring(0, idxSpace);
+			}			
+		}
+		
+		return "El valor introducido no existe en" + parentTable;	
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return null;
+}
+
 private void showConfirmationSave(String error) {
 	Label content = new Label(error);
 //	NativeButton buttonInside = new NativeButton("Cerrar");

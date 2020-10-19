@@ -274,7 +274,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //				label.setWidth("500px");
 				String[] rowField = itRowsFieldList.next();
 				String fieldName = rowField[0];
-				if (fieldName.equals("NOMBRE_BASE"))
+				if (fieldName.equals("CODIGO"))
 					System.out.println("STOP DEBUG");	
 				boolean isReadOnly = isReadOnly( rowField [1]);
 				boolean isPick = isPick (rowField [1]);
@@ -388,8 +388,9 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					setBeanValidators(validationRuleName, isQuery, cache) ;
 					if (isRequired && isQuery == false && fieldSize.length() == 0)
 					{
-						binder.forField(nf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
-								ValidationMetadata.of(Integer.class)))
+						binder.forField(nf).asRequired()
+//						.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
+//								ValidationMetadata.of(Integer.class)))
 								.bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 //						binder.forField(nf).withValidator(new Validator<Integer>() {
 //				            @Override
@@ -403,15 +404,27 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					{
 	//					nf.setMax(100);
 						System.out.println("****** FIELD WITH WARNING "+ nf.getId());
-						binder.forField(nf)
+						if (isRequired)
+							{
+							binder.forField(nf).asRequired()
 						
-						.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.lessThan#"+getMaxValueForNumber(fieldSize)+";"+isRequired,
+							.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.lessThan#"+getMaxValueForNumber(fieldSize),//+";"+isRequired,
 								ValidationMetadata.of(Integer.class)))
 //						.withValidator(e -> {
 //					         return e == 0;
 //					      }, "Maybe you should enter more than 5 characters", ErrorLevel.WARNING)
 								.bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+							}
+						else
+						{
+							{
+							binder.forField(nf)
+							.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.lessThan#"+getMaxValueForNumber(fieldSize),//+";"+isRequired,
+								ValidationMetadata.of(Integer.class)))
+								.bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+							}
 
+						}
 					}
 					
 					else
@@ -449,8 +462,9 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					setBeanValidators(validationRuleName, isQuery, cache) ;
 					if (isRequired && isQuery == false && fieldSize.length() == 0)
 					{
-						binder.forField(bdf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
-						ValidationMetadata.of(String.class)))
+						binder.forField(bdf).asRequired()
+//						withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
+//						ValidationMetadata.of(String.class)))
 						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
 
 //						binder.forField(bdf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
@@ -469,7 +483,9 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					else
 					{
 //						binder.bind(tf, fieldNameInUI);
-						binder.forField(bdf).bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
+						bdf.setMaxLength(new Integer(fieldSize));
+						binder.forField(bdf)
+						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
 //						binder.forField(bdf).bind(d-> d.getColBigDecimal(fieldNameInUI), (d,v)-> d.setColBigDecimal(v,fieldNameInUI));
 					
 					}	
@@ -497,8 +513,9 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //					}
 					if (isRequired && isQuery == false )
 					{	
-					binder.forField(tf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
-							ValidationMetadata.of(String.class)))
+					binder.forField(tf).asRequired()
+//						.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
+//							ValidationMetadata.of(String.class)))
 							.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
 
 					}
@@ -787,6 +804,8 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 
 	private Object fillDataForPickAndAccept(Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
 		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
+		if (seletedRows.iterator() ==  null)
+			return null;
 		DynamicDBean seletedParentRow = seletedRows.iterator().next();
 		while (tokens.hasMoreElements())
 		{

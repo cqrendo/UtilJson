@@ -277,7 +277,7 @@ private long sizeBE;
 		                .orElse((o1, o2) -> 0);
 		    }
 
-			public void save(String ResourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
+			public boolean save(String ResourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
 				DynamicDBean firstBean = beansToSaveAndRefresh.get(ResourceTobeSave);
 				boolean newRow = firstBean.getRowJSon()== null ; // when RowJson is not Fill is a new row
 		        
@@ -291,6 +291,7 @@ private long sizeBE;
 		            refreshItem(firstBean);
 		        }
 //				return selectedRow;
+				return hashasError;
 		    }
 			public void delete(String ResourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
 				DynamicDBean firstBean = beansToSaveAndRefresh.get(ResourceTobeSave);
