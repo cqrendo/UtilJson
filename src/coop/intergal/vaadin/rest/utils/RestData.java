@@ -357,7 +357,8 @@ public class RestData {
 		if (keepFieldName.get(resourceAndFieldNinUI) != null)
 		{
 //			System.out.println("RestData.getColName() FOUND IN HASHTABLE");
-			return keepFieldName.get(resourceAndFieldNinUI);
+			if (keepFieldName.get(resourceAndFieldNinUI).equals("null") == false)
+				return keepFieldName.get(resourceAndFieldNinUI);
 		}
 		if (rowsColList.size() > i)
 			colNameInUIinColList = rowsColList.get(i)[2];

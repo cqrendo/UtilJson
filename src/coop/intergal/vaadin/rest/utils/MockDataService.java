@@ -281,7 +281,7 @@ private String transErrorParentMIssing(String error) {
 		Object cacheStr = VaadinSession.getCurrent().getAttribute("cache");
 		boolean cache = true ;
 		if (cacheStr != null && cacheStr.equals("false"))
-			cache = true;
+			cache = false;
 		JsonNode rowsList = JSonClient.get("FormTemplate",filter,cache,AppConst.PRE_CONF_PARAM_METADATA,1+"");
 		for (JsonNode eachRow : rowsList)  {
 			String name = eachRow.get("name").asText();
@@ -292,7 +292,7 @@ private String transErrorParentMIssing(String error) {
 				int idxSpace = name.indexOf(" ");
 				if (idxSpace == -1)
 					idxSpace = name.length();
-				return "El valor introducido no existe en " + name.substring(0, idxSpace);
+				return "El valor introducido no existe en " + name;//.substring(0, idxSpace);
 			}			
 		}
 		
