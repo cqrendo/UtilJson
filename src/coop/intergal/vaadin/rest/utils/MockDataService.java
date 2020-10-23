@@ -270,6 +270,8 @@ private String transalateError(String error) {
 		return "Registro duplicado" ;
 	else if (error.startsWith("Validation violation:"))	
 		return error.substring(21);
+	else if (error.startsWith("Unable to delete entity") && error.indexOf("has at least one child on relationship") > -1) 
+		return "No es posible borrar este registro. Existen otros que dependen de él.";
 	return error;
 }
 
@@ -472,7 +474,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 							i++;
 						}
 				}
-				else if(colNameInUI != null && colNameInTable !=null && colNameInUI.startsWith("col") == true && isAlreadyFill == false)  // FILL NULLS
+				else if(colNameInUI != null && colNameInTable !=null && colNameInTable.startsWith("FK-") == false && colNameInUI.startsWith("col") == true && isAlreadyFill == false)  // FILL NULLS
 				{
 					if((value == null || value.toString().equals("") ==  true) && colNameInUI.equals("null") == false && colNameInUI.startsWith("FK-") == false)// && isCheckBox(o) == false)// to process when you empty the field
 					{

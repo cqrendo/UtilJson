@@ -1954,6 +1954,8 @@ public class DynamicDBean {// implements Serializable {
 				methodName= "getC" + colName.substring(1);
 			Method getColX = ((DynamicDBean.class)).getMethod(methodName );
 			String value = ((String) getColX.invoke(dbean));
+			if (value == null)
+				return null;
 			value = String.format("%."+nDecimals+"f",Double.valueOf(value));
 			return value.replace(".",",");
 		} catch (NoSuchMethodException | SecurityException e1) {

@@ -790,6 +790,7 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 		if (dialogForPick == null)
 			dialogForPick = new Dialog();
 		dialogForPick.removeAll();
+		dialogForPick.setCloseOnOutsideClick(false);
 		dialogForPick.add(dynamicGridForPick);
 		dialogForPick.open();
 		
@@ -804,8 +805,11 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 
 	private Object fillDataForPickAndAccept(Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
 		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
-		if (seletedRows.iterator() ==  null)
+		if (seletedRows.iterator() ==  null || seletedRows.iterator().hasNext() == false)
+		{
+			dialogForPick.close();
 			return null;
+		}	
 		DynamicDBean seletedParentRow = seletedRows.iterator().next();
 		while (tokens.hasMoreElements())
 		{

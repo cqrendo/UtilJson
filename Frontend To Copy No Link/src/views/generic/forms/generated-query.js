@@ -92,7 +92,8 @@ class GeneratedQuery extends PolymerElement {
  <!--  </vaadin-custom-field> -->
  <!--  </vaadin-form-item> -->
  <!--  </vaadin-vertical-layout> -->
- <div class="linCampos" style="width: 5%; height: 10%;">
+ <!-- <div class="linCampos" style="width: 5%; height: 10%;"> -->
+ <div class="linCampos" style="width: 100px; height: 100px;">
   <query-buttons-bar id="queryButtonsBar"></query-buttons-bar>
  </div>
 </vaadin-horizontal-layout>
