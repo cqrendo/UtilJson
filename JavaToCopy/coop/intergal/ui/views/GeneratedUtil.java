@@ -65,6 +65,7 @@ import com.vaadin.flow.router.QueryParameters;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawerFooter;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawerHeader;
@@ -736,7 +737,7 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 		String filter="tableName='"+resourceName+"'%20AND%20FieldNameInUI='"+fieldName+"'";
 		String parentResource = "";
 		
-		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,cache,"metadata","1");
+		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,cache,AppConst.PRE_CONF_PARAM_METADATA,"1");
 		for (JsonNode eachRow : rowsList)  {
 			if (eachRow.size() > 0)
 			{
@@ -848,13 +849,23 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 				if (header.indexOf("#")>0)
 					header = header.substring(2); // to avoid date typ indicator "D#"
 				if (isCOlEditable && isGridEditable)
+				{
 //					if (isNotAParentField)
 //						grid.addEditColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
 //						.setResizable(true).setSortProperty(colData[0]);
 //					else
 //						grid.addEditColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
 //						.setResizable(true);
-					System.err.println(" REVISAR ESTE CODIGO AL MIGRAR A 14 da error");
+//					EsDatePicker datePicker = new EsDatePicker();
+//					grid.addEditColumn(Item::getValue, new LocalDateRenderer<>(Item::getValue, "yyyy/MM/dd")).custom(datePicker, Item::setValue);
+//					LocalDate getValue();
+//					void setValue(LocalDate value);
+					EsDatePicker datePicker = new EsDatePicker();
+					col= grid.addEditColumn(item->item.getColLocalDate(colName),  new LocalDateRenderer<>(item->item.getColLocalDate(colName), "dd/MM/yyyy")).custom(datePicker,(item,date) -> {item.setColDate(date, colName); dynamicViewGrid.colChanged(item,colName,date);}).setHeader(header);
+//					col..setHeader(header);item.getColLocalDate(colName)).custom(datePicker, (item,date) -> {item.setColDate(date, colName); dynamicViewGrid.colChanged(item,colName,newValue);})
+//					col = grid.addEditColumn(colName).custom(datePicker, (item,date) -> item.setColDate(date, colName));//(date));
+	//				System.err.println(" REVISAR ESTE CODIGO AL MIGRAR A 14 da error");
+				}
 				else
 					if (isNotAParentField)
 						col = grid.addColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).setHeader(header).setSortProperty(colData[0])

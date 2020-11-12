@@ -24,6 +24,7 @@ import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.dom.DomEvent;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
+import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
@@ -175,7 +176,7 @@ private String pickMapFields;
 		String filter="tableName='"+currentRow.getResourceName()+"'%20AND%20FieldNameInUI='"+fieldName+"'";
 		String parentResource = "";
 		
-		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,"metadata","1");
+		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,AppConst.PRE_CONF_PARAM_METADATA,"1");
 		for (JsonNode eachRow : rowsList)  {
 			if (eachRow.size() > 0)
 			{

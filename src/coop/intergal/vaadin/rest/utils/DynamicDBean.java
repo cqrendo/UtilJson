@@ -11,8 +11,11 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+
 
 //@Entity
 //@Bean
@@ -1664,10 +1667,40 @@ public class DynamicDBean {// implements Serializable {
 //		Method getColX = ((DynamicDBean.class)).getMethod("setCol"+i);
 //		this.col2Date = col2Date;
 	}
+	public void setColDate(LocalDate colDate, String colName ) {
+		Object dbean = this;
+		try {
+		
+			String methodName = "setCol" + colName;
+			if (colName.startsWith("col"))
+				methodName= "setC" + colName.substring(1);
+			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+//			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+			setColX.invoke(dbean,df.format(java.sql.Date.valueOf(colDate)));
+		} catch (NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+//		Method getColX = ((DynamicDBean.class)).getMethod("setCol"+i);
+//		this.col2Date = col2Date;
+// catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+	}
 	public LocalDate getColLocalDate(String colName) {
 //		System.out.println("DynamicDBean.getColLocalDate() "+ colName);
 //		return LocalDate.now();
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		DateFormat formatterShort = new SimpleDateFormat("yyyy-MM-dd");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
 		Object dbean = this;
 		try {
 			String methodName = "setCol" + colName;
@@ -1675,6 +1708,9 @@ public class DynamicDBean {// implements Serializable {
 				methodName= "getC" + colName.substring(1);
 //			Method setColXDate = ((DynamicDBean.class)).getMethod("setCol"+i+"Date", new Class[] {java.util.Date.class} );
 			Method getColX = ((DynamicDBean.class)).getMethod(methodName);
+		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() == 10) // 4 is the length of null, and not date is so short
+			return formatterShort.parse((String) getColX.invoke(dbean)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
+	
 		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 4) // 4 is the length of null, and not date is so short
 			return formatter.parse((String) getColX.invoke(dbean)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();		
 		} catch (ParseException e) {
@@ -1695,6 +1731,8 @@ public class DynamicDBean {// implements Serializable {
 	public Date getColDate(String colName) {
 //		System.out.println("DynamicDBean.getColDate().."+colName);
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		DateFormat formatterShort = new SimpleDateFormat("yyyy-MM-dd");//.XXX");//("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
 		Object dbean = this;
 		try {
 			String methodName = "getCol" + colName;
@@ -1702,6 +1740,12 @@ public class DynamicDBean {// implements Serializable {
 				methodName= "getC" + colName.substring(1);
 
 			Method getColX = ((DynamicDBean.class)).getMethod(methodName);
+			if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() == 10) // to avoid "null" as date has to be always bugger than 4 
+			{
+				
+					return formatterShort.parse((String) getColX.invoke(dbean));		
+			}		
+	
 		if (getColX.invoke(dbean)!= null && getColX.invoke(dbean).toString().length() > 4) // to avoid "null" as date has to be always bugger than 4 
 		{
 			
@@ -1993,7 +2037,41 @@ public class DynamicDBean {// implements Serializable {
 			e.printStackTrace();
 		}
 	}
+	public String getValueAfterMark(int i, String mark) {
+//		System.out.println("DynamicDBean.getCol()" +i);
+		
+		Object dbean = this;
+//		if (getCol0().equals("18:00"))
+//		{
+//			System.out.println("DynamicDBean.getValueAfterMark() TO STOP DEBUG");
+//		}	
+		try
+		{
+//			Method setColXDate = ((DynamicDBean.class)).getMethod("setCol"+i+"Date", new Class[] {java.util.Date.class} );
+			Method getColX = ((DynamicDBean.class)).getMethod("getCol"+i);
+			String value =  (String) getColX.invoke(dbean);
+			int idxMark = 0;
+			if(value !=null)
+				idxMark = value.indexOf(mark)+1;
+			if (value == null)
+				return "";
+			return value.substring(idxMark);
+		} catch (NoSuchMethodException | SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+		return null;//col3Date;
+	}
 
 
 	

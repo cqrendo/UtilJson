@@ -6,6 +6,9 @@ import static coop.intergal.AppConst.PAGE_PRODUCTS;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -178,6 +181,9 @@ private FormButtonsBar buttonsForm;
 private boolean hasSideDisplay = true;
 private boolean autoSaveGrid = true;
 private boolean cache = true;
+private Object divInDisplay;
+@Id("divExporter")
+private Div divExporter;
 
 
 //	@Autowired()
@@ -214,7 +220,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		dataProvider.setResourceName(getResourceName());
 		dataProvider.setFilter(getFilter());
 //		grid = new Grid<>(DynamicDBean.class); 
-//		grid.removeAllColumns();
+		grid.removeAllColumns();
 		grid.setDataProvider(dataProvider);
 		grid.setEnterNextRow(true);
 		grid.setMultiSort(true);
@@ -231,7 +237,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 //		crud.setDataProvider(dataProvider);
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
         
-		rowsColListGrid = dataProvider.getRowsColList(cache );
+		rowsColListGrid = dataProvider.getRowsColList(cache);
 		newRow.addClickListener(e -> insertBeanInList());
 		deleteRow.addClickListener(e -> deleteBeanFromList());
 //		grid.removeAllColumns();
@@ -256,12 +262,18 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 	//	Anchor anchor = new Anchor(new StreamResource("my-excel.xlsx", Exporter.exportAsExcel(grid)), "Download As Excel");
         if (hasExportButton)
         {
-        	Button button = new Button(new Icon(VaadinIcon.FILE_TABLE));
-        	button.addThemeName("small");
+     //   	export.setVisible(true);
+        	divExporter.removeAll();
+        	Button b = new Button(new Icon(VaadinIcon.FILE_TABLE));
+        	b.addThemeName("small");
         	FileDownloadWrapper buttonWrapper = new FileDownloadWrapper(
             new StreamResource("export.xls", Exporter.exportAsExcel(grid)));
-        	buttonWrapper.wrapComponent(button);
-        	itemButtons.add(buttonWrapper);  
+        	buttonWrapper.wrapComponent(b);
+        	divExporter.add(buttonWrapper);  
+        }
+        else
+        {
+  //      	export.setVisible(false);
         }
 //		itemButtons.add(anchor);
 //		grid.getColumns().forEach(column -> column.setAutoWidth(true));
@@ -516,7 +528,7 @@ public DdbDataBackEndProvider getDataProvider() {
 		String filter="tableName='"+currentRow.getResourceName()+"'%20AND%20FieldNameInUI='"+colName+"'";
 		String parentResource = "";
 		
-		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,"metadata","1");
+		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,AppConst.PRE_CONF_PARAM_METADATA,"1");
 		for (JsonNode eachRow : rowsList)  {
 			if (eachRow.size() > 0)
 			{
@@ -584,7 +596,7 @@ public Object pickParent(String colName, DynamicDBean item) {
 	String filter="tableName='"+currentRow.getResourceName()+"'%20AND%20FieldNameInUI='"+colName+"'";
 	String parentResource = "";
 	
-	JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,"metadata","1");
+	JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,AppConst.PRE_CONF_PARAM_METADATA,"1");
 	for (JsonNode eachRow : rowsList)  {
 		if (eachRow.size() > 0)
 		{
@@ -765,18 +777,22 @@ private boolean isBoolean(String header, String colType) {
 			
 			setBean.invoke(display,bean);
 			setDataProvider.invoke(display, dataProvider);
+			divDisplay.removeAll();
 			if (displayFormClassName.indexOf("Generated") > -1)
 			{
 			//	setDataProvider.invoke(display, dataProvider);
 				Method createContent= dynamicForm.getMethod("createContent");
-				display = createContent.invoke(display);
+				divInDisplay = createContent.invoke(display);
+				divDisplay.add((Component)divInDisplay);
 			}
-	//		else
+			else
+			{
+				divDisplay.add((Component)display);
+			}
 
-
-			divDisplay.removeAll();
+			
 	//		divDisplay.remove((Component) display);
-			divDisplay.add((Component)display);
+			
 			String resourceSubGrid = extractResourceSubGrid(bean,0);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO adapt to use more than one subresource , use a variable instead of 9
 			divSubGrid.removeAll();
 			if (resourceSubGrid != null)
@@ -797,9 +813,10 @@ private boolean isBoolean(String header, String colType) {
 			}
 			else
 			{
-				DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
-				subDynamicViewGrid.setButtonsRowVisible(true);
-				divSubGrid.add(subDynamicViewGrid );
+//				divSubGrid.removeAll();
+//				DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
+//				subDynamicViewGrid.setButtonsRowVisible(false);//(true);
+//				divSubGrid.add(subDynamicViewGrid );
 			}
 	
 
@@ -1134,7 +1151,7 @@ private boolean isBoolean(String header, String colType) {
 
 	public Object saveSelectedRow(String apiname) {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + selectedRow.getRowJSon().toString());
-		if (selectedRow.getResourceName().equals("CR-FormTemplate"));
+		if (selectedRow.getResourceName().equals("CR-FormTemplate")) 
 			selectedRow.setCol9(getApiID(apiname));
 		beansToSaveAndRefresh.clear();
 		beansToSaveAndRefresh.put(selectedRow.getResourceName(), selectedRow);
@@ -1161,6 +1178,13 @@ private boolean isBoolean(String header, String colType) {
 		return "999999";
 	}
 
+	public Object colChanged(DynamicDBean item, String colName, LocalDate newDate) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String newValue = df.format(java.sql.Date.valueOf(newDate));
+		colChanged(item, colName, newValue);
+		return null;
+		
+	}
 	public Object colChanged(DynamicDBean item, String colName, String newValue) {
 //		System.out.println("DynamicViewGrid.colChanged()..."+  "...colName "+ colName +"...newValue "+ newValue+"...item " + item.getRowJSon() + "...newValue "+ newValue);
 		if (colName != null) // is call by the acceptPick

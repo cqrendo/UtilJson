@@ -34,10 +34,10 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 //@Tag("dynamic-view-grid")
 @Tag("dynamic-grid-display")
 @JsModule("./src/views/generic/layout/dynamic-grid-display.js")
-@Route(value = PAGE_DYNAMIC)//, layout = MainView.class)
+//@Route(value = PAGE_DYNAMIC)
 //@PageTitle(AppConst.TITLE_PRODUCTS)
 //@Secured(Role.ADMIN)
-public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle  {
+public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {
 //public class DynamicGridDisplay extends ThemableMixin(PolymerElement<TemplateModel>) implements BeforeEnterObserver, HasDynamicTitle  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
 	private String preConfParam;
@@ -259,7 +259,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 			Object queryForm = dynamicQuery.newInstance();
 			Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
 			setGrid.invoke(queryForm,grid);
-			if (displayFormClassName.indexOf("Generated") > -1)
+			if (queryFormClassName.indexOf("Generated") > -1)
 			{
 				
 				DdbDataBackEndProvider dataProvider = new DdbDataBackEndProvider();
@@ -274,6 +274,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 //				queryForm = 
 				createContent.invoke(queryForm);
 			}
+			divQuery.removeAll();
 			divQuery.add((Component)queryForm);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -338,6 +339,19 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 		return title;
 	}
 
+//	@Override
+//	public void serviceInit(ServiceInitEvent event) {
+//	      // add view only during development time
+//        if (!event.getSource()
+//                .getDeploymentConfiguration()
+//                .isProductionMode()) {
+//            RouteConfiguration configuration =
+//               RouteConfiguration.forApplicationScope();
+//
+//            configuration.setRoute(PAGE_DYNAMIC,
+//               MainLayout.class);
+//        }
+//    }
 //	@Override
 //	protected CrudEntityPresenter<DynamicDBean> getPresenter() {
 //		// TODO Auto-generated method stub

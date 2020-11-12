@@ -67,7 +67,7 @@ public class MockDataService extends DataService {
 	@Override
 //	public Collection<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean b, String s, String s0,
 		public Collection<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean refreshFromServer, String resourceName, String preConfParam,
-				ArrayList<String[]> rowsColList, String filtro, List<QuerySortOrder> sortOrdersFields, Boolean hasNewRow) {
+				ArrayList<String[]> rowsColList, String filtro, List<QuerySortOrder> sortOrdersFields, Boolean hasNewRow, String variant) {
 		//	if (refreshFromServer)
 		if (sortOrdersFields.isEmpty() == false)
 		{
@@ -91,7 +91,7 @@ public class MockDataService extends DataService {
 			}
 		}
 				
-				rows = RestData.getResourceData(offset,limit, resourceName, preConfParam, rowsColList, filtro, refreshFromServer, hasNewRow);// refresh data from server each interaction with grid
+				rows = RestData.getResourceData(offset,limit, resourceName, preConfParam, rowsColList, filtro, refreshFromServer, hasNewRow, variant);// refresh data from server each interaction with grid
 				if (rows != null)
 					System.out.println("MockDataService.getAllDynamicDBean()-----"+rows.size()+ ".....resourceName "+resourceName);
 				else
@@ -438,15 +438,24 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 						}
 						else // are "normal fields"
 						{
-							if(isDate(o))	
+							if(colType == 1) // Date	
 							{
-								DateFormat fechaIni = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-								if (value != null)
-									newEntityinfo.put(colNameInTable,fechaIni.format(value) );
+								
+//								DateFormat fechaIni = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//								if (value != null)
+//									newEntityinfo.put(colNameInTable,fechaIni.format(value) );
+								String valueStr = (String) ""+value;
+								if (valueStr.indexOf("00:00:00") > -1) // is date without time
+									{
+									valueStr = 	valueStr.substring(0,10);
+									}
+									
+								newEntityinfo.put(colNameInTable,valueStr);
 							}
 							else
-								if (isCheckBox(o) || value.equals("true") ||  value.equals("false") )	
+								if (colType == 4 || value.equals("true") ||  value.equals("false") )	// boolean
 								{
+									System.out.println("MockDataService.putValuesOnObject()  IS CHECKBOX");
 									if (value.equals("true")) 
 										newEntityinfo.put(colNameInTable, (Boolean) true);  
 									else if (  value.equals("false") )

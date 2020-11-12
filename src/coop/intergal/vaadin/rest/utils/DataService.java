@@ -24,7 +24,7 @@ public abstract class DataService implements Serializable {
         return MockDataService.getInstance();
     }
 
-	public abstract Collection<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean b, String s, String s0, ArrayList<String[]> arrayList, String filtro, List<QuerySortOrder> sortOrdersFields, Boolean hasNewRow) ;
+	public abstract Collection<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean b, String s, String s0, ArrayList<String[]> arrayList, String filtro, List<QuerySortOrder> sortOrdersFields, Boolean hasNewRow, String variant) ;
 
 	public abstract DynamicDBean getDynamicDBeanById(int productId) ;
 	public abstract void updateDynamicDBean(DynamicDBean customer) ;

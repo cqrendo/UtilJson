@@ -285,8 +285,8 @@ public class FieldTemplateComboRelatedForPick extends PolymerTemplate<TemplateMo
 		fieldArr[1] = "";
 		fieldArr[2] = "col1";
 		rowsColList.add(fieldArr);
-		dbeanListChild  = RestData.getResourceData(0,200,"FieldTemplate", AppConst.PRE_CONF_PARAM_METADATA, rowsColList, filterChild, false, new Boolean(false));
-		dbeanListParent = RestData.getResourceData(0,200,"FieldTemplate", AppConst.PRE_CONF_PARAM_METADATA, rowsColList, filterParent, false, new Boolean(false));
+		dbeanListChild  = RestData.getResourceData(0,200,"FieldTemplate", AppConst.PRE_CONF_PARAM_METADATA, rowsColList, filterChild, false, new Boolean(false),null);
+		dbeanListParent = RestData.getResourceData(0,200,"FieldTemplate", AppConst.PRE_CONF_PARAM_METADATA, rowsColList, filterParent, false, new Boolean(false),null);
 	}
 	private void fillCombo(int line) {
 		switch (line)

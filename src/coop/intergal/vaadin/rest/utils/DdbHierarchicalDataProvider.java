@@ -93,11 +93,11 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 //	  }
 	
 	  public ArrayList<String[]> getRowsColList() {
-		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, null);
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, null, null);
 		 
 	  }
 	  public ArrayList<String[]> getRowsColList(boolean cache) {
-		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, cache);
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, cache, null);
 	  }
 	  public ArrayList<String[]> getRowsFieldList() {
 		 return RestData.getRowsFieldList(rowsColList, resourceName, preConfParam, null);	
@@ -162,7 +162,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 				int offset = query.getOffset();
 		        int limit = query.getLimit();
 		        List<QuerySortOrder> sortOrdersFields = query.getSortOrders();
-		        Stream<DynamicDBean> stream = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(),  filter,sortOrdersFields, hasNewRow).stream();
+		        Stream<DynamicDBean> stream = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(),  filter,sortOrdersFields, hasNewRow, null).stream();
 
 		        if (query.getFilter().isPresent()) {
 		            stream = stream

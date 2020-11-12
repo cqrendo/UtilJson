@@ -27,8 +27,10 @@ public class RestData {
 
 	private static final boolean CACHE_TRUE = true;
 	static Hashtable<String, String> keepFieldName = new Hashtable<String, String>();
-
-	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filter, boolean cache, Boolean hasNewRow) {
+	private static ArrayList<String> rowsColList;
+	private static String variant;
+	
+	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filter, boolean cache, boolean hasNewRow, String variant) {
 
 		if (cache == false)
 			keepFieldName.clear();
@@ -264,6 +266,8 @@ public class RestData {
 			try {
 				if (field.getName().equals("col"+i) && i <= maxNumberOfFields)//rowsColList.size())//maxNumberOfFields)
 					{
+//					if (i == 1)
+//						System.out.println("RestData.fillRow() STOP DEBUG");
 					field.setAccessible(true);
 					String colName = getColName(rowsColList,i, resourceName);
 					if ("null".equals(colName) == false)
@@ -401,7 +405,7 @@ public class RestData {
 		}
 	}
 	public static void refresh(DynamicDBean dDb) {
-		getResourceData(0,0,dDb.getResourceName(), dDb.getPreConfParam(), dDb.getRowsColList(), dDb.getFilter(), true, false);
+		getResourceData(0,0,dDb.getResourceName(), dDb.getPreConfParam(), dDb.getRowsColList(), dDb.getFilter(), true, false, variant);
 		
 	}
 	public static int  getCountRows(String resourceName, String preConfParam, String filter, boolean cache, boolean hasNewRow) {
@@ -466,12 +470,17 @@ public class RestData {
 		return value; 
 		
 	}
+	public static DynamicDBean getOneRow(String resourceName, String filter, String preConfParam)
+	{
+		return getOneRow(resourceName, filter, preConfParam, null);
+		
+	}
 
 	public static DynamicDBean getOneRow(String resourceName, String filter, String preConfParam, ArrayList<String[]> rowsColList)
 	{
 		try {
 			JsonNode rowsList = JSonClient.get(resourceName,filter,false,preConfParam,"20");
-			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam, null);//, "");
+			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam, null, null);//, "");
 			for (JsonNode eachRow : rowsList)  {
 				if (eachRow.get(rowsColList.get(0)[0]) !=null)
 				{
@@ -506,7 +515,158 @@ public class RestData {
 		return 	false;
 		
 	}
-	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache){//, String variant) { // variant is use to have different lists of fields in the same resource
+	// with Variant
+	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache, String variant) { // variant is use to have different lists of fields in the same resource
+		if (cache == null)
+		{
+			cache = CACHE_TRUE;
+		}	
+		if (rowsColList == null || rowsColList.isEmpty() || cache == false)
+				{
+				JsonNode cols;
+				try {
+					String genericResourceName = resourceName;
+					String tableNameToSearch = genericResourceName;
+					if (variant != null && variant.isEmpty() == false)
+					{
+						genericResourceName = resourceName;
+						int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
+						int idxPomt = resourceName.indexOf(".");
+						if (indx__ > 1 && idxPomt == -1) // only when there is not a subresource (after a point), you can extract the generic name from first name substring(0....
+							genericResourceName = resourceName.substring(0, indx__);
+						tableNameToSearch = genericResourceName+variant;
+					}	
+//					
+					String filter = "tableName='"+tableNameToSearch+"'%20AND%20isDataField=true&order=colOrder";
+
+					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch  + " "+ new Date());
+					cols = JSonClient.get("CR-FieldTemplate",filter, cache, AppConst.PRE_CONF_PARAM_METADATA);
+					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
+					{
+						rowsColList = new ArrayList<String[]>();
+						int i = 0;
+						int maxColNumber = 0;
+						for (JsonNode col :cols)
+						{
+							String[] fieldArr  = new String[17];
+							fieldArr[0] = col.get("fieldName").asText();
+							if ( col.get("showInGrid").asBoolean())
+								fieldArr[1] = "#SIG#";
+							else
+								fieldArr[1] = "";
+							if ( col.get("isSorteable").asBoolean())
+								fieldArr[1] = fieldArr[1]+"SORT";
+							fieldArr[0] = col.get("fieldName").asText();
+							if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
+								fieldArr[1] = fieldArr[1]+"#CNoEDT#";
+							if ( col.get("parentResource") != null && col.get("parentResource").asText().trim().length() > 1 && col.get("parentResource").asText().trim().equals("null")== false) 
+							{
+								fieldArr[1] = fieldArr[1]+"#PCK#";
+			
+							}
+							if (fieldArr[0].equals("pickMapFields"))  // is a field with a special PICK
+								fieldArr[1] = fieldArr[1]+"#PCK#FOR#pickMapFields";
+//							if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
+//								fieldArr[1] = fieldArr[1]+"#REQ#";
+							if ( col.get("FieldNameInUI").asText().isEmpty())
+								fieldArr[2] = "col"+i;	
+							else
+								fieldArr[2] = col.get("FieldNameInUI").asText();
+							if ( col.get("idFieldType").asText().isEmpty() || col.get("idFieldType").asText().equals("null"))
+								fieldArr[3] = "";
+							else
+								fieldArr[3] = col.get("idFieldType").asText();
+							if ( col.get("PathToParentField").asText().isEmpty() || col.get("PathToParentField").asText().equals("null"))
+								fieldArr[4] = "";
+							else
+								fieldArr[4] = col.get("PathToParentField").asText();
+							if ( col.get("defaultValue").asText().isEmpty() || col.get("defaultValue").asText().equals("null"))
+								fieldArr[5] = "";
+							else
+								fieldArr[5] = col.get("defaultValue").asText();
+							if ( col.get("colOrder").asText().isEmpty())
+								fieldArr[6] = "";
+							else if ( col.get("colOrder").asText().contains("#")) // after the # becames the col header
+								{
+								String colOrder =  col.get("colOrder").asText();
+								fieldArr[6] =colOrder.substring(colOrder.indexOf("#")+1);
+								}
+							else
+								fieldArr[6] = "";
+							if ( col.get("fieldOrder").asText().isEmpty())
+								fieldArr[7] = "";
+							else if ( col.get("fieldOrder").asText().contains("#")) // after the # becames the field label
+								{
+								String fieldOrder =  col.get("fieldOrder").asText();
+								fieldArr[7] =fieldOrder.substring(fieldOrder.indexOf("#")+1);
+								}
+							else
+								fieldArr[7] = "";
+							if ( col.get("queryOrder").asText().isEmpty())
+								fieldArr[8] = "";
+							else if ( col.get("queryOrder").asText().contains("#")) // after the # becames the query label
+								{
+								String fieldOrder =  col.get("queryOrder").asText();
+								fieldArr[8] =fieldOrder.substring(fieldOrder.indexOf("#")+1);
+								}
+							else
+								fieldArr[8] = "";
+							if ( col.get("titleDisplay").asText().isEmpty() || col.get("titleDisplay").asText().equals("null") )
+								fieldArr[9] = "";
+							else
+								fieldArr[9] = col.get("titleDisplay").asText();
+							if ( col.get("titleQuery").asText().isEmpty() || col.get("titleQuery").asText().equals("null") )
+								fieldArr[10] = "";
+							else
+								fieldArr[10] = col.get("titleQuery").asText();
+							if ( col.get("titleGrid").asText().isEmpty() || col.get("titleGrid").asText().equals("null") )
+								fieldArr[11] = "";
+							else
+								fieldArr[11] = col.get("titleGrid").asText();
+							fieldArr[12] = ""; // is only used for query fields
+							fieldArr[13] = ""; // is only used for Form fields
+							fieldArr[14] = ""; // is only used for Form fields
+							
+							if ( col.get("maxColNumber").asText().isEmpty() || col.get("maxColNumber").asText().equals("null") )
+								fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
+							else
+								fieldArr[15] = col.get("maxColNumber").asText();
+							fieldArr[16] = ""; // is only used for Form fields
+							rowsColList.add(fieldArr);
+							i++;
+						}
+						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
+						if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself
+							{
+							int idxPoint = resourceName.indexOf(".");
+							if (idxPoint > -1) 
+							resourceName = resourceName.substring(0, idxPoint);
+							String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
+						
+							 
+							if (ident !=null) 
+								{
+								JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam); 
+								if ((resource.get("statusCode") != null && resource.get("statusCode").asInt() != 500) || resource.get("statusCode") == null)  // TODO check why sme times you get 500, by example when you do 	DynamicDBean dynamicDBean = RestData.getOneRow(RESOURCE_FIELD_TEMPLATE,filter, AppConst.PRE_CONF_PARAM_METADATA, null); in consrain.java
+
+									JSonClient.keepJoinConditionSubResources(resource); 
+								}
+							}
+					}
+					
+					else	
+					{
+						
+						rowsColList = getColListFromTable(resourceName, preConfParam);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				}	
+			return rowsColList;
+		}
+	public static ArrayList<String[]> getRowsColListOLD(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache){//, String variant) { // variant is use to have different lists of fields in the same resource
 		if (cache == null)
 		{
 			cache = CACHE_TRUE;
@@ -652,6 +812,43 @@ public class RestData {
 			return rowsColList;
 		}
 
+	public static ArrayList<String> getRowsColList(String resourceName, String preConfParam, String variant) {
+			
+//			if (rowsColList == null || rowsColList.isEmpty())
+//				{
+				JsonNode cols;
+				try {				
+					String genericResourceName = resourceName;
+					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
+					if (indx__ > 1)
+						genericResourceName = resourceName.substring(0, indx__);
+					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'", true, preConfParam);
+					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
+					{
+						rowsColList = new ArrayList<String>();
+						for (JsonNode col :cols)
+						{
+							rowsColList.add(col.get("fieldName").asText());
+						}
+					}
+					
+					else	
+					{
+						cols = JSonClient.getColumnsFromTable(resourceName, null, true, preConfParam);
+						
+						rowsColList = new ArrayList<String>();
+						Iterator<String> fN = cols.get(0).fieldNames();
+						while (fN.hasNext()) {
+							rowsColList.add(fN.next());
+						}
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+//				}	
+			return rowsColList;
+		}
 	public static ArrayList<String[]> getRowsFieldList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache){//, String variant) { // variant is use to have different lists of fields in the same resource
 		if (cache == null)
 		{
@@ -868,7 +1065,7 @@ public class RestData {
 
 	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam) {
 		// TODO Auto-generated method stub
-		return getRowsColList(rowsColList, resourceName, preConfParam, null);
+		return getRowsColList(rowsColList, resourceName, preConfParam, null, null);
 	}
 
 	/// ******* CAMPOS QUERY ********

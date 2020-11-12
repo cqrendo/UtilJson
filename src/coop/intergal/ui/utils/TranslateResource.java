@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.UI;
 
+import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
 public class TranslateResource {
@@ -22,7 +23,8 @@ public class TranslateResource {
 	    ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", locale);
 //		ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", new Locale("es", "ES"));
 //		Enumeration bundleKeys = labels.getKeys();
-		clave = labels.getString(field);
+	    if (labels != null && field != null)
+	    	clave = labels.getString(field);
 		}
 //		catch ( java.util.MissingResourceException)
 		catch (java.util.MissingResourceException e)
@@ -49,7 +51,7 @@ public class TranslateResource {
 					tableName = tableName.substring(6);
 				filtro = filtro + "%20AND%20tableName='"+tableName+"'";
 			}
-			JsonNode rowsFT = JSonClient.get("FieldTemplate", filtro, true, "metadata", "10"); // is use to pass as lTxsumary in the case this is empty for not changes
+			JsonNode rowsFT = JSonClient.get("FieldTemplate", filtro, true, AppConst.PRE_CONF_PARAM_METADATA, "10"); // is use to pass as lTxsumary in the case this is empty for not changes
 			if (rowsFT != null && rowsFT.get("errorMessage") == null)
 			{
 				if (rowsFT.size() > 0)

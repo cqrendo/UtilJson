@@ -44,17 +44,17 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 	private Boolean cache = true;
 	private Boolean hasNewRow = false;
 //	private WrappedSession keepLastWSession;
-//	private String variant = "";
+	private String variant = "";
 	private Consumer<Long> sizeChangeListener;
 private long sizeBE;
 
-//	public String getVariant() {
-//		return variant;
-//	}
-//
-//	public void setVariant(String variant) {
-//		this.variant = variant;
-//	}
+	public String getVariant() {
+		return variant;
+	}
+
+	public void setVariant(String variant) {
+		this.variant = variant;
+	}
 
 	public String getPreConfParam() {
 		return preConfParam;
@@ -99,10 +99,17 @@ private long sizeBE;
 //	  }
 	
 	  public ArrayList<String[]> getRowsColList() {
-		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, null);
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, null,null);
 	  }
+	  public ArrayList<String[]> getRowsColList(String variant) {
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, null,variant);
+	  }
+
+	  public ArrayList<String> getRowsColListOnlyNames(String resourceName, String preConfParam, String variant) {
+		 return RestData.getRowsColList(resourceName, preConfParam, variant);
+	  }	 
 	  public ArrayList<String[]> getRowsColList(boolean cache) {
-		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, cache);
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, cache, null);
 	  }
 	  public ArrayList<String[]> getRowsFieldList() {
 		 return RestData.getRowsFieldList(rowsFieldList, resourceName, preConfParam, null);	
@@ -173,7 +180,7 @@ private long sizeBE;
 		        int offset = query.getOffset();
 		        int limit = query.getLimit();
 		        List<QuerySortOrder> sortOrdersFields = query.getSortOrders();
-		        Collection<DynamicDBean> rows = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(),  filter,sortOrdersFields, hasNewRow);
+		        Collection<DynamicDBean> rows = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(variant),  filter,sortOrdersFields, hasNewRow, variant);
 		        if (rows.size() == 1 && sizeBE > 1)
 		        {
 		        	DynamicDBean row = rows.iterator().next();

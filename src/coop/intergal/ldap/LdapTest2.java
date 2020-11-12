@@ -1,6 +1,8 @@
 package coop.intergal.ldap;
  
 import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -20,10 +22,11 @@ public class LdapTest2 {
     public void run() {
         try {
             DirContext context = getContext();
-            String name = "uid=user,ou=people";
-//            createLDAPObject(context, name);
+            String name = "uid=terra2, ou=anpas";
+ //           createLDAPObject(context, name);
+            createLDAPUser(name, "password", null, "snvalue", "cnvalue" );
 //            createAttribute(context, name, "displayName", "JOBS");
-            System.out.println("result "+changePassword(name , "admin2", "admin3"));
+ //           System.out.println("result "+changePassword(name , "admin2", "admin3"));
 //            viewAttribute(context, name, "displayName");
 //            updateAttribute(context, name, "displayName", "STEVE");
 //            viewAttribute(context, name, "displayName");
@@ -31,10 +34,75 @@ public class LdapTest2 {
     //        removeLDAPObject(context, name);
         } catch (NamingException e) {
             e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            
+//        } catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//
+          }
+    }
+    public static void createLDAPUser(String name, String password, Hashtable<String, String> fieldsAndData, String snvalue, String cnvalue ) throws NamingException {
+    	DirContext context = getContext();
+        Attributes attributes = new BasicAttributes();
+ 
+        Attribute attribute = new BasicAttribute("objectClass");
+        attribute.add("inetOrgPerson");
+        attribute.add("organizationalPerson");
+        attribute.add("person");
+        attribute.add("top");
+        attributes.put(attribute);
+ 
+//        Attribute oc = new BasicAttribute("objectClass");
+//        oc.add("organizationalPerson");
+//        attributes.put(oc);
+// 
+//        Attribute person = new BasicAttribute("objectClass");
+//        person.add("person");
+//        attributes.put(person);
+        
+//        Attribute calEntry = new BasicAttribute("objectClass");
+//        calEntry.add("calEntry");
+//        attributes.put(calEntry);
+
+//        attribute = new BasicAttribute("objectClass");
+//        attribute.add("top");
+//        attributes.put(attribute);
+       
+
+        Attribute sn = new BasicAttribute("sn");
+        sn.add(snvalue);
+        attributes.put(sn);
+ 
+        Attribute cn = new BasicAttribute("cn");
+        cn.add(cnvalue);
+        attributes.put(cn);
+        
+//       Attribute uid = new BasicAttribute("uid");
+//       uid.add("bob2");
+//       attributes.put(uid);
+// 
+ 
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+ //       encoder.encode("1234");
+        Attribute userPassword = new BasicAttribute("userPassword");
+        userPassword.add(encoder.encode(password));//"$2a$10$c6bSeWPhg06xB1lvmaWNNe4NROmZiSpYhlocU/98HNr2MhIOiSt36");
+        attributes.put(userPassword);
+        if ( fieldsAndData != null)
+        {
+        	Enumeration<String> fieldsAndDataELE = fieldsAndData.keys();
+        	while (fieldsAndDataELE.hasMoreElements())
+        	{
+        		String field = fieldsAndDataELE.nextElement();
+        		String data = fieldsAndData.get(field);
+        		attributes.put(field,data );
+        	}
+        }	
+
+//        Attribute dname = new BasicAttribute("texto");
+//        dname.add(name);
+//        attributes.put(dname);
+ //      attributes.put("telephoneNumber", "1234");
+        context.createSubcontext(name, attributes);
     }
     public static String changePassword(String name , String oldPass, String newPass) throws NamingException, UnsupportedEncodingException {
     	DirContext context = getContext();
@@ -99,7 +167,7 @@ public class LdapTest2 {
         attributes.put(sn);
  
         Attribute cn = new BasicAttribute("cn");
-        cn.add("Jobs");
+        cn.add("terra");
         attributes.put(cn);
         
 //       Attribute uid = new BasicAttribute("uid");
@@ -145,13 +213,22 @@ public class LdapTest2 {
         System.out.println(attrName + ":" + attrs.get(attrName).get());
     }
  
+//    private static DirContext getContext() throws NamingException {
+//        Properties properties = new Properties();
+//        properties.put(Context.INITIAL_CONTEXT_FACTORY,
+//                "com.sun.jndi.ldap.LdapCtxFactory");
+//        properties.put(Context.PROVIDER_URL, "ldap://intergal01.cloud.netimaging.net:389/dc=intergal,dc=coop");
+//        properties.put(Context.SECURITY_CREDENTIALS, "toorLDAP44");
+//        properties.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=intergal,dc=coop");
+//        return new InitialDirContext(properties);
+//    }
     private static DirContext getContext() throws NamingException {
         Properties properties = new Properties();
         properties.put(Context.INITIAL_CONTEXT_FACTORY,
                 "com.sun.jndi.ldap.LdapCtxFactory");
-        properties.put(Context.PROVIDER_URL, "ldap://intergal01.cloud.netimaging.net:389/dc=intergal,dc=coop");
-        properties.put(Context.SECURITY_CREDENTIALS, "toorLDAP44");
-        properties.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=intergal,dc=coop");
+        properties.put(Context.PROVIDER_URL, "ldap://intergal03.cloud.netimaging.net:389/dc=cloud");
+        properties.put(Context.SECURITY_CREDENTIALS, "intergalldapadmin");
+        properties.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=cloud");
         return new InitialDirContext(properties);
     }
  
