@@ -26,6 +26,7 @@ import com.vaadin.flow.router.Route;
 
 import coop.intergal.AppConst;
 import coop.intergal.ui.security.ldap.LdapClient;
+import coop.intergal.ui.util.SendEmail;
 import coop.intergal.ui.utils.TranslateResource;
 
 @Route(value = "login")
@@ -106,7 +107,7 @@ public class LoginView extends FlexLayout implements AfterNavigationObserver {
 		    String destinatario = elUser; 
 		    String asunto = "Nueva contraseña";
 		    String cuerpo = "<p>Esta es tu nueva contraseña:</p><p style=\"font-size:16px;\">"+psw+"</p><p>Puedes cambiarla una vez que entres en la aplicación.</p>";	    
-		    coop.intergal.ampa.ui.util.SendEmail.SendEmail(destinatario, asunto, cuerpo);
+		    SendEmail.SendEmail(destinatario, asunto, cuerpo);
 	    	Notification notification = new Notification("Te hemos enviado un email con tu nueva contraseña. Si no aparece en la carpeta de \"entrada\" revisa la de \"correo no deseado\" (spam)", 8000, Position.MIDDLE);
     		notification.open();
 	}
