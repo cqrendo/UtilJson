@@ -1,4 +1,4 @@
-package coop.intergal.ui.util;
+package coop.intergal.ampa.ui.util;
 
 import java.util.Properties;
 
@@ -12,18 +12,16 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import coop.intergal.AppConst;
 
 public class SendEmail {
 
 	public static void SendEmail(String destinatario, String asunto, String cuerpo) {
-	    // Esto es lo que va delante de @gmail.com en tu cuenta de correo. Es el remitente también.
-	    String remitente = "anpa@anpaterradeturonio.org";  //Para la dirección anpa@anpaterradeturonio.org
-	    String clave = "anpa123%";
-//	    String elhost = "cp695.webempresa.eu";
-	    String elhost = "mail.anpaterradeturonio.org";
-//	    String puerto = "465";
-	    String puerto = "26";
-	    
+	    String remitente = AppConst.EMAIL_REMITENTE;
+	    String clave = AppConst.EMAIL_CLAVE;
+	    String elhost = AppConst.EMAIL_HOST;
+	    String puerto = AppConst.EMAIL_PORT;
+
 	    Properties props = System.getProperties();
 	    props.put("mail.smtp.host", elhost);  //El servidor SMTP de Google
 	    props.put("mail.smtp.user", remitente);

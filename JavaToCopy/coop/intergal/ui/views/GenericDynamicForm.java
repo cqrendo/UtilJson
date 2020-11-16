@@ -12,7 +12,6 @@ import java.util.StringTokenizer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -26,6 +25,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
@@ -117,7 +117,7 @@ private String pickMapFields;
 					}
 					else if (rowCol[3].equals("1")) // is Date
 						{
-						binder.forField((DatePicker) fieldObj)
+						binder.forField((EsDatePicker) fieldObj)
 						.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
 						.bind(d-> d.getColDate(fieldName), (d,v)-> d.setColDate(v,fieldName));//DynamicDBean::setCol2Date);				
 					}
@@ -185,7 +185,8 @@ private String pickMapFields;
 				queryFormForPickClassName =  eachRow.get("queryFormForPickClassName").asText();
 			}
 		}
-		queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;
+		if (queryFormForPickClassName.startsWith("coop.intergal.ui.views") == false)
+			queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;
 		DynamicViewGrid grid = dynamicGridForPick.getGrid();
 		Class<?> dynamicQuery = Class.forName(queryFormForPickClassName);
 		Object queryForm = dynamicQuery.newInstance();

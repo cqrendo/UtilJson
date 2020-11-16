@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -358,12 +357,12 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				}
 				else if (idFieldType == 1 && isQuery == false) // is Date
 				{
-					DatePicker dp = new DatePicker();
+					EsDatePicker dp = new EsDatePicker();
 					dp.getElement().setAttribute("theme", "small");
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
 					Div l = alingLabel(label); 
-					binder.forField((DatePicker) dp)
+					binder.forField((EsDatePicker) dp)
 					.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
 					.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
 					FormLayout.FormItem item = form.addFormItem(dp, l );
@@ -484,7 +483,8 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					else
 					{
 //						binder.bind(tf, fieldNameInUI);
-						bdf.setMaxLength(new Integer(fieldSize));
+						if (fieldSize.isEmpty() == false)
+							bdf.setMaxLength(new Integer(fieldSize));
 						binder.forField(bdf)
 						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
 //						binder.forField(bdf).bind(d-> d.getColBigDecimal(fieldNameInUI), (d,v)-> d.setColBigDecimal(v,fieldNameInUI));

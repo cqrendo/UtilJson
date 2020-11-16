@@ -605,7 +605,8 @@ public Object pickParent(String colName, DynamicDBean item) {
 			queryFormForPickClassName =  eachRow.get("queryFormForPickClassName").asText();
 		}
 	}
-	queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;
+	if (queryFormForPickClassName.startsWith("coop.intergal.ui.views") == false)
+		queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;
 	DynamicViewGrid grid = dynamicGridForPick.getGrid();
 	Class<?> dynamicQuery = Class.forName(queryFormForPickClassName);
 	Object queryForm = dynamicQuery.newInstance();

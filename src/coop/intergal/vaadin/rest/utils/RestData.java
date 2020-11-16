@@ -822,7 +822,7 @@ public class RestData {
 					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
 					if (indx__ > 1)
 						genericResourceName = resourceName.substring(0, indx__);
-					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'", true, preConfParam);
+					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'", true, AppConst.PRE_CONF_PARAM_METADATA);
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
 						rowsColList = new ArrayList<String>();

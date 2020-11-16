@@ -75,7 +75,7 @@ public class LoginView extends FlexLayout implements AfterNavigationObserver {
     	if (!user.isEmpty()) {
     		elUser = user.getValue();
 			if (compruebaEmail(elUser) == true) {
-				usuario = "uid="+elUser+",ou=anpas";
+				usuario = "uid="+elUser+AppConst.LDAP_BASE;
 				psw = getPassword(CARACTERES,5);
 				try {
 					String estado = LdapClient.changePassword(usuario, "", psw, true, true);
@@ -153,6 +153,8 @@ public class LoginView extends FlexLayout implements AfterNavigationObserver {
     	    i18n.getErrorMessage().setTitle("Usuario o contraseña incorrectos.");
     	    i18n.getErrorMessage()
     	        .setMessage("Revisa tu usuario y contraseña y vuelve a intentarlo.");
+    	    i18n.getHeader().setTitle(AppConst.LOGIN_NAME);
+    	    i18n.getHeader().setDescription(AppConst.LOGIN_DESCRIPTION);
     	    i18n.setAdditionalInformation("");
     	    return i18n;	
     }

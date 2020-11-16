@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -22,6 +21,7 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 
+import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.util.FontSize;
@@ -377,12 +377,12 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 				}
 				else if (idFieldType.equals("1")) // is Date
 				{
-					DatePicker dp = new DatePicker();
+					EsDatePicker dp = new EsDatePicker();
 					dp.getElement().setAttribute("theme", "small");
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
 					Div l = alingLabel(label); 
-					binder.forField((DatePicker) dp)
+					binder.forField((EsDatePicker) dp)
 					.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
 					.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
 					FormLayout.FormItem item = form.addFormItem(dp, l );
@@ -512,11 +512,11 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 			}
 			else if (idFieldType.equals("1")) // is Date
 			{
-				DatePicker dp = new DatePicker();
+				EsDatePicker dp = new EsDatePicker();
 				boolean isRightLabel = false;
 //				if (label.endsWith("#"))isRightLabel = true;
 				Div l = alingLabel(label); 
-				binder.forField((DatePicker) dp)
+				binder.forField((EsDatePicker) dp)
 				.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
 				.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
 				FormLayout.FormItem item = form.addFormItem(dp, l );
