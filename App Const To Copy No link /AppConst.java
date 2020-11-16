@@ -48,6 +48,9 @@ public class AppConst {   // @@ TODO this class for now is copy and represents t
 	public static final String DEFAULT_PICK_DIALOG_HEIGHT = "800px";
 	public static final String DEFAULT_API_NAME = "monbus";
 	
+	public static final String LOGIN_FORGETPASS_CONTENT = "Escribe tu usuario a continuación y te enviaremos un email con tu nueva contraseña.";
+	public static final String LOGIN_FORGETPASS_ERROR = "Ha habido un error. Posiblemente ese usuario no existe. Revísalo.";  
+	public static final String LOGIN_FORGETPASS_NOTEMAIL = " no es un email válido. Revísalo.";	
 	public static final String EMAIL_REMITENTE = "ampafacil.com@gmail.com";
 	public static final String EMAIL_CLAVE = "Susita123%";
 	public static final String EMAIL_HOST = "smtp.gmail.com";
