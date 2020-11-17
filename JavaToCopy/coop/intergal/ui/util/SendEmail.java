@@ -1,4 +1,4 @@
-package coop.intergal.ampa.ui.util;
+package coop.intergal.ui.util;
 
 import java.util.Properties;
 
