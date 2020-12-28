@@ -1677,8 +1677,8 @@ public class DynamicDBean {// implements Serializable {
 			Method setColX = ((DynamicDBean.class)).getMethod(methodName, new Class[] {java.lang.String.class} );
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 //			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
-			setColX.invoke(dbean,df.format(java.sql.Date.valueOf(colDate)));
+			if (colDate != null )
+				setColX.invoke(dbean,df.format(java.sql.Date.valueOf(colDate)));
 		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {

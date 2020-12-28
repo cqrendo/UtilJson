@@ -344,167 +344,6 @@ public DdbDataBackEndProvider getDataProvider() {
 	public void setDataProvider(DdbDataBackEndProvider dataProvider) {
 		this.dataProvider = dataProvider;
 	}
-	private Column<DynamicDBean> addFormatedColumnOLD2(int i, boolean isGridEditable) {
-		String[] colData = rowsColListGrid.get(i);
-		String colName = colData[2];
-		String colType = colData[3];
-		String colHeader = colData[6];
-		String header = colHeader;
-		Column<DynamicDBean> col = null;
-		boolean isNotAParentField = colData[1].indexOf("#SORT")>-1; // parent field for now can not be use as sort column
-		boolean isCOlEditable = true;;
-		if (colData[1].indexOf("#CNoEDT#")>-1)
-			isCOlEditable = false;
-		if (colData[1].indexOf("#SIG#")>-1) { // #SIG# = Show In Grid
-//			String header = TranslateResource.getFieldLocale(colData[0], preConfParam);
-			header = colHeader;
-			if (isDate(header, colType)) {
-				if (header.indexOf("#")>0)
-					header = header.substring(2); // to avoid date typ indicator "D#"
-				if (isCOlEditable && isGridEditable)
-//					if (isNotAParentField)
-//						grid.addEditColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
-//						.setResizable(true).setSortProperty(colData[0]);
-//					else
-//						grid.addEditColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
-//						.setResizable(true);
-					System.err.println(" REVISAR ESTE CODIGO AL MIGRAR A 14 da error");
-				else
-					if (isNotAParentField)
-					{
-						col = grid.addColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).setHeader(header).setSortProperty(colData[0])
-						.setResizable(true).setSortProperty(colData[0]);
-					}
-					else
-					{
-						col = grid.addColumn(new LocalDateRenderer<>(d -> d.getColLocalDate(colName), "dd/MM/yyyy")).setHeader(header).setSortProperty(colData[0])
-						.setResizable(true);
-						
-					}	
-				
-//		grid.addColumn(d ->d.getCol(i)).setHeader(header).setResizable(true);
-			} else if (isCurrency(header,colType)) {
-				if (header.indexOf("#")>0)
-					header = header.substring(2);
-				if (isCOlEditable  && isGridEditable) 
-					if (isNotAParentField)
-					{
-						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
-					}
-					else
-					{
-						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true);
-					}
-				else
-					if (isNotAParentField)
-						{
-						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
-						}
-					else
-						{
-						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true);
-						}
-
-			} else if (isDecimal(header,colType)) {
-				if (header.indexOf("#")>0)
-					header = header.substring(2);
-				if (isCOlEditable  && isGridEditable) 
-					if (isNotAParentField)
-					{
-						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),2))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
-					}
-					else
-					{
-						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),2))).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true);
-					}
-				else
-					if (isNotAParentField)
-						{
-						col = grid.addColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),2))).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
-						}
-					else
-						{
-						col = grid.addColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),2))).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true);
-						}
-
-			} 
-			else if (isBoolean(header,colType)) {
-				if (header.indexOf("#")>0)
-					header = header.substring(2);
-				if (isCOlEditable  && isGridEditable) {
-					col = grid.addEditColumn(d -> d.getColBoolean(colName)?//"Si":"No")
-							TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NO", AppConst.PRE_CONF_PARAM))
-					.checkbox((item, newValue) -> colChanged(item,colName,newValue))		
-					.setHeader(header);
-					}
-				else
-					if (isNotAParentField)
-						{
-						col = grid.addColumn(d -> d.getColBoolean(colName)?//"Si":"No")
-								TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))		
-								.setHeader(header)
-//						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
-						}
-					else
-						{
-						col = grid.addColumn(d -> d.getColBoolean(colName)?//"Si":"No")
-								TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))		
-								.setHeader(header)
-//						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
-						.setTextAlign(ColumnTextAlign.END).setResizable(true);
-						}
-
-			}
-			else
-				if ((isCOlEditable && isGridEditable))
-					if (isNotAParentField)						
-						col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header).setResizable(true).setSortProperty(colData[0]);
-					else
-						col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> colChanged(item,colName,newValue)).setHeader(header).setResizable(true);				
-				else if (isGridEditable && isCOlEditable == false ) 
-				{
-					if (isNotAParentField)
-						{
-						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
-						}
-					else {
-						col = grid.addColumn(new ComponentRenderer<Label,DynamicDBean>(item->{
-							 Label l = new Label("Buscar....");
-							 if (item.getCol(colName) != null && item.getCol(colName).isEmpty() == false)
-								 l = new Label(item.getCol(colName));
-							 l.getElement().addEventListener("click", ev->pickParent(colName, item));
-							 return l;
-							 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
-						
-					}
-				}	
-				else
-				{
-					if (isNotAParentField)
-						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
-					else 
-						col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true) ;
-				}
-		}
-		if (col !=null)
-		{
-			if (colName.equals("col0"))
-				System.out.println("DynamicViewGrid.addFormatedColumn()");
-			col.setKey(colName);
-			System.out.println("DynamicViewGrid.addFormatedColumn() Header" + colName);
-		}
-		return col;
-	}
-
 
 
 
@@ -584,8 +423,10 @@ private Object fillDataForPickAndAcceptComboMap(FieldTemplateComboRelatedForPick
 	return null;
 
 }
-
-public Object pickParent(String colName, DynamicDBean item) {
+public Object pickParentOLD(String colName, DynamicDBean item) {
+	return null;
+}
+public Object pickParentOLD1(String colName, DynamicDBean item) {
 	System.out.println("clicked "+colName + item.getCol(colName));
 //	return null;
 	try {
@@ -1181,7 +1022,9 @@ private boolean isBoolean(String header, String colType) {
 
 	public Object colChanged(DynamicDBean item, String colName, LocalDate newDate) {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		String newValue = df.format(java.sql.Date.valueOf(newDate));
+		String newValue = null;
+		if (newDate != null)
+			newValue = df.format(java.sql.Date.valueOf(newDate));
 		colChanged(item, colName, newValue);
 		return null;
 		

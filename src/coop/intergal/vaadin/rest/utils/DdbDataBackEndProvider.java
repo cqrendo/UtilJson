@@ -22,6 +22,7 @@ import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.QuerySortOrder;
 import com.vaadin.flow.data.provider.SortDirection;
 
+import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
 //public class DdbDataProvider  extends AbstractDataProvider<DynamicDBean, String> {
@@ -177,6 +178,9 @@ private long sizeBE;
 
 		  @Override
 		    protected Stream<DynamicDBean> fetchFromBackEnd(Query<DynamicDBean, CrudFilter> query) {
+		        if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
+		        	System.out.println("DdbDataBackEndProvider.sizeInBackEnd() DEBUG GET_DATA_FROM_BACK_END <<Activado>>" );
+
 		        int offset = query.getOffset();
 		        int limit = query.getLimit();
 		        List<QuerySortOrder> sortOrdersFields = query.getSortOrders();
@@ -221,6 +225,8 @@ private long sizeBE;
 		    protected int sizeInBackEnd(Query<DynamicDBean, CrudFilter> query) {
 		        // For RDBMS just execute a SELECT COUNT(*) ... WHERE query
 		        long count = RestData.getCountRows(getTableDbForCount(resourceName), preConfParam, filter, false, hasNewRow);//fetchFromBackEnd(query).count();
+		        if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
+		        	System.out.println("DdbDataBackEndProvider.sizeInBackEnd() DEBUG GET_DATA_FROM_BACK_END <<Activado>>" );
 		        sizeBE = count;
 		        if (sizeChangeListener != null) {
 		            sizeChangeListener.accept(count);

@@ -441,16 +441,16 @@ public class RestData {
 		}// preConfParam, null);//globalVars.getPagesize());
 //		System.out.println("RestData.getResourceCustomer() after FILL LIST" + new Date());
 		System.out.println("RestData.getCountRows()--------"+ count);
-//		if (hasNewRow)
-//			{
-//			count = count+1;
-//			System.out.println("RestData.getCountRows()--------(hasNewRow) "+ count);
-//			
-//			Integer limit = new Integer (AppConstGeneric.DEFAULT_PAGESIZE);
-//			Integer actualCount =  new Integer (count);
-//			if (actualCount > limit)
-//				count = limit+1;
-//			}
+		if (hasNewRow)
+			{
+			count = count+1;
+			System.out.println("RestData.getCountRows()--------(hasNewRow) "+ count);
+			
+			Integer limit = new Integer (AppConstGeneric.DEFAULT_PAGESIZE);
+			Integer actualCount =  new Integer (count);
+			if (actualCount > limit)
+				count = limit+1;
+			}
 		return count;
 	}
 
@@ -517,6 +517,8 @@ public class RestData {
 	}
 	// with Variant
 	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache, String variant) { // variant is use to have different lists of fields in the same resource
+        if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
+        	System.out.println("DdbDataBackEndProvider.sizeInBackEnd() DEBUG GET_DATA_FROM_BACK_END <<Activado>>" );
 		if (cache == null)
 		{
 			cache = CACHE_TRUE;

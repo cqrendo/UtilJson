@@ -54,6 +54,16 @@ public class AppConst {   // @@ TODO this class for now is copy and represents t
 	public static final String QUERY_FIELD_DEFAULT_SIZE = "25#25";
 	public static final String DEFAULT_CSS_STYLE_QRY_FIELD =  ".labelM";
 	public static final int MAX_NUMBER_OF_FIELDS_PER_TABLE = 150;
+	public static final String LOGIN_FORGETPASS_CONTENT = "Escribe tu usuario a continuación y te enviaremos un email con tu nueva contraseña.";
+	public static final String LOGIN_FORGETPASS_ERROR = "Ha habido un error. Posiblemente ese usuario no existe. Revísalo.";  
+	public static final String LOGIN_FORGETPASS_NOTEMAIL = " no es un email válido. Revísalo.";	
+	public static final String EMAIL_REMITENTE = "ampafacil.com@gmail.com";
+	public static final String EMAIL_CLAVE = "Susita123%";
+	public static final String EMAIL_HOST = "smtp.gmail.com";
+	public static final String EMAIL_PORT = "587";
+	public static final String LDAP_BASE = ",ou=anpas,dc=cloud";
+	public static final boolean DEBUG_GET_DATA_FROM_BACK_END = false;
+
 
 	// Mutable for testing.
 	public static int NOTIFICATION_DURATION = 4000;

@@ -98,7 +98,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
  //   private ListDataProvider<Payment> dataProvider;
 //	private DdbDataBackEndProvider dataProvider;
     private DetailsDrawer detailsDrawer;
-	private Binder<DynamicDBean> binder;
+	private static Binder<DynamicDBean> binder;
 //	private FormLayout form;
 //	private ArrayList<String[]> rowsColList;
 //	private ArrayList<String[]> rowsFieldList;
@@ -111,8 +111,8 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 	private String title;
 	private String resource;
 	private DynamicDBean bean;
-	private Dialog dialogForPick;
-	private String pickMapFields; 
+	private static Dialog dialogForPick;
+	private static String pickMapFields; 
 
 
 
@@ -548,7 +548,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 						}
 					if (isPick)
 					{
-						tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldNameInUI, tf, cache));
+						tf.getElement().addEventListener("click", ev->showDialogForPick(null, null, fieldNameInUI, cache));
 						Icon edit = new Icon(VaadinIcon.DOWNLOAD_ALT);
 						tf.setSuffixComponent(edit);
 					}
@@ -725,15 +725,28 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 			return false;
 			
 	}
+    
+    // ANTES NO ERA STATIC
 
-private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, boolean cache) {
+private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean item,  String fieldName, boolean cache) { 
 		
-		try {
+		try { 
 		DynamicGridForPick dynamicGridForPick = new DynamicGridForPick(); 
 		String queryFormForPickClassName = null;
-//		Object queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
-		DynamicDBean currentRow = binder.getBean();
-		String resourceName =currentRow.getResourceName();
+		DynamicDBean currentRow;
+		String resourceName = null;
+		boolean isPickFromAGrid= false;
+		if (item != null) // the item is only send when comes froma a gtid
+			{
+			resourceName =item.getResourceName();
+			isPickFromAGrid = true;
+//			currentRow=item;
+			}
+		else
+		{
+			currentRow = binder.getBean();
+			resourceName =currentRow.getResourceName();
+		}
 		String filter="tableName='"+resourceName+"'%20AND%20FieldNameInUI='"+fieldName+"'";
 		String parentResource = "";
 		
@@ -781,13 +794,17 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 		grid.setButtonsRowVisible(false);
 		grid.setResourceName(parentResource);
 		grid.setupGrid();
-//			subDynamicViewGrid.getElement().getStyle().set("height","100%");
+
+		//			subDynamicViewGrid.getElement().getStyle().set("height","100%");
 //		subDynamicViewGrid.setResourceName(resourceSubGrid);
 //		if (resourceSubGrid.indexOf(".")> -1)
 //			subDynamicViewGrid.setFilter(componFKFilter(bean, resourceSubGrid));
 //		subDynamicViewGrid.setupGrid();
 //		dynamicGridForPick.setRowsColList(currentRow.getRowsColList());
-		dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,currentRow, pickMapFields ));
+		if (isPickFromAGrid)
+			dynamicGridForPick.addAcceptPickListener(e -> fillDataForGridPickAndAccept(gridChild, grid.getGrid().getSelectedItems(),dialogForPick,item, pickMapFields ));
+		else	
+			dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,binder.getBean(), pickMapFields ));//, currentRow, pickMapFields ));
 		if (dialogForPick == null)
 			dialogForPick = new Dialog();
 		dialogForPick.removeAll();
@@ -804,7 +821,7 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 		return null;
 	}
 
-	private Object fillDataForPickAndAccept(Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
+	private static Object fillDataForPickAndAccept(Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
 		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
 		if (seletedRows.iterator() ==  null || seletedRows.iterator().hasNext() == false)
 		{
@@ -824,6 +841,29 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 		dialogForPick.close();
 		return null;
 	}
+	private static Object fillDataForGridPickAndAccept(DynamicViewGrid grid,Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
+		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
+		if (seletedRows == null || seletedRows.isEmpty())
+		{
+			dialogForPick.close();
+			return null;
+		}
+		DynamicDBean seletedParentRow = seletedRows.iterator().next();
+		while (tokens.hasMoreElements())
+		{
+			String eachFieldMap = tokens.nextToken();
+			int idxSeparator = eachFieldMap.indexOf(";");
+			String childField = eachFieldMap.substring(0, idxSeparator);
+			String parentField = eachFieldMap.substring(idxSeparator+1);
+			currentRow.setCol(seletedParentRow.getCol(parentField), childField);						
+		}
+		grid.getDataProvider().refresh(currentRow);
+//		binder.setBean(currentRow);
+		grid.colChanged(currentRow, null, "");
+		dialogForPick.close();
+		return null;
+	}
+
 	// ******* COLUMNS ********
 	public static Column<DynamicDBean> addFormatedColumn(int i, ArrayList<String[]> rowsColListGrid, DynamicViewGrid dynamicViewGrid, GridPro<DynamicDBean> grid, boolean isGridEditable) {  // for now grid is not editable , then was copy and adapted from DynamicViewGrid
 //		String colName = "col"+i;
@@ -986,7 +1026,7 @@ private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf, bo
 								 Label l = new Label("Buscar....");
 								 if (item.getCol(colName) != null && item.getCol(colName).isEmpty() == false)
 									 l = new Label(item.getCol(colName));
-								 l.getElement().addEventListener("click", ev->dynamicViewGrid.pickParent(colName, item));
+								 l.getElement().addEventListener("click", ev->showDialogForPick(dynamicViewGrid, item, colName, false) );//ev->dynamicViewGrid.pickParent(colName, item));
 								 return l;
 								 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
 							
