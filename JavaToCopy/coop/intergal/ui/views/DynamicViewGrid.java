@@ -882,8 +882,12 @@ private boolean isBoolean(String header, String colType) {
 			if (idXEqual == -1)
 				break;
 			int idXMark = fKfilter.indexOf("]");
-			if (fKfilter.startsWith("\n and"))
+			if (fKfilter.startsWith("\n and")) 
 				step = 6;
+			else if ((fKfilter.indexOf("and") > -1 && fKfilter.indexOf("and") < 5))
+			{
+				step = fKfilter.indexOf("and") + 4;
+			}
 			else
 				step = 0;
 			String fKfieldName = fKfilter.substring(step+1, idXEqual - 2  );

@@ -32,6 +32,8 @@ public class RestData {
 	
 	public static List<DynamicDBean> getResourceData(int offset, int limit, String resourceName, String preConfParam, ArrayList<String[]> rowsColList, String filter, boolean cache, boolean hasNewRow, String variant) {
 
+		if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
+			System.out.println("RestData.getResourceData()  DEBUG GET_DATA_FROM_BACK_END <<Activado>>");
 		if (cache == false)
 			keepFieldName.clear();
 		if (resourceName  == null ||  resourceName.trim().length() == 0)
@@ -425,13 +427,15 @@ public class RestData {
 		//	String filtro = null;
 			System.out.println("RestData.getCountRows() resourceName " + resourceName + " filter " + filter +  " preConfParam " + preConfParam);
 			rowsList = JSonClient.get("Count_"+resourceName,filter,cache,preConfParam,"1"); 
+	        if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
+	        	System.out.println("RestData.getCountRows() DEBUG GET_DATA_FROM_BACK_END <<Activado>>\" );" );
 			if (rowsList.get("statusCode") != null)
 			{
 				showError(rowsList.get("errorMessage").asText());
 			}
 			else
 			{
-				count = rowsList.get(0).get("count(*)").asInt();
+				count = rowsList.get(0).get(AppConst.COUNT_USED_BY_DB).asInt();
 			}
 
 		

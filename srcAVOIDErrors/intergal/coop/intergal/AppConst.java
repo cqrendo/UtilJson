@@ -63,6 +63,7 @@ public class AppConst {   // @@ TODO this class for now is copy and represents t
 	public static final String EMAIL_PORT = "587";
 	public static final String LDAP_BASE = ",ou=anpas,dc=cloud";
 	public static final boolean DEBUG_GET_DATA_FROM_BACK_END = false;
+	public static final String COUNT_USED_BY_DB = "count(*)";// depending on DB the result for count is different by example  "count(*)"; para mysql y COUNT(*) para Oracle // 
 
 
 	// Mutable for testing.

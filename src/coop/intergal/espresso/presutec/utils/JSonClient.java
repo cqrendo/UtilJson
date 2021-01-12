@@ -52,7 +52,7 @@ public class JSonClient {
 //	private final static HttpClient client = new DefaultHttpClient();
 	private static CloseableHttpClient client = HttpClientBuilder.create().build();
 	private final static JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
-	private static Boolean SHOW_LOGS = false;
+	private static Boolean SHOW_LOGS = true;
 	private static Boolean SHOW_LOGS_DETAIL = false;
 
 //	protected static String LOCAL_BASE_URL = "http://localhost:8080/KahunaService/rest/abl/demo/demo1/";   // for internal testing (ignore)
@@ -919,7 +919,7 @@ public class JSonClient {
 				String childResource = eachRow.get("name").asText();
 				String resourceName = getResourceName(parentResource,childResource);
 				if (ht.get(resourceName) == null)
-					ht.put(resourceName, eachRow.get("join_condition").asText()); // keeps 
+					ht.put(resourceName, cleanEmptyJoin(eachRow.get("join_condition").asText())); // keeps 
 
 				JsonNode subResources1 = eachRow.get("subresources");
 				if (subResources1 != null)
@@ -928,7 +928,7 @@ public class JSonClient {
 						String childResource1 = eachRow1.get("name").asText();
 						String resourceName1 = getResourceName(childResource,childResource1);
 						if (ht.get(resourceName1) == null)
-							ht.put(resourceName1, eachRow1.get("join_condition").asText()); // keeps 
+							ht.put(resourceName1, cleanEmptyJoin(eachRow1.get("join_condition").asText())); // keeps 
 						JsonNode subResources2 = eachRow1.get("subresources");
 						if (subResources2 != null)
 							{
@@ -936,7 +936,7 @@ public class JSonClient {
 								String childResource2 = eachRow2.get("name").asText();
 								String resourceName2 = getResourceName(childResource1,childResource2);
 								if (ht.get(resourceName2) == null)
-									ht.put(resourceName2, eachRow1.get("join_condition").asText()); // keeps 
+									ht.put(resourceName2, cleanEmptyJoin(eachRow1.get("join_condition").asText())); // keeps 
 							}
 						}
 					}
@@ -945,6 +945,17 @@ public class JSonClient {
 		}		
 	}
 		
+	private static String cleanEmptyJoin(String join) {  // this extra condition in the join is to get the resources with less data, but must be clean to get real data
+		int posEmptyJoin = join.indexOf("EmptyJoin");
+		if (join.indexOf("EMPTYJOIN") > -1)
+		{			
+			int lastIdx = join.substring(11).indexOf("AND") +15;
+			String newJoin = join.substring(lastIdx);
+			printLog(" newJoin " + newJoin);
+			return newJoin;
+		}	
+		return join;
+	}
 	private static String getResourceName(String parentResource, String childResource) {
 		String resourceName = parentResource+"."+childResource;
 //		int idxEndOfTableName = childResource.indexOf("--"); // anulado por ahora afecta a las bus

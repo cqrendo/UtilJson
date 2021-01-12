@@ -69,6 +69,8 @@ public class MockDataService extends DataService {
 		public Collection<DynamicDBean> getAllDynamicDBean(int offset, int limit, boolean refreshFromServer, String resourceName, String preConfParam,
 				ArrayList<String[]> rowsColList, String filtro, List<QuerySortOrder> sortOrdersFields, Boolean hasNewRow, String variant) {
 		//	if (refreshFromServer)
+		if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
+			System.out.println("MockDataService.getAllDynamicDBean()  DEBUG GET_DATA_FROM_BACK_END <<Activado>>" );
 		if (sortOrdersFields.isEmpty() == false)
 		{
 			Iterator<QuerySortOrder> itSortOrdersFields = sortOrdersFields.iterator();
