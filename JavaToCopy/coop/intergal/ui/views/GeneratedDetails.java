@@ -21,6 +21,7 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 
+import coop.intergal.AppConst;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
@@ -182,7 +183,7 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 	    //		content.setPadding(Horizontal.RESPONSIVE_X, Top.RESPONSIVE_X);
 //	    		content.setWidthFull();
 //	    		content.setMaxWidth("1200px"); // if we want reposponsive we must uncomment this and previous, comment next
-	    content.setWidth("1160px");
+	    content.setWidth(AppConst.DEFAULT_WIDTH_FORM);
 	    Div header = new Div(); 
 	    header.setClassName("formTitle");
 	    header.add(UIUtils.createH3Label(title));

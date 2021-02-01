@@ -31,10 +31,11 @@ import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
+
 //@Tag("dynamic-view-grid")
 @Tag("dynamic-grid-display")
 @JsModule("./src/views/generic/layout/dynamic-grid-display.js")
-//@Route(value = PAGE_DYNAMIC)
+//@Route(value = PAGE_DYNAMIC, layout = MainLayout.class)   /// @@ TODO cambiado para metaconfig comprobar que no afecta en otros proyectos
 //@PageTitle(AppConst.TITLE_PRODUCTS)
 //@Secured(Role.ADMIN)
 public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {

@@ -453,7 +453,7 @@ public class RestData {
 			Integer limit = new Integer (AppConstGeneric.DEFAULT_PAGESIZE);
 			Integer actualCount =  new Integer (count);
 			if (actualCount > limit)
-				count = limit+1;
+				count = limit;//+1;
 			}
 		return count;
 	}
@@ -699,7 +699,7 @@ public class RestData {
 						int maxColNumber = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[17];
+							String[] fieldArr  = new String[20];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -783,6 +783,10 @@ public class RestData {
 							else
 								fieldArr[15] = col.get("maxColNumber").asText();
 							fieldArr[16] = ""; // is only used for Form fields
+							fieldArr[17] = ""; // is only used for Form fields
+							fieldArr[18] = ""; // is only used for Form fields
+							fieldArr[19] = ""; // is only used for Form fields
+
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -880,7 +884,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[17];
+						String[] fieldArr  = new String[20];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -953,6 +957,18 @@ public class RestData {
 							fieldArr[16] = "";
 						else
 							fieldArr[16] = col.get("toolTip").asText();	
+						if ( col.get("tabs").asText().isEmpty() || col.get("tabs").asText().equals("null") )
+							fieldArr[17] = "";
+						else
+							fieldArr[17] = col.get("tabs").asText();	
+						if ( col.get("tab").asText().isEmpty() || col.get("tab").asText().equals("null") )
+							fieldArr[18] = "";
+						else
+							fieldArr[18] = col.get("tab").asText();	
+						if ( col.get("fieldHeight").asText().isEmpty() || col.get("fieldHeight").asText().equals("null") )
+							fieldArr[19] = "";
+						else
+							fieldArr[19] = col.get("fieldHeight").asText();	
 
 						rowsColList.add(fieldArr);
 						i++;
@@ -991,7 +1007,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[17];
+			String[] fieldArr  = new String[20];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -1012,6 +1028,11 @@ public class RestData {
 			fieldArr[14] = "";
 			fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
 			fieldArr[16] = ""; // is only used for Form fields
+			fieldArr[17] = ""; // is only used for Form fields
+			fieldArr[18] = ""; // is only used for Form fields
+			fieldArr[19] = ""; // is only used for Form fields
+			
+
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
 			rowsColList.add(fieldArr);
@@ -1101,7 +1122,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[17];
+						String[] fieldArr  = new String[20];
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -1134,10 +1155,14 @@ public class RestData {
 							fieldArr[7] = AppConst.QUERY_FIELD_DEFAULT_SIZE;
 						else
 							fieldArr[7] = col.get("queryFieldWidth").asText();  
-						if ( col.get("cssStyle").asText().isEmpty() || col.get("cssStyle").asText().equals("null") )
-							fieldArr[8] = "";
-						else
-							fieldArr[8] = col.get("cssStyle").asText();
+						if ( col.get("cssStyleQueryField").asText().isEmpty() || col.get("cssStyleQueryField").asText().equals("null") )
+						fieldArr[8] =AppConst.DEFAULT_CSS_STYLE_QRY_FIELD;
+							else
+						fieldArr[8] = col.get("cssStyleQueryField").asText();
+//						if ( col.get("cssStyle").asText().isEmpty() || col.get("cssStyle").asText().equals("null") )
+//							fieldArr[8] = "";
+//						else
+//							fieldArr[8] = col.get("cssStyle").asText();
 						if ( col.get("titleDisplay").asText().isEmpty() || col.get("titleDisplay").asText().equals("null") )
 							fieldArr[9] = "";
 						else
@@ -1150,10 +1175,11 @@ public class RestData {
 							fieldArr[11] = "";
 						else
 							fieldArr[11] = col.get("titleGrid").asText();
-						if ( col.get("cssStyleQueryField").asText().isEmpty() || col.get("cssStyleQueryField").asText().equals("null") )
-							fieldArr[12] =AppConst.DEFAULT_CSS_STYLE_QRY_FIELD;
-						else
-							fieldArr[12] = col.get("cssStyleQueryField").asText();
+						fieldArr[12] = ""; /// is not used PUT A NEW FIELD when is need 
+//						if ( col.get("cssStyleQueryField").asText().isEmpty() || col.get("cssStyleQueryField").asText().equals("null") )
+//							fieldArr[12] =AppConst.DEFAULT_CSS_STYLE_QRY_FIELD;
+//						else
+//							fieldArr[12] = col.get("cssStyleQueryField").asText();
 						fieldArr[13] = ""; // is only used for Form fields
 						fieldArr[14] = ""; // is only used for Form fields
 						if ( col.get("maxColNumber").asText().isEmpty() || col.get("maxColNumber").asText().equals("null") )
@@ -1162,7 +1188,18 @@ public class RestData {
 							fieldArr[15] = col.get("maxColNumber").asText();
 						rowsFIeldQueryList.add(fieldArr);
 						fieldArr[16] = ""; // is only used for Form fields
-						i++;
+						fieldArr[16] = col.get("toolTip").asText();	
+						
+						if ( col.get("tabsQuery").asText().isEmpty() || col.get("tabsQuery").asText().equals("null") )
+							fieldArr[17] = "";
+						else
+							fieldArr[17] = col.get("tabsQuery").asText();	
+						
+						if ( col.get("tabQuery").asText().isEmpty() || col.get("tabQuery").asText().equals("null") )
+							fieldArr[18] = "";
+						else
+							fieldArr[18] = col.get("tabQuery").asText();	
+						fieldArr[19] = ""; // is only used for Form fields++;
 					}
 					// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
 					if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself
