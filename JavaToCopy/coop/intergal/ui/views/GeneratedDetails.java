@@ -198,11 +198,22 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 			generatedUtil.setBean(bean);
 	//		if (cache == false)
 			rowsFieldList = dataProvider.getRowsFieldList(cache);
-			if (form == null)
-				form = new FormLayout();
-			Component details = generatedUtil.createDetails(rowsFieldList,form, false, cache );
-			title = generatedUtil.getTitle();
-			return details;
+			String tabs ="";
+	   		if (rowsFieldList != null)
+			{
+				tabs = rowsFieldList.get(0)[17];
+			}
+//			if (form == null)
+//				form = new FormLayout();
+			if (tabs.isEmpty()) 
+			{
+				return generatedUtil.createDetails(rowsFieldList, false, cache,"noTAB");
+			}
+			else
+			{
+				return generatedUtil.createTabs(rowsFieldList, false,cache,tabs);
+			}
+	//		return details;
 	}
 	private Component createDetailsOLD() {
 				
@@ -440,142 +451,6 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 	return formLayout;
 }
 
-    private Component createDetailsOLD(DynamicDBean dynamicDBean) {
-		this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
-		rowsFieldList = dataProvider.getRowsFieldList();
-	    if (dynamicDBean != null)
-			binder.setBean(dynamicDBean);
-
-		Iterator<String[]> itRowsFieldList = rowsFieldList.iterator();
-		if (form == null)
-			form = new FormLayout();
-		form.removeAll();
-		form.setResponsiveSteps(
-			new ResponsiveStep("31em",1),
-			new ResponsiveStep("32em",2),
-			new ResponsiveStep("33em",3),
-			new ResponsiveStep("34em",4),
-			new ResponsiveStep("45em",5),
-			new ResponsiveStep("46em",6),
-			new ResponsiveStep("47em",7),
-			new ResponsiveStep("48em",8),
-			new ResponsiveStep("49em",9),
-			new ResponsiveStep("50em",10),
-			new ResponsiveStep("51em",11),
-			new ResponsiveStep("52em",12),
-			new ResponsiveStep("63em",13),
-			new ResponsiveStep("64em",14),
-			new ResponsiveStep("65em",15),
-			new ResponsiveStep("66em",16));
-		int i = 0;
-		int ii = 0;
-		Div div = new Div();
-	//	FormLayout.FormItem item = formLayout.addFormItem(phoneLayout, "Phone");
-//		form.setColSpan(item, 2);
-		while (itRowsFieldList.hasNext())
-		{
-//			Label label = new Label(itRowsColList.next()[0]);
-//			label.setWidth("500px");
-			String[] rowField = itRowsFieldList.next();
-			String filedName = rowField[0];
-			boolean isReadOnly = isReadOnly( rowField [1]);
-			String label = rowField[6];
-			String fieldNameInUI = rowField[2];
-			String idFieldType = rowField[3];
-			String fieldWidth = rowField[7];
-			if( fieldWidth.isEmpty())
-				fieldWidth = "10";
-			
-			int idxMark = fieldWidth.indexOf("#");
-			Integer colspan = 0;
-			if (idxMark == -1)
-			{
-				colspan = new Integer (fieldWidth);
-				fieldWidth = (colspan*2)+1+"em";
-			}
-			else
-			{
-				colspan = new Integer (fieldWidth.substring(0,idxMark));
-				fieldWidth = fieldWidth.substring(idxMark+1)+"em";
-			}
-			
-			TextField tf = new TextField();//itRowsColList.next()[0]);
-			tf.setReadOnly(isReadOnly);
-//			FormItem fi = new FormItem(label);
-//			fi.add(tf);
-//	//		tf.setWidth("100px");
-			if (filedName.equals("#SPACE#"))
-			{
-				Label l = new Label(); 
-				FormLayout.FormItem item = form.addFormItem(l, label );
-		//		item.addClassName("style1");
-				form.setColspan(item, colspan);
-			}
-			else if (idFieldType.equals("1")) // is Date
-			{
-				EsDatePicker dp = new EsDatePicker();
-				boolean isRightLabel = false;
-//				if (label.endsWith("#"))isRightLabel = true;
-				Div l = alingLabel(label); 
-				binder.forField((EsDatePicker) dp)
-				.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
-				.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
-				FormLayout.FormItem item = form.addFormItem(dp, l );
-//				if (isRightLabel)
-//					item.addClassName("filabelright");
-//				else
-					item.addClassName("style1");
-				form.setColspan(item, colspan);
-				dp.setWidth(fieldWidth);
-			}
-			else
-			{
-				binder.bind(tf, fieldNameInUI);
-//			form.add(fi);
-				boolean isRightLabel = false;
-//				if (label.endsWith("#"))isRightLabel = true;
-				Div l = alingLabel(label); 
-				FormLayout.FormItem item = form.addFormItem(tf, l );
-//				if (isRightLabel)
-//					item.addClassName("filabelright");
-//				else
-					item.addClassName("style1");
-				form.setColspan(item, colspan);
-				tf.setWidth(fieldWidth);
-			}
-//			form.addFormItem(tf, label);
-			i++;
-			
-		}
-//		while (itRowsColList.hasNext())
-//		{
-//			TextField tf = new TextField(itRowsColList.next()[0]);
-//			tf.setWidth("100px");
-//			if (ii < 4)
-//			{
-//				
-//				div.add(tf);
-//				ii++;
-//				
-//			}
-//			else
-//			{
-//				div = new Div();
-//				div.setWidth("1100px");
-//				ii=0;
-//			}
-//
-//			binder.bind(tf, "col"+i);
-//			form.add(div);
-//			i++;
-//			
-//		}
-
-//        Div details = new Div(status, from, to, amount, date);
-//        details.addClassName(LumoStyles.Padding.Vertical.S);
-//        return details;
-		return form;
-    }
 	private Div alingLabel(String label) {
 		Div l = new Div();
 		l.add(label);

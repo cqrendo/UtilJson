@@ -260,12 +260,13 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 //			i++;
 //		}
 	//	Anchor anchor = new Anchor(new StreamResource("my-excel.xlsx", Exporter.exportAsExcel(grid)), "Download As Excel");
-        if (hasExportButton)
+        if (hasExportButton && grid.getColumns().isEmpty() == false)
         {
      //   	export.setVisible(true);
         	divExporter.removeAll();
         	Button b = new Button(new Icon(VaadinIcon.FILE_TABLE));
         	b.addThemeName("small");
+        	
         	FileDownloadWrapper buttonWrapper = new FileDownloadWrapper(
             new StreamResource("export.xls", Exporter.exportAsExcel(grid)));
         	buttonWrapper.wrapComponent(b);

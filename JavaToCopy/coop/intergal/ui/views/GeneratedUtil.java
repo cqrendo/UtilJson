@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -40,9 +41,12 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
@@ -65,6 +69,7 @@ import com.vaadin.flow.router.QueryParameters;
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
+import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawerFooter;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawerHeader;
@@ -91,7 +96,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMarginL50";
+	private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMarginL50";
 //	private Grid<DynamicDBean> grid;
 	private DynamicViewGrid grid;
 
@@ -111,6 +116,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 	private String title;
 	private String resource;
 	private DynamicDBean bean;
+//	private FormLayout form;
 	private static Dialog dialogForPick;
 	private static String pickMapFields; 
 
@@ -142,18 +148,158 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 		this.title = title;
 	}
 
-   
+	public Component createTabs(ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache,String tabsLabels) {
+			String [] tokens = tabsLabels.split(Pattern.quote(","));
+//			int i = 0;
+			Tab tab0 =null ;Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;
+		   	FlexBoxLayout content0=null; 
+		   	FlexBoxLayout content1=null;
+		   	FlexBoxLayout content2=null; FlexBoxLayout content3=null;
+		   	FlexBoxLayout content4=null; 
+//		   	Div contentyDiv0 = new Div(); 
+		   	int nTabs = tokens.length;
+		   	String tabTitle;
+//			while (tokens.length > i)
+//			{ 
+				if (nTabs > 0)
+				{
+					tabTitle = tokens[0];
+					tab0 = new Tab(tabTitle);
+					content0 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"0"));
+					content0.setWidthFull();
+					
+				}
+				if (nTabs > 1)
+				{
+					tabTitle = tokens[1];
+					tab1 = new Tab(tabTitle);
+					content1 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"1"));
+					content1.setWidthFull();
+					content1.setVisible(false);
+					
+				}
+				if (nTabs > 2)
+				{
+					tabTitle = tokens[2];
+					tab2 = new Tab(tabTitle);
+					content2 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"2"));
+					content2.setWidthFull();
+					content2.setVisible(false);
+					
+				}
+				if (nTabs > 3)
+				{
+					tabTitle = tokens[3];
+					tab3 = new Tab(tabTitle);
+					content3 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"3"));
+					content3.setWidthFull();
+					content3.setVisible(false);
+
+					
+				}
+				if (nTabs > 4)
+				{
+					tabTitle = tokens[4];
+					tab4 = new Tab(tabTitle);
+					content4 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"4"));		
+					content4.setWidthFull();
+					content4.setVisible(false);
+
+				}
+//				i++;
+//			}
+
+	 
+	    	Map<Tab, Component> tabsToPages = new HashMap<>();
+	 //   	Tabs tabs = new Tabs(tab0,tab1);
+	    	Div pages =null ;
+	    	if (nTabs > 4)
+	    		{
+	    		tabsToPages.put(tab0, content0);
+	    		tabsToPages.put(tab1, content1);
+	       		tabsToPages.put(tab2, content2);
+	    		tabsToPages.put(tab3, content3);
+	    		tabsToPages.put(tab4, content4);
+	    		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4);
+	    		pages = new Div(content0, content1, content2,content3, content4 );
+	    	   	tabs.addSelectedChangeListener(event -> {
+	        	    tabsToPages.values().forEach(page -> page.setVisible(false));
+	        	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	        	    selectedPage.setVisible(true);
+	        	});
+	    	   	Div content = new Div();
+	        	content.add(tabs, pages);
+	    		return content;
+	    		}
+	    	else if (nTabs > 3)
+	    		{
+	    		tabsToPages.put(tab0, content0);
+	    		tabsToPages.put(tab1, content1);
+	       		tabsToPages.put(tab2, content2);
+	    		tabsToPages.put(tab3, content3);
+	    		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3);
+	    		pages = new Div(content0, content1, content2,content3);
+	    	   	tabs.addSelectedChangeListener(event -> {
+	        	    tabsToPages.values().forEach(page -> page.setVisible(false));
+	        	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	        	    selectedPage.setVisible(true);
+	        	});
+	    	   	Div content = new Div();
+	        	content.add(tabs, pages);
+	    		return content;
+
+	    		}
+	      	else if (nTabs > 2)
+	      		{
+	      		tabsToPages.put(tab0, content0);
+	      		tabsToPages.put(tab1, content1);
+	      		tabsToPages.put(tab2, content2);
+	      		Tabs tabs = new Tabs(tab0, tab1, tab2);
+	      		pages = new Div(content0, content1, content2);
+	      		tabs.addSelectedChangeListener(event -> {
+	      			tabsToPages.values().forEach(page -> page.setVisible(false));
+	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	      			selectedPage.setVisible(true);
+	      		});
+	      		Div content = new Div();
+	        	content.add(tabs, pages);
+	        	content.setWidthFull();
+	    		return content;
+
+	      		}
+	    	else
+	    		{
+	     		tabsToPages.put(tab0, content0);
+	    		tabsToPages.put(tab1, content1);
+	    		Tabs tabs = new Tabs(tab0, tab1);
+	    		pages = new Div(content0, content1 );
+	     		tabs.addSelectedChangeListener(event -> {
+	      			tabsToPages.values().forEach(page -> page.setVisible(false));
+	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	      			selectedPage.setVisible(true);
+	      		});
+	        	Div content = new Div();
+	        	content.add(tabs, pages);
+	    		return content;
+
+
+	    		}
+
+
+	    }
  
  
-    public Component createDetails(ArrayList<String[]> rowsFieldList, FormLayout form, Boolean isQuery, Boolean cache ) {
+    public Component createDetails(ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache, String currentTab ) {
  			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
 //			rowsFieldList = dataProvider.getRowsFieldList(cache);
 		    if (bean != null)
 				binder.setBean(bean);
 		  
 			Iterator<String[]> itRowsFieldList = rowsFieldList.iterator();
-			if (form == null)
-				form = new FormLayout();
+//			private FormLayout form;
+//			if (form == null)
+//				form = new FormLayout();
+			FormLayout	form = new FormLayout();
 			form.removeAll();
 			Div statusLabel = new Div();
 			statusLabel.getElement().getStyle().set("color", "var(--lumo-error-text-color)");
@@ -172,22 +318,6 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				form.setColspan(itemSL, 40);
 			}	
 			form.setResponsiveSteps(
-//				new ResponsiveStep("31em",1),
-//				new ResponsiveStep("32em",2),
-//				new ResponsiveStep("33em",3),
-//				new ResponsiveStep("34em",4),
-//				new ResponsiveStep("45em",5),
-//				new ResponsiveStep("46em",6),
-//				new ResponsiveStep("47em",7),
-//				new ResponsiveStep("48em",8),
-//				new ResponsiveStep("49em",9),
-//				new ResponsiveStep("50em",10),
-//				new ResponsiveStep("51em",11),
-//				new ResponsiveStep("52em",12),
-//				new ResponsiveStep("63em",13),
-//				new ResponsiveStep("64em",14),
-//				new ResponsiveStep("65em",15),
-//				new ResponsiveStep("66em",16));
 					calculateResponsiveStep(1),
 					calculateResponsiveStep(2),
 					calculateResponsiveStep(3),
@@ -227,51 +357,13 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 			calculateResponsiveStep(37),
 			calculateResponsiveStep(38),
 			calculateResponsiveStep(39),
-			calculateResponsiveStep(40));
-					
-//					new ResponsiveStep("15em",1),
-//					new ResponsiveStep("16em",2),
-//					new ResponsiveStep("16.5em",3),
-//					new ResponsiveStep("17em",4),
-//					new ResponsiveStep("17.5em",5),
-//					new ResponsiveStep("18em",6),
-//					new ResponsiveStep("18.5em",7),
-//					new ResponsiveStep("19em",8),
-//					new ResponsiveStep("19.5em",9),
-//					new ResponsiveStep("20em",10),
-//					new ResponsiveStep("20.5em",11),
-//					new ResponsiveStep("21em",12),
-//					new ResponsiveStep("21.5em",13),
-//					new ResponsiveStep("22em",14),
-//					new ResponsiveStep("22.5em",15),
-//					new ResponsiveStep("23em",16),
-//					new ResponsiveStep("23.5em",17),
-//					new ResponsiveStep("24em",18),
-//					new ResponsiveStep("24.5em",19),
-//					new ResponsiveStep("25em",20),
-//					new ResponsiveStep("25.5em",21),
-//					new ResponsiveStep("26em",22),
-//					new ResponsiveStep("26.5em",23),
-//					new ResponsiveStep("37em",24),
-//					new ResponsiveStep("37.5em",25),
-//					new ResponsiveStep("38em",26),
-//					new ResponsiveStep("38.5em",27),
-//					new ResponsiveStep("58em",28),
-//					new ResponsiveStep("62em",19),
-//					new ResponsiveStep("66em",30),
-//					new ResponsiveStep("70.5em",31),
-//					new ResponsiveStep("74em",32));
-			
-			int i = 0;
-			int ii = 0;
-			Div div = new Div();
-		//	FormLayout.FormItem item = formLayout.addFormItem(phoneLayout, "Phone");
-//			form.setColSpan(item, 2);
+			calculateResponsiveStep(40));			
+//			int i = 0;
+//			int ii = 0;
+//			Div div = new Div();
 			int nRow = 0;
 			while (itRowsFieldList.hasNext())
 			{
-//				Label label = new Label(itRowsColList.next()[0]);
-//				label.setWidth("500px");
 				String[] rowField = itRowsFieldList.next();
 				String fieldName = rowField[0];
 				if (fieldName.equals("CODIGO"))
@@ -291,31 +383,33 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				String classNames =  rowField[8];
 				String classNamesForm = ""; 
 				String classNamesItem = ""; 
-				String classNamesItemQuery = rowField[12];
-		//		String toolTip = "Some very looooooooooooooooooooooooooooooooooooooong text \nSecond line \nThird line";rowField[16].toString();;
+				String tabNumber = rowField[18];
+				String fieldHeight = rowField[19];	
 				String toolTip = rowField[16].toString();
+				if (tabNumber.isEmpty() || tabNumber.equals(currentTab))
+					{
 				
-				String [] tokens = classNames.split(Pattern.quote("."));
-				int iii = 0;
-				while (tokens.length > iii)
-				{ 
-					if (tokens[iii].indexOf("form") > -1 )  // form CSS must include form in his name
-						classNamesForm = classNamesForm + "." + tokens[iii];
-					else
-						classNamesItem = classNamesItem + "." + tokens[iii];
-					iii ++;
-				}
-				if (nRow == 0)
-				{
-					form.setClassName("");
-					if(isQuery)
-						form = addClassNames(form,CLASSNAME_FOR_FORM_QUERY);
-					else
-						form = addClassNames(form,classNamesForm.trim());
-					title = rowField[9];
+					String [] tokens = classNames.split(Pattern.quote("."));
+					int iii = 0;
+					while (tokens.length > iii)
+					{ 
+						if (tokens[iii].indexOf("form") > -1 )  // form CSS must include form in his name
+							classNamesForm = classNamesForm + "." + tokens[iii];
+						else
+							classNamesItem = classNamesItem + "." + tokens[iii];
+						iii ++;
+					}
+					if (nRow == 0)
+					{
+						form.setClassName("");
+						if(isQuery)
+							form = addClassNames(form,CLASSNAME_FOR_FORM_QUERY);
+						else
+							form = addClassNames(form,classNamesForm.trim());
+						title = rowField[9];
 					
-				}
-		
+					}
+				classNamesItem = classNamesItem.replace("..", ".");	
 				nRow ++;
 				
 				System.out.println("DetailsPreview.createDetails()" +" filedName " + fieldName + " "+classNames + " isRequired " +isRequired + " validationRuleName "+validationRuleName + " idFieldType "+ idFieldType);
@@ -345,8 +439,8 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					tf.setTitle(toolTip);
 				}	
 				tf.setId("tf"+fieldNameInUI);
-				tf.setReadOnly(isReadOnly);
 				tf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+				tf.setReadOnly(isReadOnly);
 				if (fieldName.equals("#SPACE#"))
 				{
 					Span s = new Span();
@@ -354,6 +448,38 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
+				}
+				else if (idFieldType == 2) // is TextArea
+				{
+					TextArea ta = new TextArea();
+					if (fieldHeight.isEmpty())
+						ta.setHeight(AppConst.DEFAULT_FIELD_HEIGHT);
+					else
+						ta.setHeight(fieldHeight);
+					Div l = alingLabel(label); 
+					FormLayout.FormItem item = form.addFormItem(ta, l );
+					item.setId(fieldNameInUI);
+// not in clon		item.addClickListener(e ->ShowFieldToEdit(e.getSource().getId()));
+					item = addClassNames(item, classNamesItem);
+					form.setColspan(item, colspan);
+					ta.setWidth(fieldWidth);
+//	not in clon		if (deFaultValue.isEmpty() == false)	
+//						{
+//						ta.setValue(deFaultValue);
+//						}
+					if (isRequired && isQuery == false )
+					{	
+					binder.forField(ta).asRequired()
+//						.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
+//							ValidationMetadata.of(String.class)))
+							.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+
+					}
+					else 
+					{		
+						binder.bind(ta, fieldNameInUI);
+					}
+					
 				}
 				else if (idFieldType == 1 && isQuery == false) // is Date
 				{
@@ -503,15 +629,7 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 				}
 				else // is Text
 				{
-			//		binder.bind(tf, fieldNameInUI);
-//					setValidators(tf,null, fieldNameInUI, validationRuleName, isRequired, isQuery, cache);
 					setBeanValidators(validationRuleName, isQuery, cache) ;
-//					if (validationRuleName.length() > 1 && isQuery == false)
-//					{
-//					binder.withValidator(
-//						new DynValidator<>("org.vaadin.intergal.validation.Constraints.validateFromBackEnd#"+validationRuleName+","+cache,
-//								ValidationMetadata.of(DynamicDBean.class)));
-//					}
 					if (isRequired && isQuery == false )
 					{	
 					binder.forField(tf).asRequired()
@@ -524,10 +642,6 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					{		
 					binder.bind(tf, fieldNameInUI);
 					}
-//					setFieldWarningValidators(validationRuleName,isQuery, tf);
-					// *****
-//					binder.forField(tf).bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
-//				form.add(fi);
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
 					Div l = alingLabel(label); 
@@ -544,7 +658,6 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 //				        tooltip.add("Hola");
 //				        tooltip.add(new Paragraph(TranslateResource.getFieldLocale("FABORRARAVISO", AppConst.PRE_CONF_PARAM)));
 						item.getElement().setAttribute("title","Ayuda busqueda...."); 
-						classNamesItem = classNamesItemQuery; 
 						}
 					if (isPick)
 					{
@@ -559,7 +672,8 @@ private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMargin
 					if (fieldSize.length() > 0)						
 						tf.setMaxLength(new Integer(fieldSize));
 					}
-				i++;
+				}
+//				i++;
 				
 			}
 

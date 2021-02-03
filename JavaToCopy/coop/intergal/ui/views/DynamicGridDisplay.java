@@ -106,6 +106,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 	private FormButtonsBar buttons;
 	private String apiname;
 	private boolean cache = true;
+	private Object divInDisplay;
 //	@Id("splitQryAndResult")
 //	private SplitLayout splitQryAndResult;
 
@@ -260,6 +261,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 			Object queryForm = dynamicQuery.newInstance();
 			Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
 			setGrid.invoke(queryForm,grid);
+			divQuery.removeAll();
 			if (queryFormClassName.indexOf("Generated") > -1)
 			{
 				
@@ -272,11 +274,14 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 				setDataProvider.invoke(queryForm,dataProvider );
 				setRowsColList.invoke(queryForm,rowsColList);
 //				Method createContent= dynamicQuery.getMethod("createDetails");
-//				queryForm = 
-				createContent.invoke(queryForm);
+				//queryForm = 
+				divInDisplay =createContent.invoke(queryForm);
+				divQuery.add((Component)divInDisplay);
 			}
-			divQuery.removeAll();
-			divQuery.add((Component)queryForm);
+			else 
+			{				
+				divQuery.add((Component)queryForm);
+			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

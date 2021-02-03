@@ -20,8 +20,10 @@ import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+import coop.intergal.ui.components.FlexBoxLayout;
 
 import coop.intergal.AppConst;
+
 import coop.intergal.ui.components.QueryButtonsBar;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 
@@ -159,10 +161,22 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 
 	public Component createDetails() {
 		GeneratedUtil generatedUtil = new GeneratedUtil();
-		rowsQueryFieldList = dataProvider.getRowsQueryFieldList(cache);		
-//		queryButtonsBar.addSearchListener(e -> createFilterFromQryForm());
-//		queryButtonsBar.addClearSearchListener(e -> cleanQryForm());//System.out.println("PedidoProveedorQuery.beforeEnter() BUSCAR>>>>"));
-		return generatedUtil.createDetails(rowsQueryFieldList, form, true, cache);
+		rowsQueryFieldList = dataProvider.getRowsQueryFieldList(cache);	
+   		String tabs ="";
+   		if (rowsQueryFieldList != null)
+		{
+			tabs = rowsQueryFieldList.get(0)[17];
+		}
+ 		if (tabs.isEmpty()) 
+		{
+			return  generatedUtil.createDetails(rowsQueryFieldList, true, cache,"noTAB");
+		}
+		else
+		{
+			return generatedUtil.createTabs(rowsQueryFieldList, true,cache,tabs);
+		}
+
+//		return generatedUtil.createDetails(rowsQueryFieldList, form, true, cache);
 }
 
 
