@@ -321,7 +321,7 @@ public class Constraints {
 				tableName = resourceName.substring(3, idxEnd);
 			return tableName;
 		}
-		if (resourceName.startsWith("List-")) 
+		if (resourceName.indexOf("List-") > -1 && resourceName.indexOf("List-") < 3) // could be xxList where xx is the order position for children tabs
 		{
 			int idxEnd = resourceName.indexOf("__");
 			String tableName = resourceName.substring(5);

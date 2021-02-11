@@ -911,6 +911,7 @@ public class JSonClient {
 		return rowFields;
 	}
 	public static void keepJoinConditionSubResources(JsonNode resource) { // Keeps Join Condition for all resources 3 levels deep
+		// @@ TODO analice the posibility to avoid re-scan in case of already exist in HT
 		String parentResource = resource.get("name").asText(); // is add to sub-resource to avoid conflicts when a child have more than one parent
 		JsonNode subResources = resource.get("subresources");
 		if (subResources != null && subResources.size() > 0)

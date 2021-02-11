@@ -11,10 +11,14 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import org.vaadin.haijian.Exporter;
 import org.vaadin.olli.FileDownloadWrapper;
@@ -41,6 +45,8 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.IconRenderer;
@@ -57,6 +63,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.metadata.ui.views.dev.lac.FieldTemplateComboRelatedForPick;
+import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
@@ -637,26 +644,24 @@ private boolean isBoolean(String header, String colType) {
 	//		divDisplay.remove((Component) display);
 			
 			String resourceSubGrid = extractResourceSubGrid(bean,0);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO adapt to use more than one subresource , use a variable instead of 9
+//			String resourceSubGrid1 = extractResourceSubGrid(bean,1);
+//			String resourceSubGrid2 = extractResourceSubGrid(bean,2);
+//			String resourceSubGrid3 = extractResourceSubGrid(bean,3);
+//			String resourceSubGrid4 = extractResourceSubGrid(bean,4);
+//			String resourceSubGrid5 = extractResourceSubGrid(bean,5);
 			divSubGrid.removeAll();
-			if (resourceSubGrid != null)
+			String tabsList = rowsColListGrid.get(0)[12];
+			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
 			{
-				DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
-				subDynamicViewGrid.setCache(cache);
-				subDynamicViewGrid.setButtonsRowVisible(true);
-	//			subDynamicViewGrid.getElement().getStyle().set("height","100%");
-				subDynamicViewGrid.setResourceName(resourceSubGrid);
-				if (resourceSubGrid.indexOf(".")> -1)
-					subDynamicViewGrid.setFilter(componFKFilter(bean, resourceSubGrid));
-				subDynamicViewGrid.setupGrid(true,true);
-				subDynamicViewGrid.setParentRow(selectedRow);
-				subDynamicViewGrid.setDisplayParent(display);
-				subDynamicViewGrid.setBeanParent(setBean);
-				divSubGrid.add(subDynamicViewGrid );
+				divSubGrid.add(componSubgrid(bean, resourceSubGrid));
+	
 	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
 			}
 			else
 			{
-//				divSubGrid.removeAll();
+//				createTabs(DynamicDBean bean)
+				divSubGrid.removeAll();
+				divSubGrid.add(createTabs(bean, tabsList));
 //				DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
 //				subDynamicViewGrid.setButtonsRowVisible(false);//(true);
 //				divSubGrid.add(subDynamicViewGrid );
@@ -708,6 +713,383 @@ private boolean isBoolean(String header, String colType) {
 
 //	UI.getCurrent().navigate("dymanic");
 }
+	private Div componSubgrid(DynamicDBean bean, String resourceSubGrid2) {
+		DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
+		subDynamicViewGrid.setCache(cache);
+		subDynamicViewGrid.setButtonsRowVisible(true);
+//			subDynamicViewGrid.getElement().getStyle().set("height","100%");
+		subDynamicViewGrid.setResourceName(resourceSubGrid2);
+		if (resourceSubGrid2.indexOf(".")> -1)
+			subDynamicViewGrid.setFilter(componFKFilter(bean, resourceSubGrid2));
+		subDynamicViewGrid.setupGrid(true,true);
+		subDynamicViewGrid.setParentRow(selectedRow);
+		subDynamicViewGrid.setDisplayParent(display);
+		subDynamicViewGrid.setBeanParent(setBean);
+		divSubGrid.add(subDynamicViewGrid );
+		Div divTab = new Div();
+		divTab.add(subDynamicViewGrid );
+		return divTab;
+		
+	}
+
+	public Component createTabs(DynamicDBean bean, String tabsList) {//ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache,String tabsLabels) {
+//		String tabsLabels="1,2,3,4,5";
+		String [] tokens = tabsList.split(Pattern.quote(","));
+//		int i = 0;
+//	   	Div contentyDiv0 = new Div(); 
+		Tab tab0 =null ;Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;Tab tab5=null ;Tab tab6=null ;Tab tab7=null ;
+		Div content0=null; 
+		Div content1=null;
+		Div content2=null; Div content3=null;
+		Div content4=null; 
+		Div content5=null; 
+		Div content6=null; 
+		Div content7=null; 
+//		FlexBoxLayout content7=null; 
+
+	   	int nTabs = tokens.length;
+	   	String tabTitle;
+//		while (tokens.length > i)
+//		{ 
+			if (nTabs > 0)
+			{
+				tabTitle = tokens[0];
+				tab0 = new Tab(tabTitle);
+				tab0.setId("0");
+				content0 = fillContent(content0, 0, bean);									
+			}
+			if (nTabs > 1)
+			{
+				tabTitle = tokens[1];
+				tab1 = new Tab(tabTitle);
+				tab1.setId("1");
+				content1 = fillContent(content0, 1, bean);	
+				content1.setVisible(false);
+				
+			}
+			if (nTabs > 2)
+			{
+				tabTitle = tokens[2];
+				tab2 = new Tab(tabTitle);
+				content2 = fillContent(content0, 2, bean);	
+				content2.setVisible(false);
+				
+			}
+			if (nTabs > 3)
+			{
+				tabTitle = tokens[3];
+				tab3 = new Tab(tabTitle);
+				content3 = fillContent(content0, 3, bean);	
+				content3.setVisible(false);
+
+				
+			}
+			if (nTabs > 4)
+			{
+				tabTitle = tokens[4];
+				tab4 = new Tab(tabTitle);
+				content4 = fillContent(content0, 4, bean);	
+				content4.setVisible(false);
+
+			}
+			if (nTabs > 5)
+			{
+				tabTitle = tokens[5];
+				tab5 = new Tab(tabTitle);
+				content5 = fillContent(content0, 5, bean);	
+				content5.setVisible(false);
+				
+			}
+			if (nTabs > 6)
+			{
+				tabTitle = tokens[6];
+				tab6 = new Tab(tabTitle);
+				content6 = fillContent(content0, 6, bean);	
+				content6.setVisible(false);
+
+				
+			}
+			if (nTabs > 7)
+			{
+				tabTitle = tokens[7];
+				tab7 = new Tab(tabTitle);
+				content7 = fillContent(content0, 7, bean);	
+				content7.setVisible(false);
+
+			}				
+//			i++;
+//		}
+
+ 
+    	Map<Tab, Component> tabsToPages = new HashMap<>();
+ //   	Tabs tabs = new Tabs(tab0,tab1);
+    	Div pages =null ;
+      	if (nTabs > 7)
+		{
+      		tabsToPages.put(tab0, content0);
+      		tabsToPages.put(tab1, content1);
+      		tabsToPages.put(tab2, content2);
+      		tabsToPages.put(tab3, content3);
+      		tabsToPages.put(tab4, content4);
+      		tabsToPages.put(tab5, content5);
+      		tabsToPages.put(tab6, content6);
+      		tabsToPages.put(tab7, content7);
+      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7);
+      		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+      		tabs.addSelectedChangeListener(event -> {
+      			tabsToPages.values().forEach(page -> page.setVisible(false));
+      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+      			fillContentSelectedPage(selectedPage, tabsToPages, bean);
+      			selectedPage.setVisible(true);
+    	});
+	   	Div content = new Div();
+    	content.add(tabs, pages);
+		return content;
+		}
+      	else     	    	
+      	if (nTabs > 6)
+		{
+      		tabsToPages.put(tab0, content0);
+      		tabsToPages.put(tab1, content1);
+      		tabsToPages.put(tab2, content2);
+      		tabsToPages.put(tab3, content3);
+      		tabsToPages.put(tab4, content4);
+      		tabsToPages.put(tab5, content5);
+      		tabsToPages.put(tab6, content6);
+      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6);
+      		pages = new Div(content0, content1, content2,content3, content4, content5, content6 );
+      		tabs.addSelectedChangeListener(event -> {
+      			tabsToPages.values().forEach(page -> page.setVisible(false));
+      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+      			selectedPage.setVisible(true);
+    	});
+	   	Div content = new Div();
+    	content.add(tabs, pages);
+		return content;
+		}
+      	else     	
+      	if (nTabs > 5)
+		{
+      		tabsToPages.put(tab0, content0);
+      		tabsToPages.put(tab1, content1);
+      		tabsToPages.put(tab2, content2);
+      		tabsToPages.put(tab3, content3);
+      		tabsToPages.put(tab4, content4);
+      		tabsToPages.put(tab5, content5);
+      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5);
+      		pages = new Div(content0, content1, content2,content3, content4, content5 );
+      		tabs.addSelectedChangeListener(event -> {
+      			tabsToPages.values().forEach(page -> page.setVisible(false));
+      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+      			selectedPage.setVisible(true);
+    	});
+	   	Div content = new Div();
+    	content.add(tabs, pages);
+		return content;
+		}
+      	else     	
+    	if (nTabs > 4)
+    		{
+    		tabsToPages.put(tab0, content0);
+    		tabsToPages.put(tab1, content1);
+       		tabsToPages.put(tab2, content2);
+    		tabsToPages.put(tab3, content3);
+    		tabsToPages.put(tab4, content4);
+    		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4);
+    		pages = new Div(content0, content1, content2,content3, content4 );
+    	   	tabs.addSelectedChangeListener(event -> {
+        	    tabsToPages.values().forEach(page -> page.setVisible(false));
+        	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+        	    selectedPage.setVisible(true);
+        	});
+    	   	Div content = new Div();
+        	content.add(tabs, pages);
+    		return content;
+    		}
+    	else if (nTabs > 3)
+    		{
+    		tabsToPages.put(tab0, content0);
+    		tabsToPages.put(tab1, content1);
+       		tabsToPages.put(tab2, content2);
+    		tabsToPages.put(tab3, content3);
+    		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3);
+    		pages = new Div(content0, content1, content2,content3);
+    	   	tabs.addSelectedChangeListener(event -> {
+        	    tabsToPages.values().forEach(page -> page.setVisible(false));
+        	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+        	    selectedPage.setVisible(true);
+        	});
+    	   	Div content = new Div();
+        	content.add(tabs, pages);
+    		return content;
+
+    		}
+      	else if (nTabs > 2)
+      		{
+      		tabsToPages.put(tab0, content0);
+      		tabsToPages.put(tab1, content1);
+      		tabsToPages.put(tab2, content2);
+      		Tabs tabs = new Tabs(tab0, tab1, tab2);
+      		pages = new Div(content0, content1, content2);
+      		tabs.addSelectedChangeListener(event -> {
+      			tabsToPages.values().forEach(page -> page.setVisible(false));
+      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+      			selectedPage.setVisible(true);
+      		});
+      		Div content = new Div();
+        	content.add(tabs, pages);
+        	content.setWidthFull();
+    		return content;
+
+      		}
+    	else
+    		{
+     		tabsToPages.put(tab0, content0);
+    		tabsToPages.put(tab1, content1);
+    		Tabs tabs = new Tabs(tab0, tab1);
+    		pages = new Div(content0, content1 );
+     		tabs.addSelectedChangeListener(event -> {
+      			tabsToPages.values().forEach(page -> page.setVisible(false));
+      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+      			selectedPage.setVisible(true);
+      		});
+        	Div content = new Div();
+        	content.add(tabs, pages);
+    		return content;
+
+
+    		}
+
+
+    }
+
+	private void fillContentSelectedPage(Component selectedPage, Map<Tab, Component> tabsToPages, DynamicDBean bean) {
+		Optional<String> id = selectedPage.getId();
+		if (id.equals("0"))
+		{
+			Div content = (Div) tabsToPages.get(selectedPage);
+			content = fillContent(content, 0, bean);	
+		}		
+		
+	}
+
+	private Div fillContent(Div content, int i, DynamicDBean bean) {
+		String resourceSubGrid = extractResourceSubGrid(bean,i);
+		int idxFormExt = resourceSubGrid.indexOf("FormExt");
+		if ( idxFormExt> -1)
+			content = new Div(componSubForm(bean, resourceSubGrid));
+		else
+			content = new Div(componSubgrid(bean, resourceSubGrid));
+		content.setWidthFull();
+		return content;
+	}
+
+	private Component componSubForm(DynamicDBean bean, String resourceSubGrid0) {
+		Div divSubForm = new Div();
+//		divSubForm.add(new Label(" FORMULARIO "));
+		JsonNode jsonNode = bean.getRowJSon();
+		int idxPoint = resourceSubGrid0.indexOf(".");
+		if (idxPoint > -1)
+			resourceSubGrid0 = resourceSubGrid0.substring(idxPoint+1);
+		JsonNode subGridFormExt = jsonNode.get(resourceSubGrid0); 
+		String subFormClassName = subGridFormExt.get("displaySubFormClassName").asText();
+		String subFormFilter = subGridFormExt.get("filter").asText();
+		String subFormResource = subGridFormExt.get("resource").asText();
+		DdbDataBackEndProvider dataProviderSub = new DdbDataBackEndProvider();
+		dataProviderSub.setPreConfParam(AppConst.PRE_CONF_PARAM);
+		dataProviderSub.setResourceName(subFormResource);
+		dataProviderSub.setFilter(subFormFilter);
+		DynamicDBean subBean = RestData.getOneRow(subFormResource, subFormFilter, AppConst.PRE_CONF_PARAM);
+		if (subBean != null)
+			return componForm (dataProviderSub, subBean, subFormClassName, divSubForm, true );
+		else
+			return new Label ("Sin datos");
+	}
+	private Component componForm (DdbDataBackEndProvider dataProviderForm, DynamicDBean bean2, String subFormClassName, Div divSubForm, boolean isSub )
+	{
+		try {
+//			setVisibleRowData(true);
+			ArrayList<String[]> rowsColList = bean2.getRowsColList();
+			if (bean2.isReadOnly()) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC 
+				buttonsForm.setVisible(false);
+			if (isSub == false)
+				selectedRow = bean2;
+//			keepRowBeforChanges = new DynamicDBean(); 
+//			keepRowBeforChanges = RestData.copyDatabean(bean);
+//			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
+			Class<?> dynamicForm = Class.forName(subFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
+			display = dynamicForm.newInstance();
+			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
+			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+			
+			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
+			setRowsColList.invoke(display,rowsColList);//rowsColListGrid);
+			setBinder.invoke(display,binder);
+			
+			setBean.invoke(display,bean2);
+			setDataProvider.invoke(display, dataProviderForm);
+			divSubForm.removeAll();
+			if (subFormClassName.indexOf("Generated") > -1)
+			{
+			//	setDataProvider.invoke(display, dataProvider);
+				Method createContent= dynamicForm.getMethod("createContent");
+				Object divInSubDisplay = createContent.invoke(display);
+				divSubForm.add((Component)divInSubDisplay);
+			}
+			else
+			{
+				divSubForm.add((Component)display);
+			}
+// ADDING SUB GRIDS			
+			String resourceSubGrid = extractResourceSubGrid(bean2,0);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO adapt to use more than one subresource , use a variable instead of 9
+//			divSubForm.removeAll();
+			Div divSubFormSubGrid = new Div(); 
+			String tabsList = rowsColList.get(0)[12];
+			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
+			{
+				divSubFormSubGrid.add(componSubgrid(bean2, resourceSubGrid));
+			}
+			else
+			{
+				divSubFormSubGrid.removeAll();
+				divSubFormSubGrid.add(createTabs(bean2, tabsList));
+			}
+			divSubForm.add(divSubFormSubGrid);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+//		display.beforeEnter(null);
+//		gridSplitDisplay.getElement().removeAllChildren();//removeChild(display.getElement());
+//		gridSplitDisplay.getElement().appendChild(grid.getElement());
+//		gridSplitDisplay.getElement().appendChild(display.getElement());
+
+//	UI.getCurrent().navigate("dymanic");
+		
+		
+		return divSubForm;
+	}
+
 	private void setBeanParent(Method setBean2) {
 		this.setBeanParent = setBean2;
 		
@@ -808,13 +1190,15 @@ private boolean isBoolean(String header, String colType) {
 
 	private String extractResourceSubGrid(DynamicDBean bean, int idx) {
 		// TODO Auto-generated method stub CR-entradas_cab.List-entradas_lin/
-		if (resourceAndSubresources.get(bean.getResourceName()) != null)
+		if (resourceAndSubresources.get(bean.getResourceName()+idx) != null)
 			{
-			String[] subResourcesOfResource = resourceAndSubresources.get(bean.getResourceName());
-			if (subResourcesOfResource[idx].isEmpty() == false)
-				return subResourcesOfResource[idx];
-			}
-				
+			String[] subResourcesOfResource = resourceAndSubresources.get(bean.getResourceName()+idx);
+			if (subResourcesOfResource.length > idx)
+				{
+				if (subResourcesOfResource[idx].isEmpty() == false)
+					return subResourcesOfResource[idx];
+				}
+			}	
 		String rowJson = bean.getRowJSon().toString();
 		if (bean.getRowJSon().get("tableName") != null)
 			{
@@ -828,24 +1212,51 @@ private boolean isBoolean(String header, String colType) {
 			String pathSubreourceName = null;
 			if (idxResourceSubResource > -1 && idxEndSubreourceName >-1)
 				pathSubreourceName = rowJson.substring(idxResourceSubResource, idxEndSubreourceName);
-			keepSubResourcesNames(bean.getResourceName(),pathSubreourceName);	
+			keepSubResourcesNames(bean.getResourceName()+idx,pathSubreourceName);	
 			return pathSubreourceName;
 		}
 		else
 		{
 			idxResourceSubResource = rowJson.indexOf("List-");
+		//	idxResourceSubResource = addBackwardsChars(idxResourceSubResource, rowJson);
+			if (idx > 0)
+			{
+				int i=0;//idx-1;
+				int keepIdx = 0;
+				while (i < idx)
+				{
+					
+					idxResourceSubResource = rowJson.substring(idxResourceSubResource+idx).indexOf("List-")+idxResourceSubResource+1;	
+					keepIdx = idxResourceSubResource;
+					i++;
+				}
+//				idxResourceSubResource =addBackwardsChars(idxResourceSubResource, rowJson);
+				idxResourceSubResource = idxResourceSubResource+idx-1;
+			}
 			if (idxResourceSubResource > -1)
 			{
-				int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("\":[")+idxResourceSubResource;
+				idxResourceSubResource =addBackwardsChars(idxResourceSubResource, rowJson);
+				int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("\":")+idxResourceSubResource;//indexOf("\":[")+idxResourceSubResource;
 				String pathSubreourceName = rowJson.substring(idxResourceSubResource, idxEndSubreourceName);		
 				pathSubreourceName = bean.getResourceName()+"."+pathSubreourceName;
-				keepSubResourcesNames(bean.getResourceName(),pathSubreourceName);	
+				keepSubResourcesNames(bean.getResourceName()+idx,pathSubreourceName);	
 				return pathSubreourceName;
 			}
 			else
 				return null;
 		}
 	}
+
+	private int addBackwardsChars(int idxResourceSubResource, String rowJson) {
+		while (true) // search backwards to add extra numbers in List
+		{
+			if (rowJson.substring(idxResourceSubResource-1,idxResourceSubResource).equals("\""))
+				break;
+			else
+				idxResourceSubResource--;
+		}
+		return idxResourceSubResource;
+}
 
 	private void keepSubResourcesNames(String resourceName2, String pathSubreourceName) {
 		String[] subResourcesOfResource = null;
@@ -1013,7 +1424,7 @@ private boolean isBoolean(String header, String colType) {
 		showBean(selectedRow);
 		return null;
 	}
-	private String getApiID(String apiname) {
+	private String getApiID(String apiname) { // sets Id ApiTemplate see APITemplate table
 		if ("anpas".equals(apiname))
 			return "1";
 		else if ("GFER".equals(apiname))
@@ -1021,7 +1432,9 @@ private boolean isBoolean(String header, String colType) {
 		else if ("monbus".equals(apiname))
 			return "3";
 		else if ("metadata".equals(apiname))
-			return "4";
+			return "4";		
+		else if ("XesAcademy".equals(apiname))
+			return "5";
 		return "999999";
 	}
 

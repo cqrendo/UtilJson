@@ -629,7 +629,10 @@ public class RestData {
 								fieldArr[11] = "";
 							else
 								fieldArr[11] = col.get("titleGrid").asText();
-							fieldArr[12] = ""; // is only used for query fields
+							if ( col.get("tabsList").asText().isEmpty() || col.get("tabsList").asText().equals("null") )
+								fieldArr[12] = ""; // is only used for query fields
+							else
+								fieldArr[12] = col.get("tabsList").asText();
 							fieldArr[13] = ""; // is only used for Form fields
 							fieldArr[14] = ""; // is only used for Form fields
 							
@@ -672,156 +675,6 @@ public class RestData {
 				}	
 			return rowsColList;
 		}
-	public static ArrayList<String[]> getRowsColListOLD(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache){//, String variant) { // variant is use to have different lists of fields in the same resource
-		if (cache == null)
-		{
-			cache = CACHE_TRUE;
-		}	
-		if (rowsColList == null || rowsColList.isEmpty() || cache == false)
-				{
-				JsonNode cols;
-				try {				
-					String genericResourceName = resourceName;
-//					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
-//					int idxPomt = resourceName.indexOf(".");
-//					if (indx__ > 1 && idxPomt == -1) // only when there is not a subresource (after a point), you can extract the generic name from first name substring(0....
-//						genericResourceName = resourceName.substring(0, indx__);
-//					String tableNameToSearch = genericResourceName+variant;
-					String tableNameToSearch = genericResourceName;
-					String filter = "tableName='"+tableNameToSearch+"'%20AND%20isDataField=true&order=colOrder";
-
-					System.out.println("RestData.getRowsColList()  tablename to search = "+tableNameToSearch  + " "+ new Date());
-					cols = JSonClient.get("CR-FieldTemplate",filter, cache, AppConst.PRE_CONF_PARAM_METADATA);
-					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
-					{
-						rowsColList = new ArrayList<String[]>();
-						int i = 0;
-						int maxColNumber = 0;
-						for (JsonNode col :cols)
-						{
-							String[] fieldArr  = new String[20];
-							fieldArr[0] = col.get("fieldName").asText();
-							if ( col.get("showInGrid").asBoolean())
-								fieldArr[1] = "#SIG#";
-							else
-								fieldArr[1] = "";
-							if ( col.get("isSorteable").asBoolean())
-								fieldArr[1] = fieldArr[1]+"SORT";
-							fieldArr[0] = col.get("fieldName").asText();
-							if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
-								fieldArr[1] = fieldArr[1]+"#CNoEDT#";
-							if ( col.get("parentResource") != null && col.get("parentResource").asText().trim().length() > 1 && col.get("parentResource").asText().trim().equals("null")== false) 
-							{
-								fieldArr[1] = fieldArr[1]+"#PCK#";
-			
-							}
-							if (fieldArr[0].equals("pickMapFields"))  // is a field with a special PICK
-								fieldArr[1] = fieldArr[1]+"#PCK#FOR#pickMapFields";
-//							if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
-//								fieldArr[1] = fieldArr[1]+"#REQ#";
-							if ( col.get("FieldNameInUI").asText().isEmpty())
-								fieldArr[2] = "col"+i;	
-							else
-								fieldArr[2] = col.get("FieldNameInUI").asText();
-							if ( col.get("idFieldType").asText().isEmpty() || col.get("idFieldType").asText().equals("null"))
-								fieldArr[3] = "";
-							else
-								fieldArr[3] = col.get("idFieldType").asText();
-							if ( col.get("PathToParentField").asText().isEmpty() || col.get("PathToParentField").asText().equals("null"))
-								fieldArr[4] = "";
-							else
-								fieldArr[4] = col.get("PathToParentField").asText();
-							if ( col.get("defaultValue").asText().isEmpty() || col.get("defaultValue").asText().equals("null"))
-								fieldArr[5] = "";
-							else
-								fieldArr[5] = col.get("defaultValue").asText();
-							if ( col.get("colOrder").asText().isEmpty())
-								fieldArr[6] = "";
-							else if ( col.get("colOrder").asText().contains("#")) // after the # becames the col header
-								{
-								String colOrder =  col.get("colOrder").asText();
-								fieldArr[6] =colOrder.substring(colOrder.indexOf("#")+1);
-								}
-							else
-								fieldArr[6] = "";
-							if ( col.get("fieldOrder").asText().isEmpty())
-								fieldArr[7] = "";
-							else if ( col.get("fieldOrder").asText().contains("#")) // after the # becames the field label
-								{
-								String fieldOrder =  col.get("fieldOrder").asText();
-								fieldArr[7] =fieldOrder.substring(fieldOrder.indexOf("#")+1);
-								}
-							else
-								fieldArr[7] = "";
-							if ( col.get("queryOrder").asText().isEmpty())
-								fieldArr[8] = "";
-							else if ( col.get("queryOrder").asText().contains("#")) // after the # becames the query label
-								{
-								String fieldOrder =  col.get("queryOrder").asText();
-								fieldArr[8] =fieldOrder.substring(fieldOrder.indexOf("#")+1);
-								}
-							else
-								fieldArr[8] = "";
-							if ( col.get("titleDisplay").asText().isEmpty() || col.get("titleDisplay").asText().equals("null") )
-								fieldArr[9] = "";
-							else
-								fieldArr[9] = col.get("titleDisplay").asText();
-							if ( col.get("titleQuery").asText().isEmpty() || col.get("titleQuery").asText().equals("null") )
-								fieldArr[10] = "";
-							else
-								fieldArr[10] = col.get("titleQuery").asText();
-							if ( col.get("titleGrid").asText().isEmpty() || col.get("titleGrid").asText().equals("null") )
-								fieldArr[11] = "";
-							else
-								fieldArr[11] = col.get("titleGrid").asText();
-							fieldArr[12] = ""; // is only used for query fields
-							fieldArr[13] = ""; // is only used for Form fields
-							fieldArr[14] = ""; // is only used for Form fields
-							
-							if ( col.get("maxColNumber").asText().isEmpty() || col.get("maxColNumber").asText().equals("null") )
-								fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
-							else
-								fieldArr[15] = col.get("maxColNumber").asText();
-							fieldArr[16] = ""; // is only used for Form fields
-							fieldArr[17] = ""; // is only used for Form fields
-							fieldArr[18] = ""; // is only used for Form fields
-							fieldArr[19] = ""; // is only used for Form fields
-
-							rowsColList.add(fieldArr);
-							i++;
-						}
-						// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
-						if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself
-							{
-							int idxPoint = resourceName.indexOf(".");
-							if (idxPoint > -1) 
-							resourceName = resourceName.substring(0, idxPoint);
-							String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
-						
-							 
-							if (ident !=null) 
-								{
-								JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam); 
-								if ((resource.get("statusCode") != null && resource.get("statusCode").asInt() != 500) || resource.get("statusCode") == null)  // TODO check why sme times you get 500, by example when you do 	DynamicDBean dynamicDBean = RestData.getOneRow(RESOURCE_FIELD_TEMPLATE,filter, AppConst.PRE_CONF_PARAM_METADATA, null); in consrain.java
-
-									JSonClient.keepJoinConditionSubResources(resource); 
-								}
-							}
-					}
-					
-					else	
-					{
-						
-						rowsColList = getColListFromTable(resourceName, preConfParam);
-					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				}	
-			return rowsColList;
-		}
-
 	public static ArrayList<String> getRowsColList(String resourceName, String preConfParam, String variant) {
 			
 //			if (rowsColList == null || rowsColList.isEmpty())
@@ -1175,7 +1028,7 @@ public class RestData {
 							fieldArr[11] = "";
 						else
 							fieldArr[11] = col.get("titleGrid").asText();
-						fieldArr[12] = ""; /// is not used PUT A NEW FIELD when is need 
+						fieldArr[12] = ""; 
 //						if ( col.get("cssStyleQueryField").asText().isEmpty() || col.get("cssStyleQueryField").asText().equals("null") )
 //							fieldArr[12] =AppConst.DEFAULT_CSS_STYLE_QRY_FIELD;
 //						else

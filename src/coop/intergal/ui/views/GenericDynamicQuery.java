@@ -581,8 +581,8 @@ private void clearField(FormLayout form, String id) {
 //return filter;
 	private void setFKIdsForFilter(String id, String value) { // keeps the filters in each parent id comes with the format list- or CR-childTable#childField.FK-paremtTable-fieldnmame , childField is opctional when there is more than one parent (same table) of the same child
 		int idxTable = 0;
-		int idxChildField = 0;
-		if (id.startsWith("CR-") ||id.startsWith("List-") || id.indexOf(".") >-1 )
+		int idxChildField = 0; 
+		if (id.startsWith("CR-") ||isAList(id)|| id.indexOf(".") >-1 )
 			{
 			idxTable = id.indexOf(".");
 			idxChildField = id.indexOf("#");
@@ -598,6 +598,13 @@ private void clearField(FormLayout form, String id) {
 		String table = id.substring(idxTable, id.lastIndexOf("-"));
 		System.err.println("childName "+ childName +" Field " + field + " table " + table);
 		searchAndPaste(table, field, value);
+	}
+
+	private boolean isAList(String id) {// could be xxList where xx is the order position for children tabs
+		if (id.indexOf("List-") > -1 && id.indexOf("List-") < 3) 
+			return true;
+		else 
+			return false;
 	}
 
 	private String getParentKeys() { /// returns the parent KEYS generate after searching in parents
@@ -679,7 +686,7 @@ private void clearField(FormLayout form, String id) {
 
 				if (tableFkChild.length() == 0)
 					if (childName.length() > 1)
-						if (childName.startsWith("list-"))
+						if (isAList(childName))
 							childTableToGetFK = childName.substring(5);
 						else if (childName.startsWith("CR-"))
 							childTableToGetFK = childName.substring(3);

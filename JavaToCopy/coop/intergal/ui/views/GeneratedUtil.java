@@ -151,12 +151,16 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	public Component createTabs(ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache,String tabsLabels) {
 			String [] tokens = tabsLabels.split(Pattern.quote(","));
 //			int i = 0;
-			Tab tab0 =null ;Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;
-		   	FlexBoxLayout content0=null; 
-		   	FlexBoxLayout content1=null;
-		   	FlexBoxLayout content2=null; FlexBoxLayout content3=null;
-		   	FlexBoxLayout content4=null; 
 //		   	Div contentyDiv0 = new Div(); 
+			Tab tab0 =null ;Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;Tab tab5=null ;Tab tab6=null ;Tab tab7=null ;
+			FlexBoxLayout content0=null; 
+			FlexBoxLayout content1=null;
+			FlexBoxLayout content2=null; FlexBoxLayout content3=null;
+			FlexBoxLayout content4=null; 
+			FlexBoxLayout content5=null; 
+			FlexBoxLayout content6=null; 
+			FlexBoxLayout content7=null; 
+
 		   	int nTabs = tokens.length;
 		   	String tabTitle;
 //			while (tokens.length > i)
@@ -206,6 +210,34 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					content4.setVisible(false);
 
 				}
+				if (nTabs > 5)
+				{
+					tabTitle = tokens[5];
+					tab5 = new Tab(tabTitle);
+					content5 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"5"));
+					content5.setWidthFull();
+					content5.setVisible(false);
+					
+				}
+				if (nTabs > 6)
+				{
+					tabTitle = tokens[6];
+					tab6 = new Tab(tabTitle);
+					content6 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"6"));
+					content6.setWidthFull();
+					content6.setVisible(false);
+
+					
+				}
+				if (nTabs > 7)
+				{
+					tabTitle = tokens[7];
+					tab7 = new Tab(tabTitle);
+					content7 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"7"));		
+					content7.setWidthFull();
+					content7.setVisible(false);
+
+				}				
 //				i++;
 //			}
 
@@ -213,6 +245,69 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	    	Map<Tab, Component> tabsToPages = new HashMap<>();
 	 //   	Tabs tabs = new Tabs(tab0,tab1);
 	    	Div pages =null ;
+	      	if (nTabs > 7)
+			{
+	      		tabsToPages.put(tab0, content0);
+	      		tabsToPages.put(tab1, content1);
+	      		tabsToPages.put(tab2, content2);
+	      		tabsToPages.put(tab3, content3);
+	      		tabsToPages.put(tab4, content4);
+	      		tabsToPages.put(tab5, content5);
+	      		tabsToPages.put(tab6, content6);
+	      		tabsToPages.put(tab7, content7);
+	      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7);
+	      		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+	      		tabs.addSelectedChangeListener(event -> {
+	      			tabsToPages.values().forEach(page -> page.setVisible(false));
+	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	      			selectedPage.setVisible(true);
+	    	});
+		   	Div content = new Div();
+	    	content.add(tabs, pages);
+			return content;
+			}
+	      	else     	    	
+	      	if (nTabs > 6)
+			{
+	      		tabsToPages.put(tab0, content0);
+	      		tabsToPages.put(tab1, content1);
+	      		tabsToPages.put(tab2, content2);
+	      		tabsToPages.put(tab3, content3);
+	      		tabsToPages.put(tab4, content4);
+	      		tabsToPages.put(tab5, content5);
+	      		tabsToPages.put(tab6, content6);
+	      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6);
+	      		pages = new Div(content0, content1, content2,content3, content4, content5, content6 );
+	      		tabs.addSelectedChangeListener(event -> {
+	      			tabsToPages.values().forEach(page -> page.setVisible(false));
+	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	      			selectedPage.setVisible(true);
+	    	});
+		   	Div content = new Div();
+	    	content.add(tabs, pages);
+			return content;
+			}
+	      	else     	
+	      	if (nTabs > 5)
+			{
+	      		tabsToPages.put(tab0, content0);
+	      		tabsToPages.put(tab1, content1);
+	      		tabsToPages.put(tab2, content2);
+	      		tabsToPages.put(tab3, content3);
+	      		tabsToPages.put(tab4, content4);
+	      		tabsToPages.put(tab5, content5);
+	      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5);
+	      		pages = new Div(content0, content1, content2,content3, content4, content5 );
+	      		tabs.addSelectedChangeListener(event -> {
+	      			tabsToPages.values().forEach(page -> page.setVisible(false));
+	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	      			selectedPage.setVisible(true);
+	    	});
+		   	Div content = new Div();
+	    	content.add(tabs, pages);
+			return content;
+			}
+	      	else     	
 	    	if (nTabs > 4)
 	    		{
 	    		tabsToPages.put(tab0, content0);
