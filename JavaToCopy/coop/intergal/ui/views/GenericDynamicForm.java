@@ -72,7 +72,7 @@ private String pickMapFields;
 //		
 //	}
 	
-
+ 
 	public Dialog getDialogForPick() {
 		return dialogForPick;
 	}
