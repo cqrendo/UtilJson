@@ -251,7 +251,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 			displayFormClassName= queryParameters.getParameters().get("displayFormClassName").get(0);
 			if (queryFormClassName.startsWith("coop.intergal.ui.views") == false)
 				queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
-			if (queryFormClassName.startsWith("coop.intergal.ui.views") == false)
+			if (displayFormClassName.startsWith("coop.intergal.ui.views") == false)
 				displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
 			
 //			resourceSubGrid =  queryParameters.getParameters().get("resourceSubGrid").get(0);

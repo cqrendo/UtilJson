@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.vaadin.haijian.Exporter;
 import org.vaadin.olli.FileDownloadWrapper;
@@ -731,6 +733,39 @@ private boolean isBoolean(String header, String colType) {
 		return divTab;
 		
 	}
+	public Component  dummy2 ()
+	{
+		Tab timecard = new Tab("Time card");
+		Tab comments = new Tab("Comments");
+		Tabs tabs = new Tabs(timecard, comments);
+
+		Div div = new Div();
+		Div timecardPage = new Div();
+		timecardPage.add("This is the time card page");
+//		timecardPage.add(new TextField());
+		timecardPage.add(grid);
+		Div commentsPage = new Div();
+		commentsPage.add("This is the comments page");
+//		commentsPage.add(new TextField());
+		Map<Tab, Component> tabsToPages = new HashMap<>();
+		tabsToPages.put(timecard, timecardPage);
+		tabsToPages.put(comments, commentsPage);
+
+		Div pages = new Div(timecardPage);
+		Set<Component> pagesShown = Stream.of(commentsPage).collect(Collectors.toSet());
+
+		tabs.addSelectedChangeListener(event -> {
+		pages.removeAll();
+		pagesShown.clear();
+		Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+		pages.add(selectedPage);
+		pagesShown.add(selectedPage);
+		});
+//		add(tabs, pages);
+       	Div content = new Div();
+    	content.add(tabs, pages);
+		return content;
+	}
 
 	public Component createTabs(DynamicDBean bean, String tabsList) {//ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache,String tabsLabels) {
 //		String tabsLabels="1,2,3,4,5";
@@ -738,13 +773,13 @@ private boolean isBoolean(String header, String colType) {
 //		int i = 0;
 //	   	Div contentyDiv0 = new Div(); 
 		Tab tab0 =null ;Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;Tab tab5=null ;Tab tab6=null ;Tab tab7=null ;
-		Div content0=null; 
-		Div content1=null;
-		Div content2=null; Div content3=null;
-		Div content4=null; 
-		Div content5=null; 
-		Div content6=null; 
-		Div content7=null; 
+		Div content0=new Div(); 
+		Div content1=new Div();
+		Div content2=new Div(); Div content3=new Div();
+		Div content4=new Div(); 
+		Div content5=new Div(); 
+		Div content6=new Div(); 
+		Div content7=new Div(); 
 //		FlexBoxLayout content7=null; 
 
 	   	int nTabs = tokens.length;
@@ -754,24 +789,25 @@ private boolean isBoolean(String header, String colType) {
 			if (nTabs > 0)
 			{
 				tabTitle = tokens[0];
-				tab0 = new Tab(tabTitle);
-				tab0.setId("0");
-				content0 = fillContent(content0, 0, bean);									
+				tab0 = new Tab(tabTitle);				
+				content0 = fillContent(content0, 0, bean);	
+				content0.setId("0");
 			}
 			if (nTabs > 1)
 			{
 				tabTitle = tokens[1];
 				tab1 = new Tab(tabTitle);
-				tab1.setId("1");
-				content1 = fillContent(content0, 1, bean);	
-				content1.setVisible(false);
+				content1.setId("1");
+//				content1 = fillContent(content1, 1, bean);	
+//				content1.setVisible(false);
 				
 			}
 			if (nTabs > 2)
 			{
 				tabTitle = tokens[2];
 				tab2 = new Tab(tabTitle);
-				content2 = fillContent(content0, 2, bean);	
+				content2.setId("2");
+//				content2 = fillContent(content2, 2, bean);	
 				content2.setVisible(false);
 				
 			}
@@ -779,7 +815,8 @@ private boolean isBoolean(String header, String colType) {
 			{
 				tabTitle = tokens[3];
 				tab3 = new Tab(tabTitle);
-				content3 = fillContent(content0, 3, bean);	
+				content3.setId("3");
+//				content3 = fillContent(content3, 3, bean);	
 				content3.setVisible(false);
 
 				
@@ -788,7 +825,8 @@ private boolean isBoolean(String header, String colType) {
 			{
 				tabTitle = tokens[4];
 				tab4 = new Tab(tabTitle);
-				content4 = fillContent(content0, 4, bean);	
+				content4.setId("4");
+//				content4 = fillContent(content4, 4, bean);	
 				content4.setVisible(false);
 
 			}
@@ -796,7 +834,8 @@ private boolean isBoolean(String header, String colType) {
 			{
 				tabTitle = tokens[5];
 				tab5 = new Tab(tabTitle);
-				content5 = fillContent(content0, 5, bean);	
+				content5.setId("5");
+//				content5 = fillContent(content5, 5, bean);	
 				content5.setVisible(false);
 				
 			}
@@ -804,7 +843,8 @@ private boolean isBoolean(String header, String colType) {
 			{
 				tabTitle = tokens[6];
 				tab6 = new Tab(tabTitle);
-				content6 = fillContent(content0, 6, bean);	
+				content6.setId("6");
+//				content6 = fillContent(content6, 6, bean);	
 				content6.setVisible(false);
 
 				
@@ -813,7 +853,8 @@ private boolean isBoolean(String header, String colType) {
 			{
 				tabTitle = tokens[7];
 				tab7 = new Tab(tabTitle);
-				content7 = fillContent(content0, 7, bean);	
+				content7.setId("7");
+//				content7 = fillContent(content7, 7, bean);	
 				content7.setVisible(false);
 
 			}				
@@ -822,6 +863,8 @@ private boolean isBoolean(String header, String colType) {
 
  
     	Map<Tab, Component> tabsToPages = new HashMap<>();
+//		Set<Component> pagesShown = Stream.of(commentsPage).collect(Collectors.toSet());
+
  //   	Tabs tabs = new Tabs(tab0,tab1);
     	Div pages =null ;
       	if (nTabs > 7)
@@ -861,6 +904,7 @@ private boolean isBoolean(String header, String colType) {
       		tabs.addSelectedChangeListener(event -> {
       			tabsToPages.values().forEach(page -> page.setVisible(false));
       			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+     			fillContentSelectedPage(selectedPage, tabsToPages, bean);
       			selectedPage.setVisible(true);
     	});
 	   	Div content = new Div();
@@ -881,6 +925,7 @@ private boolean isBoolean(String header, String colType) {
       		tabs.addSelectedChangeListener(event -> {
       			tabsToPages.values().forEach(page -> page.setVisible(false));
       			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+     			fillContentSelectedPage(selectedPage, tabsToPages, bean);
       			selectedPage.setVisible(true);
     	});
 	   	Div content = new Div();
@@ -888,7 +933,7 @@ private boolean isBoolean(String header, String colType) {
 		return content;
 		}
       	else     	
-    	if (nTabs > 4)
+    	if (nTabs > 499)
     		{
     		tabsToPages.put(tab0, content0);
     		tabsToPages.put(tab1, content1);
@@ -900,12 +945,34 @@ private boolean isBoolean(String header, String colType) {
     	   	tabs.addSelectedChangeListener(event -> {
         	    tabsToPages.values().forEach(page -> page.setVisible(false));
         	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+        	    selectedPage = fillContentSelectedPage(selectedPage, tabsToPages, bean);
         	    selectedPage.setVisible(true);
         	});
     	   	Div content = new Div();
         	content.add(tabs, pages);
     		return content;
     		}
+    	else if (nTabs > 4)
+		{
+		tabsToPages.put(tab0, content0);
+		tabsToPages.put(tab1, content1);
+   		tabsToPages.put(tab2, content2);
+		tabsToPages.put(tab3, content3);
+		tabsToPages.put(tab4, content4);
+		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4);
+		Div pages2 = new Div(content0, content1, content2,content3, content4 );
+		tabs.addSelectedChangeListener(event -> {
+			pages2.removeAll();
+//			pagesShown.clear();
+			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+			pages2.add(selectedPage);
+//			pagesShown.add(selectedPage);
+		});
+	   	Div content = new Div();
+    	content.add(tabs, pages2);
+		return content;
+		}
     	else if (nTabs > 3)
     		{
     		tabsToPages.put(tab0, content0);
@@ -917,6 +984,7 @@ private boolean isBoolean(String header, String colType) {
     	   	tabs.addSelectedChangeListener(event -> {
         	    tabsToPages.values().forEach(page -> page.setVisible(false));
         	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+     			fillContentSelectedPage(selectedPage, tabsToPages, bean);
         	    selectedPage.setVisible(true);
         	});
     	   	Div content = new Div();
@@ -934,6 +1002,7 @@ private boolean isBoolean(String header, String colType) {
       		tabs.addSelectedChangeListener(event -> {
       			tabsToPages.values().forEach(page -> page.setVisible(false));
       			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+     			fillContentSelectedPage(selectedPage, tabsToPages, bean);
       			selectedPage.setVisible(true);
       		});
       		Div content = new Div();
@@ -951,6 +1020,7 @@ private boolean isBoolean(String header, String colType) {
      		tabs.addSelectedChangeListener(event -> {
       			tabsToPages.values().forEach(page -> page.setVisible(false));
       			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+      			selectedPage = fillContentSelectedPage(selectedPage, tabsToPages, bean);
       			selectedPage.setVisible(true);
       		});
         	Div content = new Div();
@@ -963,13 +1033,14 @@ private boolean isBoolean(String header, String colType) {
 
     }
 
-	private void fillContentSelectedPage(Component selectedPage, Map<Tab, Component> tabsToPages, DynamicDBean bean) {
+	private Component fillContentSelectedPage(Component selectedPage, Map<Tab, Component> tabsToPages, DynamicDBean bean) {
 		Optional<String> id = selectedPage.getId();
-		if (id.equals("0"))
-		{
+		Integer idInt = new Integer (id.get());
+//		if (id.equals("0"))
+//		{
 			Div content = (Div) tabsToPages.get(selectedPage);
-			content = fillContent(content, 0, bean);	
-		}		
+			content = fillContent(content, idInt, bean);
+			return content;
 		
 	}
 

@@ -447,10 +447,10 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 //								if (value != null)
 //									newEntityinfo.put(colNameInTable,fechaIni.format(value) );
 								String valueStr = (String) ""+value;
-								if (valueStr.indexOf("00:00:00") > -1) // is date without time
-									{
-									valueStr = 	valueStr.substring(0,10);
-									}
+//								if (valueStr.indexOf("00:00:00") > -1) // is date without time
+//									{
+//									valueStr = 	valueStr.substring(0,10);
+//									}
 									
 								newEntityinfo.put(colNameInTable,valueStr);
 							}
@@ -463,7 +463,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 									else if (  value.equals("false") )
 										newEntityinfo.put(colNameInTable, (Boolean) false);  
 									else
-										newEntityinfo.put(colNameInTable, (Boolean) value);  
+										newEntityinfo.put(colNameInTable, (Integer) value);  
 								}
 								else
 									if (isInteger(o))	

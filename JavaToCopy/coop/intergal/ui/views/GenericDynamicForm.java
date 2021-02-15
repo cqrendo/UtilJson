@@ -67,10 +67,10 @@ private String pickMapFields;
 		
 	}
 
-	public void setBean(DynamicDBean bean) {
-		// TODO Auto-generated method stub
-		
-	}
+//	public void setBean(DynamicDBean bean) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 	
 
 	public Dialog getDialogForPick() {
