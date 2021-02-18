@@ -423,6 +423,8 @@ public class RestData {
 		JsonNode rowsList = null;
 		if (resourceName.startsWith("@")) // is to handle @resources by example because the resource name it changes @ by _
 			resourceName = resourceName.replace("@", "_");
+		if (resourceName.indexOf(".") > -1) // for susb.sub.sub resources
+			resourceName = resourceName.replace(".", "_");
 		try { //TODO CACHE IS FALSE always , put as param
 		//	String filtro = null;
 			System.out.println("RestData.getCountRows() resourceName " + resourceName + " filter " + filter +  " preConfParam " + preConfParam);

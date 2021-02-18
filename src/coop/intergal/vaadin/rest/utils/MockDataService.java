@@ -463,7 +463,9 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 									else if (  value.equals("false") )
 										newEntityinfo.put(colNameInTable, (Boolean) false);  
 									else
-										newEntityinfo.put(colNameInTable, (Integer) value);  
+									{
+										newEntityinfo.put(colNameInTable, (Integer) Integer.parseInt((String) value));  
+									}	
 								}
 								else
 									if (isInteger(o))	

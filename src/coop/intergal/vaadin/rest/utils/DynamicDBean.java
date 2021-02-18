@@ -1855,7 +1855,7 @@ public class DynamicDBean {// implements Serializable {
 		{
 			
 				String colValue = (String)getColX.invoke(dbean);
-				if (colValue.equals("true"))
+				if (colValue.equals("true") || (colValue.equals("1")))
 					return true;
 				else
 					return false;

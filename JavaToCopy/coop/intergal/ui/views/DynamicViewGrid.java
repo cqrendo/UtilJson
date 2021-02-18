@@ -663,7 +663,7 @@ private boolean isBoolean(String header, String colType) {
 			{
 //				createTabs(DynamicDBean bean)
 				divSubGrid.removeAll();
-				divSubGrid.add(createTabs(bean, tabsList));
+				divSubGrid.add(createSubTabs(bean, tabsList));
 //				DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
 //				subDynamicViewGrid.setButtonsRowVisible(false);//(true);
 //				divSubGrid.add(subDynamicViewGrid );
@@ -767,7 +767,7 @@ private boolean isBoolean(String header, String colType) {
 		return content;
 	}
 
-	public Component createTabs(DynamicDBean bean, String tabsList) {//ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache,String tabsLabels) {
+	public Component createSubTabs(DynamicDBean bean, String tabsList) {//ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache,String tabsLabels) {
 //		String tabsLabels="1,2,3,4,5";
 		String [] tokens = tabsList.split(Pattern.quote(","));
 //		int i = 0;
@@ -878,16 +878,17 @@ private boolean isBoolean(String header, String colType) {
       		tabsToPages.put(tab6, content6);
       		tabsToPages.put(tab7, content7);
       		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7);
-      		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
-      		tabs.addSelectedChangeListener(event -> {
-      			tabsToPages.values().forEach(page -> page.setVisible(false));
-      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
-      			fillContentSelectedPage(selectedPage, tabsToPages, bean);
-      			selectedPage.setVisible(true);
-    	});
-	   	Div content = new Div();
-    	content.add(tabs, pages);
-		return content;
+  //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+      		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+    		tabs.addSelectedChangeListener(event -> {
+    			pages2.removeAll();
+    			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+    			pages2.add(selectedPage);
+    		});
+    		Div content = new Div();
+    		content.add(tabs, pages);
+    		return content;
 		}
       	else     	    	
       	if (nTabs > 6)
@@ -900,16 +901,17 @@ private boolean isBoolean(String header, String colType) {
       		tabsToPages.put(tab5, content5);
       		tabsToPages.put(tab6, content6);
       		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6);
-      		pages = new Div(content0, content1, content2,content3, content4, content5, content6 );
-      		tabs.addSelectedChangeListener(event -> {
-      			tabsToPages.values().forEach(page -> page.setVisible(false));
-      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
-     			fillContentSelectedPage(selectedPage, tabsToPages, bean);
-      			selectedPage.setVisible(true);
-    	});
-	   	Div content = new Div();
-    	content.add(tabs, pages);
-		return content;
+    //  		pages = new Div(content0, content1, content2,content3, content4, content5, content6 );
+      		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 );
+    		tabs.addSelectedChangeListener(event -> {
+    			pages2.removeAll();
+    			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+    			pages2.add(selectedPage);
+    		});
+    		Div content = new Div();
+    		content.add(tabs, pages);
+    		return content;
 		}
       	else     	
       	if (nTabs > 5)
@@ -921,57 +923,37 @@ private boolean isBoolean(String header, String colType) {
       		tabsToPages.put(tab4, content4);
       		tabsToPages.put(tab5, content5);
       		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5);
-      		pages = new Div(content0, content1, content2,content3, content4, content5 );
-      		tabs.addSelectedChangeListener(event -> {
-      			tabsToPages.values().forEach(page -> page.setVisible(false));
-      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
-     			fillContentSelectedPage(selectedPage, tabsToPages, bean);
-      			selectedPage.setVisible(true);
-    	});
-	   	Div content = new Div();
-    	content.add(tabs, pages);
-		return content;
+ //     		pages = new Div(content0, content1, content2,content3, content4, content5 );
+    		Div pages2 = new Div(content0, content1, content2,content3, content4, content5);
+    		tabs.addSelectedChangeListener(event -> {
+    			pages2.removeAll();
+    			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+    			pages2.add(selectedPage);
+    		});
+    		Div content = new Div();
+    		content.add(tabs, pages);
+    		return content;
 		}
       	else     	
-    	if (nTabs > 499)
-    		{
-    		tabsToPages.put(tab0, content0);
-    		tabsToPages.put(tab1, content1);
-       		tabsToPages.put(tab2, content2);
-    		tabsToPages.put(tab3, content3);
-    		tabsToPages.put(tab4, content4);
-    		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4);
-    		pages = new Div(content0, content1, content2,content3, content4 );
-    	   	tabs.addSelectedChangeListener(event -> {
-        	    tabsToPages.values().forEach(page -> page.setVisible(false));
-        	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
-        	    selectedPage = fillContentSelectedPage(selectedPage, tabsToPages, bean);
-        	    selectedPage.setVisible(true);
-        	});
-    	   	Div content = new Div();
-        	content.add(tabs, pages);
-    		return content;
-    		}
-    	else if (nTabs > 4)
+      	if (nTabs > 4)
 		{
-		tabsToPages.put(tab0, content0);
-		tabsToPages.put(tab1, content1);
-   		tabsToPages.put(tab2, content2);
-		tabsToPages.put(tab3, content3);
-		tabsToPages.put(tab4, content4);
-		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4);
-		Div pages2 = new Div(content0, content1, content2,content3, content4 );
-		tabs.addSelectedChangeListener(event -> {
+      		tabsToPages.put(tab0, content0);
+      		tabsToPages.put(tab1, content1);
+      		tabsToPages.put(tab2, content2);
+      		tabsToPages.put(tab3, content3);
+      		tabsToPages.put(tab4, content4);
+      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4);
+      		Div pages2 = new Div(content0, content1, content2,content3, content4 );
+      		tabs.addSelectedChangeListener(event -> {
 			pages2.removeAll();
-//			pagesShown.clear();
 			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
 			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
 			pages2.add(selectedPage);
-//			pagesShown.add(selectedPage);
-		});
-	   	Div content = new Div();
-    	content.add(tabs, pages2);
-		return content;
+      		});
+      		Div content = new Div();
+      		content.add(tabs, pages2);
+      		return content;
 		}
     	else if (nTabs > 3)
     		{
@@ -980,15 +962,15 @@ private boolean isBoolean(String header, String colType) {
        		tabsToPages.put(tab2, content2);
     		tabsToPages.put(tab3, content3);
     		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3);
-    		pages = new Div(content0, content1, content2,content3);
-    	   	tabs.addSelectedChangeListener(event -> {
-        	    tabsToPages.values().forEach(page -> page.setVisible(false));
-        	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
-     			fillContentSelectedPage(selectedPage, tabsToPages, bean);
-        	    selectedPage.setVisible(true);
-        	});
-    	   	Div content = new Div();
-        	content.add(tabs, pages);
+    		Div pages2 = new Div(content0, content1, content2,content3);
+    		tabs.addSelectedChangeListener(event -> {
+    			pages2.removeAll();
+    			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+    			pages2.add(selectedPage);
+    		});
+    		Div content = new Div();
+        	content.add(tabs, pages2);
     		return content;
 
     		}
@@ -998,15 +980,16 @@ private boolean isBoolean(String header, String colType) {
       		tabsToPages.put(tab1, content1);
       		tabsToPages.put(tab2, content2);
       		Tabs tabs = new Tabs(tab0, tab1, tab2);
-      		pages = new Div(content0, content1, content2);
-      		tabs.addSelectedChangeListener(event -> {
-      			tabsToPages.values().forEach(page -> page.setVisible(false));
-      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
-     			fillContentSelectedPage(selectedPage, tabsToPages, bean);
-      			selectedPage.setVisible(true);
-      		});
-      		Div content = new Div();
-        	content.add(tabs, pages);
+//      		pages = new Div(content0, content1, content2);
+    		Div pages2 = new Div(content0, content1, content2);
+    		tabs.addSelectedChangeListener(event -> {
+    			pages2.removeAll();
+    			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+    			pages2.add(selectedPage);
+    		});
+    		Div content = new Div();
+        	content.add(tabs, pages2);
         	content.setWidthFull();
     		return content;
 
@@ -1016,15 +999,16 @@ private boolean isBoolean(String header, String colType) {
      		tabsToPages.put(tab0, content0);
     		tabsToPages.put(tab1, content1);
     		Tabs tabs = new Tabs(tab0, tab1);
-    		pages = new Div(content0, content1 );
-     		tabs.addSelectedChangeListener(event -> {
-      			tabsToPages.values().forEach(page -> page.setVisible(false));
-      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
-      			selectedPage = fillContentSelectedPage(selectedPage, tabsToPages, bean);
-      			selectedPage.setVisible(true);
-      		});
-        	Div content = new Div();
-        	content.add(tabs, pages);
+//    		pages = new Div(content0, content1 );
+    		Div pages2 = new Div(content0, content1);
+    		tabs.addSelectedChangeListener(event -> {
+    			pages2.removeAll();
+    			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+    			pages2.add(selectedPage);
+    		});
+    		Div content = new Div();
+        	content.add(tabs, pages2);
     		return content;
 
 
@@ -1124,7 +1108,7 @@ private boolean isBoolean(String header, String colType) {
 			else
 			{
 				divSubFormSubGrid.removeAll();
-				divSubFormSubGrid.add(createTabs(bean2, tabsList));
+				divSubFormSubGrid.add(createSubTabs(bean2, tabsList));
 			}
 			divSubForm.add(divSubFormSubGrid);
 		} catch (ClassNotFoundException e) {
@@ -1277,7 +1261,7 @@ private boolean isBoolean(String header, String colType) {
 				return bean.getRowJSon().get("tableName").asText();
 			}
 		int idxResourceSubResource = rowJson.indexOf(bean.getResourceName() +".");
-		if (idxResourceSubResource > -1)
+		if (idxResourceSubResource > -1 && rowJson.substring(idxResourceSubResource -12 ).startsWith("\"resource\"") == false  ) // when beside to "Resource"  is ExtForm
 		{
 			int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("/")+idxResourceSubResource;
 			String pathSubreourceName = null;

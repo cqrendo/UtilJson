@@ -169,11 +169,15 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		}
  		if (tabs.isEmpty()) 
 		{
-			return  generatedUtil.createDetails(rowsQueryFieldList, true, cache,"noTAB");
+ 			FlexBoxLayout content = new FlexBoxLayout(generatedUtil.createDetails(rowsQueryFieldList, true, cache,"noTAB"));
+ 			content.setWidth(AppConst.DEFAULT_WIDTH_FORM);
+ 			return  content;
 		}
 		else
 		{
-			return generatedUtil.createTabs(rowsQueryFieldList, true,cache,tabs);
+			FlexBoxLayout content = new FlexBoxLayout(generatedUtil.createTabs(rowsQueryFieldList, true,cache,tabs));
+			content.setWidth(AppConst.DEFAULT_WIDTH_FORM);
+			return content;
 		}
 
 //		return generatedUtil.createDetails(rowsQueryFieldList, form, true, cache);
