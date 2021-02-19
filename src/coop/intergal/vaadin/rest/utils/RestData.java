@@ -427,8 +427,14 @@ public class RestData {
 			resourceName = resourceName.replace(".", "_");
 		try { //TODO CACHE IS FALSE always , put as param
 		//	String filtro = null;
-			System.out.println("RestData.getCountRows() resourceName " + resourceName + " filter " + filter +  " preConfParam " + preConfParam);
-			rowsList = JSonClient.get("Count_"+resourceName,filter,cache,preConfParam,"1"); 
+			String countName = "Count_";
+			if (resourceName.length() > 44)
+				countName = countName+ resourceName.substring(0,44);
+			else
+				countName = countName+ resourceName;
+			//the max length for resource name is 50 
+			System.out.println("RestData.getCountRows() resourceName " + countName + " filter " + filter +  " preConfParam " + preConfParam);
+			rowsList = JSonClient.get(countName,filter,cache,preConfParam,"1"); 
 	        if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
 	        	System.out.println("RestData.getCountRows() DEBUG GET_DATA_FROM_BACK_END <<Activado>>\" );" );
 			if (rowsList.get("statusCode") != null)

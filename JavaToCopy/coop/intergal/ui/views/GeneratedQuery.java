@@ -89,7 +89,9 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 	private Object createFilterFromQryForm() {
 		stringFilter = "";
 		keysFromParent = "";
-		String filter = getFieldsDataForFilter(GeneratedQuery.class, this, dataProvider.getResourceName());
+//		String filter = getFieldsDataForFilter(GeneratedQuery.class, this, dataProvider.getResourceName());
+
+		String filter = getFieldsDataForFilter(GeneratedQuery.class, form, dataProvider.getResourceName());
 		System.out.println("GeneratedQuery.createFilter()...." + filter);
 		if (grid != null) // when is a query form of a popup doesn't have grid thta is null
 			dataProvider = grid.getDataProvider();
@@ -171,13 +173,15 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		{
  			FlexBoxLayout content = new FlexBoxLayout(generatedUtil.createDetails(rowsQueryFieldList, true, cache,"noTAB"));
  			content.setWidth(AppConst.DEFAULT_WIDTH_FORM);
- 			return  content;
+ 			form.add(content);
+ 			return  this;
 		}
 		else
 		{
 			FlexBoxLayout content = new FlexBoxLayout(generatedUtil.createTabs(rowsQueryFieldList, true,cache,tabs));
 			content.setWidth(AppConst.DEFAULT_WIDTH_FORM);
-			return content;
+			form.add(content);
+			return form;
 		}
 
 //		return generatedUtil.createDetails(rowsQueryFieldList, form, true, cache);

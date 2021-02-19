@@ -14,6 +14,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.FormItem;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -219,20 +220,22 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		{
 			Field fieldForm;
 			try {
-				fieldForm = ((class1)).getDeclaredField("form");
-				fieldForm.setAccessible(true);
-				Object fieldObj = fieldForm.get(object);
-				form = ((FormLayout) fieldObj);
-			} catch (NoSuchFieldException | SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				fieldForm = ((class1)).getDeclaredField("form");
+//				fieldForm.setAccessible(true);
+//				Object fieldObj = object;//fieldForm.get(object);
+				form = ((FormLayout) object);
+//				form = ((FormLayout) fieldObj);
+//			} catch (NoSuchFieldException | SecurityException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} 
+//				catch (IllegalAccessException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 	
 		}	
 		
@@ -469,9 +472,11 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 //		return filter;
 //	}	
 
-	private Object getValueFromField(FormLayout form, String id) {
-		Object value = form.getChildren()
-			    .flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
+	private Object getValueFromField(FormLayout form, String id) { // adapt to actual component tree  
+		FormLayout subform = (FormLayout) form.getChildren().findFirst().get().getChildren().findFirst().get();//flatMap(c->c instanceof Div?((Div)c).getChildren():Stream.of(c));
+//		FormLayout subform = (FormLayout) subDiv.getChildren().findFirst().get();
+		Object value = subform.getChildren()
+				.flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
 			    .filter(c->id.equals(c.getId().orElse(null))).findFirst()
 			    .filter(HasValue.class::isInstance)
 			.map(HasValue.class::cast)
