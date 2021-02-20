@@ -162,7 +162,7 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 	private String title;
 	private String filter;
 //	private DynamicForm display;
-	private DynamicGridDisplay layout;
+	private DynamicQryGridDisplay layout;
 //	private SplitLayout gridSplitDisplay;
 //	private Div divDisplay;
 	private Div divDisplay;
@@ -608,7 +608,7 @@ private boolean isBoolean(String header, String colType) {
 		return null;
 	}
 
-	private void showBean(DynamicDBean bean ) {
+	void showBean(DynamicDBean bean ) {
 		try {
 			setVisibleRowData(true);
 			if (bean.isReadOnly()) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC 
@@ -1047,6 +1047,7 @@ private boolean isBoolean(String header, String colType) {
 		if (idxPoint > -1)
 			resourceSubGrid0 = resourceSubGrid0.substring(idxPoint+1);
 		JsonNode subGridFormExt = jsonNode.get(resourceSubGrid0); 
+		String subLayoutClassName = subGridFormExt.get("subLayoutClassName").asText();
 		String subFormClassName = subGridFormExt.get("displaySubFormClassName").asText();
 		String subFormFilter = subGridFormExt.get("filter").asText();
 		String subFormResource = subGridFormExt.get("resource").asText();
@@ -1054,12 +1055,88 @@ private boolean isBoolean(String header, String colType) {
 		dataProviderSub.setPreConfParam(AppConst.PRE_CONF_PARAM);
 		dataProviderSub.setResourceName(subFormResource);
 		dataProviderSub.setFilter(subFormFilter);
+		if (subLayoutClassName.indexOf("DynamicGridDisplay") > -1)
+		{
+			return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
+		}
+		else
+		{	
 		DynamicDBean subBean = RestData.getOneRow(subFormResource, subFormFilter, AppConst.PRE_CONF_PARAM);
 		if (subBean != null)
 			return componForm (dataProviderSub, subBean, subFormClassName, divSubForm, true );
 		else
 			return new Label ("Sin datos");
+		}
 	}
+	private Component componDynamicGridDisplay(String subLayoutClassName, String subFormResource, String subFormFilter,
+			String subFormClassName, Div divSubForm, boolean b) {
+		try {
+//			setVisibleRowData(true);
+//			ArrayList<String[]> rowsColList = bean2.getRowsColList();
+//			if (bean2.isReadOnly()) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC 
+//				buttonsForm.setVisible(false);
+//			if (isSub == false)
+//				selectedRow = bean2;
+//			keepRowBeforChanges = new DynamicDBean(); 
+//			keepRowBeforChanges = RestData.copyDatabean(bean);
+//			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
+			Class<?> dynamicForm = Class.forName(subLayoutClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
+			display = dynamicForm.newInstance();
+//			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+//			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
+//			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+			Method setDisplayFormClassName = dynamicForm.getMethod("setDisplayFormClassName", new Class[] {String.class} );
+//			Method setQueryFormClassName = dynamicForm.getMethod("setQueryFormClassName", new Class[] {String.class} );
+			Method setResourceName = dynamicForm.getMethod("setResourceName", new Class[] {String.class} );
+			Method setFilter = dynamicForm.getMethod("setFilter", new Class[] {String.class} );
+			
+			setDisplayFormClassName.invoke(display, subFormClassName);
+			setResourceName.invoke(display, subFormResource);
+			setFilter.invoke(display, subFormFilter);
+//			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
+//			setRowsColList.invoke(display,rowsColList);//rowsColListGrid);
+//			setBinder.invoke(display,binder);
+			
+//			setBean.invoke(display,bean2);
+//			setDataProvider.invoke(display, dataProviderForm);
+			divSubForm.removeAll();
+			Method createContent= dynamicForm.getMethod("createContent");
+			Object divInSubDisplay = createContent.invoke(display);
+			divSubForm.add((Component)divInSubDisplay);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+//		display.beforeEnter(null);
+//		gridSplitDisplay.getElement().removeAllChildren();//removeChild(display.getElement());
+//		gridSplitDisplay.getElement().appendChild(grid.getElement());
+//		gridSplitDisplay.getElement().appendChild(display.getElement());
+
+//	UI.getCurrent().navigate("dymanic");
+		
+		
+		return divSubForm;
+	}
+
 	private Component componForm (DdbDataBackEndProvider dataProviderForm, DynamicDBean bean2, String subFormClassName, Div divSubForm, boolean isSub )
 	{
 		try {
@@ -1407,8 +1484,8 @@ private boolean isBoolean(String header, String colType) {
 		
 	}
 
-	public void setLayout(DynamicGridDisplay dynamicGridDisplay) {
-		this.layout = dynamicGridDisplay;
+	public void setLayout(DynamicQryGridDisplay dynamicQryGridDisplay) {
+		this.layout = dynamicQryGridDisplay;
 		
 	}
 

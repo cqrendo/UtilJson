@@ -92,8 +92,7 @@ class GeneratedQuery extends PolymerElement {
  <!--  </vaadin-custom-field> -->
  <!--  </vaadin-form-item> -->
  <!--  </vaadin-vertical-layout> -->
- <!-- <div class="linCampos" style="width: 5%; height: 10%;"> -->
- <div class="linCampos" style="width: 100px; height: 100px;">
+ <div class="linCampos" style="width: 5%; height: 10%;">
   <query-buttons-bar id="queryButtonsBar"></query-buttons-bar>
  </div>
 </vaadin-horizontal-layout>
@@ -104,12 +103,12 @@ class GeneratedQuery extends PolymerElement {
   static get is() {
     return 'generated-query';
   }
-//  ready() {
-//    super.ready();
-//    this.$.form.addEventListener('change', e => {
-//      this.$.buttons.$.save.disabled = false;
-//    });
-//  }
+      static get properties() {
+        return {
+            // Declare your properties here.
+        };
+    }
+
 }
 window.customElements.define(GeneratedQuery.is, GeneratedQuery);
 

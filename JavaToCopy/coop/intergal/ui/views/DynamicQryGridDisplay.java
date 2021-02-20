@@ -33,16 +33,15 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
 
 //@Tag("dynamic-view-grid")
-@Tag("dynamic-grid-display")
-@JsModule("./src/views/generic/layout/dynamic-grid-display.js")
+@Tag("dynamic-qry-grid-display")
+@JsModule("./src/views/generic/layout/dynamic-qry-grid-display.js")
 //@Route(value = PAGE_DYNAMIC, layout = MainLayout.class)   /// @@ TODO cambiado para metaconfig comprobar que no afecta en otros proyectos
 //@PageTitle(AppConst.TITLE_PRODUCTS)
 //@Secured(Role.ADMIN)
-public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {
-//public class DynamicGridDisplay extends ThemableMixin(PolymerElement<TemplateModel>) implements BeforeEnterObserver, HasDynamicTitle  {
+public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {
+//public class DynamicQryGridDisplay extends ThemableMixin(PolymerElement<TemplateModel>) implements BeforeEnterObserver, HasDynamicTitle  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
 	private String preConfParam;
-//	private Binder<DynamicDBean> binder;
 	public ArrayList<String> getRowsColList() {
 		return rowsColList;
 	}
@@ -51,18 +50,18 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 		this.rowsColList = rowsColList;
 	}	
 
-	public DynamicGridDisplay() {
+	public DynamicQryGridDisplay() {
 		super();
 //		setupGrid();
 		
 	}
 
-	public DynamicGridDisplay(TemplateParser parser, VaadinService service) {
+	public DynamicQryGridDisplay(TemplateParser parser, VaadinService service) {
 		super(parser, service);
 		// TODO Auto-generated constructor stub
 	}
 
-	public DynamicGridDisplay(TemplateParser parser) {
+	public DynamicQryGridDisplay(TemplateParser parser) {
 		super(parser);
 		// TODO Auto-generated constructor stub
 	}
@@ -93,49 +92,23 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 
 //	private CrudEntityPresenter<DynamicDBean> presenter;
 
-	private Binder<DynamicDBean> binder = new Binder<>(DynamicDBean.class);
-	private DdbDataBackEndProvider dataProvider; 
-	private DynamicDBean bean;
+	private final Binder<DynamicDBean> binder = new Binder<>(DynamicDBean.class);
 	
-
-	public DynamicDBean getBean() {
-		return bean;
-	}
-
-	public void setBean(DynamicDBean bean) {
-		this.bean = bean;
-	}
-
-	public DdbDataBackEndProvider getDataProvider() {
-		return dataProvider;
-	}
-
-	public void setDataProvider(DdbDataBackEndProvider dataProvider) {
-		this.dataProvider = dataProvider;
-	}
 
 	private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
 
 	private String resourceName;
 	private String title;
 	private String filter;
+	@Id("divQuery")
+	private Div divQuery;
 	@Id("buttons")
 	private FormButtonsBar buttons;
 	private String apiname;
 	private boolean cache = true;
 	private Object divInDisplay;
-	private String queryFormClassName;
-public String getQueryFormClassName() {
-		return queryFormClassName;
-	}
-
-	public void setQueryFormClassName(String queryFormClassName) {
-		this.queryFormClassName = queryFormClassName;
-	}
-
-	//	@Id("splitQryAndResult")
+//	@Id("splitQryAndResult")
 //	private SplitLayout splitQryAndResult;
-	private String displayFormClassName;
 
 //	@Autowired()
 //	public DynamicViewGrid(CrudEntityPresenter<DynamicDBean> presenter, CrudForm<DynamicDBean> form) {
@@ -209,18 +182,6 @@ public String getQueryFormClassName() {
 	protected Binder<DynamicDBean> getBinder() {
 		return binder;
 	}
-	public void setBinder(Binder<DynamicDBean> binder) {
-		this.binder = binder;
-	}
-
-	public String getFilter() {
-		return filter;
-	}
-
-	public void setFilter(String filter) {
-		this.filter = filter;
-	}
-	
 
 ////	@Override
 //	protected SearchBar getSearchBar() {
@@ -233,15 +194,7 @@ public String getQueryFormClassName() {
 //		return null;
 //	}
 
-public String getResourceName() {
-		return resourceName;
-	}
-
-	public void setResourceName(String resourceName) {
-		this.resourceName = resourceName;
-	}
-
-	//	@Override
+//	@Override
 //	public void afterNavigation(AfterNavigationEvent event) {
 //		QueryParameters queryParameters = event.getLocation().getQueryParameters();
 //		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
@@ -276,8 +229,8 @@ public String getResourceName() {
 //				filter = "inlinelimit="+parinlinelimit.get(0);
 //			}
 		title="..";
-//		String queryFormClassName = null;
-//		String displayFormClassName  = null;
+		String queryFormClassName = null;
+		String displayFormClassName  = null;
 //		String resourceSubGrid = null;
 		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
 		{
@@ -303,23 +256,63 @@ public String getResourceName() {
 			
 //			resourceSubGrid =  queryParameters.getParameters().get("resourceSubGrid").get(0);
 		}
-		createContent() ;
-	}
-
-		public Component createContent() {
+		try {
+			Class<?> dynamicQuery = Class.forName(queryFormClassName);
+			Object queryForm = dynamicQuery.newInstance();
+			Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
+			setGrid.invoke(queryForm,grid);
+			divQuery.removeAll();
+			if (queryFormClassName.indexOf("Generated") > -1)
+			{
+				
+				DdbDataBackEndProvider dataProvider = new DdbDataBackEndProvider();
+				dataProvider.setPreConfParam(AppConst.PRE_CONF_PARAM);
+				dataProvider.setResourceName(resourceName);
+				Method setDataProvider= dynamicQuery.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+				Method createContent= dynamicQuery.getMethod("createDetails");
+				Method setRowsColList = dynamicQuery.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+				setDataProvider.invoke(queryForm,dataProvider );
+				setRowsColList.invoke(queryForm,rowsColList);
+//				Method createContent= dynamicQuery.getMethod("createDetails");
+				//queryForm = 
+				divInDisplay =createContent.invoke(queryForm);
+				divQuery.add((Component)divInDisplay);
+			}
+			else 
+			{				
+				divQuery.add((Component)queryForm);
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //		splitQryAndResult.setSplitterPosition(2);
 
 		grid.setDisplayFormClassName(displayFormClassName);
 		grid.setDisplay(divDisplay);
 		grid.setDivSubGrid(divSubGrid);
 		grid.setButtonsForm(buttons);
-//		grid.setLayout(this);
+		grid.setLayout(this);
 //		grid.setGridSplitDisplay(gridSplitDisplay);
 		grid.setResourceName(resourceName);
-		grid.getGrid().addSelectionListener(e -> {
-			if (e.getFirstSelectedItem().isPresent())
-					grid.showBean((DynamicDBean)e.getFirstSelectedItem().get());
-			});
 		if ((apiname == null || apiname.length() == 0) == false)
 		{
 			if (filter != null  && filter.length() > 0)
@@ -332,7 +325,7 @@ public String getResourceName() {
 			}
 		}
 		grid.setFilter(filter);
-		System.out.println("DynamicGridDisplay.beforeEnter() CACHE "+ cache);
+		System.out.println("DynamicQryGridDisplay.beforeEnter() CACHE "+ cache);
 		grid.setCache(cache);
 		grid.setupGrid(false, true);
 //		divGrid.add(grid );
@@ -344,16 +337,8 @@ public String getResourceName() {
 	
 //		queryButtonsBar.addClearSearchListener(e -> cleanQryForm());//System.out.println("PedidoProveedorQuery.beforeEnter() BUSCAR>>>>"));
 
-		return this;
+		
 	}
-
-	public String getDisplayFormClassName() {
-			return displayFormClassName;
-		}
-
-		public void setDisplayFormClassName(String displayFormClassName) {
-			this.displayFormClassName = displayFormClassName;
-		}
 
 	@Override
 	public String getPageTitle() {

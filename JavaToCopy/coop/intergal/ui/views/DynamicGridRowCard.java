@@ -109,7 +109,7 @@ public class DynamicGridRowCard extends PolymerTemplate<TemplateModel> implement
 	private String title;
 	private String filter;
 //	private DynamicForm display;
-	private DynamicGridDisplay layout;
+	private DynamicQryGridDisplay layout;
 	private SplitLayout gridSplitDisplay;
 //	private Div divDisplay;
 	private Div divDisplay;
@@ -420,7 +420,7 @@ private boolean isDate(String header) {
 		
 	}
 
-	public void setLayout(DynamicGridDisplay layout) {
+	public void setLayout(DynamicQryGridDisplay layout) {
 		this.layout = layout;
 		
 	}
