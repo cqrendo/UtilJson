@@ -32,17 +32,7 @@ class GeneratedQuery extends PolymerElement {
       }
        :host([focused].custom-style) [part="input-field"] {
         border-color: #aaa;
-      }
-	    
-       vaadin-form-item { 
-       
-    	flex: auto ;
-/*	    overflow: auto;  */
-/*	    --vaadin-form-item-label-width: 1em; */
-/*        --vaadin-form-item-label-spacing: 1em; */
-        --vaadin-form-item-row-spacing: 1.25em; 
- 	    }  
-      
+      }      
       vaadin-text-field.big{
                 width: var(--vaadin-text-field-default-width, 20em);
                 margin-left: 5px;
