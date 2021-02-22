@@ -12,6 +12,7 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -26,6 +27,9 @@ import coop.intergal.AppConst;
 
 import coop.intergal.ui.components.QueryButtonsBar;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
+import static coop.intergal.AppConst.STYLES_CSS;
+import static coop.intergal.AppConst.STYLES_FORM_ITEM_CSS;
+import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 
 //@PageTitle("Payments")
 //@Route(value = "gridDetails", layout = MainLayout.class)
@@ -35,8 +39,9 @@ import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Route(value = "queryGenerated")
 
-@CssImport(value = "./styles/monbusstyle.css")
-@CssImport(value = "./styles/monbusstyle-form-item.css", themeFor = "vaadin-form-item")
+@CssImport(value = STYLES_CSS, themeFor="dynamic-grid-display")
+@CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
+@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-item")
 public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTitle, BeforeEnterObserver {//, AfterNavigationListener {
 
 	/**
@@ -71,7 +76,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 	}
 
 	@Id("form")
-	private FormLayout form;
+	private Div form;
 	@Id("queryButtonsBar")
 	private QueryButtonsBar queryButtonsBar;
 
@@ -171,7 +176,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		}
  		if (tabs.isEmpty()) 
 		{
- 			FlexBoxLayout content = new FlexBoxLayout(generatedUtil.createDetails(rowsQueryFieldList, true, cache,"noTAB"));
+ 			Div content = new Div(generatedUtil.createDetails(rowsQueryFieldList, true, cache,"noTAB"));
  			form.setWidth(AppConst.DEFAULT_WIDTH_FORM);
  			content.setWidth(AppConst.DEFAULT_WIDTH_FORM);
  			form.add(content);
@@ -179,7 +184,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		}
 		else
 		{
-			FlexBoxLayout content = new FlexBoxLayout(generatedUtil.createTabs(rowsQueryFieldList, true,cache,tabs));
+			Div content = new Div(generatedUtil.createTabs(rowsQueryFieldList, true,cache,tabs));
 			form.setWidth(AppConst.DEFAULT_WIDTH_FORM);
 			content.setWidth(AppConst.DEFAULT_WIDTH_FORM);
 			form.add(content);

@@ -1,17 +1,17 @@
 package coop.intergal.ui.views;
 
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
+import static coop.intergal.AppConst.STYLES_CSS;
+import static coop.intergal.AppConst.STYLES_FORM_ITEM_CSS;
+import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -23,9 +23,7 @@ import org.vaadin.intergal.validation.ValidationMetadata;
 import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -33,7 +31,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.FormItem;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.html.Div;
@@ -43,7 +40,6 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -53,41 +49,26 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ErrorLevel;
 import com.vaadin.flow.data.binder.StatusChangeEvent;
 import com.vaadin.flow.data.binder.ValidationResult;
-import com.vaadin.flow.data.binder.Validator;
-import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
-import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.dom.DomEvent;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.HasDynamicTitle;
-import com.vaadin.flow.router.Location;
-import com.vaadin.flow.router.QueryParameters;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
-import coop.intergal.ui.components.detailsdrawer.DetailsDrawerFooter;
-import coop.intergal.ui.components.detailsdrawer.DetailsDrawerHeader;
-import coop.intergal.ui.util.FontSize;
-import coop.intergal.ui.util.LumoStyles;
-import coop.intergal.ui.util.TextColor;
-import coop.intergal.ui.util.UIUtils;
 import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.ui.utils.converters.DecimalFormatter;
-import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
 //@PageTitle("Payments")
 //@Route(value = "gridDetails", layout = MainLayout.class)
-@CssImport(value = "./styles/monbusstyle.css")
-@CssImport(value = "./styles/monbusstyle-form-item.css", themeFor = "vaadin-form-item")
+@CssImport(value = STYLES_CSS, themeFor="dynamic-grid-display")
+@CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
+@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-item")
 @Uses(NumberField.class) 
 public class GeneratedUtil  {//, AfterNavigationListener {
 
