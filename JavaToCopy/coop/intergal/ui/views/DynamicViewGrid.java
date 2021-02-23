@@ -193,6 +193,7 @@ private boolean cache = true;
 private Object divInDisplay;
 @Id("divExporter")
 private Div divExporter;
+private Boolean isResourceReadOnly;
 
 
 //	@Autowired()
@@ -611,7 +612,7 @@ private boolean isBoolean(String header, String colType) {
 	void showBean(DynamicDBean bean ) {
 		try {
 			setVisibleRowData(true);
-			if (bean.isReadOnly()) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC 
+			if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
 				buttonsForm.setVisible(false);
 			selectedRow = bean;
 			keepRowBeforChanges = new DynamicDBean(); 
@@ -718,7 +719,7 @@ private boolean isBoolean(String header, String colType) {
 	private Div componSubgrid(DynamicDBean bean, String resourceSubGrid2) {
 		DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
 		subDynamicViewGrid.setCache(cache);
-		subDynamicViewGrid.setButtonsRowVisible(true);
+		subDynamicViewGrid.setButtonsRowVisible(isSubResourceReadOnly(resourceSubGrid2)== false);
 //			subDynamicViewGrid.getElement().getStyle().set("height","100%");
 		subDynamicViewGrid.setResourceName(resourceSubGrid2);
 		if (resourceSubGrid2.indexOf(".")> -1)
@@ -733,6 +734,28 @@ private boolean isBoolean(String header, String colType) {
 		return divTab;
 		
 	}
+	private boolean isSubResourceReadOnly(String resourceSubGrid2) {
+		try {
+//			if (isResourceReadOnly != null)
+//				return isResourceReadOnly;
+			JsonNode extProp = JSonClient.get("JS_ExtProp", resourceSubGrid2, cache, AppConst.PRE_CONF_PARAM);
+			if (extProp.get("isReadOnly") != null)
+			{
+				isResourceReadOnly = extProp.get("isReadOnly").asBoolean();
+				return isResourceReadOnly;
+			}
+			else
+			{
+				isResourceReadOnly = false;
+				return isResourceReadOnly;
+			}	
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	public Component  dummy2 ()
 	{
 		Tab timecard = new Tab("Time card");
@@ -1047,7 +1070,9 @@ private boolean isBoolean(String header, String colType) {
 		if (idxPoint > -1)
 			resourceSubGrid0 = resourceSubGrid0.substring(idxPoint+1);
 		JsonNode subGridFormExt = jsonNode.get(resourceSubGrid0); 
-		String subLayoutClassName = subGridFormExt.get("subLayoutClassName").asText();
+		String subLayoutClassName = "NO LAYOUT";
+		if (subGridFormExt.get("subLayoutClassName") != null)
+			subLayoutClassName = subGridFormExt.get("subLayoutClassName").asText();
 		String subFormClassName = subGridFormExt.get("displaySubFormClassName").asText();
 		String subFormFilter = subGridFormExt.get("filter").asText();
 		String subFormResource = subGridFormExt.get("resource").asText();
@@ -1081,7 +1106,7 @@ private boolean isBoolean(String header, String colType) {
 //			keepRowBeforChanges = RestData.copyDatabean(bean);
 //			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
 			Class<?> dynamicForm = Class.forName(subLayoutClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
-			display = dynamicForm.newInstance();
+			Object oDynamicForm = dynamicForm.newInstance();
 //			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
 //			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
 //			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
@@ -1090,9 +1115,9 @@ private boolean isBoolean(String header, String colType) {
 			Method setResourceName = dynamicForm.getMethod("setResourceName", new Class[] {String.class} );
 			Method setFilter = dynamicForm.getMethod("setFilter", new Class[] {String.class} );
 			
-			setDisplayFormClassName.invoke(display, subFormClassName);
-			setResourceName.invoke(display, subFormResource);
-			setFilter.invoke(display, subFormFilter);
+			setDisplayFormClassName.invoke(oDynamicForm, subFormClassName);
+			setResourceName.invoke(oDynamicForm, subFormResource);
+			setFilter.invoke(oDynamicForm, subFormFilter);
 //			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 //			setRowsColList.invoke(display,rowsColList);//rowsColListGrid);
 //			setBinder.invoke(display,binder);
@@ -1101,7 +1126,7 @@ private boolean isBoolean(String header, String colType) {
 //			setDataProvider.invoke(display, dataProviderForm);
 			divSubForm.removeAll();
 			Method createContent= dynamicForm.getMethod("createContent");
-			Object divInSubDisplay = createContent.invoke(display);
+			Object divInSubDisplay = createContent.invoke(oDynamicForm);
 			divSubForm.add((Component)divInSubDisplay);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block

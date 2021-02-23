@@ -1,10 +1,7 @@
 package coop.intergal.ui.views;
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
-import static coop.intergal.AppConst.PAGE_DYNAMIC;
 import static coop.intergal.AppConst.PAGE_PRODUCTS;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +18,10 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.QueryParameters;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
-import coop.intergal.AppConst;
 import coop.intergal.ui.components.FormButtonsBar;
-import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
@@ -41,7 +35,7 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {
 //public class DynamicGridDisplay extends ThemableMixin(PolymerElement<TemplateModel>) implements BeforeEnterObserver, HasDynamicTitle  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
-	private String preConfParam;
+//	private String preConfParam;
 //	private Binder<DynamicDBean> binder;
 	public ArrayList<String> getRowsColList() {
 		return rowsColList;
@@ -114,7 +108,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 		this.dataProvider = dataProvider;
 	}
 
-	private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
+//	private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
 
 	private String resourceName;
 	private String title;
@@ -123,7 +117,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 	private FormButtonsBar buttons;
 	private String apiname;
 	private boolean cache = true;
-	private Object divInDisplay;
+//	private Object divInDisplay;
 	private String queryFormClassName;
 public String getQueryFormClassName() {
 		return queryFormClassName;
@@ -313,6 +307,7 @@ public String getResourceName() {
 		grid.setDisplay(divDisplay);
 		grid.setDivSubGrid(divSubGrid);
 		grid.setButtonsForm(buttons);
+		grid.setButtonsRowVisible(false);  // @@ TODO set by parameter  
 //		grid.setLayout(this);
 //		grid.setGridSplitDisplay(gridSplitDisplay);
 		grid.setResourceName(resourceName);
