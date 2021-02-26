@@ -41,7 +41,7 @@ import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 
 @CssImport(value = STYLES_CSS, themeFor="dynamic-grid-display")
 @CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
-@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-item")
+//@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-item")
 public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTitle, BeforeEnterObserver {//, AfterNavigationListener {
 
 	/**

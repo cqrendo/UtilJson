@@ -128,7 +128,7 @@ private String pickMapFields;
 					else if (rowCol[3].equals("3")) // is currency
 					{
 			//			binder.bind((AmountField) fieldObj, fieldName);
-						binder.forField((TextField) fieldObj).bind(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(fieldName))), (d,v)-> d.setColInteger(v,fieldName));
+						binder.forField((TextField) fieldObj).bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldName))), (d,v)-> d.setColInteger(v,fieldName));
 			//			binder.forField((AmountField) fieldObj).bind(d-> d.getColInteger(fieldName), (d,v)-> d.setColInteger(v,fieldName));//DynamicDBean::setCol2Date);				
 
 					}

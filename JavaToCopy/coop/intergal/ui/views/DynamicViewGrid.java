@@ -656,8 +656,9 @@ private boolean isBoolean(String header, String colType) {
 			String tabsList = rowsColListGrid.get(0)[12];
 			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
 			{
-				divSubGrid.add(componSubgrid(bean, resourceSubGrid));
-	
+			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
+				Div content0=new Div(); 
+				divSubGrid.add(fillContent(content0, 0 , bean));	
 	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
 			}
 			else
@@ -1467,7 +1468,8 @@ private boolean isBoolean(String header, String colType) {
 			fKfilter = fKfilter.substring(idXMark+1);
 			
 		}
-		componFilter = componFilter.substring(0, componFilter.length()-9); // to delete last and
+		if (componFilter.length()>9)
+			componFilter = componFilter.substring(0, componFilter.length()-9); // to delete last and
 		return componFilter;
 	}
 
@@ -1482,7 +1484,7 @@ private boolean isBoolean(String header, String colType) {
 			setFilter(parFIlter.get(0));
 			setFilter(getFilter().replace("EEQQ", "="));
 			}
-		title="..";
+		title="";//"..";
 		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
 			title=queryParameters.getParameters().get("title").get(0);
 		

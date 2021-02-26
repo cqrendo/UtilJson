@@ -442,7 +442,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			{
 				String[] rowField = itRowsFieldList.next();
 				String fieldName = rowField[0];
-				if (fieldName.equals("CODIGO"))
+				if (fieldName.equals("TOTAL_LINEAS"))
 					System.out.println("STOP DEBUG");	
 				boolean isReadOnly = isReadOnly( rowField [1]);
 				boolean isPick = isPick (rowField [1]);
@@ -646,6 +646,31 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					form.setColspan(item, colspan);
 					nf.setWidth(fieldWidth);
 				}
+				else if (idFieldType == 3  && isQuery == false) // is currency
+				{
+				//	int nDecimals = idFieldType - 100 ; 
+					TextField cTf = new TextField();
+//					new NumeralFieldFormatter(".", ",", nDecimals).extend(bdf);
+//					nf.setValueChangeMode(ValueChangeMode.EAGER); 
+					cTf.setId("tf"+fieldNameInUI);
+					cTf.getElement().setAttribute("theme", "small");
+					cTf.setReadOnly(isReadOnly);
+					cTf.addClassName("alignRigth");
+					Div l = alingLabel(label); 
+					if (isRequired)
+						binder.forField(cTf).asRequired()
+						.bind(d-> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
+
+					else
+						binder.forField(cTf)
+						.bind(d-> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
+					FormLayout.FormItem item = form.addFormItem(cTf, l );
+					item = addClassNames(item, classNamesItem);
+					item.setId(fieldNameInUI);
+					form.setColspan(item, colspan);
+					tf.setWidth(fieldWidth);
+
+				}
 				else if (idFieldType > 100 && isQuery == false) // is Decimal
 				{
 //					BigDecimalField bdf = new BigDecimalField();
@@ -656,6 +681,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					bdf.setId("tf"+fieldNameInUI);
 					bdf.getElement().setAttribute("theme", "small");
 					bdf.setReadOnly(isReadOnly);
+					bdf.addClassName("alignRigth");
 //					bdf.set
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
