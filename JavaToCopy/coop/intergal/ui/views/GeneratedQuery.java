@@ -168,7 +168,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 
 	public Component createDetails() {
 		GeneratedUtil generatedUtil = new GeneratedUtil();
-		rowsQueryFieldList = dataProvider.getRowsQueryFieldList(cache);	
+		rowsQueryFieldList = dataProvider.getRowsQueryFieldList();	
    		String tabs ="";
    		if (rowsQueryFieldList != null)
 		{

@@ -25,6 +25,7 @@ import com.vaadin.flow.server.VaadinSession;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.vaadin.ui.util.UtilSessionData;
 
 
 
@@ -282,10 +283,11 @@ private String transErrorParentMIssing(String error) {
 		int idxStar = error.indexOf("child main:")+ 11;
 		String parentTable = error.substring(idxStar);
 		String filter = "tableName%20like%20('CR-"+parentTable + "%25')" ;
-		Object cacheStr = VaadinSession.getCurrent().getAttribute("cache");
-		boolean cache = true ;
-		if (cacheStr != null && cacheStr.equals("false"))
-			cache = false;
+		boolean cache = UtilSessionData.getCache();
+//		Object cacheStr = VaadinSession.getCurrent().getAttribute("cache");
+//		boolean cache = true ;
+//		if (cacheStr != null && cacheStr.equals("false"))
+//			cache = false;;
 		JsonNode rowsList = JSonClient.get("FormTemplate",filter,cache,AppConst.PRE_CONF_PARAM_METADATA,1+"");
 		for (JsonNode eachRow : rowsList)  {
 			String name = eachRow.get("name").asText();

@@ -197,7 +197,7 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 			GeneratedUtil generatedUtil = new GeneratedUtil();
 			generatedUtil.setBean(bean);
 	//		if (cache == false)
-			rowsFieldList = dataProvider.getRowsFieldList(cache);
+			rowsFieldList = dataProvider.getRowsFieldList();
 			String tabs ="";
 	   		if (rowsFieldList != null)
 			{
@@ -219,7 +219,7 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 				
 			
 			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
-			rowsFieldList = dataProvider.getRowsFieldList(cache);
+			rowsFieldList = dataProvider.getRowsFieldList();
 		    if (bean != null)
 				binder.setBean(bean);
 

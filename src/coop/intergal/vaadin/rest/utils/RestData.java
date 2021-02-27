@@ -19,13 +19,14 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import coop.intergal.AppConst;
 import coop.intergal.AppConstGeneric;
 import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.vaadin.ui.util.UtilSessionData;
 
 
 
 public class RestData {
 
 
-	private static final boolean CACHE_TRUE = true;
+//	private static final boolean CACHE_TRUE = true;
 	static Hashtable<String, String> keepFieldName = new Hashtable<String, String>();
 	private static ArrayList<String> rowsColList;
 	private static String variant;
@@ -34,6 +35,7 @@ public class RestData {
 
 		if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
 			System.out.println("RestData.getResourceData()  DEBUG GET_DATA_FROM_BACK_END <<Activado>>");
+//		boolean cache = UtilSessionData.getCache(); // getting data is not affected by cache fixed in session
 		if (cache == false)
 			keepFieldName.clear();
 		if (resourceName  == null ||  resourceName.trim().length() == 0)
@@ -406,8 +408,8 @@ public class RestData {
 			return "null";
 		}
 	}
-	public static void refresh(DynamicDBean dDb) {
-		getResourceData(0,0,dDb.getResourceName(), dDb.getPreConfParam(), dDb.getRowsColList(), dDb.getFilter(), true, false, variant);
+	public static void refresh(DynamicDBean dDb) {  // @@ ANTES CACHE fijo true  
+		getResourceData(0,0,dDb.getResourceName(), dDb.getPreConfParam(), dDb.getRowsColList(), dDb.getFilter(),false, false, variant);
 		
 	}
 	public static int  getCountRows(String resourceName, String preConfParam, String filter, boolean cache, boolean hasNewRow) {
@@ -417,6 +419,7 @@ public class RestData {
 // yolaqr			throw new UserFriendlyDataException("NO hay tabla seleccionada, revise el link"); //"XesbentaLAC"
 //			return null;
 		}
+//		boolean cache = UtilSessionData.getCache(); // getting data is not affected by cache fixed in session
 
 		int count = 0;
 		List<DynamicDBean> customerList = new ArrayList<DynamicDBean>();
@@ -492,7 +495,7 @@ public class RestData {
 	{
 		try {
 			JsonNode rowsList = JSonClient.get(resourceName,filter,false,preConfParam,"20");
-			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam, null, null);//, "");
+			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam, null);//, "");
 			for (JsonNode eachRow : rowsList)  {
 				if (eachRow.get(rowsColList.get(0)[0]) !=null)
 				{
@@ -528,13 +531,14 @@ public class RestData {
 		
 	}
 	// with Variant
-	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache, String variant) { // variant is use to have different lists of fields in the same resource
+	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, String variant) { // variant is use to have different lists of fields in the same resource
         if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
         	System.out.println("DdbDataBackEndProvider.sizeInBackEnd() DEBUG GET_DATA_FROM_BACK_END <<Activado>>" );
-		if (cache == null)
-		{
-			cache = CACHE_TRUE;
-		}	
+//		if (cache == null)
+//		{
+//			cache = CACHE_TRUE;
+//		}
+		boolean cache = UtilSessionData.getCache();
 		if (rowsColList == null || rowsColList.isEmpty() || cache == false)
 				{
 				JsonNode cols;
@@ -687,13 +691,14 @@ public class RestData {
 			
 //			if (rowsColList == null || rowsColList.isEmpty())
 //				{
+				boolean cache = UtilSessionData.getCache();
 				JsonNode cols;
 				try {				
 					String genericResourceName = resourceName;
 					int indx__ = genericResourceName.indexOf("__"); // -- indicates variations over same resource, or same means same field list
 					if (indx__ > 1)
 						genericResourceName = resourceName.substring(0, indx__);
-					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'", true, AppConst.PRE_CONF_PARAM_METADATA);
+					cols = JSonClient.get("FieldTemplate","tableName='"+genericResourceName+variant+"'", cache, AppConst.PRE_CONF_PARAM_METADATA);
 					if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 					{
 						rowsColList = new ArrayList<String>();
@@ -705,7 +710,7 @@ public class RestData {
 					
 					else	
 					{
-						cols = JSonClient.getColumnsFromTable(resourceName, null, true, preConfParam);
+						cols = JSonClient.getColumnsFromTable(resourceName, null, cache, preConfParam);
 						
 						rowsColList = new ArrayList<String>();
 						Iterator<String> fN = cols.get(0).fieldNames();
@@ -721,10 +726,11 @@ public class RestData {
 			return rowsColList;
 		}
 	public static ArrayList<String[]> getRowsFieldList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam, Boolean cache){//, String variant) { // variant is use to have different lists of fields in the same resource
-		if (cache == null)
-		{
-			cache = CACHE_TRUE;
-		}
+//		if (cache == null)
+//		{
+//			cache = CACHE_TRUE;
+//		}
+		cache = UtilSessionData.getCache();
 		if (rowsColList == null || rowsColList.isEmpty() || cache == false)
 			{
 			JsonNode cols;
@@ -862,7 +868,8 @@ public class RestData {
 		return rowsColList;
 	}
 	private static ArrayList<String[]> getColListFromTable(String resourceName, String preConfParam) {
-		JsonNode cols = JSonClient.getColumnsFromTable(resourceName, null, CACHE_TRUE, preConfParam);
+		boolean cache = UtilSessionData.getCache();
+		JsonNode cols = JSonClient.getColumnsFromTable(resourceName, null, cache, preConfParam);
 		
 		ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 		Iterator<String> fN = cols.get(0).fieldNames();
@@ -953,16 +960,17 @@ public class RestData {
 
 	public static ArrayList<String[]> getRowsColList(ArrayList<String[]> rowsColList, String resourceName, String preConfParam) {
 		// TODO Auto-generated method stub
-		return getRowsColList(rowsColList, resourceName, preConfParam, null, null);
+		return getRowsColList(rowsColList, resourceName, preConfParam, null);
 	}
 
 	/// ******* CAMPOS QUERY ********
-	public static ArrayList<String[]> getRowsQueryFieldList(ArrayList<String[]> rowsFIeldQueryList, String resourceName,String preConfParam, Boolean cache){
+	public static ArrayList<String[]> getRowsQueryFieldList(ArrayList<String[]> rowsFIeldQueryList, String resourceName,String preConfParam){
 
-		if (cache == null)
-		{
-			cache = CACHE_TRUE;
-		}
+//		if (cache == null)
+//		{
+//			cache = CACHE_TRUE;
+//		}
+		boolean cache = UtilSessionData.getCache();
 		if (rowsFIeldQueryList == null || rowsFIeldQueryList.isEmpty() || cache == false)
 			{
 			JsonNode cols;

@@ -68,6 +68,7 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 //@Route(value = "gridDetails", layout = MainLayout.class)
 @CssImport(value = STYLES_CSS, themeFor="dynamic-grid-display")
 @CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
+//@CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-text-field")
 @CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-item")
 @Uses(NumberField.class) 
 public class GeneratedUtil  {//, AfterNavigationListener {
@@ -650,13 +651,16 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 				//	int nDecimals = idFieldType - 100 ; 
 					TextField cTf = new TextField();
+					cTf.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+					cTf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+//					cTf.addClassName("alignRigth");
 //					new NumeralFieldFormatter(".", ",", nDecimals).extend(bdf);
 //					nf.setValueChangeMode(ValueChangeMode.EAGER); 
 					cTf.setId("tf"+fieldNameInUI);
-					cTf.getElement().setAttribute("theme", "small");
-					cTf.setReadOnly(isReadOnly);
-					cTf.addClassName("alignRigth");
+//					cTf.getElement().setAttribute("theme", "small");
+					cTf.setReadOnly(isReadOnly);					
 					Div l = alingLabel(label); 
+//					binder.bind(cTf, fieldNameInUI);
 					if (isRequired)
 						binder.forField(cTf).asRequired()
 						.bind(d-> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
@@ -676,12 +680,14 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //					BigDecimalField bdf = new BigDecimalField();
 					int nDecimals = idFieldType - 100 ; 
 					TextField bdf = new TextField();
+					bdf.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+					bdf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
 					new NumeralFieldFormatter(".", ",", nDecimals).extend(bdf);
 //					nf.setValueChangeMode(ValueChangeMode.EAGER); 
 					bdf.setId("tf"+fieldNameInUI);
-					bdf.getElement().setAttribute("theme", "small");
 					bdf.setReadOnly(isReadOnly);
-					bdf.addClassName("alignRigth");
+//					bdf.addClassName("alignRigth");
 //					bdf.set
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;

@@ -247,7 +247,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 //		crud.setDataProvider(dataProvider);
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
         
-		rowsColListGrid = dataProvider.getRowsColList(cache);
+		rowsColListGrid = dataProvider.getRowsColList();
 		newRow.addClickListener(e -> insertBeanInList());
 		deleteRow.addClickListener(e -> deleteBeanFromList());
 //		grid.removeAllColumns();

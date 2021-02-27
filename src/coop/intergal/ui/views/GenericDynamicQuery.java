@@ -212,7 +212,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 																							// fields
 		Iterator<String[]> itRowsColList = RestData
 				//.getRowsColList(rowsColList, ResourceName, preConfParam).iterator();
-				.getRowsQueryFieldList(rowsColList, ResourceName, preConfParam, true).iterator();
+				.getRowsQueryFieldList(rowsColList, ResourceName, preConfParam).iterator();
 
 		
 		FormLayout form = null ;

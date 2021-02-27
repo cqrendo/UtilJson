@@ -100,29 +100,33 @@ private long sizeBE;
 //	  }
 	
 	  public ArrayList<String[]> getRowsColList() {
-		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, null,null);
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam,null);
 	  }
 	  public ArrayList<String[]> getRowsColList(String variant) {
-		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, null,variant);
+		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam,variant);
 	  }
 
 	  public ArrayList<String> getRowsColListOnlyNames(String resourceName, String preConfParam, String variant) {
 		 return RestData.getRowsColList(resourceName, preConfParam, variant);
 	  }	 
-	  public ArrayList<String[]> getRowsColList(boolean cache) {
-		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, cache, null);
-	  }
+//	  public ArrayList<String[]> getRowsColList(boolean cache) {
+//		 return RestData.getRowsColList(rowsColList, resourceName, preConfParam, null);
+//	  }
 	  public ArrayList<String[]> getRowsFieldList() {
 		 return RestData.getRowsFieldList(rowsFieldList, resourceName, preConfParam, null);	
 	  }	
 	  
-	  public ArrayList<String[]> getRowsFieldList(boolean cache) {
-		  return RestData.getRowsFieldList(rowsFieldList, resourceName, preConfParam, cache);	
-		}
-		 
-	  public ArrayList<String[]> getRowsQueryFieldList(boolean cache) {
-		  return RestData.getRowsQueryFieldList(rowsFIeldQueryList, resourceName, preConfParam, cache);	
-	  	} 
+//	  public ArrayList<String[]> getRowsFieldList(boolean cache) {
+//		  return RestData.getRowsFieldList(rowsFieldList, resourceName, preConfParam, cache);	
+//		}
+//		 
+//	  public ArrayList<String[]> getRowsQueryFieldList(boolean cache) {
+//		  return RestData.getRowsQueryFieldList(rowsFIeldQueryList, resourceName, preConfParam);	
+//	  	} 
+
+	  public ArrayList<String[]> getRowsQueryFieldList() {
+		  return RestData.getRowsQueryFieldList(rowsFIeldQueryList, resourceName, preConfParam);	
+  		} 
 
 
 		public void setRowsColList(ArrayList<String[]> rowsColList) {
@@ -222,9 +226,9 @@ private long sizeBE;
 		    }
 
 			@Override
-		    protected int sizeInBackEnd(Query<DynamicDBean, CrudFilter> query) {
+		    protected int sizeInBackEnd(Query<DynamicDBean, CrudFilter> query) { 
 		        // For RDBMS just execute a SELECT COUNT(*) ... WHERE query
-		        long count = RestData.getCountRows(getTableDbForCount(resourceName), preConfParam, filter, false, hasNewRow);//fetchFromBackEnd(query).count();
+		        long count = RestData.getCountRows(getTableDbForCount(resourceName), preConfParam, filter, false, hasNewRow); // // @@ ANTES CACHE fijo false   //fetchFromBackEnd(query).count();
 		        if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
 		        	System.out.println("DdbDataBackEndProvider.sizeInBackEnd() DEBUG GET_DATA_FROM_BACK_END <<Activado>>" );
 		        sizeBE = count;
