@@ -1,16 +1,11 @@
 package coop.intergal.vaadin.rest.utils;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -21,11 +16,10 @@ import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.data.provider.QuerySortOrder;
-import com.vaadin.flow.server.VaadinSession;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
-import coop.intergal.vaadin.ui.util.UtilSessionData;
+import coop.intergal.ui.utils.UtilSessionData;
 
 
 

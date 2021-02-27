@@ -1,4 +1,4 @@
-package coop.intergal.vaadin.ui.util;
+package coop.intergal.ui.utils;
 
 import com.vaadin.flow.server.VaadinSession;
 

@@ -19,7 +19,7 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import coop.intergal.AppConst;
 import coop.intergal.AppConstGeneric;
 import coop.intergal.espresso.presutec.utils.JSonClient;
-import coop.intergal.vaadin.ui.util.UtilSessionData;
+import coop.intergal.ui.utils.UtilSessionData;
 
 
 
