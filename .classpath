@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="srcAVOIDErrors/intergal"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="srcAVOIDErrors"/>
 	<classpathentry kind="lib" path="lib/com.fasterxml.jackson.annotations.jar"/>
 	<classpathentry kind="lib" path="lib/com.fasterxml.jackson.core.jar"/>
 	<classpathentry kind="lib" path="lib/com.fasterxml.jackson.databind.jar"/>
