@@ -670,9 +670,8 @@ private boolean isBoolean(String header, String colType) {
 //				subDynamicViewGrid.setButtonsRowVisible(false);//(true);
 //				divSubGrid.add(subDynamicViewGrid );
 			}
-	
-
-
+			layout.getGrid().getElement().getStyle().set("flex-basis", "70px");
+			layout.getDivQuery().getStyle().set("flex-basis", "70px");
 //		GenericDynamicForm  display = null; 
 //		if (className.equals("C0")r
 //			display = (GenericDynamicForm)new DynamicForm(); 

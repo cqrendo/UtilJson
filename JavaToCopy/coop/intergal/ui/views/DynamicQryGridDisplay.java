@@ -84,6 +84,14 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	
 	@Id("divDisplay")
 	private Div divDisplay;
+	public DynamicViewGrid getGrid() {
+		return grid;
+	}
+
+	public void setGrid(DynamicViewGrid grid) {
+		this.grid = grid;
+	}
+
 	@Id("divSubGrid")  
 	private Div divSubGrid;
 	
@@ -105,6 +113,14 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	@Id("buttons")
 	private FormButtonsBar buttons;
 	private String apiname;
+	public Div getDivQuery() {
+		return divQuery;
+	}
+
+	public void setDivQuery(Div divQuery) {
+		this.divQuery = divQuery;
+	}
+
 	private boolean cache = true;
 	private Object divInDisplay;
 //	@Id("splitQryAndResult")
