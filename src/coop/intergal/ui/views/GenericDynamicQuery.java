@@ -215,7 +215,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 				.getRowsQueryFieldList(rowsColList, ResourceName, preConfParam).iterator();
 
 		
-		FormLayout form = null ;
+		Div form = null ;
 		if (isGeneratedForm)
 		{
 			Field fieldForm;
@@ -223,7 +223,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 //				fieldForm = ((class1)).getDeclaredField("form");
 //				fieldForm.setAccessible(true);
 //				Object fieldObj = object;//fieldForm.get(object);
-				form = ((FormLayout) object);
+				form = (Div) object;
 //				form = ((FormLayout) fieldObj);
 //			} catch (NoSuchFieldException | SecurityException e) {
 //				// TODO Auto-generated catch block
@@ -353,7 +353,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 			return determineOperator(value);
 	}
 
-	private String getValueFromField(FormLayout form, String id, Object fieldObj, boolean isGeneratedForm) {
+	private String getValueFromField(Div form, String id, Object fieldObj, boolean isGeneratedForm) {
 		String value = "";
 		if (isGeneratedForm)
 		{
@@ -472,7 +472,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 //		return filter;
 //	}	
 
-	private Object getValueFromField(FormLayout form, String id) { // adapt to actual component tree  
+	private Object getValueFromField(Div form, String id) { // adapt to actual component tree  
 		FormLayout subform = (FormLayout) form.getChildren().findFirst().get().getChildren().findFirst().get();//flatMap(c->c instanceof Div?((Div)c).getChildren():Stream.of(c));
 //		FormLayout subform = (FormLayout) subDiv.getChildren().findFirst().get();
 		Object value = subform.getChildren()
