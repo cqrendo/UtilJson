@@ -9,15 +9,19 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.vaadin.textfieldformatter.NumeralFieldFormatter;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
-
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.dom.DomEvent;
@@ -117,23 +121,41 @@ private String pickMapFields;
 					}
 					else if (rowCol[3].equals("1")) // is Date
 						{
+						((EsDatePicker) fieldObj).setReadOnly(isReadOnly);
 						binder.forField((EsDatePicker) fieldObj)
 						.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
 						.bind(d-> d.getColDate(fieldName), (d,v)-> d.setColDate(v,fieldName));//DynamicDBean::setCol2Date);				
 					}
 					else if (rowCol[3].equals("2")) // is TextArea
 					{
+						((TextArea) fieldObj).setReadOnly(isReadOnly);
 						binder.bind((TextArea) fieldObj, fieldName);
 					}
 					else if (rowCol[3].equals("3")) // is currency
 					{
 			//			binder.bind((AmountField) fieldObj, fieldName);
+						((TextField) fieldObj).addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+						((TextField) fieldObj).setReadOnly(isReadOnly);
 						binder.forField((TextField) fieldObj).bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldName))), (d,v)-> d.setColInteger(v,fieldName));
 			//			binder.forField((AmountField) fieldObj).bind(d-> d.getColInteger(fieldName), (d,v)-> d.setColInteger(v,fieldName));//DynamicDBean::setCol2Date);				
 
 					}
+					else if (idFieldType > 100 ) // is Decimal
+					{
+//						BigDecimalField bdf = new BigDecimalField();
+						((TextField) fieldObj).addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+						((TextField) fieldObj).setReadOnly(isReadOnly);
+						
+						int nDecimals = idFieldType - 100 ; 
+
+						new NumeralFieldFormatter(".", ",", nDecimals).extend(((TextField) fieldObj));
+						binder.forField((TextField) fieldObj)
+		//					.bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldName))), (d,v)-> d.setColInteger(v,fieldName));
+							.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldName));
+					}
 					else if (rowCol[3].equals("4")) // is Boolean
 					{
+						((Checkbox) fieldObj).setReadOnly(isReadOnly);
 						binder.forField((Checkbox) fieldObj).bind(d -> d.getColBoolean(fieldName), (d,v)-> d.setColBoolean(v,fieldName));//DynamicDBean::setCol2Date);				
 					}
 					else if (idFieldType == 5 ) // is Number

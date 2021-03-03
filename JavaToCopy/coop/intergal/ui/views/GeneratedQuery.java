@@ -177,16 +177,18 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
  		if (tabs.isEmpty()) 
 		{
  			Div content = new Div(generatedUtil.createDetails(rowsQueryFieldList, true, cache,"noTAB"));
- 			form.setWidth(AppConst.DEFAULT_WIDTH_FORM);
- 			content.setWidth(AppConst.DEFAULT_WIDTH_FORM);
+ 			form.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
+ 			content.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
+ 			content.setHeight("100%");
  			form.add(content);
  			return  this;
 		}
 		else
 		{
 			Div content = new Div(generatedUtil.createTabs(rowsQueryFieldList, true,cache,tabs));
-			form.setWidth(AppConst.DEFAULT_WIDTH_FORM);
-			content.setWidth(AppConst.DEFAULT_WIDTH_FORM);
+			form.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
+			content.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
+			content.setHeight("100%");
 			form.add(content);
 			return form;
 		}

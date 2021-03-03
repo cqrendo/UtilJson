@@ -673,7 +673,7 @@ private boolean isBoolean(String header, String colType) {
 			if (layout != null)
 			{
 				layout.getGrid().getElement().getStyle().set("flex-basis", "70px");
-				layout.getDivQuery().getStyle().set("flex-basis", "70px");
+				layout.getDivQuery().getStyle().set("flex-basis", "65px");
 			}	
 //		GenericDynamicForm  display = null; 
 //		if (className.equals("C0")r
