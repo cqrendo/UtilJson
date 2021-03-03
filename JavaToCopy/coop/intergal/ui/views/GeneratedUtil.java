@@ -378,6 +378,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //				form = new FormLayout();
 			FormLayout	form = new FormLayout();
 			form.removeAll();
+			form.getStyle().set("overflow", "inherit");
 			Div statusLabel = new Div();
 			statusLabel.getElement().getStyle().set("color", "var(--lumo-error-text-color)");
 			statusLabel.getElement().getStyle().set("white-space", "nowrap");
