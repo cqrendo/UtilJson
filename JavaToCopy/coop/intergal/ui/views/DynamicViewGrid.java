@@ -1632,6 +1632,12 @@ private boolean isBoolean(String header, String colType) {
 		colChanged(item, colName, newValueStr);
 	return null;
 	}
+	public Object colChangedComboBox(DynamicDBean item, String colName, DynamicDBean newValue) {
+		
+		System.out.println("DynamicViewGrid.colChangedComboBox() colName " + colName + " Value " + item.getCol0()+  "/" + item.getCol117()  + " newValue " + newValue.getCol0() +  "/" + newValue.getCol11() );
+		colChanged(item, colName, newValue.getCol0()); // gets the id from bean select in comboBox
+		return null;
+	}
 	
 	public Object saveRowGridIfNotInserting(Hashtable<String, DynamicDBean> beansToSaveAndRefresh2, String beanTobeSave) {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + row.getRowJSon().toString());
@@ -1799,4 +1805,6 @@ private boolean isBoolean(String header, String colType) {
 //		// TODO Auto-generated method stub
 //		return null;
 //	}
+
+
 }

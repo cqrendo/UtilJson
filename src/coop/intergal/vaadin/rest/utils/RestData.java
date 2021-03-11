@@ -149,6 +149,22 @@ public class RestData {
 		System.out.println("RestData.getResourceCustomer() after FILL LIST "+ resourceName + " Filter:" +filter + " " + new Date());
 		return customerList;
 	}
+	public static List<DynamicDBean> getResourceData(String textToReturn) { // to fill data for by example a data of combo with given text
+
+		if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
+			System.out.println("RestData.getResourceData()  DEBUG GET_DATA_FROM_BACK_END <<Activado>>");
+		List<DynamicDBean> customerList = new ArrayList<DynamicDBean>();
+		JsonNode rowsList = null;
+		try { //TODO CACHE IS FALSE always , put as param, 
+			DynamicDBean dB = new DynamicDBean();
+			dB.setCol0("1");
+			dB.setCol1(textToReturn);
+			customerList.add(dB);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}// preConfParam, null);//globalVars.getPagesize());
+		return customerList;
+	}
 
 	private static boolean isARealRow(JsonNode eachRow) {
 		JsonNode metadata = eachRow.get("@metadata");
@@ -566,7 +582,7 @@ public class RestData {
 						int maxColNumber = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[17];
+							String[] fieldArr  = new String[21];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -579,7 +595,13 @@ public class RestData {
 								fieldArr[1] = fieldArr[1]+"#CNoEDT#";
 							if ( col.get("parentResource") != null && col.get("parentResource").asText().trim().length() > 1 && col.get("parentResource").asText().trim().equals("null")== false) 
 							{
-								fieldArr[1] = fieldArr[1]+"#PCK#";
+							
+								fieldArr[20] = col.get("parentResource").asText();
+								if ((( col.get("idFieldType") != null && col.get("idFieldType").asText().trim().length() > 0 && col.get("idFieldType").asText().trim().equals("null")== false)) && 
+								 	 col.get("idFieldType").asInt() == 6)
+									fieldArr[1] = fieldArr[1]+"#COMBO#";
+								else	
+									fieldArr[1] = fieldArr[1]+"#PCK#";
 			
 							}
 							if (fieldArr[0].equals("pickMapFields"))  // is a field with a special PICK
@@ -653,6 +675,10 @@ public class RestData {
 							else
 								fieldArr[15] = col.get("maxColNumber").asText();
 							fieldArr[16] = ""; // is only used for Form fields
+							fieldArr[17] = ""; // is only used for Form fields
+							fieldArr[18] = ""; // is only used for Form fields
+							fieldArr[19] = ""; // is only used for Form fields
+					//		fieldArr[20] = ""; // is used back in the code
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -751,14 +777,23 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[20];
+						String[] fieldArr  = new String[21];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
 						if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#REQ#";
 						if ( col.get("parentResource") != null && col.get("parentResource").asText().trim().length() > 1 && col.get("parentResource").asText().trim().equals("null")== false) 
-							fieldArr[1] = fieldArr[1]+"#PCK#";
+						{
+						
+							fieldArr[20] = col.get("parentResource").asText();
+							if ((( col.get("idFieldType") != null && col.get("idFieldType").asText().trim().length() > 0 && col.get("idFieldType").asText().trim().equals("null")== false)) && 
+							 	 col.get("idFieldType").asInt() == 6)
+								fieldArr[1] = fieldArr[1]+"#COMBO#";
+							else	
+								fieldArr[1] = fieldArr[1]+"#PCK#";
+		
+						}
 						if ( col.get("FieldNameInUI").asText().isEmpty())
 							fieldArr[2] = "col"+i;	
 						else
@@ -836,7 +871,7 @@ public class RestData {
 							fieldArr[19] = "";
 						else
 							fieldArr[19] = col.get("fieldHeight").asText();	
-
+						// el 	
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -875,7 +910,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[20];
+			String[] fieldArr  = new String[21];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -895,10 +930,11 @@ public class RestData {
 			fieldArr[13] = "";
 			fieldArr[14] = "";
 			fieldArr[15] = AppConst.MAX_NUMBER_OF_FIELDS_PER_TABLE +"";
-			fieldArr[16] = ""; // is only used for Form fields
-			fieldArr[17] = ""; // is only used for Form fields
-			fieldArr[18] = ""; // is only used for Form fields
-			fieldArr[19] = ""; // is only used for Form fields
+			fieldArr[16] = ""; // is only used for metadata config:
+			fieldArr[17] = ""; // is only used for metadata config:
+			fieldArr[18] = ""; // is only used for metadata config:
+			fieldArr[19] = ""; // is only used for metadata config:
+			fieldArr[20] = ""; // is only used for metadata config:
 			
 
 			if (type.equals("Date"))
@@ -991,7 +1027,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[20];
+						String[] fieldArr  = new String[21];
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -1069,6 +1105,7 @@ public class RestData {
 						else
 							fieldArr[18] = col.get("tabQuery").asText();	
 						fieldArr[19] = ""; // is only used for Form fields++;
+						fieldArr[20] = ""; // is only used for Form fields++; // @@ TODO implement combo in qrys
 					}
 					// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
 					if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself

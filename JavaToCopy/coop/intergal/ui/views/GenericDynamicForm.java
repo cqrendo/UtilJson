@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -14,6 +16,7 @@ import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
@@ -24,6 +27,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.dom.DomEvent;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
@@ -32,6 +36,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
+import coop.intergal.vaadin.rest.utils.RestData;
 
 public class GenericDynamicForm extends PolymerTemplate<TemplateModel> {
 	
@@ -166,6 +171,44 @@ private String pickMapFields;
 //						nf.getElement().setAttribute("theme", "small");
 						nf.setReadOnly(isReadOnly);
 						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+					}
+					else if (idFieldType == 6 ) // is Combobox
+					{
+						String parentResource = rowCol[20];
+						ComboBox<DynamicDBean> cB = ((ComboBox<DynamicDBean>) fieldObj);
+					//	cB = fillComboBox(parentResource);
+						ArrayList<String[]> rowsColList = new ArrayList<String[]>();
+						
+						String[] fieldArr  = new String[3];
+						fieldArr[0] = "STOREDVALUE";
+						fieldArr[1] = "";
+						fieldArr[2] = "col0";
+						rowsColList.add(fieldArr);
+						
+						fieldArr  = new String[3];
+						fieldArr[0] = "DISPLAYVALUE";
+						fieldArr[1] = "";
+						fieldArr[2] = "col1";
+						rowsColList.add(fieldArr);
+//						String parentResource = getParentResource(resourceName, fieldNameInUI);
+						Collection<DynamicDBean> 	rowsListForCombo = RestData.getResourceData("!!ERROR!! combo sin Resource Parent, especificar en MetaConfig ");
+						if (parentResource != null && parentResource.isEmpty() == false)
+						{				
+							rowsListForCombo = RestData.getResourceData(0,0,parentResource, AppConst.PRE_CONF_PARAM, rowsColList, null, true, false, null);
+						}
+	//					ComboBox<DynamicDBean> cB = new ComboBox<DynamicDBean>() ;
+						cB.setItems(rowsListForCombo);
+						cB.setItemLabelGenerator(DynamicDBean::getCol1);
+	
+						cB.setId("tf"+fieldNameInUI);
+//						nf.getElement().setAttribute("theme", "small");
+						cB.setReadOnly(isReadOnly);
+						binder.forField(cB).withConverter(
+								item-> Optional.ofNullable(item).map(DynamicDBean::getCol0).orElse(null),
+								id-> getRowById(id, cB))
+						.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+
+//						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					}	
 				}
 					
@@ -186,6 +229,17 @@ private String pickMapFields;
 			
 //		}
 		
+	}
+	private DynamicDBean getRowById(String id, ComboBox cB) {
+		
+		ListDataProvider<DynamicDBean> ListCombo = (ListDataProvider<DynamicDBean>) cB.getDataProvider();
+		for (DynamicDBean bean : ListCombo.getItems()) {
+		
+			System.out.println("GeneratedUtil.getRowById()------>"+bean.getCol0());
+			if(id.equals(bean.getCol0()))
+				return bean;
+		}
+		return null;
 	}
 
 	private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {

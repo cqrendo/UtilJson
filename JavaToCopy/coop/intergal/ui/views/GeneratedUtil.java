@@ -9,14 +9,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.vaadin.intergal.validation.DynValidator;
 import org.vaadin.intergal.validation.ValidationMetadata;
@@ -24,6 +27,7 @@ import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -52,6 +56,7 @@ import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.TextRenderer;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
@@ -59,10 +64,14 @@ import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.utils.TranslateResource;
+import coop.intergal.ui.utils.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.ui.utils.converters.DecimalFormatter;
+import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
+import coop.intergal.vaadin.rest.utils.RestData;
+import com.vaadin.flow.data.provider.ListDataProvider;
 
 //@PageTitle("Payments")
 //@Route(value = "gridDetails", layout = MainLayout.class)
@@ -736,7 +745,40 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					form.setColspan(item, colspan);
 					bdf.setWidth(fieldWidth);
 				}
-				else // is Text
+				else if (idFieldType == 6 )// is combobox; 
+				{
+
+					String parentResource = rowField[20];
+	
+					ComboBox<DynamicDBean> cB = fillComboBox(parentResource);
+//					setBeanValidators(validationRuleName, isQuery, cache) ;
+		
+//					cB.setValue(getRowById(bean.getCol(fieldNameInUI), cB));
+					binder.forField(cB).withConverter(
+							item-> Optional.ofNullable(item).map(DynamicDBean::getCol0).orElse(null),
+							id-> getRowById(id, cB))
+					.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+	//				.bind( DynamicDBean::getCol11, DynamicDBean::setCol11);
+//					binder.forField(cB).withConverter(
+//							item-> Optional.ofNullable(item).map(DynamicDBean::getCol0).orElse(null),
+//							id-> getRowById(id, cB))
+//							﻿.bind( Bean::getGenderId, Bean::setGenderId);
+					boolean isRightLabel = false;
+					Div l = alingLabel(label); 
+					FormLayout.FormItem item = form.addFormItem(cB, l );
+					if (isQuery)
+						{
+						item.getElement().setAttribute("title","Ayuda busqueda...."); 
+						}
+					item = addClassNames(item, classNamesItem);
+					item.setId(fieldNameInUI);
+					form.setColspan(item, colspan);
+					tf.setWidth(fieldWidth);
+					if (fieldSize.length() > 0)						
+						tf.setMaxLength(new Integer(fieldSize));
+					}
+					
+				else  // is Text
 				{
 					setBeanValidators(validationRuleName, isQuery, cache) ;
 					if (isRequired && isQuery == false )
@@ -791,6 +833,87 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			form.add(statusLabel);
 			return form;
 	    }
+	private static DynamicDBean getRowById(String id, ComboBox cB) {
+		
+		if (id != null)
+			{
+			ListDataProvider<DynamicDBean> ListCombo = (ListDataProvider<DynamicDBean>) cB.getDataProvider();
+			for (DynamicDBean bean : ListCombo.getItems()) {
+		
+				System.out.println("GeneratedUtil.getRowById()------>"+bean.getCol0());
+				if(id.equals(bean.getCol0()))
+					return bean;
+				}
+			}
+		DynamicDBean errorBean = new DynamicDBean();
+		errorBean.setCol0("1");
+		errorBean.setCol1("ERROR, Reg no EXISTE");
+		return errorBean ;
+	}
+
+	private DynamicDBean getID(String id) {
+		System.out.println("ID "+ id);
+		return new DynamicDBean();
+	}
+
+	private Object putCBintoBean(DynamicDBean d, DynamicDBean v, String fieldNameInUI) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private DynamicDBean getCBValue(DynamicDBean d) {
+		// TODO Auto-generated method stub
+		return d;
+	}
+
+	private static ComboBox<DynamicDBean> fillComboBox(String parentResource) {
+		ArrayList<String[]> rowsColList = new ArrayList<String[]>();
+		
+		String[] fieldArr  = new String[3];
+		fieldArr[0] = "STOREDVALUE";
+		fieldArr[1] = "";
+		fieldArr[2] = "col0";
+		rowsColList.add(fieldArr);
+		
+		fieldArr  = new String[3];
+		fieldArr[0] = "DISPLAYVALUE";
+		fieldArr[1] = "";
+		fieldArr[2] = "col1";
+		rowsColList.add(fieldArr);
+//		String parentResource = getParentResource(resourceName, fieldNameInUI);
+		Collection<DynamicDBean> 	teacherList = RestData.getResourceData("!!ERROR!! combo sin Resource Parent, especificar en MetaConfig ");
+		if (parentResource != null && parentResource.isEmpty() == false)
+		{				
+			teacherList = RestData.getResourceData(0,0,parentResource, AppConst.PRE_CONF_PARAM, rowsColList, null, true, false, null);
+		}
+		ComboBox<DynamicDBean> cB = new ComboBox<DynamicDBean>() ;
+		cB.setItems(teacherList);
+		cB.setItemLabelGenerator(DynamicDBean::getCol1);
+		
+		return cB;
+	}
+
+	private String getParentResource(String fieldNameInUI, String resourceName) {
+		String filter="tableName='"+resourceName+"'%20AND%20FieldNameInUI='"+fieldNameInUI+"'";
+		String parentResource = "";
+		
+		JsonNode rowsList;
+		try {
+			rowsList = JSonClient.get("FieldTemplate",filter, UtilSessionData.getCache(),AppConst.PRE_CONF_PARAM_METADATA,"1");
+
+		for (JsonNode eachRow : rowsList)  {
+			if (eachRow.size() > 0)
+			{
+				parentResource = eachRow.get("parentResource").asText();				
+			}
+		}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private Object showWarning(StatusChangeEvent e) {
 //		((Object) e).getFieldValidationStatuses();
 //		List<ValidationResult> listErrors = e.getBinder(),
@@ -1221,7 +1344,24 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 						.setTextAlign(ColumnTextAlign.END).setResizable(true);
 						}
 
-				}	
+				}
+				else if (isComboBox(idFieldType)) // combobox
+				{
+					String parentResource = colData[20];
+					ComboBox<DynamicDBean> cB = fillComboBox(parentResource);	
+					if ((isCOlEditable && isGridEditable))
+						{
+						col = grid.addEditColumn(d -> getRowById(d.getCol(colName), cB), new TextRenderer<DynamicDBean>(d-> getRowById(d.getCol(colName), cB).getCol1()))
+						.custom(cB, (item, newValue) -> dynamicViewGrid.colChangedComboBox(item,colName,newValue))
+						.setHeader(header)
+						.setResizable(true).setSortProperty(colData[0]);
+						}
+					else
+					{
+						col = grid.addColumn(d -> getRowById(d.getCol(colName), cB).getCol1()).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+					}
+						
+				}
 				else
 					if ((isCOlEditable && isGridEditable))
 						if (isNotAParentField)						
@@ -1284,6 +1424,11 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
     }
     private static boolean isBoolean(String header, int idFieldType) {
     	if (idFieldType == 4)
+    		return true;
+    	return false;
+    }
+    private static boolean isComboBox(int idFieldType) {
+    	if (idFieldType == 6)
     		return true;
     	return false;
     }
