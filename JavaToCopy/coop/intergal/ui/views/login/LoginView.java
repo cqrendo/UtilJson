@@ -123,7 +123,7 @@ public class LoginView extends FlexLayout implements AfterNavigationObserver {
 			return true;
 		} else {
 //			System.out.println("El email ingresado es inválido.");
-			NativeButton buttonInside = new NativeButton(TranslateResource.getFieldLocale("CERRAR", AppConst.PRE_CONF_PARAM));
+			NativeButton buttonInside = new NativeButton(TranslateResource.getFieldLocale("CERRAR"));
 			Label content = new Label(elUser + AppConst.LOGIN_FORGETPASS_NOTEMAIL);
 	    	content.getStyle().set("font-size", "small");
     		Notification notification = new Notification(content, buttonInside);

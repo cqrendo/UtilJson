@@ -42,6 +42,7 @@ import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.FormButtonsBar;
+import coop.intergal.ui.utils.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DdbHierarchicalDataProvider;
@@ -306,7 +307,7 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 	//	grid.getDataProvider().
 	//	DdbDataProvider dataProvider = new DdbDataProvider();
 		dataProvider = new DdbHierarchicalDataProvider();
-		dataProvider.setPreConfParam(AppConst.PRE_CONF_PARAM);
+		dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 		dataProvider.setResourceName(resourceName);
 //		dataProvider.setFilter(getFilter());
 //		grid = new Grid<>(DynamicDBean.class); 

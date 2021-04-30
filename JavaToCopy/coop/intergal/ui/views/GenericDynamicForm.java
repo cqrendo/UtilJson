@@ -20,6 +20,8 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -34,7 +36,9 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
+import coop.intergal.ui.utils.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
+import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 import coop.intergal.vaadin.rest.utils.RestData;
 
@@ -102,10 +106,17 @@ private String pickMapFields;
 			String fieldName = rowCol [2];
 			String idFieldTypeStr = rowCol [3];
 			String fieldNameInUI = rowCol [2];
+			String tagsForVisibility = rowCol[21].toString();
+			String tagsForEdition = rowCol[22].toString();
+			boolean isPick = isPick (rowCol [1]);
+
+			boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
+			boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
+ 
 			int idFieldType = 0;
 			if ( idFieldTypeStr.isEmpty() == false)
 				idFieldType = new Integer (idFieldTypeStr);
-			boolean isReadOnly = isReadOnly( rowCol [1]);
+			boolean isReadOnly = !editableByTag || isReadOnly( rowCol [1]);
 			if (!fieldName.isEmpty())
 			try {
 //				System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
@@ -118,9 +129,15 @@ private String pickMapFields;
 					{
 						TextField tf = ((TextField) fieldObj);
 						tf.setReadOnly(isReadOnly);
-						if (isReadOnly)
+						if (!visibleByTag)
+			//			//	tf.getElement().executeJs("this.shadowRoot.children[1].style='display: none;'");
+							tf.getElement().getStyle().set("visibility","hidden");
+			//			tf.setVisible(visibleByTag);
+						if (isPick)
 						{
 							tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldName, tf));
+							Icon icon = new Icon(VaadinIcon.DOWNLOAD_ALT);
+							tf.setSuffixComponent(icon);
 						}
 						binder.bind(tf, fieldName);
 					}
@@ -133,7 +150,10 @@ private String pickMapFields;
 					}
 					else if (rowCol[3].equals("2")) // is TextArea
 					{
+						
 						((TextArea) fieldObj).setReadOnly(isReadOnly);
+						if (!visibleByTag)
+							((TextArea) fieldObj).getElement().getStyle().set("visibility","hidden");
 						binder.bind((TextArea) fieldObj, fieldName);
 					}
 					else if (rowCol[3].equals("3")) // is currency
@@ -141,6 +161,8 @@ private String pickMapFields;
 			//			binder.bind((AmountField) fieldObj, fieldName);
 						((TextField) fieldObj).addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
 						((TextField) fieldObj).setReadOnly(isReadOnly);
+						if (!visibleByTag)
+							((TextField) fieldObj).getElement().getStyle().set("visibility","hidden");
 						binder.forField((TextField) fieldObj).bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldName))), (d,v)-> d.setColInteger(v,fieldName));
 			//			binder.forField((AmountField) fieldObj).bind(d-> d.getColInteger(fieldName), (d,v)-> d.setColInteger(v,fieldName));//DynamicDBean::setCol2Date);				
 
@@ -150,7 +172,8 @@ private String pickMapFields;
 //						BigDecimalField bdf = new BigDecimalField();
 						((TextField) fieldObj).addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
 						((TextField) fieldObj).setReadOnly(isReadOnly);
-						
+						if (!visibleByTag)
+							((TextField) fieldObj).getElement().getStyle().set("visibility","hidden");
 						int nDecimals = idFieldType - 100 ; 
 
 						new NumeralFieldFormatter(".", ",", nDecimals).extend(((TextField) fieldObj));
@@ -161,6 +184,8 @@ private String pickMapFields;
 					else if (rowCol[3].equals("4")) // is Boolean
 					{
 						((Checkbox) fieldObj).setReadOnly(isReadOnly);
+						if (!visibleByTag)
+							((Checkbox) fieldObj).getElement().getStyle().set("visibility","hidden");
 						binder.forField((Checkbox) fieldObj).bind(d -> d.getColBoolean(fieldName), (d,v)-> d.setColBoolean(v,fieldName));//DynamicDBean::setCol2Date);				
 					}
 					else if (idFieldType == 5 ) // is Number
@@ -170,6 +195,8 @@ private String pickMapFields;
 //						nf.setId("tf"+fieldNameInUI);
 //						nf.getElement().setAttribute("theme", "small");
 						nf.setReadOnly(isReadOnly);
+						if (!visibleByTag)
+							nf.getElement().getStyle().set("visibility","hidden");
 						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					}
 					else if (idFieldType == 6 ) // is Combobox
@@ -194,7 +221,7 @@ private String pickMapFields;
 						Collection<DynamicDBean> 	rowsListForCombo = RestData.getResourceData("!!ERROR!! combo sin Resource Parent, especificar en MetaConfig ");
 						if (parentResource != null && parentResource.isEmpty() == false)
 						{				
-							rowsListForCombo = RestData.getResourceData(0,0,parentResource, AppConst.PRE_CONF_PARAM, rowsColList, null, true, false, null);
+							rowsListForCombo = RestData.getResourceData(0,0,parentResource, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM, rowsColList, null, true, false, null);
 						}
 	//					ComboBox<DynamicDBean> cB = new ComboBox<DynamicDBean>() ;
 						cB.setItems(rowsListForCombo);
@@ -203,6 +230,9 @@ private String pickMapFields;
 						cB.setId("tf"+fieldNameInUI);
 //						nf.getElement().setAttribute("theme", "small");
 						cB.setReadOnly(isReadOnly);
+						if (!visibleByTag)
+							cB.getElement().getStyle().set("visibility","hidden");
+//						cB.setVisible(visibleByTag);  // in this way it covers the space with next field
 						binder.forField(cB).withConverter(
 								item-> Optional.ofNullable(item).map(DynamicDBean::getCol0).orElse(null),
 								id-> getRowById(id, cB))
@@ -229,6 +259,16 @@ private String pickMapFields;
 			
 //		}
 		
+	}
+	private static boolean isPick(String params) {
+		
+		if (params == null)
+			return false;
+		if (params.indexOf("#PCK#")>-1)
+			return true;
+		else 
+			return false;
+			
 	}
 	private DynamicDBean getRowById(String id, ComboBox cB) {
 		
@@ -270,6 +310,21 @@ private String pickMapFields;
 		Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
 
 		setGrid.invoke(queryForm,grid);
+		if (queryFormForPickClassName.indexOf("Generated") > -1)
+		{
+			
+			DdbDataBackEndProvider dataProvider = new DdbDataBackEndProvider();
+			dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+			dataProvider.setResourceName(parentResource);
+			Method setDataProvider= dynamicQuery.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+			Method createContent= dynamicQuery.getMethod("createDetails");
+			Method setRowsColList = dynamicQuery.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+			setDataProvider.invoke(queryForm,dataProvider );
+//			setRowsColList.invoke(queryForm,rowsColList);
+//			Method createContent= dynamicQuery.getMethod("createDetails");
+//			queryForm = 
+			createContent.invoke(queryForm);
+		}
 		dynamicGridForPick.getDivQuery().add((Component)queryForm);
 
 		
@@ -283,6 +338,8 @@ private String pickMapFields;
 //		subDynamicViewGrid.setupGrid();
 //		dynamicGridForPick.setRowsColList(currentRow.getRowsColList());
 		dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,currentRow, pickMapFields ));
+		if (dialogForPick == null)
+			dialogForPick = new Dialog();
 		dialogForPick.removeAll();
 		dialogForPick.add(dynamicGridForPick);
 		dialogForPick.open();
@@ -298,6 +355,11 @@ private String pickMapFields;
 
 	private Object fillDataForPickAndAccept(Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
 		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
+		if (seletedRows == null || seletedRows.isEmpty())
+		{
+			dialogForPick.close();
+			return null;
+		}
 		DynamicDBean seletedParentRow = seletedRows.iterator().next();
 		while (tokens.hasMoreElements())
 		{

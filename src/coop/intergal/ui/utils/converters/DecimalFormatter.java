@@ -28,8 +28,9 @@ public class DecimalFormatter implements ModelEncoder<BigInteger, String> {
 	public BigInteger getCents(String col, int nDecimals) {
 		if (col == null || col.equals("null") == true || col.equals("") == true)
 			return null;
-		col = col.format("%."+nDecimals+"f",Double.valueOf(col));
 		col=col.replace(",","."); // change , for .
+		col = col.format("%."+nDecimals+"f",Double.valueOf(col));
+		col=col.replace(",",".");
 		int idxE = col.indexOf("€"); // take off € sign 
 		if (idxE > -1)
 			col = col.substring(0,idxE-1 );

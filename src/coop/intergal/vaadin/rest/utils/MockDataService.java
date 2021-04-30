@@ -474,8 +474,8 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 									//	if (rowsColList.get(i)[0].length() > 0)
 										if ("null".equals(colNameInTable) == false)
 										{
-											if (colType == 3) // is currency
-												value = cleanCurrencySymbols(value);
+											if (colType == 3 || colType > 100) // is currency or decimal
+												value = cleanCurrencySymbolsAndChangeCommaXPoint(value);
 											newEntityinfo.put(colNameInTable, (String) ""+value);  
 										}
 										else
@@ -505,7 +505,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		return newEntityinfo;
 	}
 	
-	private Object cleanCurrencySymbols(Object value) {
+	private Object cleanCurrencySymbolsAndChangeCommaXPoint(Object value) {
 		String valueStr = (String) value;
 		valueStr= valueStr.replace(",", ".");
 		int idxE = valueStr.indexOf("€");

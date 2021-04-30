@@ -47,7 +47,9 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 	 */
 	private static final long serialVersionUID = 1L;
 	private Grid<DynamicDBean> grid;
- //   private ListDataProvider<Payment> dataProvider;
+	private DynamicViewGrid dVGrid;
+
+	//   private ListDataProvider<Payment> dataProvider;
 	private DdbDataBackEndProvider dataProvider;
     private DetailsDrawer detailsDrawer;
 	private Binder<DynamicDBean> binder;
@@ -62,6 +64,9 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 	private String resource;
 	private boolean cache = true; // @@TODO fill whwn call
 	private DynamicDBean bean;
+	private Div divSubGrid; 
+	
+	GeneratedUtil generatedUtil = new GeneratedUtil();
 
 
 
@@ -117,9 +122,25 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 //        appBar.centerTabs();
 //    }
 
-   
+	public DynamicViewGrid getDVGrid() {
+		return dVGrid;
+	}
+
+	public void setDVGrid(DynamicViewGrid dVGrid) {
+		this.dVGrid = dVGrid;
+	}
+
   
-    private boolean isCurrency(String header, String colType) {
+    public Div getDivSubGrid() {
+		return divSubGrid;
+	}
+
+	public void setDivSubGrid(Div divSubGrid) {
+		this.divSubGrid = divSubGrid;
+		generatedUtil.setDivSubGrid(divSubGrid);
+	}
+
+	private boolean isCurrency(String header, String colType) {
     	if (header.startsWith("C#")) // when there is nmot the type defined in FiledTemplate it can be defined in the name with the prefix "d#"
     		return true; 
     	if (colType.equals("3"))
@@ -194,8 +215,12 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 	    }
 
 	private Component createDetails() {
-			GeneratedUtil generatedUtil = new GeneratedUtil();
+//			GeneratedUtil generatedUtil = new GeneratedUtil();
+			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
+			generatedUtil.setGrid(dVGrid);
+			generatedUtil.setBinder(binder);
 			generatedUtil.setBean(bean);
+//			generatedUtil.setDivSubGrid(divSubGrid);
 	//		if (cache == false)
 			rowsFieldList = dataProvider.getRowsFieldList();
 			String tabs ="";

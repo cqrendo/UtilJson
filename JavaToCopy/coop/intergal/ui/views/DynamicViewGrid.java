@@ -2,6 +2,7 @@ package coop.intergal.ui.views;
 
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
 import static coop.intergal.AppConst.PAGE_PRODUCTS;
+import static coop.intergal.AppConst.STYLES_CSS;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +27,9 @@ import org.vaadin.haijian.Exporter;
 import org.vaadin.olli.FileDownloadWrapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -36,6 +39,8 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
+import com.vaadin.flow.component.grid.contextmenu.GridMenuItem;
 import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
@@ -47,6 +52,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
+import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.data.binder.Binder;
@@ -67,7 +73,9 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.metadata.ui.views.dev.lac.FieldTemplateComboRelatedForPick;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.FormButtonsBar;
+import coop.intergal.ui.utils.ProcessParams;
 import coop.intergal.ui.utils.TranslateResource;
+import coop.intergal.ui.utils.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.ui.utils.converters.DecimalFormatter;
 import coop.intergal.vaadin.rest.utils.DataService;
@@ -85,6 +93,7 @@ import coop.intergal.vaadin.rest.utils.RestData;
 //@PageTitle(AppConst.TITLE_PRODUCTS)
 //@Secured(Role.ADMIN)
 //public class DynamicViewGrid extends CrudViewREST<DynamicDBean,TemplateModel> implements BeforeEnterObserver,AfterNavigationObserver, HasDynamicTitle  {
+@CssImport(value = STYLES_CSS)
 public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver,AfterNavigationObserver, HasDynamicTitle  {
 
 //	@Autowired
@@ -102,7 +111,8 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 	private String resourceSubGrid;
 	private Hashtable<String, DynamicDBean> beansToSaveAndRefresh = new Hashtable<String, DynamicDBean>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
 	private Hashtable<String, String[]> resourceAndSubresources = new Hashtable<String, String[]>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
-
+	Map<String, Dialog> allDialogs = new HashMap<>();
+	//	Dialog dialogForShow = new Dialog();
 	//public DynamicViewGrid() {
 //		// TODO Auto-generated constructor stub
 //	}
@@ -121,10 +131,12 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 
 	public DynamicViewGrid() {
 		super();
-		grid.addSelectionListener(e -> {
-			if (e.getFirstSelectedItem().isPresent())
-				selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
-			});
+//		grid.addSelectionListener(e -> {
+//			if (e.getFirstSelectedItem().isPresent())
+//				selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
+//				System.out.println("Registro selecionado " + selectedRow.getCol0());
+//
+//			});
 //		setupGrid();
 		
 	}
@@ -180,7 +192,15 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 	private DynamicDBean rowIsInserted;
 	private DynamicDBean parentRow;
 	private Method setBeanParent;
-//	private boolean isInError = false;
+public Div getDivDisplay() {
+		return divDisplay;
+	}
+
+	public void setDivDisplay(Div divDisplay) {
+		this.divDisplay = divDisplay;
+	}
+
+	//	private boolean isInError = false;
 	private boolean isInsertingALine = false;
 private Dialog dialogForPick;
 private String pickMapFields;
@@ -194,6 +214,12 @@ private Object divInDisplay;
 @Id("divExporter")
 private Div divExporter;
 private Boolean isResourceReadOnly;
+//private Dialog dialogForShow;
+//private Dialog dialogForShow;
+//private Button bCloseDialog = new Button ("X", e -> dialogForShow.close());
+//private String openIds = "";
+//private DdbDataBackEndProvider dataProviderpopup;
+//private String displayFormClassNamePopup;
 
 
 //	@Autowired()
@@ -220,13 +246,30 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 	
 }
 
-	public void setupGrid(boolean isGridEditable, boolean hasExportButton) {
+	public void setupGrid(Boolean isGridEditable, Boolean hasExportButton) {
 	
 	//	grid.scrollTo(1); 
 	//	grid.getDataProvider().
 	//	DdbDataProvider dataProvider = new DdbDataProvider();
+//		Grid gridx = new Grid();
+		grid.addSelectionListener(e -> {
+			if (e.getFirstSelectedItem().isPresent())
+				selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
+				System.out.println("Registro selecionado " + selectedRow.getCol0());
+				methodForRowSelected(selectedRow); 
+			});
+		
+//		grid.getElement().executeJs("setTimeout(function(){var item=this._cache.getItemForIndex(0); item&&this.$connector.doSelection([item]);}.bind(this))"); 
+// FOR Autoselect		grid.getElement().executeJs("setTimeout(function(){this.querySelector('vaadin-grid-cell-content').click();}.bind(this))");
+		grid.addCellEditStartedListener(ev->grid.select(ev.getItem()));
+		GridContextMenu<DynamicDBean> contextMenu = new GridContextMenu<>(grid);
+//		GridMenuItem<DynamicDBean> opcion = contextMenu.addItem("Opcion");
+		contextMenu.addItem("Remove", e -> {
+		    e.getItem().ifPresent(dB -> {
+		    System.out.println("context menu " + dB.getCol0());});
+		});
 		dataProvider = new DdbDataBackEndProvider();
-		dataProvider.setPreConfParam(AppConst.PRE_CONF_PARAM);
+		dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 		dataProvider.setResourceName(getResourceName());
 		dataProvider.setFilter(getFilter());
 //		grid = new Grid<>(DynamicDBean.class); 
@@ -256,7 +299,8 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		for (int i=0;i<numberOFCols; i++)
 		{
 		//	Column<DynamicDBean> col = addFormatedColumn(i, isGridEditable);
-			Column<DynamicDBean> col = GeneratedUtil.addFormatedColumn(i, rowsColListGrid, this, grid, isGridEditable);
+			GeneratedUtil generatedUtil = new GeneratedUtil();
+			Column<DynamicDBean> col = generatedUtil.addFormatedColumn(i, rowsColListGrid, this, grid, isGridEditable);
 			if (col != null)
 				col.setAutoWidth(true);
 		}
@@ -290,6 +334,56 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 //		grid.getColumns().forEach(column -> column.setAutoWidth(true));
 
 }
+
+private void methodForRowSelected(DynamicDBean selectedRow2) {
+		
+		String method = selectedRow2.getMethodForRowSelected();
+		if (method != null)
+		{
+			runMethodFor(method, selectedRow2);
+		}
+		else
+			System.out.println("DynamicViewGrid.methodForRowSelected() NOT method assigned");
+		}
+		
+	private void runMethodFor(String methodName, DynamicDBean selectedRow2) {
+		System.out.println("method to run "+ methodName);
+//		Class<?> dynamicQuery;
+		try {
+			Class<?> classForMethods = Class.forName(AppConst.CLASS_FOR_METHODS);
+			Object oClassForMethods = classForMethods.newInstance();
+			Method method = classForMethods.getMethod(methodName, new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class, coop.intergal.ui.views.DynamicViewGrid.class} );
+//			this.getParent().get().getParent().get().getParent().get().getParent().get().getParent().get().getChildren().findFirst();
+//			UI.getCurrent().getChildren().findFirst();
+			method.invoke(oClassForMethods,selectedRow2, this);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+	
+}
+
+	
 
 private String getRowStyleName(DynamicDBean row) {
 		String valueStr = row.getCol0(); 
@@ -577,6 +671,8 @@ private boolean isBoolean(String header, String colType) {
 		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
 			setResourceName(queryParameters.getParameters().get("resourceName").get(0));
 //@@		setupEventListeners();
+
+		    
 		if (hasSideDisplay )
 		{
 		grid.addSelectionListener(e -> {
@@ -589,13 +685,14 @@ private boolean isBoolean(String header, String colType) {
 //				getGrid().deselectAll();
 			});
 		}
-		else // for deleting and other events that need the selectedRow
-		{
-			grid.addSelectionListener(e -> {
-				if (e.getFirstSelectedItem().isPresent())
-					selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
-				});
-		}
+//		else // for deleting and other events that need the selectedRow 
+//		{
+//			grid.addSelectionListener(e -> {
+//				if (e.getFirstSelectedItem().isPresent())
+//					selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
+//					System.out.println("Registro selecionado " + selectedRow.getCol0());
+//				});
+//		}
 //		});
 //@@		display.getButtons().addSaveListener(e -> nextRow());
 //		setupGrid();
@@ -635,6 +732,8 @@ private boolean isBoolean(String header, String colType) {
 			{
 			//	setDataProvider.invoke(display, dataProvider);
 				Method createContent= dynamicForm.getMethod("createContent");
+				Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
+				setdVGrid.invoke(display, this); // to use methods in this class
 				divInDisplay = createContent.invoke(display);
 				divDisplay.add((Component)divInDisplay);
 			}
@@ -646,12 +745,7 @@ private boolean isBoolean(String header, String colType) {
 			
 	//		divDisplay.remove((Component) display);
 			
-			String resourceSubGrid = extractResourceSubGrid(bean,0);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO adapt to use more than one subresource , use a variable instead of 9
-//			String resourceSubGrid1 = extractResourceSubGrid(bean,1);
-//			String resourceSubGrid2 = extractResourceSubGrid(bean,2);
-//			String resourceSubGrid3 = extractResourceSubGrid(bean,3);
-//			String resourceSubGrid4 = extractResourceSubGrid(bean,4);
-//			String resourceSubGrid5 = extractResourceSubGrid(bean,5);
+			String resourceSubGrid = extractResourceSubGrid(bean,0);
 			divSubGrid.removeAll();
 			String tabsList = rowsColListGrid.get(0)[12];
 			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
@@ -659,21 +753,104 @@ private boolean isBoolean(String header, String colType) {
 			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
 				Div content0=new Div(); 
 				divSubGrid.add(fillContent(content0, 0 , bean));	
+				Method setDivSubGrid= dynamicForm.getMethod("setDivSubGrid", new Class[] {com.vaadin.flow.component.html.Div.class});
+				setDivSubGrid.invoke(display, divSubGrid); // to use methods in this class
+
 	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
 			}
-			else
+			else if (resourceSubGrid != null) //123456789
 			{
 //				createTabs(DynamicDBean bean)
 				divSubGrid.removeAll();
 				divSubGrid.add(createSubTabs(bean, tabsList));
+				Method setDivSubGrid= dynamicForm.getMethod("setDivSubGrid", new Class[] {com.vaadin.flow.component.html.Div.class});
+				setDivSubGrid.invoke(display, divSubGrid); // to use methods in this class
+
 //				DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
 //				subDynamicViewGrid.setButtonsRowVisible(false);//(true);
 //				divSubGrid.add(subDynamicViewGrid );
 			}
+			else // resourceSubGrid is null
+			{
+				layout.getDisplaySplitSubGrid().setOrientation(Orientation.HORIZONTAL); // to hide split
+			}
 			if (layout != null)
 			{
-				layout.getGrid().getElement().getStyle().set("flex-basis", "70px");
-				layout.getDivQuery().getStyle().set("flex-basis", "65px");
+
+				if (bean.getParams() != null )
+				{		
+				if (bean.getParams().indexOf("classForLayout") == -1)
+				{
+					
+					String parClassForLayout = bean.getParams().substring(bean.getParams().indexOf("classForLayout")+15);
+					int idxNextAnd = parClassForLayout.indexOf("&");
+					int  idxLast = parClassForLayout.length();
+					if (idxNextAnd > -1)
+						idxLast = idxNextAnd;
+					String classForLayout = parClassForLayout.substring(1,idxLast-1);
+					String[] methodAndValue = classForLayout.split(":");
+					String method = methodAndValue[0];
+					String value = methodAndValue[1];
+					Class<?> classLayout = Class.forName("coop.intergal.ui.views.DynamicQryGridDisplay");
+					Method getDiv = classLayout.getMethod(method);
+					Div div = (Div) getDiv.invoke(layout);
+					div.addClassName(value);
+	
+				}
+				if (bean.getParams() == null || bean.getParams().indexOf("splitGridDisplay") == -1)
+		//			layout.getGrid().getElement().getStyle().set("flex-basis", "70px");
+					System.out.println("DynamicViewGrid.showBean() NOT splitGridDisplay");
+				if (bean.getParams() != null || bean.getParams().indexOf("splitGridDisplay") != -1) 
+					{
+					String params = bean.getParams().substring(bean.getParams().indexOf("splitGridDisplay")+17);
+					int idxNextAnd = params.indexOf("&");
+					int  idxLast = params.length();
+					if (idxNextAnd > -1)
+						idxLast = idxNextAnd;
+					String splitPos = params.substring(1,idxLast-1);
+					System.out.println("DynamicViewGrid.showBean() splitPos <"+ splitPos +">");
+					layout.getGridSplitDisplay().setSplitterPosition(new Double(splitPos));
+	//				layout.getDisplaySplitSubGrid().setSplitterPosition(50);
+					}
+				else
+					{
+					layout.getGridSplitDisplay().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_GRID_DISPLAY);
+					}
+				if (bean.getParams() != null || bean.getParams().indexOf("splitQuery") != -1) 
+					{
+					String params = bean.getParams().substring(bean.getParams().indexOf("splitQuery")+11);
+					int idxNextAnd = params.indexOf("&");
+					int  idxLast = params.length();
+					if (idxNextAnd > -1)
+						idxLast = idxNextAnd;
+					String splitPos = params.substring(1,idxLast-1);
+					System.out.println("DynamicViewGrid.showBean() splitPos splitQuery <"+ splitPos +">");
+					layout.getQuerySplitGrid().setSplitterPosition(new Double(splitPos));
+					}
+				else
+					{
+					layout.getQuerySplitGrid().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_QUERY_GRID);
+					}
+				if (bean.getParams() != null || bean.getParams().indexOf("splitDisplaySubGrid") != -1) 
+					{
+					String params = bean.getParams().substring(bean.getParams().indexOf("splitDisplaySubGrid")+20);
+					int idxNextAnd = params.indexOf("&");
+					int  idxLast = params.length();
+					if (idxNextAnd > -1)
+						idxLast = idxNextAnd;
+					String splitPos = params.substring(1,idxLast-1);
+					System.out.println("DynamicViewGrid.showBean() splitPos splitDisplaySubGrid <"+ splitPos +">");
+					layout.getDisplaySplitSubGrid().setSplitterPosition(new Double(splitPos));
+					}
+			}
+			else
+				{
+				layout.getDisplaySplitSubGrid().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_DISPLAY_SUBGRID);
+				}
+				
+//				layout.getDivQuery().getStyle().set("flex-basis", "65px");
+//				Div div = (Div) layout.getDivDisplay().get;
+//				div.getStyle().set("flex-basis", "650px");
 			}	
 //		GenericDynamicForm  display = null; 
 //		if (className.equals("C0")r
@@ -719,6 +896,234 @@ private boolean isBoolean(String header, String colType) {
 
 //	UI.getCurrent().navigate("dymanic");
 }
+	public void showBeaninPopupXX	(DynamicDBean bean, String resourcePopup,String layoutClassName, String displayFormClassNamePopup, Dialog dialogForShow2, String filterForPopup ) {
+			showBeaninPopup(resourcePopup);
+		}
+	   public void showBeaninPopup(String resourcePopup) {
+	        final Dialog requestedDialog;
+	        if (allDialogs.containsKey(resourcePopup)) {
+	            requestedDialog = allDialogs.get(resourcePopup);
+	        } else {
+	            requestedDialog = new Dialog();
+	            Button bCloseDialog = new Button(resourcePopup, e -> requestedDialog.close());
+	            requestedDialog.removeAll();
+	            requestedDialog.setCloseOnOutsideClick(false);
+	            requestedDialog.add(bCloseDialog/*,(Component)layoutPopup*/);
+	            requestedDialog.setModal(false);
+	            requestedDialog.setDraggable(true);
+	            requestedDialog.setResizable(true);
+	            requestedDialog.setId(resourcePopup);
+	            allDialogs.put(resourcePopup, requestedDialog);
+	        }
+
+	        if (!requestedDialog.isOpened())
+	            requestedDialog.open();
+	    }
+
+	public void showBeaninPopupXX(String resourcePopup) {
+
+		final Dialog dialogForShow = new Dialog();
+		String idForDialog = resourcePopup;
+
+		Dialog dialogAlreadyOpen = isDialogAlreadyOpen(idForDialog);
+//		if (dialogAlreadyOpen == null )
+//			{
+//			dialogForShow = new Dialog();
+//			}
+//		else
+//			dialogForShow = dialogAlreadyOpen;
+		 Button bCloseDialog = new Button(resourcePopup, e -> dialogForShow.close());
+//		 bCloseDialog.addClickListener(e -> dialogForShow.close());
+		 dialogForShow.removeAll();
+		 dialogForShow.setCloseOnOutsideClick(false);
+		 dialogForShow.add(bCloseDialog/*,(Component)layoutPopup*/);
+		 dialogForShow.setModal(false);
+		 dialogForShow.setDraggable(true);
+		 dialogForShow.setResizable(true);
+		 dialogForShow.setId(idForDialog);
+		 if (dialogForShow.isOpened() == false)
+			 dialogForShow.open();
+	}
+	private Object closeDialog(Dialog dialogForShow2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void showBeaninPopup	(DynamicDBean bean, String resourcePopup,String layoutClassName, String displayFormClassNamePopup, Dialog dialogForShow2, String filterForPopup ) {
+		try {
+//			if (dialogForShow2 != null)
+//				dialogForShow = dialogForShow2;
+
+			DdbDataBackEndProvider dataProviderPopup = new DdbDataBackEndProvider();
+			dataProviderPopup.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+			dataProviderPopup.setResourceName(resourcePopup);
+			Class<?> dynamicLayout = Class.forName(layoutClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
+			Object layoutPopup = dynamicLayout.newInstance();
+			if (layoutClassName.indexOf("DynamicViewGrid") > -1) // is a Layout that shows a Grid
+			{
+				Method setResourceName = dynamicLayout.getMethod("setResourceName",new Class[] {String.class} );
+				Method setFilter = dynamicLayout.getMethod("setFilter",new Class[] {String.class} );
+				Method setupGrid = dynamicLayout.getMethod("setupGrid",new Class[] {Boolean.class, Boolean.class} );
+				setResourceName.invoke(layoutPopup, resourcePopup);
+				String filter = ProcessParams.componFilterFromParams(filterForPopup, bean);
+				setFilter.invoke(layoutPopup, filter);
+				setupGrid.invoke(layoutPopup, true, true);
+			}
+			else if (displayFormClassNamePopup != null && displayFormClassNamePopup.isEmpty() == false) // is a layout that shows one row + children if exist
+				{
+
+				Method getDivDisplay = dynamicLayout.getMethod("getDivDisplay");
+				Method getDivSubGrid = dynamicLayout.getMethod("getDivSubGrid");
+				Div divDisplayPopup = (Div) getDivDisplay.invoke(layoutPopup);
+				Div divSubGridPopup = (Div) getDivSubGrid.invoke(layoutPopup);
+			
+//			DynamicDisplaySubgrid dynamicDisplaySubgrid = new DynamicDisplaySubgrid();
+//			Div divDisplayPopup = dynamicDisplaySubgrid.getDivDisplay();
+//			Div divSubGridPopup =  dynamicDisplaySubgrid.getDivSubGrid();//new Div();
+				Object divInDisplayPopup = new Div();
+				setVisibleRowData(true);
+
+				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
+					buttonsForm.setVisible(false);
+				selectedRow = bean;
+				keepRowBeforChanges = new DynamicDBean(); 
+				keepRowBeforChanges = RestData.copyDatabean(bean);
+//			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
+				Class<?> dynamicForm = Class.forName(displayFormClassNamePopup);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
+				Object displayPopup = dynamicForm.newInstance();
+				Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+				Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
+				Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+			
+				setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
+				ArrayList<String[]> rowsColListGridPopup = dataProviderPopup.getRowsColList();
+				setRowsColList.invoke(displayPopup,rowsColListGridPopup);
+				setBinder.invoke(displayPopup,binder);
+				setDataProvider.invoke(displayPopup, dataProviderPopup);
+				setBean.invoke(displayPopup,bean);
+				resourcePopup = bean.getResourceName(); // when is a display the bean is the on e to show and has the resourcename
+ 
+				divDisplayPopup.removeAll();
+				if (displayFormClassNamePopup.indexOf("Generated") > -1)
+				{
+			//	setDataProvider.invoke(display, dataProvider);
+					Method createContent= dynamicForm.getMethod("createContent");
+					divInDisplayPopup = createContent.invoke(displayPopup);
+					divDisplayPopup.add((Component)divInDisplayPopup);
+				}
+				else
+				{
+					divDisplayPopup.add((Component)displayPopup);
+				}
+			
+			
+	//		divDisplay.remove((Component) display);
+			
+				String resourceSubGrid = extractResourceSubGrid(bean,0);
+				divSubGridPopup.removeAll();
+				String tabsList = rowsColListGrid.get(0)[12];
+				if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
+				{
+			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
+					Div content0=new Div(); 
+					divSubGridPopup.add(fillContent(content0, 0 , bean));	
+	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
+				}
+				else if (resourceSubGrid != null)
+				{
+					divSubGridPopup.removeAll();
+					divSubGridPopup.add(createSubTabs(bean, tabsList));
+				}
+			}
+			String idForDialog = resourcePopup+"@DFC@"+displayFormClassNamePopup+"@F@"+filterForPopup+"@L@"+layoutClassName;
+//			if (dialogForShow != null && dialogForShow.getId().isPresent() )
+//			{ 
+			final Dialog dialogForShow;// = new Dialog();
+				Dialog dialogAlreadyOpen = isDialogAlreadyOpen(idForDialog);
+				if (dialogAlreadyOpen == null )
+					{
+					dialogForShow = new Dialog();
+		            Button bCloseDialog = new Button("X", e -> dialogForShow.close());
+		            dialogForShow.removeAll();
+		            dialogForShow.setCloseOnOutsideClick(false);
+		            dialogForShow.add(bCloseDialog, (Component)layoutPopup);
+		            dialogForShow.setModal(false);
+		            dialogForShow.setDraggable(true);
+		            dialogForShow.setResizable(true);
+		            dialogForShow.setId(idForDialog);
+					}
+				else
+				{
+					dialogForShow = dialogAlreadyOpen;
+					dialogForShow.removeAll();
+		            Button bCloseDialog = new Button("X", e -> dialogForShow.close());
+		            dialogForShow.add(bCloseDialog, (Component)layoutPopup);
+
+				}
+		        if (!dialogForShow.isOpened())
+		        	dialogForShow.open();
+
+//			}
+//ialogForShow.set
+
+//			dialogForShow.removeAll();
+//			dialogForShow.setCloseOnOutsideClick(false);
+//			dialogForShow.add(new Button ("X", e -> dialogForShow.close()),(Component)layoutPopup);
+//			dialogForShow.setModal(false);
+//			dialogForShow.setDraggable(true);
+//			dialogForShow.setResizable(true);
+//			dialogForShow.setId(idForDialog);
+//			if (dialogForShow.isOpened() == false)
+//				dialogForShow.open();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+
+//		display.beforeEnter(null);
+//		gridSplitDisplay.getElement().removeAllChildren();//removeChild(display.getElement());
+//		gridSplitDisplay.getElement().appendChild(grid.getElement());
+//		gridSplitDisplay.getElement().appendChild(display.getElement());
+
+//	UI.getCurrent().navigate("dymanic");
+	}
+
+//	private Object closePoppup(ClickEvent<Button> e) {
+//		Dialog dialog = e.;
+//		return null;
+//	}
+
+	private Dialog isDialogAlreadyOpen(String idToChech) {
+		for (Component child : UI.getCurrent().getChildren().filter(c->c instanceof Dialog).collect(Collectors.toList()))
+		{
+			Dialog dialog = (Dialog) child;
+			String idDialogOpen = dialog.getId().get();
+			if (idToChech.equals(idDialogOpen))
+				return dialog;
+		}
+		return null;
+	}
+
 	private Div componSubgrid(DynamicDBean bean, String resourceSubGrid2) {
 		DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
 		subDynamicViewGrid.setCache(cache);
@@ -741,7 +1146,7 @@ private boolean isBoolean(String header, String colType) {
 		try {
 //			if (isResourceReadOnly != null)
 //				return isResourceReadOnly;
-			JsonNode extProp = JSonClient.get("JS_ExtProp", resourceSubGrid2, cache, AppConst.PRE_CONF_PARAM);
+			JsonNode extProp = JSonClient.get("JS_ExtProp", resourceSubGrid2, cache, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 			if (extProp.get("isReadOnly") != null)
 			{
 				isResourceReadOnly = extProp.get("isReadOnly").asBoolean();
@@ -1080,7 +1485,7 @@ private boolean isBoolean(String header, String colType) {
 		String subFormFilter = subGridFormExt.get("filter").asText();
 		String subFormResource = subGridFormExt.get("resource").asText();
 		DdbDataBackEndProvider dataProviderSub = new DdbDataBackEndProvider();
-		dataProviderSub.setPreConfParam(AppConst.PRE_CONF_PARAM);
+		dataProviderSub.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 		dataProviderSub.setResourceName(subFormResource);
 		dataProviderSub.setFilter(subFormFilter);
 		if (subLayoutClassName.indexOf("DynamicGridDisplay") > -1)
@@ -1279,21 +1684,37 @@ private boolean isBoolean(String header, String colType) {
 			
 			bean.setResourceName(resourceName);
 			bean.setRowsColList(rowsColListGrid);
-			bean.setPreConfParam(AppConst.PRE_CONF_PARAM);
+			bean.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 			GeneratedUtil.fillDefaultValues(bean);
 			selectedRow = bean;
 			keepRowBeforChanges = RestData.copyDatabean(bean);
 //			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
 			Class<?> dynamicForm = Class.forName(displayFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
 			display = dynamicForm.newInstance();
+			
 			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
 			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
+			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+
 			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 			setRowsColList.invoke(display,rowsColListGrid);
 			setBinder.invoke(display,binder);
 			setBean.invoke(display,bean);
+			setDataProvider.invoke(display, dataProvider);
 			divDisplay.removeAll();
-			divDisplay.add((Component)display);
+			if (displayFormClassName.indexOf("Generated") > -1)
+			{
+			//	setDataProvider.invoke(display, dataProvider);
+				Method createContent= dynamicForm.getMethod("createContent");
+				divInDisplay = createContent.invoke(display);
+				divDisplay.add((Component)divInDisplay);
+				
+
+			}
+			else
+			{
+				divDisplay.add((Component)display);
+			}
 //			String resourceSubGrid = extractResourceSubGrid(bean);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO send by param
 			divSubGrid.removeAll();
 //			if (resourceSubGrid != null)
@@ -1446,8 +1867,12 @@ private boolean isBoolean(String header, String colType) {
 	//			 and "N_PEDIDO" = ["N_PEDIDO"]}
 		int step = 0;
 		String componFilter = "";
-		int lengthFKfilter = fKfilter.length();
-		int leftLength = lengthFKfilter;
+		int lengthFKfilter = 0; 
+		if (fKfilter != null)
+			lengthFKfilter = fKfilter.length();
+		else
+			System.err.println("ERROR FK NO CARGADA -------"+ resourceSubGrid );
+//		int leftLength = lengthFKfilter;
 		while (lengthFKfilter > 0 || fKfilter.length()  > 0)
 		{
 			int idXEqual = fKfilter.indexOf("=");
@@ -1523,6 +1948,10 @@ private boolean isBoolean(String header, String colType) {
 //		
 //	}
 
+	public Div getDivSubGrid() {
+		return this.divSubGrid;
+		
+	}
 	public void setDivSubGrid(Div divSubGrid) {
 		this.divSubGrid = divSubGrid;
 		
@@ -1567,6 +1996,14 @@ private boolean isBoolean(String header, String colType) {
 	public void setResourceSubGrid(String resourceSubGrid) {
 		this.resourceSubGrid = resourceSubGrid;
 	}
+
+//	public Dialog getDialogForShow() {
+//		return dialogForShow;
+//	}
+//
+//	public void setDialogForShow(Dialog dialogForShow) {
+//		this.dialogForShow = dialogForShow;
+//	}
 
 	public Object saveSelectedRow(String apiname) {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + selectedRow.getRowJSon().toString());
@@ -1694,6 +2131,7 @@ private boolean isBoolean(String header, String colType) {
 	}
 
 	public Object insertANewRow() {
+		System.out.println("DynamicViewGrid.insertANewRow()");
 		// TODO Auto-generated method stub
 //		dataProvider.insertANewRow();	
 		insertBean();

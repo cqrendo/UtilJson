@@ -263,6 +263,29 @@ public class RestData {
 		}
 		else
 			dB.setReadOnly(false);
+		if (eachRow.get("splitGridDisplay") != null) // to indicate add row.splitGridDisplay=..px to the event of the resource in LAC 
+		{
+			dB.setParams(dB.getParams()+"&splitGridDisplay="+eachRow.get("splitGridDisplay") );				
+		}
+		if (eachRow.get("splitQuery") != null) // to indicate add row.splitQuery=..px to the event of the resource in LAC 
+		{
+			dB.setParams(dB.getParams()+"&splitQuery="+eachRow.get("splitQuery") );				
+		}
+		if (eachRow.get("splitDisplaySubGrid") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
+		{
+			dB.setParams(dB.getParams()+"&splitDisplaySubGrid="+eachRow.get("splitDisplaySubGrid") );				
+		}
+		if (eachRow.get("classForLayout") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
+		{
+			dB.setParams(dB.getParams()+"&classForLayout="+eachRow.get("classForLayout") );				
+		}
+		if (eachRow.get("methodForRowSelected") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
+		{
+			dB.setMethodForRowSelected(eachRow.get("methodForRowSelected").asText());				
+		}
+
+
+
 //		dB.setRowColTypeList(cols); TODO Keep also cols type
 //		Object userInstance = DynamicDBean.getConstructor(new Class[] {String.class}).newInstance(new Object[] {"José González"});
 //		Field aliasField = userClass.getDeclaredField("alias");
@@ -582,7 +605,7 @@ public class RestData {
 						int maxColNumber = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[21];
+							String[] fieldArr  = new String[23];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -679,6 +702,15 @@ public class RestData {
 							fieldArr[18] = ""; // is only used for Form fields
 							fieldArr[19] = ""; // is only used for Form fields
 					//		fieldArr[20] = ""; // is used back in the code
+							if ( col.get("tagsForVisibility").asText().isEmpty() || col.get("tagsForVisibility").asText().equals("null") )
+								fieldArr[21] = "";
+							else
+								fieldArr[21] = col.get("tagsForVisibility").asText();
+							if ( col.get("tagsForEdition").asText().isEmpty() || col.get("tagsForEdition").asText().equals("null") )
+								fieldArr[22] = "";
+							else
+								fieldArr[22] = col.get("tagsForEdition").asText();
+		
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -777,7 +809,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[21];
+						String[] fieldArr  = new String[23];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -871,7 +903,17 @@ public class RestData {
 							fieldArr[19] = "";
 						else
 							fieldArr[19] = col.get("fieldHeight").asText();	
-						// el 	
+						// el 
+						
+						if ( col.get("tagsForVisibility").asText().isEmpty() || col.get("tagsForVisibility").asText().equals("null") )
+							fieldArr[21] = "";
+						else
+							fieldArr[21] = col.get("tagsForVisibility").asText();
+						if ( col.get("tagsForEdition").asText().isEmpty() || col.get("tagsForEdition").asText().equals("null") )
+							fieldArr[22] = "";
+						else
+							fieldArr[22] = col.get("tagsForEdition").asText();
+
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -910,7 +952,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[21];
+			String[] fieldArr  = new String[23];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -933,9 +975,10 @@ public class RestData {
 			fieldArr[16] = ""; // is only used for metadata config:
 			fieldArr[17] = ""; // is only used for metadata config:
 			fieldArr[18] = ""; // is only used for metadata config:
-			fieldArr[19] = ""; // is only used for metadata config:
+			fieldArr[19] = ""; // is only used for metadata config:			
 			fieldArr[20] = ""; // is only used for metadata config:
-			
+			fieldArr[21] = ""; // is only used for metadata config:
+			fieldArr[22] = ""; // is only used for metadata config:
 
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
@@ -1027,7 +1070,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[21];
+						String[] fieldArr  = new String[23];
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -1106,6 +1149,12 @@ public class RestData {
 							fieldArr[18] = col.get("tabQuery").asText();	
 						fieldArr[19] = ""; // is only used for Form fields++;
 						fieldArr[20] = ""; // is only used for Form fields++; // @@ TODO implement combo in qrys
+						if ( col.get("tagsForVisibility").asText().isEmpty() || col.get("tagsForVisibility").asText().equals("null") )
+							fieldArr[21] = "";
+						else
+							fieldArr[21] = col.get("tagsForVisibility").asText();
+						fieldArr[22] = ""; // is only used for Form & grid fields++;
+
 					}
 					// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here
 					if (resourceName.startsWith("@")==false) // starts with @ it means system table that doesn't exist in @resources, in fact could be the @resources itself

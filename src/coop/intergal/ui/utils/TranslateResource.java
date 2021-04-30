@@ -11,10 +11,10 @@ import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 
 public class TranslateResource {
-	public static String getFieldLocale(String field, String preConfParam) {
-		return getFieldLocale(field, preConfParam, null);
+	public static String getFieldLocale(String field) {
+		return getFieldLocale(field, null);
 	}
-	public static String getFieldLocale(String field, String preConfParam, String tableName) {
+	public static String getFieldLocale(String field, String tableName) {
 		String clave =field;
 		Locale locale = UI.getCurrent().getLocale();
 		try
@@ -36,13 +36,13 @@ public class TranslateResource {
 			}
 			catch (java.util.MissingResourceException e2)
 			{
-				clave = getClaveFromFieldTemplate(field, preConfParam, tableName);	
+				clave = getClaveFromFieldTemplate(field, tableName);	
 			}
 		}
 	    return clave;
 	}
 
-	private static String getClaveFromFieldTemplate(String field, String preConfParam, String tableName) {
+	private static String getClaveFromFieldTemplate(String field, String tableName) {
 		try {
 			String filtro = "fieldName='"+field +"'";
 			if (tableName != null)

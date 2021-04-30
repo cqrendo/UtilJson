@@ -27,12 +27,14 @@ public class DynamicDBean {// implements Serializable {
 	private String filter; 
 	private JsonNode rowJSon;
 	private boolean isReadOnly ;
+	private String params ;
 //	private StreamResource streamResource;
 	private InputStream inputStream; // is use to keep the blob data read from LAC
 	private byte[] bytes;  // is use to save data into LAC read in a upload  
 	JsonNode rowColTypeList;
 	private ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 	private int maxColNumber ;
+	private String methodForRowSelected ;
 	private String col0;
 	private String col1;
 	private String col2;
@@ -247,6 +249,14 @@ public class DynamicDBean {// implements Serializable {
 //		this.streamResource = streamResource;
 //	}
 
+	public String getParams() {
+		return params;
+	}
+
+	public void setParams(String params) {
+		this.params = params;
+	}
+
 	public InputStream getInputStream() {
 		return inputStream;
 	}
@@ -296,6 +306,14 @@ public class DynamicDBean {// implements Serializable {
 
 	public void setMaxColNumber(int maxColNumber) {
 		this.maxColNumber = maxColNumber;
+	}
+
+	public String getMethodForRowSelected() {
+		return methodForRowSelected;
+	}
+
+	public void setMethodForRowSelected(String methodForRowSelected) {
+		this.methodForRowSelected = methodForRowSelected;
 	}
 
 	public String getCol1() {
@@ -1998,7 +2016,7 @@ public class DynamicDBean {// implements Serializable {
 				methodName= "getC" + colName.substring(1);
 			Method getColX = ((DynamicDBean.class)).getMethod(methodName );
 			String value = ((String) getColX.invoke(dbean));
-			if (value == null)
+			if (value == null || value.isEmpty())
 				return null;
 			value = String.format("%."+nDecimals+"f",Double.valueOf(value));
 			return value.replace(".",",");

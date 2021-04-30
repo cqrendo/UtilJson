@@ -71,7 +71,7 @@ public class FormattingUtils {
 		int length = value.length();
 		if (length <2)
 		{
-			System.out.println("FormattingUtils.formatAs2Decimal()");
+//			System.out.println("FormattingUtils.formatAs2Decimal()");
 			return "0";
 		}
 		int nDecimals = new Integer(value.substring(length -2));

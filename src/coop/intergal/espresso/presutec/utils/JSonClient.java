@@ -52,7 +52,7 @@ public class JSonClient {
 //	private final static HttpClient client = new DefaultHttpClient();
 	private static CloseableHttpClient client = HttpClientBuilder.create().build();
 	private final static JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
-	private static Boolean SHOW_LOGS = false;
+	private static Boolean SHOW_LOGS = true;
 	private static Boolean SHOW_LOGS_DETAIL = false;
 
 //	protected static String LOCAL_BASE_URL = "http://localhost:8080/KahunaService/rest/abl/demo/demo1/";   // for internal testing (ignore)

@@ -36,10 +36,10 @@ import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
 
-@Tag("dynamic-qry-grid-display")
-@JsModule("./src/views/generic/layout/dynamic-qry-grid-display.js")
-@CssImport(value = STYLES_CSS, themeFor = "dynamic-qry-grid-display")
-public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {
+@Tag("dynamic-display-subgrid")
+@JsModule("./src/views/generic/layout/dynamic-display-subgrid.js")
+@CssImport(value = STYLES_CSS, themeFor = "dynamic-display-subgrid")
+public class DynamicDisplaySubgrid extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
 	public ArrayList<String> getRowsColList() {
 		return rowsColList;
@@ -49,16 +49,18 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		this.rowsColList = rowsColList;
 	}	
 
-	public DynamicQryGridDisplay() {
+	public DynamicDisplaySubgrid() {
 		super();
+		displaySplitSubGrid.setOrientation(Orientation.VERTICAL);
+		
 		
 	}
 
-	public DynamicQryGridDisplay(TemplateParser parser, VaadinService service) {
+	public DynamicDisplaySubgrid(TemplateParser parser, VaadinService service) {
 		super(parser, service);
 	}
 
-	public DynamicQryGridDisplay(TemplateParser parser) {
+	public DynamicDisplaySubgrid(TemplateParser parser) {
 		super(parser);
 	}
 
@@ -68,11 +70,12 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	private static final long serialVersionUID = 1L;
 
 	
-	@Id("grid")
-	private DynamicViewGrid grid;
 	
 	@Id("divDisplay")
 	private Div divDisplay;
+	@Id("divSubGrid")  
+	private Div divSubGrid;
+
 	public Div getDivDisplay() {
 		return divDisplay;
 	}
@@ -81,17 +84,16 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		this.divDisplay = divDisplay;
 	}
 
-	public DynamicViewGrid getGrid() {
-		return grid;
+
+	public Div getDivSubGrid() {
+		return divSubGrid;
 	}
 
-	public void setGrid(DynamicViewGrid grid) {
-		this.grid = grid;
+	public void setDivSubGrid(Div divSubGrid) {
+		this.divSubGrid = divSubGrid;
 	}
 
-	@Id("divSubGrid")  
-	private Div divSubGrid;
-	
+		
 
 	private final Binder<DynamicDBean> binder = new Binder<>(DynamicDBean.class);
 	
@@ -102,23 +104,13 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	private String title;
 	private String filter;
 
-	@Id("querySplitGrid")
-	private SplitLayout querySplitGrid;
-
-	@Id("gridSplitDisplay")
-	private SplitLayout gridSplitDisplay;
 
 	@Id("displaySplitSubGrid")
 	private SplitLayout displaySplitSubGrid;
 
-	@Id("divQuery")
-	private Div divQuery;
 	@Id("buttons")
 	private FormButtonsBar buttons;
 	private String apiname;
-	public Div getDivQuery() {
-		return divQuery;
-	}
 
 	public SplitLayout getDisplaySplitSubGrid() {
 		return displaySplitSubGrid;
@@ -128,21 +120,6 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		this.displaySplitSubGrid = displaySplitSubGrid;
 	}
 
-	public SplitLayout getQuerySplitGrid() {
-		return querySplitGrid;
-	}
-
-	public void setQuerySplitGrid(SplitLayout querySplitGrid) {
-		this.querySplitGrid = querySplitGrid;
-	}
-
-	public SplitLayout getGridSplitDisplay() {
-		return gridSplitDisplay;
-	}
-
-	public void setGridSplitDisplay(SplitLayout gridSplitDisplay) {
-		this.gridSplitDisplay = gridSplitDisplay;
-	}
 
 	public Object getDivInDisplay() {
 		return divInDisplay;
@@ -152,9 +129,6 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		this.divInDisplay = divInDisplay;
 	}
 
-	public void setDivQuery(Div divQuery) {
-		this.divQuery = divQuery;
-	}
 
 	private boolean cache = true;
 	private Object divInDisplay;
@@ -185,10 +159,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		title="..";
 		String queryFormClassName = null;
 		String displayFormClassName  = null;
-		querySplitGrid.setOrientation(Orientation.VERTICAL);
-		gridSplitDisplay.setOrientation(Orientation.HORIZONTAL);
-		gridSplitDisplay.getStyle().set("height", "83vh"); 
-		displaySplitSubGrid.setOrientation(Orientation.VERTICAL);
+//		displaySplitSubGrid.setOrientation(Orientation.VERTICAL);
 		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
 		{
 			title=queryParameters.getParameters().get("title").get(0);
@@ -212,59 +183,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 				displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
 			
 		}
-		try {
-			Class<?> dynamicQuery = Class.forName(queryFormClassName);
-			Object queryForm = dynamicQuery.newInstance();
-			Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
-			setGrid.invoke(queryForm,grid);
-			divQuery.removeAll();
-			if (queryFormClassName.indexOf("Generated") > -1)
-			{
-				
-				DdbDataBackEndProvider dataProvider = new DdbDataBackEndProvider();
-				dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
-				dataProvider.setResourceName(resourceName);
-				Method setDataProvider= dynamicQuery.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
-				Method createContent= dynamicQuery.getMethod("createDetails");
-				Method setRowsColList = dynamicQuery.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
-				setDataProvider.invoke(queryForm,dataProvider );
-				setRowsColList.invoke(queryForm,rowsColList);
-				divInDisplay =createContent.invoke(queryForm);
-				divQuery.add((Component)divInDisplay);
-			}
-			else 
-			{				
-				divQuery.add((Component)queryForm);
-			}
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-		grid.setDisplayFormClassName(displayFormClassName);
-		grid.setDisplay(divDisplay);
-		grid.setDivSubGrid(divSubGrid);
-		grid.setButtonsForm(buttons);
-		grid.setLayout(this);
-		grid.setResourceName(resourceName);
 		if ((apiname == null || apiname.length() == 0) == false)
 		{
 			if (filter != null  && filter.length() > 0)
@@ -276,15 +195,11 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 			filter = "APIname='"+apiname+"'";
 			}
 		}
-		grid.setFilter(filter);
-		System.out.println("DynamicQryGridDisplay.beforeEnter() CACHE "+ cache);
-		grid.setCache(cache);
-		grid.setupGrid(false, true);
 		buttons.setVisible(false);
-		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
-		buttons.addCancelListener(e -> grid.undoSelectedRow());
-		buttons.addAddListener(e -> grid.insertANewRow());
-		buttons.addDeleteListener(e -> grid.DeleteARow());
+//		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
+//		buttons.addCancelListener(e -> grid.undoSelectedRow());
+//		buttons.addAddListener(e -> grid.insertANewRow());
+//		buttons.addDeleteListener(e -> grid.DeleteARow());
 		
 	}
 

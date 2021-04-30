@@ -26,6 +26,7 @@ import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.AppConst;
 
 import coop.intergal.ui.components.QueryButtonsBar;
+import coop.intergal.ui.utils.UtilSessionData;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import static coop.intergal.AppConst.STYLES_CSS;
 import static coop.intergal.AppConst.STYLES_FORM_ITEM_CSS;
@@ -82,7 +83,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 
 	public GeneratedQuery() {
 		super();
-		super.preConfParam = AppConst.PRE_CONF_PARAM;
+		super.preConfParam = UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM;
 		queryButtonsBar.addSearchListener(e -> createFilterFromQryForm());
 		queryButtonsBar.addClearSearchListener(e -> cleanQryForm());//System.out.println("PedidoProveedorQuery.beforeEnter() BUSCAR>>>>"));
 	}

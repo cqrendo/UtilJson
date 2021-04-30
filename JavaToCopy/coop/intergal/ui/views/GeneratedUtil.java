@@ -6,13 +6,18 @@ import static coop.intergal.AppConst.STYLES_FORM_ITEM_CSS;
 import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -26,7 +31,10 @@ import org.vaadin.intergal.validation.ValidationMetadata;
 import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
@@ -42,6 +50,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -57,12 +66,12 @@ import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
-
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
+import coop.intergal.ui.security.SecurityUtils;
 import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
@@ -94,7 +103,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
  //   private ListDataProvider<Payment> dataProvider;
 //	private DdbDataBackEndProvider dataProvider;
     private DetailsDrawer detailsDrawer;
-	private static Binder<DynamicDBean> binder;
+    protected Binder<DynamicDBean> binder;
 //	private FormLayout form;
 //	private ArrayList<String[]> rowsColList;
 //	private ArrayList<String[]> rowsFieldList;
@@ -107,10 +116,14 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	private String title;
 	private String resource;
 	private DynamicDBean bean;
+	private DynamicDBean selectedRow;
 //	private FormLayout form;
 	private static Dialog dialogForPick;
 	private static String pickMapFields; 
+	
+	private Hashtable<String, String[]> resourceAndSubresources = new Hashtable<String, String[]>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
 
+	private Div divSubGrid; 
 
 
 
@@ -376,7 +389,9 @@ public class GeneratedUtil  {//, AfterNavigationListener {
  
  
     public Component createDetails(ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache, String currentTab ) {
- 			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
+ //			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
+    		if (binder == null)
+    			binder = new Binder<DynamicDBean>(DynamicDBean.class);
 //			rowsFieldList = dataProvider.getRowsFieldList(cache);
 		    if (bean != null)
 				binder.setBean(bean);
@@ -473,6 +488,10 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				String tabNumber = rowField[18];
 				String fieldHeight = rowField[19];	
 				String toolTip = rowField[16].toString();
+				String tagsForVisibility = rowField[21].toString();
+				String tagsForEdition = rowField[22].toString();
+				boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
+				boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
 				if (tabNumber.isEmpty() || tabNumber.equals(currentTab))
 					{
 				
@@ -527,8 +546,28 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				}	
 				tf.setId("tf"+fieldNameInUI);
 				tf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-				tf.setReadOnly(isReadOnly);
-				if (fieldName.equals("#SPACE#"))
+				tf.setReadOnly(isReadOnly || !editableByTag);
+		//		tf.setReadOnly(!editableByTag);
+				if (visibleByTag == false)
+				{
+					Span s = new Span();
+					FormLayout.FormItem item = form.addFormItem(s, "" );
+					item = addClassNames(item, classNamesItem);
+					item.setId(fieldNameInUI);
+					form.setColspan(item, colspan);
+				}
+				else if (idFieldType == 10) // is a button
+				{
+		//			Button b = new Button(label);
+					Button b =coop.intergal.ui.util.UIUtils.createPrimaryButton(cleanMarks(label));
+					b.setId(label);
+					b.addClickListener(e-> proccesButton(b));
+					FormLayout.FormItem item = form.addFormItem(b, "");
+					item = addClassNames(item, classNamesItem);
+					item.setId(fieldNameInUI);
+					form.setColspan(item, colspan);
+				}
+				else if (fieldName.equals("#SPACE#"))
 				{
 					Span s = new Span();
 					FormLayout.FormItem item = form.addFormItem(s, label );
@@ -571,6 +610,8 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				else if (idFieldType == 1 && isQuery == false) // is Date
 				{
 					EsDatePicker dp = new EsDatePicker();
+					dp.setReadOnly(isReadOnly || !editableByTag);
+
 					dp.getElement().setAttribute("theme", "small");
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
@@ -590,10 +631,11 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				else if (idFieldType == 5 && isQuery == false) // is Number
 				{
 					IntegerField nf = new IntegerField();
+					nf.setReadOnly(isReadOnly || !editableByTag);
+
 //					nf.setValueChangeMode(ValueChangeMode.EAGER); 
 					nf.setId("tf"+fieldNameInUI);
 					nf.getElement().setAttribute("theme", "small");
-					nf.setReadOnly(isReadOnly);
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
 					Div l = alingLabel(label); 
@@ -661,6 +703,8 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 				//	int nDecimals = idFieldType - 100 ; 
 					TextField cTf = new TextField();
+					cTf.setReadOnly(isReadOnly || !editableByTag);
+
 					cTf.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
 					cTf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 //					cTf.addClassName("alignRigth");
@@ -668,7 +712,6 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //					nf.setValueChangeMode(ValueChangeMode.EAGER); 
 					cTf.setId("tf"+fieldNameInUI);
 //					cTf.getElement().setAttribute("theme", "small");
-					cTf.setReadOnly(isReadOnly);					
 					Div l = alingLabel(label); 
 //					binder.bind(cTf, fieldNameInUI);
 					if (isRequired)
@@ -682,7 +725,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
-					tf.setWidth(fieldWidth);
+					cTf.setWidth(fieldWidth);
 
 				}
 				else if (idFieldType > 100 && isQuery == false) // is Decimal
@@ -690,14 +733,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //					BigDecimalField bdf = new BigDecimalField();
 					int nDecimals = idFieldType - 100 ; 
 					TextField bdf = new TextField();
+					bdf.setReadOnly(isReadOnly || !editableByTag);
+
 					bdf.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
 					bdf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
 					new NumeralFieldFormatter(".", ",", nDecimals).extend(bdf);
 //					nf.setValueChangeMode(ValueChangeMode.EAGER); 
 					bdf.setId("tf"+fieldNameInUI);
-					bdf.setReadOnly(isReadOnly);
-//					bdf.addClassName("alignRigth");
+					bdf.addClassName("alignRigth");
 //					bdf.set
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
@@ -751,6 +795,9 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					String parentResource = rowField[20];
 	
 					ComboBox<DynamicDBean> cB = fillComboBox(parentResource);
+					cB.setReadOnly(isReadOnly || !editableByTag);
+					
+
 //					setBeanValidators(validationRuleName, isQuery, cache) ;
 		
 //					cB.setValue(getRowById(bean.getCol(fieldNameInUI), cB));
@@ -773,7 +820,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
-					tf.setWidth(fieldWidth);
+					cB.setWidth(fieldWidth);
 					if (fieldSize.length() > 0)						
 						tf.setMaxLength(new Integer(fieldSize));
 					}
@@ -781,6 +828,8 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				else  // is Text
 				{
 					setBeanValidators(validationRuleName, isQuery, cache) ;
+					tf.setReadOnly(isReadOnly || !editableByTag);
+			
 					if (isRequired && isQuery == false )
 					{	
 					binder.forField(tf).asRequired()
@@ -812,9 +861,9 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 						}
 					if (isPick)
 					{
-						tf.getElement().addEventListener("click", ev->showDialogForPick(null, null, fieldNameInUI, cache));
-						Icon edit = new Icon(VaadinIcon.DOWNLOAD_ALT);
-						tf.setSuffixComponent(edit);
+						tf.getElement().addEventListener("click", ev->showDialogForPick(null,null, bean, fieldNameInUI, cache));
+						Icon icon = new Icon(VaadinIcon.DOWNLOAD_ALT);
+						tf.setSuffixComponent(icon);
 					}
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
@@ -833,6 +882,73 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			form.add(statusLabel);
 			return form;
 	    }
+    
+    
+private String cleanMarks(String label) {
+	int idxMarkIDM = label.indexOf("@");
+	if (idxMarkIDM > -1)
+	{
+		return label.substring(0, idxMarkIDM);
+	}
+	return label;
+}
+
+// ******* PROCESAR BOTONES *********    
+	private Object proccesButton(Button b) {
+		String idButton = b.getId().get();
+		System.out.println("GeneratedUtil.proccesButton() " + idButton);
+		if (idButton.indexOf("@POP@IDM") > -1)
+		{
+			runMethodFor("processButtonForNavigation",idButton);
+		}
+		else if (idButton.indexOf("@IDM") > -1)
+		{
+			runMethodFor("processButtonForNavigation",idButton);
+//			processButtonForNavigation(idButton);
+		}
+		else
+		{
+			DataService.get().showError("Proceso no implementado");
+		}
+		return null;
+	}
+	private void runMethodFor(String methodName, String idButton) {
+		System.out.println("method to run "+ methodName);
+//		Class<?> dynamicQuery;
+		try {
+			Class<?> classForMethods = Class.forName(AppConst.CLASS_FOR_METHODS);
+			Object oClassForMethods = classForMethods.newInstance();
+			Method method = classForMethods.getMethod(methodName, new Class[] {String.class, coop.intergal.vaadin.rest.utils.DynamicDBean.class, com.vaadin.flow.component.html.Div.class, DynamicViewGrid.class} );
+//			this.getParent().get().getParent().get().getParent().get().getParent().get().getParent().get().getChildren().findFirst();
+//			UI.getCurrent().getChildren().findFirst();
+			method.invoke(oClassForMethods, idButton, bean, divSubGrid, grid);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+	
+}
+		
 	private static DynamicDBean getRowById(String id, ComboBox cB) {
 		
 		if (id != null)
@@ -884,7 +1000,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 		Collection<DynamicDBean> 	teacherList = RestData.getResourceData("!!ERROR!! combo sin Resource Parent, especificar en MetaConfig ");
 		if (parentResource != null && parentResource.isEmpty() == false)
 		{				
-			teacherList = RestData.getResourceData(0,0,parentResource, AppConst.PRE_CONF_PARAM, rowsColList, null, true, false, null);
+			teacherList = RestData.getResourceData(0,0,parentResource, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM, rowsColList, null, true, false, null);
 		}
 		ComboBox<DynamicDBean> cB = new ComboBox<DynamicDBean>() ;
 		cB.setItems(teacherList);
@@ -996,6 +1112,14 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 		this.binder = binder;
 	}
 
+	public Div getDivSubGrid() {
+		return divSubGrid;
+	}
+
+	public void setDivSubGrid(Div divSubGrid) {
+		this.divSubGrid = divSubGrid;
+	}
+
 	private boolean isRequired(String params) {
 		if (params == null)
 			return false;
@@ -1074,20 +1198,26 @@ public class GeneratedUtil  {//, AfterNavigationListener {
     
     // ANTES NO ERA STATIC
 
-private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean item,  String fieldName, boolean cache) { 
+private Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean item, DynamicDBean beanFromAGenerateForm, String fieldName, boolean cache) { 
 		
 		try { 
 		DynamicGridForPick dynamicGridForPick = new DynamicGridForPick(); 
 		String queryFormForPickClassName = null;
-		DynamicDBean currentRow;
+		DynamicDBean currentRow = null;
 		String resourceName = null;
 		boolean isPickFromAGrid= false;
-		if (item != null) // the item is only send when comes froma a gtid
+		if (item != null) // the item is only send when comes from a a grid
 			{
 			resourceName =item.getResourceName();
 			isPickFromAGrid = true;
 //			currentRow=item;
 			}
+//		else if (beanFromAGenerateForm != null)
+//		{
+//			currentRow = beanFromAGenerateForm;
+//			binder.setBean(currentRow);
+//			resourceName =currentRow.getResourceName();
+//		}
 		else
 		{
 			currentRow = binder.getBean();
@@ -1109,9 +1239,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 		if (queryFormForPickClassName.equals("null"))
 			return null;
 		if (queryFormForPickClassName.startsWith("coop.intergal.ui.views") == false)
-			queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;
-	
-
+			queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;	
 		DynamicViewGrid grid = dynamicGridForPick.getGrid();
 		Class<?> dynamicQuery = Class.forName(queryFormForPickClassName);
 		Object queryForm = dynamicQuery.newInstance();
@@ -1123,7 +1251,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 		{
 			
 			DdbDataBackEndProvider dataProvider = new DdbDataBackEndProvider();
-			dataProvider.setPreConfParam(AppConst.PRE_CONF_PARAM);
+			dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 			dataProvider.setResourceName(parentResource);
 			Method setDataProvider= dynamicQuery.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
 			Method createContent= dynamicQuery.getMethod("createDetails");
@@ -1135,7 +1263,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 			createContent.invoke(queryForm);
 		}
 		dynamicGridForPick.getDivQuery().add((Component)queryForm);
-
+		
 		
 		grid.setButtonsRowVisible(false);
 		grid.setResourceName(parentResource);
@@ -1149,9 +1277,11 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 //		dynamicGridForPick.setRowsColList(currentRow.getRowsColList());
 		if (isPickFromAGrid)
 			dynamicGridForPick.addAcceptPickListener(e -> fillDataForGridPickAndAccept(gridChild, grid.getGrid().getSelectedItems(),dialogForPick,item, pickMapFields ));
-		else	
-			dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,binder.getBean(), pickMapFields ));//, currentRow, pickMapFields ));
-		if (dialogForPick == null)
+		else
+			dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,beanFromAGenerateForm, pickMapFields ));
+//			dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick, binder.getBean(), pickMapFields ));//, currentRow, pickMapFields ));
+//			dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,currentRow, pickMapFields ));//, currentRow, pickMapFields ));
+//		if (dialogForPick == null)
 			dialogForPick = new Dialog();
 		dialogForPick.removeAll();
 		dialogForPick.setCloseOnOutsideClick(false);
@@ -1167,7 +1297,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 		return null;
 	}
 
-	private static Object fillDataForPickAndAccept(Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
+	private Object fillDataForPickAndAccept(Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
 		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
 		if (seletedRows.iterator() ==  null || seletedRows.iterator().hasNext() == false)
 		{
@@ -1187,7 +1317,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 		dialogForPick.close();
 		return null;
 	}
-	private static Object fillDataForGridPickAndAccept(DynamicViewGrid grid,Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
+	private Object fillDataForGridPickAndAccept(DynamicViewGrid grid,Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
 		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
 		if (seletedRows == null || seletedRows.isEmpty())
 		{
@@ -1211,12 +1341,18 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 	}
 
 	// ******* COLUMNS ********
-	public static Column<DynamicDBean> addFormatedColumn(int i, ArrayList<String[]> rowsColListGrid, DynamicViewGrid dynamicViewGrid, GridPro<DynamicDBean> grid, boolean isGridEditable) {  // for now grid is not editable , then was copy and adapted from DynamicViewGrid
+	public Column<DynamicDBean> addFormatedColumn(int i, ArrayList<String[]> rowsColListGrid, DynamicViewGrid dynamicViewGrid, GridPro<DynamicDBean> grid, boolean isGridEditable) {  // for now grid is not editable , then was copy and adapted from DynamicViewGrid
 //		String colName = "col"+i;
 		
 		String[] colData = rowsColListGrid.get(i);
 		String colName = colData[2];
 		String idFieldTypeStr = colData[3];
+		String tagsForVisibility = colData[21].toString();
+		String tagsForEdition = colData[22].toString();
+		boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
+		boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
+		if (visibleByTag == false)
+			return null;
 		int idFieldType = 0;
 		if ( idFieldTypeStr.isEmpty() == false)
 			idFieldType = new Integer (idFieldTypeStr);
@@ -1227,6 +1363,8 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 		boolean isNotAParentField = colData[1].indexOf("#SORT")>-1; // parent field for now can not be use as sort column
 		boolean isCOlEditable = true;;
 		if (colData[1].indexOf("#CNoEDT#")>-1)
+			isCOlEditable = false;
+		if (editableByTag == false)
 			isCOlEditable = false;
 		if (colData[1].indexOf("#SIG#")>-1) { // #SIG# = Show In Grid
 //			String header = TranslateResource.getFieldLocale(colData[0], preConfParam);
@@ -1321,7 +1459,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 					header = header.substring(2);
 				if (isCOlEditable  && isGridEditable) {
 					col = grid.addEditColumn(d -> d.getColBoolean(colName)?//"Si":"No")
-							TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NO", AppConst.PRE_CONF_PARAM))
+							TranslateResource.getFieldLocale("YES"): TranslateResource.getFieldLocale("NO"))
 					.checkbox((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue))		
 					.setHeader(header);
 					}
@@ -1330,7 +1468,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 					if (isNotAParentField)
 						{
 						col = grid.addColumn(d -> d.getColBoolean(colName)?//"Si":"No")
-								TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))		
+								TranslateResource.getFieldLocale("YES"): TranslateResource.getFieldLocale("NOT"))		
 								.setHeader(header)
 //						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
 						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
@@ -1338,7 +1476,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 					else
 						{
 						col = grid.addColumn(d -> d.getColBoolean(colName)?//"Si":"No")
-								TranslateResource.getFieldLocale("YES", AppConst.PRE_CONF_PARAM): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))		
+								TranslateResource.getFieldLocale("YES"): TranslateResource.getFieldLocale("NOT", AppConst.PRE_CONF_PARAM))		
 								.setHeader(header)
 //						col = grid.addColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).setHeader(header)
 						.setTextAlign(ColumnTextAlign.END).setResizable(true);
@@ -1370,7 +1508,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 							col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header).setResizable(true);				
 					else if (isGridEditable && isCOlEditable == false ) 
 					{
-						if (isNotAParentField && isPick == false)
+						if (isNotAParentField || isPick == false)
 							{
 							col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
 							}
@@ -1389,7 +1527,7 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 								 Label l = new Label("Buscar....");
 								 if (item.getCol(colName) != null && item.getCol(colName).isEmpty() == false)
 									 l = new Label(item.getCol(colName));
-								 l.getElement().addEventListener("click", ev->showDialogForPick(dynamicViewGrid, item, colName, false) );//ev->dynamicViewGrid.pickParent(colName, item));
+								 l.getElement().addEventListener("click", ev->showDialogForPick(dynamicViewGrid, item,null, colName, false) );//ev->dynamicViewGrid.pickParent(colName, item));
 								 return l;
 								 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
 							
@@ -1470,7 +1608,12 @@ private static Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean 
 	//				String colName = getColName(rowsColList,i);
 					String defaultValue = getDefaultValue(rowsColList,i);
 					if (defaultValue != null && ! defaultValue.equals("null") && defaultValue.length() > 0)
-						field.set(bean, defaultValue);
+						if (defaultValue.equals("user()"))
+						{
+							field.set(bean, SecurityUtils.getUsername());
+						}
+						else
+							field.set(bean, defaultValue);
 					i++;
 					}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
