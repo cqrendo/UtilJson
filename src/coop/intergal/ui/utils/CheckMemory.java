@@ -1,8 +1,5 @@
 package coop.intergal.ui.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CheckMemory {
     private static final long MEGABYTE = 1024L * 1024L;
 
