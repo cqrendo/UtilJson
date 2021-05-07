@@ -157,7 +157,8 @@ private long sizeBE;
 			if (resourceName2.startsWith("CR-") == false) // for using of tables without resources, when is a resource it starts with CR_
 				startIdx = 0;
 			int endIdx = resourceName2.indexOf("__");
-			if (endIdx < 0)
+			int idxSpecialFilter = resourceName2.indexOf("_SF");
+			if (endIdx < 0 || idxSpecialFilter > -1) // when is marked as SF special filter it must exist  Count that include this filter
 				endIdx=resourceName2.length();
 			int postPoint = resourceName2.indexOf(".");
 			if (postPoint > 0)

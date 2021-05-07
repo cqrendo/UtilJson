@@ -7,9 +7,9 @@ import '@vaadin/vaadin-date-picker/src/vaadin-date-picker.js';
 import '../../generic/crud-view.js';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/vaadin-text-field/src/vaadin-text-area.js';
-import '../../../components/query-buttons-bar.js';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+import '../../../components/query-buttons-bar.js';
 
 class GeneratedQuery extends PolymerElement {
   static get template() {
@@ -68,9 +68,12 @@ class GeneratedQuery extends PolymerElement {
 		style="padding-right:  0.75rem; margin-right: 0px;" 
 	}
     </style>
-<h3 id="title"></h3>
 <vaadin-horizontal-layout theme="" style="width: 100%; height: 100%;">
- <vaadin-form-layout id="form" style="flex-grow: 1;"></vaadin-form-layout>
+ <div class="linCampos" style="width: 50px; height: 100%;margin-top: 16px;">
+  <query-buttons-bar id="queryButtonsBar"></query-buttons-bar>
+ </div>
+ <h3 id="title"></h3>
+<vaadin-form-layout id="form" style="width: 100%; height: 100%;"></vaadin-form-layout>
  <!--  <vaadin-vertical-layout class="full"> -->
  <!--  <vaadin-form-item> -->
  <!-- </vaadin-form-item>  -->
@@ -82,9 +85,6 @@ class GeneratedQuery extends PolymerElement {
  <!--  </vaadin-custom-field> -->
  <!--  </vaadin-form-item> -->
  <!--  </vaadin-vertical-layout> -->
- <div class="linCampos" style="width: 5%; height: 10%;">
-  <query-buttons-bar id="queryButtonsBar"></query-buttons-bar>
- </div>
 </vaadin-horizontal-layout>
 <!-- <vaadin-horizontal-layout theme="spacing" style="width: 100%; height: 100%;"></vaadin-horizontal-layout> -->
 `;

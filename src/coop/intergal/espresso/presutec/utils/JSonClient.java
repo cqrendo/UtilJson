@@ -554,7 +554,9 @@ public class JSonClient {
 			int i=0;
 			for (JsonNode eachRow : pKeyColumns) {
 				String childTable = eachRow.get("child_table").asText();
-				if (childTable.equals("main:"+childTableName)) //@@CQR be careful with "main:" 
+				int idxColon = childTable.indexOf(":"); // to take off prefix
+				childTable = childTable.substring(idxColon+1);
+				if (childTable.equals(childTableName)) //@@CQR be careful with "main:" 
 					{
 					JsonNode childKeyColumns = eachRow.get("child_columns");
 					for (JsonNode eachChlidKey : childKeyColumns) {

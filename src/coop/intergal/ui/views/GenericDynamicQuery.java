@@ -6,12 +6,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.FormItem;
 import com.vaadin.flow.component.html.Div;
@@ -23,7 +28,9 @@ import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.ui.utils.UiComponentsUtils;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
+import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 import coop.intergal.vaadin.rest.utils.RestData;
 
@@ -41,6 +48,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 	private String childName = "";
 	private String childFkField = "";
 	protected String preConfParam;
+	private ArrayList<String[]> rowsQueryFieldList;
 
 //	public interface CrudForm<E> {
 //		FormButtonsBar getButtons();
@@ -102,9 +110,14 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 	public static String componeDateFilter(String field, String value) {
 		if (value == null)
 			return null;
+		if (value.length() < 10)
+		{
+			DataService.get().showError("Fecha incorrecta demasiado corta , formatos admintidos( DD-MM-AAAA // DD-MM-AAAA hh:mm // DD-MM-AAAA::DD-MM-AAAA // DD-MM-AAAA hh:mm::DD-MM-AAAA hh:mm // >DD-MM-AAAA hh:mm..... )");
 		// posible formats ( DD-MM-AAAA // DD-MM-AAAA hh:mm // DD-MM-AAAA::DD-MM-AAAA //
 		// DD-MM-AAAA hh:mm::DD-MM-AAAA hh:mm // >DD-MM-AAAA hh:mm..... )
 		// DD-MM-AAAA
+			return null;
+		}	
 		if (value.indexOf("/") > 0)
 			value = value.replaceAll("/", "-");
 		if (value.startsWith("<") || value.startsWith(">")) {
@@ -215,7 +228,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 				.getRowsQueryFieldList(rowsColList, ResourceName, preConfParam).iterator();
 
 		
-		Div form = null ;
+		FormLayout form = null ;
 		if (isGeneratedForm)
 		{
 			Field fieldForm;
@@ -223,7 +236,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 //				fieldForm = ((class1)).getDeclaredField("form");
 //				fieldForm.setAccessible(true);
 //				Object fieldObj = object;//fieldForm.get(object);
-				form = (Div) object;
+				form = (FormLayout) object;
 //				form = ((FormLayout) fieldObj);
 //			} catch (NoSuchFieldException | SecurityException e) {
 //				// TODO Auto-generated catch block
@@ -285,9 +298,9 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 							// filter=componefilter(filter, rowCol[0], ((TextField) fieldObj).getValue());
 								if (filter.length() > 1)
 									filter = filter + "%20AND%20" + rowCol[0]
-											+ componeNumberFilte(value);// determineOperator(value);
+											+ componeNumberFilter(value);// determineOperator(value);
 								else
-									filter = rowCol[0] + componeNumberFilte(value);// determineOperator(value);
+									filter = rowCol[0] + componeNumberFilter(value);// determineOperator(value);
 							}
 					}  
 
@@ -346,14 +359,17 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		return filter;
 	}
 
-	private String componeNumberFilte(String value) {
+	private String componeNumberFilter(String value) {
 		if (value.indexOf(":")> 0)  // is a range
 			return componeNumberRange(value);
+		else if (value.indexOf(",")> 0)  // is a list
+			return componeNumberList(value);
 		else
 			return determineOperator(value);
 	}
 
-	private String getValueFromField(Div form, String id, Object fieldObj, boolean isGeneratedForm) {
+
+	private String getValueFromField(FormLayout form, String id, Object fieldObj, boolean isGeneratedForm) {
 		String value = "";
 		if (isGeneratedForm)
 		{
@@ -472,16 +488,18 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 //		return filter;
 //	}	
 
-	private Object getValueFromField(Div form, String id) { // adapt to actual component tree  
-		FormLayout subform = (FormLayout) form.getChildren().findFirst().get().getChildren().findFirst().get();//flatMap(c->c instanceof Div?((Div)c).getChildren():Stream.of(c));
+	private Object getValueFromField(FormLayout form, String id) { // adapt to actual component tree  
+//		FormLayout subform = (FormLayout) form.getChildren().findFirst().get().getChildren().findFirst().get();//flatMap(c->c instanceof Div?((Div)c).getChildren():Stream.of(c));
 //		FormLayout subform = (FormLayout) subDiv.getChildren().findFirst().get();
-		Object value = subform.getChildren()
-				.flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
-			    .filter(c->id.equals(c.getId().orElse(null))).findFirst()
-			    .filter(HasValue.class::isInstance)
-			.map(HasValue.class::cast)
-			    .map(HasValue::getValue)
-			    .orElse(null);
+//		Object value = subform.getChildren()
+//				.flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
+//			    .filter(c->id.equals(c.getId().orElse(null))).findFirst()
+//			    .filter(HasValue.class::isInstance)
+//			.map(HasValue.class::cast)
+//			    .map(HasValue::getValue)
+//			    .orElse(null);
+		TextField tf= (TextField) UiComponentsUtils.findComponent(form, id);
+		Object value = tf.getValue();
 		if (value == null)
 			value = "";
 		System.out.println("VALUE........"+ value);
@@ -515,7 +533,9 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		// combining ROW fields and
 		// parents and grand parent
 		// fields
-		Iterator<String[]> itRowsColList = RestData.getRowsColList(rowsColList, ResourceName, preConfParam).iterator();
+		if (rowsQueryFieldList == null)
+			rowsQueryFieldList = RestData.getRowsQueryFieldList(rowsColList, ResourceName, preConfParam);
+		Iterator<String[]> itRowsColList = rowsQueryFieldList.iterator();//RestData.getRowsColList(rowsColList, ResourceName, preConfParam).iterator();
 		String filter = "";
 		while (itRowsColList.hasNext()) {
 			String[] rowCol = itRowsColList.next();
@@ -543,7 +563,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-							fieldName = "tf"+fieldName;
+					// 		fieldName = "tf"+fieldName;
 							clearField(form, fieldName);
 						}
 						else
@@ -571,12 +591,42 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 				
 private void clearField(FormLayout form, String id) {
 	
-	form.getChildren()
-    .flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
-    .filter(c->id.equals(c.getId().orElse(null))).findFirst()
-    .filter(HasValue.class::isInstance)
-    .map(HasValue.class::cast)
-    .ifPresent(HasValue::clear);
+//	form.getChildren()
+//	.filter(c->id.equals(c.getId().orElse(null)))
+//	.flatMap(c->c.getChildren())
+//	.findFirst()
+//	.filter(HasValue.class::isInstance)
+//	.map(HasValue.class::cast)
+//	.ifPresent(HasValue::clear);
+	TextField tf = (TextField) UiComponentsUtils.findComponent(form, id).getChildren().findFirst().get();
+	if (tf != null)
+		tf.clear();
+//	findComponent(UI.getCurrent(),"col2");
+//	for (Component child : form.getChildren().filter(c->c instanceof Div).collect(Collectors.toList()))
+//	{
+//		Div div = (Div) child;
+//		for (Component childForm : div.getChildren().filter(c->c instanceof FormLayout).collect(Collectors.toList()))
+//		{
+//			FormLayout form2 = (FormLayout) childForm;
+//			form2.getChildren()	
+//			.flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
+//			.filter(c->id.equals(c.getId().orElse(null))).findFirst()
+//			.filter(HasValue.class::isInstance)
+//			.map(HasValue.class::cast)
+//			.ifPresent(HasValue::clear);
+//			break;
+//		}
+//		break;
+//	}
+//	Div div = (Div) form.getChildren()
+//			.flatMap(c->c instanceof Div?((Div)c).:Stream.of(c))
+//			.filter(Div.class::isInstance);
+//	div.getChildren()
+//    .flatMap(c->c instanceof FormItem?((FormItem)c).getChildren():Stream.of(c))
+//    .filter(c->id.equals(c.getId().orElse(null))).findFirst()
+//    .filter(HasValue.class::isInstance)
+//    .map(HasValue.class::cast)
+//    .ifPresent(HasValue::clear);
 		
 	}
 
@@ -584,6 +634,78 @@ private void clearField(FormLayout form, String id) {
 
 //}
 //return filter;
+//public static List<Component> returnAllNodes(Component node){
+//    List<Component> listOfNodes = new ArrayList<Component>();
+//    if (node != null) {
+//        listOfNodes.add(node);
+//        for(int i = 0; i < listOfNodes.size(); ++i) {
+//            Node n = listOfNodes.get(i);
+//            List<Node> children = n.getChildren();
+//            if (children != null) {
+//                for (Node child: children) {
+//                    if (!listOfNodes.contains(child)) {
+//                        listOfNodes.add(child);
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    return listOfNodes;
+//}
+public static Stream<Component> findComponents(Component component, String id) {
+	if (component.getId().filter(id::equals).isPresent()) {
+		return Stream.of(component);
+	} else {
+		return component.getChildren().flatMap(child->findComponents(child, id));
+	}
+	}
+public static Component findComponentXX(Component component, String searchid) {
+	for (Component child : component.getChildren().collect(Collectors.toList()))
+	{
+		if (child.getId().isPresent()== false)
+			return findComponentXX(child, searchid);
+		String id = child.getId().get();
+
+		if (id.equals(searchid))
+			return child;
+		else
+		{
+			return findComponentXX(child, searchid);
+		}
+	}
+	return component;
+}
+//		for (Component child2 :child.getChildren().collect(Collectors.toList()))
+//			{
+//			id = child2.getId().get();
+//			if (id.equals(searchid))
+//				break;
+//			else
+//			{
+//			for (Component child3:child.getChildren().collect(Collectors.toList()))
+//			{
+//				id = child3.getId().get();
+//
+//				if (id.equals(searchid))
+//					break;
+//				else
+//				{
+//				for (Component child4:child.getChildren().collect(Collectors.toList()))
+//					{
+//						id = child4.getId().get();
+//
+//						if (id.equals(searchid))
+//							break;
+//						else
+//						{
+//							
+//						}
+//						}	
+//
+
+//}
+	
+
 	private void setFKIdsForFilter(String id, String value) { // keeps the filters in each parent id comes with the format list- or CR-childTable#childField.FK-paremtTable-fieldnmame , childField is opctional when there is more than one parent (same table) of the same child
 		int idxTable = 0;
 		int idxChildField = 0; 
@@ -781,5 +903,10 @@ private void clearField(FormLayout form, String id) {
 		
 		return "%20BETWEEN%20" + fromNumber + "%20AND%20" + toNumber ;
 	}
+	private String componeNumberList(String value) {
+		value = value.trim(); // deletes extra blanks pre and post
+		return "%20IN("+value+")";
+	}
+
 
 }

@@ -77,7 +77,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 	}
 
 	@Id("form")
-	private Div form;
+	private FormLayout form;
 	@Id("queryButtonsBar")
 	private QueryButtonsBar queryButtonsBar;
 
@@ -191,7 +191,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 			content.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
 			content.setHeight("100%");
 			form.add(content);
-			return form;
+			return this;//form;
 		}
 
 //		return generatedUtil.createDetails(rowsQueryFieldList, form, true, cache);
