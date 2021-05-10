@@ -1074,6 +1074,17 @@ public class RestData {
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
+						if ( col.get("parentResource") != null && col.get("parentResource").asText().trim().length() > 1 && col.get("parentResource").asText().trim().equals("null")== false) 
+						{
+						
+							fieldArr[20] = col.get("parentResource").asText();
+							if ((( col.get("idFieldType") != null && col.get("idFieldType").asText().trim().length() > 0 && col.get("idFieldType").asText().trim().equals("null")== false)) && 
+							 	 col.get("idFieldType").asInt() == 6)
+								fieldArr[1] = fieldArr[1]+"#COMBO#";
+							else	
+								fieldArr[1] = fieldArr[1]+"#PCK#";
+		
+						}
 						if ( col.get("FieldNameInUI").asText().isEmpty())
 							fieldArr[2] = "col"+i;	
 						else

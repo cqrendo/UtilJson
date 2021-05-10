@@ -73,6 +73,7 @@ import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.security.SecurityUtils;
 import coop.intergal.ui.utils.TranslateResource;
+import coop.intergal.ui.utils.UiComponentsUtils;
 import coop.intergal.ui.utils.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.ui.utils.converters.DecimalFormatter;
@@ -152,7 +153,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 		this.title = title;
 	}
 
-	public Component createTabs(ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache,String tabsLabels) {
+	public Component createTabs(String resourceName,ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache,String tabsLabels) {
 			String [] tokens = tabsLabels.split(Pattern.quote(","));
 //			int i = 0;
 //		   	Div contentyDiv0 = new Div(); 
@@ -173,7 +174,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 					tabTitle = tokens[0];
 					tab0 = new Tab(tabTitle);
-					content0 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"0"));
+					content0 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"0"));
 					content0.setWidthFull();
 					
 				}
@@ -181,7 +182,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 					tabTitle = tokens[1];
 					tab1 = new Tab(tabTitle);
-					content1 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"1"));
+					content1 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"1"));
 					content1.setWidthFull();
 					content1.setVisible(false);
 					
@@ -190,7 +191,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 					tabTitle = tokens[2];
 					tab2 = new Tab(tabTitle);
-					content2 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"2"));
+					content2 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"2"));
 					content2.setWidthFull();
 					content2.setVisible(false);
 					
@@ -199,7 +200,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 					tabTitle = tokens[3];
 					tab3 = new Tab(tabTitle);
-					content3 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"3"));
+					content3 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"3"));
 					content3.setWidthFull();
 					content3.setVisible(false);
 
@@ -209,7 +210,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 					tabTitle = tokens[4];
 					tab4 = new Tab(tabTitle);
-					content4 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"4"));		
+					content4 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"4"));		
 					content4.setWidthFull();
 					content4.setVisible(false);
 
@@ -218,7 +219,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 					tabTitle = tokens[5];
 					tab5 = new Tab(tabTitle);
-					content5 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"5"));
+					content5 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"5"));
 					content5.setWidthFull();
 					content5.setVisible(false);
 					
@@ -227,7 +228,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 					tabTitle = tokens[6];
 					tab6 = new Tab(tabTitle);
-					content6 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"6"));
+					content6 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"6"));
 					content6.setWidthFull();
 					content6.setVisible(false);
 
@@ -237,7 +238,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				{
 					tabTitle = tokens[7];
 					tab7 = new Tab(tabTitle);
-					content7 = new FlexBoxLayout(createDetails(rowsFieldList, isQuery, cache,"7"));		
+					content7 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"7"));		
 					content7.setWidthFull();
 					content7.setVisible(false);
 
@@ -388,7 +389,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	    }
  
  
-    public Component createDetails(ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache, String currentTab ) {
+    public Component createDetails(String resourceName, ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache, String currentTab ) {
  //			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
     		if (binder == null)
     			binder = new Binder<DynamicDBean>(DynamicDBean.class);
@@ -400,7 +401,11 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			private FormLayout form;
 //			if (form == null)
 //				form = new FormLayout();
-			FormLayout	form = new FormLayout();
+			FormLayout form = new FormLayout();
+//			if (isQuery)
+//				{
+//				form.setId(ResourceName+"_QRY");
+//				}
 			form.removeAll();
 			form.getStyle().set("overflow", "inherit");
 			Div statusLabel = new Div();
@@ -861,8 +866,13 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 						}
 					if (isPick)
 					{
-						tf.getElement().addEventListener("click", ev->showDialogForPick(null,null, bean, fieldNameInUI, cache));
+//                        idForm = null;
+//                        if (form.getId().isPresent())
+//                        	idForm = form.getId().get();
+ 						//						final form2 = form; 
+						Component formForFields = tf.getParent().get().getParent().get();
 						Icon icon = new Icon(VaadinIcon.DOWNLOAD_ALT);
+						icon.getElement().addEventListener("click", ev->showDialogForPick(formForFields,resourceName, null,null, bean, fieldNameInUI, cache, isQuery));
 						tf.setSuffixComponent(icon);
 					}
 					item = addClassNames(item, classNamesItem);
@@ -880,6 +890,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			[part="error-message"] {white-space: nowrap;}
 
 //			form.add(statusLabel);
+			form.setId(resourceName);
 			return form;
 	    }
     
@@ -1198,17 +1209,19 @@ private String cleanMarks(String label) {
     
     // ANTES NO ERA STATIC
 
-private Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean item, DynamicDBean beanFromAGenerateForm, String fieldName, boolean cache) { 
+private Object showDialogForPick(Component parentTF, String resourceName, DynamicViewGrid gridChild, DynamicDBean item, DynamicDBean beanFromAGenerateForm, String fieldName, boolean cache, Boolean isQuery) { 
 		
 		try { 
 		DynamicGridForPick dynamicGridForPick = new DynamicGridForPick(); 
 		String queryFormForPickClassName = null;
 		DynamicDBean currentRow = null;
-		String resourceName = null;
+//		final resourceName;
+//		String resourceName = null;
 		boolean isPickFromAGrid= false;
+		String idForm = null;
 		if (item != null) // the item is only send when comes from a a grid
 			{
-			resourceName =item.getResourceName();
+//			resourceName =item.getResourceName();
 			isPickFromAGrid = true;
 //			currentRow=item;
 			}
@@ -1218,10 +1231,15 @@ private Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean item, D
 //			binder.setBean(currentRow);
 //			resourceName =currentRow.getResourceName();
 //		}
-		else
+//		else if (isQuery)
+//		{
+//			idForm = resourceName+"_QRY";
+////			resourceName = beanFromAGenerateForm.getResourceName();
+//		}
+		else if (isQuery == false)
 		{
 			currentRow = binder.getBean();
-			resourceName =currentRow.getResourceName();
+//			resourceName =currentRow.getResourceName();
 		}
 		String filter="tableName='"+resourceName+"'%20AND%20FieldNameInUI='"+fieldName+"'";
 		String parentResource = "";
@@ -1278,12 +1296,13 @@ private Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean item, D
 		if (isPickFromAGrid)
 			dynamicGridForPick.addAcceptPickListener(e -> fillDataForGridPickAndAccept(gridChild, grid.getGrid().getSelectedItems(),dialogForPick,item, pickMapFields ));
 		else
-			dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,beanFromAGenerateForm, pickMapFields ));
+			dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(parentTF, resourceName,grid.getGrid().getSelectedItems(),dialogForPick,beanFromAGenerateForm, pickMapFields ));
 //			dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick, binder.getBean(), pickMapFields ));//, currentRow, pickMapFields ));
 //			dynamicGridForPick.addAcceptPickListener(e -> fillDataForPickAndAccept(grid.getGrid().getSelectedItems(),dialogForPick,currentRow, pickMapFields ));//, currentRow, pickMapFields ));
 //		if (dialogForPick == null)
 			dialogForPick = new Dialog();
 		dialogForPick.removeAll();
+		dialogForPick.setModal(false);
 		dialogForPick.setCloseOnOutsideClick(false);
 		dialogForPick.add(dynamicGridForPick);
 		dialogForPick.open();
@@ -1297,7 +1316,7 @@ private Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean item, D
 		return null;
 	}
 
-	private Object fillDataForPickAndAccept(Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
+	private Object fillDataForPickAndAccept(Component parentTF, String idForm, Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
 		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
 		if (seletedRows.iterator() ==  null || seletedRows.iterator().hasNext() == false)
 		{
@@ -1311,12 +1330,23 @@ private Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean item, D
 			int idxSeparator = eachFieldMap.indexOf(";");
 			String childField = eachFieldMap.substring(0, idxSeparator);
 			String parentField = eachFieldMap.substring(idxSeparator+1);
-			currentRow.setCol(seletedParentRow.getCol(parentField), childField);						
+			if (currentRow != null)
+				currentRow.setCol(seletedParentRow.getCol(parentField), childField);
+			else
+				getCOlById(parentTF, "tf" + childField).setValue(seletedParentRow.getCol(parentField));
+			
 		}
-		binder.setBean(currentRow);
+		if (currentRow != null)
+			binder.setBean(currentRow);
 		dialogForPick.close();
 		return null;
 	}
+	private TextField getCOlById(Component parentTF, String childField) {
+//		FormLayout form = (FormLayout) UiComponentsUtils.findComponent(UI.getCurrent(), idForm);
+		return (TextField) UiComponentsUtils.findComponent(parentTF, childField);
+//		return null;
+	}
+
 	private Object fillDataForGridPickAndAccept(DynamicViewGrid grid,Set<DynamicDBean> seletedRows, Dialog dialogForPick2, DynamicDBean currentRow, String pickMapFields) {
 		StringTokenizer tokens = new StringTokenizer(pickMapFields,"#");
 		if (seletedRows == null || seletedRows.isEmpty())
@@ -1527,7 +1557,7 @@ private Object showDialogForPick(DynamicViewGrid gridChild, DynamicDBean item, D
 								 Label l = new Label("Buscar....");
 								 if (item.getCol(colName) != null && item.getCol(colName).isEmpty() == false)
 									 l = new Label(item.getCol(colName));
-								 l.getElement().addEventListener("click", ev->showDialogForPick(dynamicViewGrid, item,null, colName, false) );//ev->dynamicViewGrid.pickParent(colName, item));
+								 l.getElement().addEventListener("click", ev->showDialogForPick(null, null,dynamicViewGrid, item,null, colName, false, false) );//ev->dynamicViewGrid.pickParent(colName, item));
 								 return l;
 								 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
 							

@@ -177,7 +177,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		}
  		if (tabs.isEmpty()) 
 		{
- 			Div content = new Div(generatedUtil.createDetails(rowsQueryFieldList, true, cache,"noTAB"));
+ 			Div content = new Div(generatedUtil.createDetails(dataProvider.getResourceName(), rowsQueryFieldList, true, cache,"noTAB"));
  			form.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
  			content.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
  			content.setHeight("100%");
@@ -186,7 +186,7 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 		}
 		else
 		{
-			Div content = new Div(generatedUtil.createTabs(rowsQueryFieldList, true,cache,tabs));
+			Div content = new Div(generatedUtil.createTabs(dataProvider.getResourceName(), rowsQueryFieldList, true,cache,tabs));
 			form.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
 			content.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
 			content.setHeight("100%");
