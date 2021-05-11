@@ -232,11 +232,11 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 //				form = new FormLayout();
 			if (tabs.isEmpty()) 
 			{
-				return generatedUtil.createDetails(null,rowsFieldList, false, cache,"noTAB");
+				return generatedUtil.createDetails(bean.getResourceName(),rowsFieldList, false, cache,"noTAB");
 			}
 			else
 			{
-				return generatedUtil.createTabs(null, rowsFieldList, false,cache,tabs);
+				return generatedUtil.createTabs(bean.getResourceName(), rowsFieldList, false,cache,tabs);
 			}
 	//		return details;
 	}

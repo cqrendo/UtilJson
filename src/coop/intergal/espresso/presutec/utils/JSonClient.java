@@ -178,17 +178,7 @@ public class JSonClient {
 		printLog("1 preConfParam "+preConfParam  + " kPreConfParam "+ kPreConfParam);
 		calculateBaseURL(preConfParam);
 		printLog("2 preConfParam "+preConfParam  + " kPreConfParam "+ kPreConfParam);
-		if (useCache)
-		{
-			JsonNode keepJson = getJsonCache(resource+filter);
-			if (keepJson != null)
-			{
-				printLog("  the resource "+ resource+ " filter " + filter + " is return form cache ");
-			//	printLog(" cache content " +keepJson);
-				return keepJson;
-			
-			}
-		}
+
 		String url = baseURL;
 		if (filter != null && filter.startsWith("#PK#")) // you send a direct GET by PK value
 										// instead of a filter then not pagesize
@@ -210,6 +200,19 @@ public class JSonClient {
 //			url = url + "&order="+order;
 //		}
 		printLog("tengo en url : (JsonNode get(String resource...)" + url);
+		if (useCache) // is there is a change 
+		{
+		//	JsonNode keepJson = getJsonCache(resource+filter);
+			JsonNode keepJson = getJsonCache(url);
+			if (keepJson != null)
+			{
+				printLog("the URL "+ url+ " with the resource "+ resource+ " and filter " + filter + " is return form cache ");
+			//	printLog("  the resource "+ resource+ " filter " + filter + " is return form cache ");
+			//	printLog(" cache content " +keepJson);
+				return keepJson;
+			
+			}
+		}
 		HttpGet get = new HttpGet(url);
 		get.addHeader(apiKeyHeader);
 		HttpResponse response = client.execute(get);
@@ -219,7 +222,8 @@ public class JSonClient {
 //		client.getConnectionManager().shutdown();
 		if (useCache)
 			{
-			jsonCaches.put(resource + filter, parResponse);
+			jsonCaches.put(url, parResponse);  // same resources can be use with different url
+	//		jsonCaches.put(resource + filter, parResponse);
 			}
 		int max = parResponse.asText().length();
 		if (max >50)
@@ -353,10 +357,10 @@ public class JSonClient {
 	public static String getBaseURL() {
 		return baseURL;
 	}
-	private static JsonNode getJsonCache(String resource) {
-		if (jsonCaches.get(resource) != null)
+	private static JsonNode getJsonCache(String url) {
+		if (jsonCaches.get(url) != null)
 		{
-			return jsonCaches.get(resource);
+			return jsonCaches.get(url);
 		}
 		return null;
 	}

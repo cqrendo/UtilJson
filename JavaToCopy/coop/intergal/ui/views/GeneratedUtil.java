@@ -890,7 +890,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			[part="error-message"] {white-space: nowrap;}
 
 //			form.add(statusLabel);
-			form.setId(resourceName);
+//			form.setId(resourceName);
 			return form;
 	    }
     
@@ -1254,7 +1254,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 			}
 		}
 //		queryFormForPickClassName = queryFormForPickClassName;
-		if (queryFormForPickClassName.equals("null"))
+		if (queryFormForPickClassName == null)// || queryFormForPickClassName.equals("null"))
 			return null;
 		if (queryFormForPickClassName.startsWith("coop.intergal.ui.views") == false)
 			queryFormForPickClassName = PACKAGE_VIEWS+queryFormForPickClassName;	
