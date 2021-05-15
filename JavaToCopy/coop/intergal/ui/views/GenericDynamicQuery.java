@@ -29,6 +29,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.utils.UiComponentsUtils;
+import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
@@ -256,6 +257,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		while (itRowsColList.hasNext()) {
 			String[] rowCol = itRowsColList.next();
 			String fieldName = rowCol[2];
+			boolean isNumber = (rowCol[3].equals("5"));
 			if (!fieldName.isEmpty())
 				try {//		System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
 					String id = rowCol[2];
@@ -271,10 +273,12 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 						if (rowCol[4].length() > 0) // it means a parent field , the field "PathToParentField" comes in 4 position  if have FK the field the path is fill it 
 							{
 							String value = getValueFromField(form, id, fieldObj, isGeneratedForm);
-							value=addAutoComodin(value);
+							if (isNumber == false)
+								value=addAutoComodin(value);
+							else 
+								value=componeNumberFilter(value);
 							setFKIdsForFilter(rowCol[4], value);
 							}	
-
 						else if (rowCol[3].isEmpty() || rowCol[3].equals("0")) { // text field 
 								String value = getValueFromField(form, id, fieldObj, isGeneratedForm);								
 								if (!value.isEmpty()) {
@@ -289,7 +293,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 										filter = rowCol[0] + determineOperator(value);
 								}
 						} 
-						else if (rowCol[3].equals("5")) { // number field 
+						else if (isNumber) { // number field 
 							String value = getValueFromField(form, id, fieldObj, isGeneratedForm);								
 							if (!value.isEmpty()) {
 						//		value=addAutoComodin(value);
@@ -533,6 +537,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		// combining ROW fields and
 		// parents and grand parent
 		// fields
+	
 		if (rowsQueryFieldList == null)
 			rowsQueryFieldList = RestData.getRowsQueryFieldList(rowsColList, ResourceName, preConfParam);
 		Iterator<String[]> itRowsColList = rowsQueryFieldList.iterator();//RestData.getRowsColList(rowsColList, ResourceName, preConfParam).iterator();
@@ -540,6 +545,9 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		while (itRowsColList.hasNext()) {
 			String[] rowCol = itRowsColList.next();
 			String fieldName = rowCol[2];
+			String tagsForQueryEdition = rowCol[23].toString();
+			boolean editableQryByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForQueryEdition);
+
 			if (!fieldName.isEmpty())
 				
 					//System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
@@ -564,7 +572,8 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 								e.printStackTrace();
 							}
 					// 		fieldName = "tf"+fieldName;
-							clearField(form, fieldName);
+							if (editableQryByTag)
+								clearField(form, fieldName);
 						}
 						else
 						{	
@@ -574,7 +583,8 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 							// .get(instancia);
 							field.setAccessible(true);
 							Object fieldObj = field.get(object);
-							((TextField) fieldObj).clear();
+							if (editableQryByTag)
+								((TextField) fieldObj).clear();
 						
 						} catch (NoSuchFieldException | SecurityException e) {
 							System.err.println("Field not defined in Form... " + e.toString());
@@ -807,7 +817,7 @@ public static Component findComponentXX(Component component, String searchid) {
 				// filter = filter.replaceAll("'", "%5C'"); // to void problems with "'" that
 				// conflicts with text delimitation BY example : 'Bob's' will be 'Bob\'s'
 				// listIds = listIds + "'" +filterValue + "',";
-				JsonNode rowsList = JSonClient.get(table, filter, false, preConfParam, "2000"); // @@ TODO a general param ? for paremts that fits
+				JsonNode rowsList = JSonClient.get(table, filter, false, preConfParam, "1000"); // @@ TODO a general param ? for paremts that fits
 				String idField = JSonClient.getPKTable(table, preConfParam); // @@ TODO CQR be careful pending of adapt to multiKey
 				String childTableToGetFK = tableFkChild;
 
@@ -827,13 +837,22 @@ public static Component findComponentXX(Component component, String searchid) {
 																													// chldname.substring(5)
 				String listIds = fkidField + "%20IN%20(";
 				for (JsonNode eachRow : rowsList) {
+					if (eachRow.get(idField) == null)
+					{
+						DataService.get().showError("Seleción con un numero elevado de registros, no todos los datos son mostrados, especificar más la consulta");
+						break;
+					}
 					String filterValue = eachRow.get(idField).asText().replaceAll(" ", "%20");
-					filterValue = filterValue.replaceAll("'", "%5C'"); // to void problems with "'" that conflicts with
+					filterValue = filterValue.replaceAll("'", "%5C'"); // to avoid problems with "'" that conflicts with
 																		// text delimitation BY example : 'Bob's' will
 																		// be 'Bob\'s'
 					listIds = listIds + "'" + filterValue + "',";
 				}
 				listIds = listIds.substring(0, listIds.length() - 1) + ")"; // depreciate last ","
+				if (listIds.indexOf("IN%20)") > -1) //It means not rows found tehn 
+				{
+					listIds = listIds.substring(0, listIds.length() - 6 ) + "IN('9999999999')";
+				}
 				searchAndPasteKFP(tableFkChild, listIds);
 				System.out.println("listIds " + listIds);
 			}
@@ -880,6 +899,8 @@ public static Component findComponentXX(Component component, String searchid) {
 
 	private String determineOperator(String value) { // determines to use = like or > <
 		value = value.trim(); // deletes extra blanks pre and post
+		if (value.indexOf("IN(") > -1 ||value.indexOf("='") > -1  || value.indexOf("%20like('") >-1) // the operator is already determined
+			return value;
 		if (value.indexOf("%") >= 0) {
 			value = value.replaceAll("%", "%25");
 			if (value.indexOf(" ") >= 0)

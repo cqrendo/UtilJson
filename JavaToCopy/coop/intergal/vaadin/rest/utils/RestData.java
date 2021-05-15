@@ -19,7 +19,7 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import coop.intergal.AppConst;
 import coop.intergal.AppConstGeneric;
 import coop.intergal.espresso.presutec.utils.JSonClient;
-import coop.intergal.ui.utils.UtilSessionData;
+import coop.intergal.ui.util.UtilSessionData;
 
 
 
@@ -605,7 +605,7 @@ public class RestData {
 						int maxColNumber = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[23];
+							String[] fieldArr  = new String[25];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -710,7 +710,9 @@ public class RestData {
 								fieldArr[22] = "";
 							else
 								fieldArr[22] = col.get("tagsForEdition").asText();
-		
+							fieldArr[23] = ""; // only used in query 
+							fieldArr[24] = ""; // only used in query 
+			
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -809,7 +811,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[23];
+						String[] fieldArr  = new String[25];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -913,7 +915,8 @@ public class RestData {
 							fieldArr[22] = "";
 						else
 							fieldArr[22] = col.get("tagsForEdition").asText();
-
+						fieldArr[23] = ""; // only used in query
+						fieldArr[24] = ""; // only used in query 
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -952,7 +955,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[23];
+			String[] fieldArr  = new String[25];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -979,7 +982,8 @@ public class RestData {
 			fieldArr[20] = ""; // is only used for metadata config:
 			fieldArr[21] = ""; // is only used for metadata config:
 			fieldArr[22] = ""; // is only used for metadata config:
-
+			fieldArr[23] = ""; // only used in query
+			fieldArr[24] = ""; // only used in query 
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
 			rowsColList.add(fieldArr);
@@ -1070,7 +1074,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[23];
+						String[] fieldArr  = new String[25];
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -1165,6 +1169,15 @@ public class RestData {
 						else
 							fieldArr[21] = col.get("tagsForVisibility").asText();
 						fieldArr[22] = ""; // is only used for Form & grid fields++;
+						if ( col.get("tagsForQueryEdition").asText().isEmpty() || col.get("tagsForQueryEdition").asText().equals("null") )
+							fieldArr[23] = "";
+						else
+							fieldArr[23] = col.get("tagsForQueryEdition").asText();
+						if ( col.get("defaultValueForQuery").asText().isEmpty() || col.get("defaultValueForQuery").asText().equals("null") )
+							fieldArr[24] = "";
+						else
+							fieldArr[24] = col.get("defaultValueForQuery").asText();
+
 
 					}
 					// **** As the getColumnsFromTable is not call the keepJoinConditionSubResources is call from here

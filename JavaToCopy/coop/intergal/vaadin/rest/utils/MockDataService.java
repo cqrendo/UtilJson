@@ -19,7 +19,7 @@ import com.vaadin.flow.data.provider.QuerySortOrder;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
-import coop.intergal.ui.utils.UtilSessionData;
+import coop.intergal.ui.util.UtilSessionData;
 
 
 

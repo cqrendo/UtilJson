@@ -1,5 +1,8 @@
 package coop.intergal.ui.views;
 
+import static coop.intergal.AppConst.STYLES_CSS;
+import static coop.intergal.AppConst.STYLES_FORM_ITEM_CSS;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +24,11 @@ import com.vaadin.flow.router.Location;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import coop.intergal.ui.components.FlexBoxLayout;
 
 import coop.intergal.AppConst;
-
 import coop.intergal.ui.components.QueryButtonsBar;
-import coop.intergal.ui.utils.UtilSessionData;
+import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
-import static coop.intergal.AppConst.STYLES_CSS;
-import static coop.intergal.AppConst.STYLES_FORM_ITEM_CSS;
-import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 
 //@PageTitle("Payments")
 //@Route(value = "gridDetails", layout = MainLayout.class)

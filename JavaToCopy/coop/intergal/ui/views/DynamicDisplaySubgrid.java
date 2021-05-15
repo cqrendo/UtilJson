@@ -4,13 +4,10 @@ import static coop.intergal.AppConst.PAGE_PRODUCTS;
 import static coop.intergal.AppConst.STYLES_CSS;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -29,10 +26,8 @@ import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
-import coop.intergal.AppConst;
 import coop.intergal.ui.components.FormButtonsBar;
-import coop.intergal.ui.utils.UtilSessionData;
-import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
+import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
 

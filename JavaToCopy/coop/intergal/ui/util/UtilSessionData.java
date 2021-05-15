@@ -1,4 +1,4 @@
-package coop.intergal.ui.utils;
+package coop.intergal.ui.util;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 import com.vaadin.flow.server.VaadinSession;
 
 import coop.intergal.AppConst;
+import coop.intergal.ui.security.SecurityUtils;
 
 public class UtilSessionData {
 	
@@ -68,6 +69,8 @@ public class UtilSessionData {
 		return false;
 	}
 	private static Object getKeyValue(String tagkey) {
+		if (tagkey.equals("user"))
+			return SecurityUtils.getUsername();
 		return VaadinSession.getCurrent().getAttribute(tagkey);
 	}
 	public static String addCompanyToTitle(String optionName) {

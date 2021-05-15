@@ -8,32 +8,25 @@ import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.vaadin.intergal.validation.DynValidator;
 import org.vaadin.intergal.validation.ValidationMetadata;
 import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -50,7 +43,6 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -63,25 +55,26 @@ import com.vaadin.flow.data.binder.ErrorLevel;
 import com.vaadin.flow.data.binder.StatusChangeEvent;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
+
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.security.SecurityUtils;
+import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.UiComponentsUtils;
-import coop.intergal.ui.utils.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.ui.utils.converters.DecimalFormatter;
 import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 import coop.intergal.vaadin.rest.utils.RestData;
-import com.vaadin.flow.data.provider.ListDataProvider;
 
 //@PageTitle("Payments")
 //@Route(value = "gridDetails", layout = MainLayout.class)
@@ -495,8 +488,13 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				String toolTip = rowField[16].toString();
 				String tagsForVisibility = rowField[21].toString();
 				String tagsForEdition = rowField[22].toString();
+				String tagsForQueryEdition = rowField[23].toString();
 				boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 				boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
+				boolean editableQryByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForQueryEdition);
+				String defaultValueForQuery = rowField[24].toString();
+				if (defaultValueForQuery == null || defaultValueForQuery.isEmpty() || defaultValueForQuery.equals("null"))
+					defaultValueForQuery = "";
 				if (tabNumber.isEmpty() || tabNumber.equals(currentTab))
 					{
 				
@@ -833,7 +831,13 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				else  // is Text
 				{
 					setBeanValidators(validationRuleName, isQuery, cache) ;
-					tf.setReadOnly(isReadOnly || !editableByTag);
+					if (isQuery)
+						{
+						tf.setReadOnly(!editableQryByTag);
+						tf.setValue(defaultValueForQuery);
+						}
+					else	
+						tf.setReadOnly(isReadOnly || !editableByTag);
 			
 					if (isRequired && isQuery == false )
 					{	
