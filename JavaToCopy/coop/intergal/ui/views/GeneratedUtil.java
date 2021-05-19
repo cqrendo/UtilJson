@@ -921,6 +921,12 @@ private String cleanMarks(String label) {
 			runMethodFor("processButtonForNavigation",idButton);
 //			processButtonForNavigation(idButton);
 		}
+		else if (idButton.indexOf("@IDP") > -1)
+		{
+			runMethodFor("processButtonForProcess",idButton);
+//			processButtonForNavigation(idButton);
+		}
+
 		else
 		{
 			DataService.get().showError("Proceso no implementado");

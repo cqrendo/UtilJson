@@ -899,7 +899,7 @@ public static Component findComponentXX(Component component, String searchid) {
 
 	private String determineOperator(String value) { // determines to use = like or > <
 		value = value.trim(); // deletes extra blanks pre and post
-		if (value.indexOf("IN(") > -1 ||value.indexOf("='") > -1  || value.indexOf("%20like('") >-1) // the operator is already determined
+		if (value.indexOf("IN(") > -1 ||value.indexOf("='") > -1  || value.indexOf("%20like('") >-1 || value.indexOf("%20BETWEEN%20") > -1) // the operator is already determined
 			return value;
 		if (value.indexOf("%") >= 0) {
 			value = value.replaceAll("%", "%25");
