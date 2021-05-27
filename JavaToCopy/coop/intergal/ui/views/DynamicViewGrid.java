@@ -938,7 +938,7 @@ private boolean isBoolean(String header, String colType) {
 		return null;
 	}
 
-	public void showBeaninPopup	(DynamicDBean bean, String resourcePopup,String layoutClassName, String displayFormClassNamePopup, Dialog dialogForShow2, String filterForPopup ) {
+	public void showBeaninPopup	(DynamicDBean bean, String resourcePopup,String layoutClassName, String displayFormClassNamePopup, Dialog dialogForShow2, String filterForPopup , DynamicDisplayForAskData dynamicDisplayForAskData) {
 		try {
 //			if (dialogForShow2 != null)
 //				dialogForShow = dialogForShow2;
@@ -946,8 +946,11 @@ private boolean isBoolean(String header, String colType) {
 			DdbDataBackEndProvider dataProviderPopup = new DdbDataBackEndProvider();
 			dataProviderPopup.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 			dataProviderPopup.setResourceName(resourcePopup);
+			
 			Class<?> dynamicLayout = Class.forName(layoutClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
 			Object layoutPopup = dynamicLayout.newInstance();
+			if ( dynamicDisplayForAskData != null)
+				layoutPopup = dynamicDisplayForAskData;
 			if (layoutClassName.indexOf("DynamicViewGrid") > -1) // is a Layout that shows a Grid
 			{
 				Method setResourceName = dynamicLayout.getMethod("setResourceName",new Class[] {String.class} );
@@ -960,11 +963,16 @@ private boolean isBoolean(String header, String colType) {
 			}
 			else if (displayFormClassNamePopup != null && displayFormClassNamePopup.isEmpty() == false) // is a layout that shows one row + children if exist
 				{
-
+				Div divSubGridPopup = null;
 				Method getDivDisplay = dynamicLayout.getMethod("getDivDisplay");
-				Method getDivSubGrid = dynamicLayout.getMethod("getDivSubGrid");
 				Div divDisplayPopup = (Div) getDivDisplay.invoke(layoutPopup);
-				Div divSubGridPopup = (Div) getDivSubGrid.invoke(layoutPopup);
+				if (layoutClassName.indexOf("DynamicDisplayForAskData") == -1) // is a form thta ask data for a process
+					{
+					Method getDivSubGrid = dynamicLayout.getMethod("getDivSubGrid");
+					divSubGridPopup = (Div) getDivSubGrid.invoke(layoutPopup);
+					}
+					
+				
 			
 //			DynamicDisplaySubgrid dynamicDisplaySubgrid = new DynamicDisplaySubgrid();
 //			Div divDisplayPopup = dynamicDisplaySubgrid.getDivDisplay();
@@ -1007,21 +1015,23 @@ private boolean isBoolean(String header, String colType) {
 			
 			
 	//		divDisplay.remove((Component) display);
-			
-				String resourceSubGrid = extractResourceSubGrid(bean,0);
-				divSubGridPopup.removeAll();
-				String tabsList = rowsColListGrid.get(0)[12];
-				if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
-				{
-			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
-					Div content0=new Div(); 
-					divSubGridPopup.add(fillContent(content0, 0 , bean));	
-	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
-				}
-				else if (resourceSubGrid != null)
-				{
+				if (layoutClassName.indexOf("DynamicDisplayForAskData") == -1) // this layout for now doesn't have subgrid
+					{
+					String resourceSubGrid = extractResourceSubGrid(bean,0);
 					divSubGridPopup.removeAll();
-					divSubGridPopup.add(createSubTabs(bean, tabsList));
+					String tabsList = rowsColListGrid.get(0)[12];
+					if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
+						{
+			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
+						Div content0=new Div(); 
+						divSubGridPopup.add(fillContent(content0, 0 , bean));	
+	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
+					}
+					else if (resourceSubGrid != null)
+					{
+						divSubGridPopup.removeAll();
+						divSubGridPopup.add(createSubTabs(bean, tabsList));
+					}
 				}
 			}
 			String idForDialog = resourcePopup+"@DFC@"+displayFormClassNamePopup+"@F@"+filterForPopup+"@L@"+layoutClassName;
