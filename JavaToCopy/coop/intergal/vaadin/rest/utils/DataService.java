@@ -33,6 +33,7 @@ public abstract class DataService implements Serializable {
 	public abstract void deleteDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) ;
 
 	public abstract void showError(String string);
+	public abstract String componFKFilter(DynamicDBean bean, String resourceSubGrid);
 
 }
 	

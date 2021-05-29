@@ -810,6 +810,50 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 
 		
 	}
+	public String componFKFilter(DynamicDBean bean, String resourceSubGrid) {
+		String fKfilter = JSonClient.getHt().get(resourceSubGrid);
+	//	"FASE_CABEZERA" = ["FASE"]
+	//			 and "CLAVE_ALMACEN" = ["CLAVE_ALMACEN"]
+	//			 and "N_PEDIDO" = ["N_PEDIDO"]}
+		int step = 0;
+		String componFilter = "";
+		int lengthFKfilter = 0; 
+		if (fKfilter != null)
+			lengthFKfilter = fKfilter.length();
+		else
+			System.err.println("ERROR FK NO CARGADA -------"+ resourceSubGrid );
+//		int leftLength = lengthFKfilter;
+		while (lengthFKfilter > 0 || (fKfilter != null && fKfilter.length()  > 0))
+		{
+			int idXEqual = fKfilter.indexOf("=");
+			if (idXEqual == -1)
+				break;
+			int idXMark = fKfilter.indexOf("]");
+			if (fKfilter.startsWith("\n and")) 
+				step = 6;
+			else if ((fKfilter.indexOf("and") > -1 && fKfilter.indexOf("and") < 5))
+			{
+				step = fKfilter.indexOf("and") + 4;
+			}
+			else
+				step = 0;
+			String fKfieldName = fKfilter.substring(step+1, idXEqual - 2  );
+			String parentfieldName = fKfilter.substring(4+idXEqual, idXMark - 1  );
+			if ( bean.getRowJSon().get(parentfieldName) == null)
+			{
+				showError(" Campo " +parentfieldName + " de la PK, no presente en el recurso padre de: "+resourceSubGrid);
+				return "";
+			}
+			String parentValue = bean.getRowJSon().get(parentfieldName).asText();
+			componFilter = componFilter + fKfieldName + "='" + parentValue + "'%20and%20";
+			lengthFKfilter = lengthFKfilter - idXMark;
+			fKfilter = fKfilter.substring(idXMark+1);
+			
+		}
+		if (componFilter.length()>9)
+			componFilter = componFilter.substring(0, componFilter.length()-9); // to delete last and
+		return componFilter;
+	}
 }
 
 

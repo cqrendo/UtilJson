@@ -207,27 +207,42 @@ public class GenericClassForMethods {
 		Stream<DynamicDBean> rowsStream = ((DataProvider<DynamicDBean, String>) grid.getGrid().getDataProvider()).fetch(createQuery(grid.getGrid()));
 //		grid.getGrid().getSelectedItems();j
 		Iterator<DynamicDBean> rowsInput = rowsStream.iterator();
+		Hashtable<Integer, DynamicDBean> beansFromGrid = new Hashtable<Integer, DynamicDBean>();
+		Integer id=0;
+		while (rowsInput.hasNext()) {
+			beansFromGrid.put(id,rowsInput.next());
+			id++;
+		}
 		DynamicDBean row = null;
-		DynamicDBean firstRowInput = rowsInput.next();
 		DynamicDBean lastParent = null;
-		insertOrUpdateOutput(firstRowInput, rowStep, true, lastParent);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
 		String groupBy = rowStep.get("groupBy").asText();
 		String keepGroup = null;
-		if (groupBy.equals("null") == false)
-			keepGroup = firstRowInput.getRowJSon().get(groupBy).asText();
-		while (rowsInput.hasNext()) {
-			row = rowsInput.next();
-			System.out.println("GenericClassForMethods.proccesDataInputOuput() ROW INPUT --->"+ row.getRowJSon().get("DESCRIPCION").asText());
-			if (keepGroup != null && row.getRowJSon().get(groupBy).asText().equals(keepGroup) == false) // Group change
+		int i = 0;
+		DynamicDBean firstRowInput = null ;
+		while (beansFromGrid.size() > i) {
+
+			if (i == 0) // first row
 			{
-				  lastParent = insertOrUpdateOutput(firstRowInput, rowStep, true, lastParent);
-				  keepGroup = row.getRowJSon().get(groupBy).asText();
+				firstRowInput = beansFromGrid.get(0);
+				lastParent = insertOrUpdateOutput(firstRowInput, rowStep, true, lastParent);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
+				if (groupBy.equals("null") == false)
+					keepGroup = firstRowInput.getRowJSon().get(groupBy).asText();				
 			}
 			else
 			{
+				row = beansFromGrid.get(i);
+				System.out.println("GenericClassForMethods.proccesDataInputOuput() ROW INPUT --->"+ row.getRowJSon().get("DESCRIPCION").asText());
+				if (keepGroup != null && row.getRowJSon().get(groupBy).asText().equals(keepGroup) == false) // Group change
+				{
+				  lastParent = insertOrUpdateOutput(row, rowStep, true, lastParent);
+				  keepGroup = row.getRowJSon().get(groupBy).asText();
+				}
+				else
+				{
 				insertOrUpdateOutput(row, rowStep, false, lastParent);//(row, rowStep, false, lastParent, rowOfInputData);
-			}
-				
+				}
+			}	
+			i++;
 //			System.out.println("GenericClassForMethods.processInput() EACH Row in grid " + row.getCol0() + " "+  row.getRowJSon().asText() );
 		}
 //		JsonNode rowsStepOuput = rowStep.get("List-ProcessStepOutput");
@@ -253,7 +268,7 @@ public class GenericClassForMethods {
 				if (rowStepOuput.get("filter").asText().equals("null") && isNewForGroupChange) // is new row for groupBy change in root 
 				{
 					lastParent = //insertAnOuputRow(rowStepOuput, null, rowPreviousStep);
-								 insertAnOuputRow(rowStepOuput, lastParent, rowInputData);//(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean rowPreviousStep) {
+								 insertAnOuputRow(rowStepOuput, null, rowInputData);//(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean rowPreviousStep) {
 				}
 				else if (isNewForGroupChange) // is a new row by a group change but is not a insert it updates the ouput
 				{
@@ -292,6 +307,9 @@ public class GenericClassForMethods {
 		if (lastParent != null)
 		{
 			beansToSaveAndRefresh.put(lastParent.getResourceName(), lastParent);
+	//		if (resourceSubGrid2.indexOf(".")> -1)
+			newBean.setFilter(DataService.get().componFKFilter(lastParent, ouputResource));
+
 		}
 
 		dataProviderOuput.save(newBean.getResourceName(), beansToSaveAndRefresh);	
