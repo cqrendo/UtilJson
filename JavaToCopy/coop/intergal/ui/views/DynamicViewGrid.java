@@ -1015,7 +1015,7 @@ private boolean isBoolean(String header, String colType) {
 			
 			
 	//		divDisplay.remove((Component) display);
-				if (layoutClassName.indexOf("DynamicDisplayForAskData") == -1) // this layout for now doesn't have subgrid
+				if (layoutClassName.indexOf("DynamicDisplayForAskData") == -1 && (layoutClassName.indexOf("DynamicDisplayOnly") == -1)) // this layout for now doesn't have subgrid
 					{
 					String resourceSubGrid = extractResourceSubGrid(bean,0);
 					divSubGridPopup.removeAll();
@@ -1130,7 +1130,7 @@ private boolean isBoolean(String header, String colType) {
 //			subDynamicViewGrid.getElement().getStyle().set("height","100%");
 		subDynamicViewGrid.setResourceName(resourceSubGrid2);
 		if (resourceSubGrid2.indexOf(".")> -1)
-			subDynamicViewGrid.setFilter(DataService.get().componFKFilter(bean, resourceSubGrid2));
+			subDynamicViewGrid.setFilter(componFKFilter(bean, resourceSubGrid2));
 		subDynamicViewGrid.setupGrid(true,true);
 		subDynamicViewGrid.setParentRow(selectedRow);
 		subDynamicViewGrid.setDisplayParent(display);
@@ -1859,45 +1859,45 @@ private boolean isBoolean(String header, String colType) {
 		
 	}
 
-//	public String componFKFilter(DynamicDBean bean, String resourceSubGrid) {
-//		String fKfilter = JSonClient.getHt().get(resourceSubGrid);
-//	//	"FASE_CABEZERA" = ["FASE"]
-//	//			 and "CLAVE_ALMACEN" = ["CLAVE_ALMACEN"]
-//	//			 and "N_PEDIDO" = ["N_PEDIDO"]}
-//		int step = 0;
-//		String componFilter = "";
-//		int lengthFKfilter = 0; 
-//		if (fKfilter != null)
-//			lengthFKfilter = fKfilter.length();
-//		else
-//			System.err.println("ERROR FK NO CARGADA -------"+ resourceSubGrid );
-////		int leftLength = lengthFKfilter;
-//		while (lengthFKfilter > 0 || fKfilter.length()  > 0)
-//		{
-//			int idXEqual = fKfilter.indexOf("=");
-//			if (idXEqual == -1)
-//				break;
-//			int idXMark = fKfilter.indexOf("]");
-//			if (fKfilter.startsWith("\n and")) 
-//				step = 6;
-//			else if ((fKfilter.indexOf("and") > -1 && fKfilter.indexOf("and") < 5))
-//			{
-//				step = fKfilter.indexOf("and") + 4;
-//			}
-//			else
-//				step = 0;
-//			String fKfieldName = fKfilter.substring(step+1, idXEqual - 2  );
-//			String parentfieldName = fKfilter.substring(4+idXEqual, idXMark - 1  );
-//			String parentValue = bean.getRowJSon().get(parentfieldName).asText();
-//			componFilter = componFilter + fKfieldName + "='" + parentValue + "'%20and%20";
-//			lengthFKfilter = lengthFKfilter - idXMark;
-//			fKfilter = fKfilter.substring(idXMark+1);
-//			
-//		}
-//		if (componFilter.length()>9)
-//			componFilter = componFilter.substring(0, componFilter.length()-9); // to delete last and
-//		return componFilter;
-//	}
+	public String componFKFilter(DynamicDBean bean, String resourceSubGrid) {
+		String fKfilter = JSonClient.getHt().get(resourceSubGrid);
+	//	"FASE_CABEZERA" = ["FASE"]
+	//			 and "CLAVE_ALMACEN" = ["CLAVE_ALMACEN"]
+	//			 and "N_PEDIDO" = ["N_PEDIDO"]}
+		int step = 0;
+		String componFilter = "";
+		int lengthFKfilter = 0; 
+		if (fKfilter != null)
+			lengthFKfilter = fKfilter.length();
+		else
+			System.err.println("ERROR FK NO CARGADA -------"+ resourceSubGrid );
+//		int leftLength = lengthFKfilter;
+		while (lengthFKfilter > 0 || fKfilter.length()  > 0)
+		{
+			int idXEqual = fKfilter.indexOf("=");
+			if (idXEqual == -1)
+				break;
+			int idXMark = fKfilter.indexOf("]");
+			if (fKfilter.startsWith("\n and")) 
+				step = 6;
+			else if ((fKfilter.indexOf("and") > -1 && fKfilter.indexOf("and") < 5))
+			{
+				step = fKfilter.indexOf("and") + 4;
+			}
+			else
+				step = 0;
+			String fKfieldName = fKfilter.substring(step+1, idXEqual - 2  );
+			String parentfieldName = fKfilter.substring(4+idXEqual, idXMark - 1  );
+			String parentValue = bean.getRowJSon().get(parentfieldName).asText();
+			componFilter = componFilter + fKfieldName + "='" + parentValue + "'%20and%20";
+			lengthFKfilter = lengthFKfilter - idXMark;
+			fKfilter = fKfilter.substring(idXMark+1);
+			
+		}
+		if (componFilter.length()>9)
+			componFilter = componFilter.substring(0, componFilter.length()-9); // to delete last and
+		return componFilter;
+	}
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {
