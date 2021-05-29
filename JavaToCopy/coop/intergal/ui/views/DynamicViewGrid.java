@@ -244,7 +244,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		grid.addSelectionListener(e -> {
 			if (e.getFirstSelectedItem().isPresent())
 				selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
-				System.out.println("Registro selecionado " + selectedRow.getCol0());
+				System.out.println("Registro seleccionado " + selectedRow.getCol0());
 				methodForRowSelected(selectedRow); 
 			});
 		
