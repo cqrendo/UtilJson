@@ -126,7 +126,7 @@ public class GenericClassForMethods {
 		Set<DynamicDBean> seletedItems = dvGrid.getGrid().getSelectedItems();
 		if (seletedItems.isEmpty())
 		{
-			DataService.get().showError("Debe de selecionar un registro");
+			DataService.get().showError("Debe seleccionar un registro");
 			return null;
 		}
 		return seletedItems.iterator().next();

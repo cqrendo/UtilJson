@@ -389,7 +389,7 @@ private String getRowStyleName(DynamicDBean row) {
 private Object deleteBeanFromList() {
 	System.out.println("DynamicViewGrid.deleteBeanFromList()");
 	if (grid.getSelectedItems().size() == 0)
-		DataService.get().showError("Debe de selecionar una linea, para eliminar");
+		DataService.get().showError("Debe seleccionar una linea para poder eliminarla");
 	else		
 	{
 	DynamicDBean rowTobeDelete = grid.getSelectedItems().iterator().next();
