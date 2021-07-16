@@ -225,6 +225,8 @@ private String pickMapFields;
 						cB.setItems(rowsListForCombo);
 						cB.setItemLabelGenerator(DynamicDBean::getCol1);
 	
+						
+						
 						cB.setId("tf"+fieldNameInUI);
 //						nf.getElement().setAttribute("theme", "small");
 						cB.setReadOnly(isReadOnly);
@@ -274,7 +276,7 @@ private String pickMapFields;
 		for (DynamicDBean bean : ListCombo.getItems()) {
 		
 			System.out.println("GeneratedUtil.getRowById()------>"+bean.getCol0());
-			if(id.equals(bean.getCol0()))
+			if(id !=null && id.equals(bean.getCol0()))
 				return bean;
 		}
 		return null;

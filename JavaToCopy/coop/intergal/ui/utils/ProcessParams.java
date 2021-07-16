@@ -10,11 +10,15 @@ public class ProcessParams {
 		filterForNavigation = filterForNavigation.substring(12); // clean row.Subgrid @@ TODO adapt to other combinations
 		int idxEnd = filterForNavigation.indexOf("=");
 		String fieldForValue = filterForNavigation.substring(0, idxEnd);
-		JsonNode rowJson = selectRow.getRowJSon();
-		String valueKey = rowJson.get(fieldForValue).asText();
-		int idxStart = filterForNavigation.indexOf("rowtarget.")+10;
-		String targetKey = filterForNavigation.substring(idxStart);
-		return targetKey+"='"+valueKey+"'";
+		if (selectRow != null)
+		{
+			JsonNode rowJson = selectRow.getRowJSon();
+			String valueKey = rowJson.get(fieldForValue).asText();
+			int idxStart = filterForNavigation.indexOf("rowtarget.")+10;
+			String targetKey = filterForNavigation.substring(idxStart);
+			return targetKey+"='"+valueKey+"'";
+		}
+		return null;
 	}
 
 

@@ -269,7 +269,7 @@ public String getResourceName() {
 //			else
 //				filter = "inlinelimit="+parinlinelimit.get(0);
 //			}
-		title="..";
+		title="";
 //		String queryFormClassName = null;
 //		String displayFormClassName  = null;
 //		String resourceSubGrid = null;
@@ -336,6 +336,7 @@ public String getResourceName() {
 		buttons.addCancelListener(e -> grid.undoSelectedRow());
 		buttons.addAddListener(e -> grid.insertANewRow());
 		buttons.addDeleteListener(e -> grid.DeleteARow());
+		buttons.addPrintListener(e -> grid.PrintARow());
 	
 //		queryButtonsBar.addClearSearchListener(e -> cleanQryForm());//System.out.println("PedidoProveedorQuery.beforeEnter() BUSCAR>>>>"));
 

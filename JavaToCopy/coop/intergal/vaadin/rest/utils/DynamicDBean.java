@@ -15,6 +15,8 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import coop.intergal.AppConst;
+
 
 
 //@Entity
@@ -1977,9 +1979,9 @@ public class DynamicDBean {// implements Serializable {
 
 	public Object setColBoolean(Boolean v, String colName) {
 		Object dbean = this;
-		String value = "false";
+		String value = AppConst.VALUE_FALSE_FOR_BOOLEANS;
 		if (v!=null && v)
-			value = "true";
+			value = AppConst.VALUE_TRUE_FOR_BOOLEANS;
 		try {
 			String methodName = "setCol" + colName;
 			if (colName.startsWith("col"))

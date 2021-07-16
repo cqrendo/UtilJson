@@ -105,6 +105,14 @@ public class DynamicDisplaySubgrid extends PolymerTemplate<TemplateModel> implem
 
 	@Id("buttons")
 	private FormButtonsBar buttons;
+	public FormButtonsBar getButtons() {
+		return buttons;
+	}
+
+	public void setButtons(FormButtonsBar buttons) {
+		this.buttons = buttons;
+	}
+
 	private String apiname;
 
 	public SplitLayout getDisplaySplitSubGrid() {
@@ -151,7 +159,7 @@ public class DynamicDisplaySubgrid extends PolymerTemplate<TemplateModel> implem
 			filter = parFIlter.get(0);
 			filter=filter.replace("EEQQ", "=");
 			}
-		title="..";
+		title="";
 		String queryFormClassName = null;
 		String displayFormClassName  = null;
 //		displaySplitSubGrid.setOrientation(Orientation.VERTICAL);

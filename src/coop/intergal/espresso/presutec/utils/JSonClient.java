@@ -325,16 +325,19 @@ public class JSonClient {
 		//	   String baseUrl = null;
 		//	   InputStream url = getClass().getClassLoader().getResourceAsStream("asambleas.properties");
 			   InputStream is = JSonClient.class.getResourceAsStream("/espresso.properties");
+			   printLog(".....IS......"+ is);
 			   if (preConfParam == null)
 			   {
 				   preConfParam = "";
 			   }
 			   else
 				   preConfParam = preConfParam + "_";
+			  
 			   if (is !=null)
 			   	   {
 				   prop.load(is);
 				   String hostName = InetAddress.getLocalHost().getHostName() ;
+				   printLog("host name: "+ hostName +" preConfParam "+ preConfParam );
 		 	   	   baseURL = prop.getProperty(preConfParam+"BASE_URL");
 		 	   	   apiKeyHeader=  new BasicHeader("Authorization", prop.getProperty(preConfParam+"API_KEY")); 
 		 	   	   if (hostName.indexOf(".local") == -1) // when you run in local LAC server is remote, when you run in remote Vaadin Should use the same server than LAC 
@@ -426,6 +429,7 @@ public class JSonClient {
 //	}
 	
 	private static void calculateBaseURL(String preConfParam) {
+		System.out.println("JSonClient.calculateBaseURL() "+ preConfParam);
 		if (preConfParam == null )
 		{	
 			if (baseURL == null)

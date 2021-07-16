@@ -6,6 +6,7 @@ import static coop.intergal.AppConst.STYLES_CSS;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -266,6 +267,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		grid.setDataProvider(dataProvider);
 		grid.setEnterNextRow(true);
 		grid.setMultiSort(true);
+//		grid.setHeightByRows(true);  /// Is you use it breaks pagination 
         grid.getElement().executeJs("this.addEventListener('keydown', function(e) {\r\n" + "  let delta = 0;\r\n"
         		+ "  if (e.key === 'ArrowUp') {\r\n" + "    delta = -1;\r\n"
         		+ "  } else if (e.key === 'ArrowDown') {\r\n" + "    delta = 1;\r\n" + "  }\r\n"
@@ -697,9 +699,12 @@ private boolean isBoolean(String header, String colType) {
 
 	void showBean(DynamicDBean bean ) {
 		try {
+
 			setVisibleRowData(true);
 			if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
 				buttonsForm.setVisible(false);
+			else
+				buttonsForm.setVisible(true);
 			selectedRow = bean;
 			keepRowBeforChanges = new DynamicDBean(); 
 			keepRowBeforChanges = RestData.copyDatabean(bean);
@@ -939,6 +944,7 @@ private boolean isBoolean(String header, String colType) {
 	}
 
 	public void showBeaninPopup	(DynamicDBean bean, String resourcePopup,String layoutClassName, String displayFormClassNamePopup, Dialog dialogForShow2, String filterForPopup , DynamicDisplayForAskData dynamicDisplayForAskData) {
+		Binder<DynamicDBean> binderForDialog = new Binder<>(DynamicDBean.class);
 		try {
 //			if (dialogForShow2 != null)
 //				dialogForShow = dialogForShow2;
@@ -956,15 +962,25 @@ private boolean isBoolean(String header, String colType) {
 				Method setResourceName = dynamicLayout.getMethod("setResourceName",new Class[] {String.class} );
 				Method setFilter = dynamicLayout.getMethod("setFilter",new Class[] {String.class} );
 				Method setupGrid = dynamicLayout.getMethod("setupGrid",new Class[] {Boolean.class, Boolean.class} );
+				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class, Boolean.class} );
 				setResourceName.invoke(layoutPopup, resourcePopup);
 				String filter = ProcessParams.componFilterFromParams(filterForPopup, bean);
 				setFilter.invoke(layoutPopup, filter);
 				setupGrid.invoke(layoutPopup, true, true);
+				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
+					{
+					setButtonsRowVisible.invoke(layoutPopup, true);
+					}
+
 			}
 			else if (displayFormClassNamePopup != null && displayFormClassNamePopup.isEmpty() == false) // is a layout that shows one row + children if exist
 				{
 				Div divSubGridPopup = null;
 				Method getDivDisplay = dynamicLayout.getMethod("getDivDisplay");
+				Method getButtons = dynamicLayout.getMethod("getButtons");
+				FormButtonsBar formButtonsBar = (FormButtonsBar)getButtons.invoke(layoutPopup);
+				if (formButtonsBar != null &&(bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName()))) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
+					formButtonsBar.setVisible(false);
 				Div divDisplayPopup = (Div) getDivDisplay.invoke(layoutPopup);
 				if (layoutClassName.indexOf("DynamicDisplayForAskData") == -1) // is a form thta ask data for a process
 					{
@@ -979,9 +995,8 @@ private boolean isBoolean(String header, String colType) {
 //			Div divSubGridPopup =  dynamicDisplaySubgrid.getDivSubGrid();//new Div();
 				Object divInDisplayPopup = new Div();
 				setVisibleRowData(true);
-
-				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
-					buttonsForm.setVisible(false);
+//				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
+//					buttonsForm.setVisible(false);
 				selectedRow = bean;
 				keepRowBeforChanges = new DynamicDBean(); 
 				keepRowBeforChanges = RestData.copyDatabean(bean);
@@ -995,7 +1010,7 @@ private boolean isBoolean(String header, String colType) {
 				setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 				ArrayList<String[]> rowsColListGridPopup = dataProviderPopup.getRowsColList();
 				setRowsColList.invoke(displayPopup,rowsColListGridPopup);
-				setBinder.invoke(displayPopup,binder);
+				setBinder.invoke(displayPopup,binderForDialog);
 				setDataProvider.invoke(displayPopup, dataProviderPopup);
 				setBean.invoke(displayPopup,bean);
 				resourcePopup = bean.getResourceName(); // when is a display the bean is the on e to show and has the resourcename
@@ -2201,8 +2216,8 @@ private boolean isBoolean(String header, String colType) {
 			divDisplay.setVisible(b);
 		if (divSubGrid != null)
 			divSubGrid.setVisible(b);
-		if (buttonsForm != null)
-			buttonsForm.setVisible(b);
+//		if (buttonsForm != null)
+//			buttonsForm.setVisible(b);
 		
 	}
 
@@ -2243,5 +2258,62 @@ private boolean isBoolean(String header, String colType) {
 //		return null;
 //	}
 
+	public Object PrintARow() {
+//		String urlBase = "../dymanic";
+//		String hostName = InetAddress.getLocalHost().getHostName() ;
+//		if (hostName.indexOf(".local") == -1) // to diferent when is running in local (Maven) or in remote (tys.war -> tomcat)
+//			urlBase= "../tys/dymanic";
+//		String reportName = "repo%3A%2F%7E%2Ftys%2FPropPedido%2520JS%2520CR.rpt";
+		System.out.println("DynamicViewGrid.PrintARow()");
+		if (selectedRow.getParams() != null )
+		{		
+		if (selectedRow.getParams().indexOf("reportName") != -1 && selectedRow.getParams().indexOf("reportSf") != -1)
+		{
+			
+			String parReportName = selectedRow.getParams().substring(selectedRow.getParams().indexOf("reportName")+11);
+			int idxNextAnd = parReportName.indexOf("&");
+			int  idxLast = parReportName.length();
+			if (idxNextAnd > -1)
+				idxLast = idxNextAnd;
+			String reportName = parReportName.substring(1,idxLast-1);
+			String parReportSf = selectedRow.getParams().substring(selectedRow.getParams().indexOf("reportSf")+9);
+			idxNextAnd = parReportSf.indexOf("&");
+			idxLast = parReportSf.length();
+			if (idxNextAnd > -1)
+				idxLast = idxNextAnd;
+			String reportSf = parReportSf.substring(1,idxLast-1);
+			int idxStartField = reportSf.indexOf("<<")+ 2;  // @@TODO prepare more more than one field
+			if (idxStartField > 1)
+			{
+				int idxEndField = reportSf.indexOf(">>");
+				String field=reportSf.substring(idxStartField, idxEndField);
+				if ( selectedRow.getRowJSon().get(field) != null)
+				{
+					String value = selectedRow.getRowJSon().get(field).asText();
+					reportSf = reportSf.replace("<<"+field+">>", value ); // TODO @@ poner comillas si el valor  es un string necesario pero encode en HTML
+				}
+				else
+				{
+					DataService.get().showError("Fórmula de selección se refiere a un campo que no existe en el recurso y/o formula de selección ( revisar en el  recurso row.reportSf los <<nombrecampo>>)");
+				}
+			}
+			String sf = "&sf=" + reportSf;
+			String datasource = "&DataSource=DB11_"+ UtilSessionData.getCompanyYear();
+			String url = AppConst.CLEAR_REPORT_SERVER+"?report="+reportName+"&init=htm"+sf+datasource;
+			System.out.println("DynamicViewGrid.PrintARow() URL->"+url);
+			UI.getCurrent().getPage().executeJs("window.open('"+url+"', '_blank');");
+			}
+			else
+			{
+				DataService.get().showError("Falta por definir en los parametros de el recurso nombre de report y/o formula de selección ( poner en el evento del recurso row.reportName y row.reportSf)");
+			}
+		}
+		else
+		{
+			DataService.get().showError("Falta por definir en el recurso los parametros con el nombre de report y/o formula de selección ( poner en el evento del recurso row.reportName y row.reportSf)");
+		}
+		return null;
+	}
+ 
 
 }

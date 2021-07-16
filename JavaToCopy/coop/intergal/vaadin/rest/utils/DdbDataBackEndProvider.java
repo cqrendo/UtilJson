@@ -188,6 +188,8 @@ private long sizeBE;
 
 		        int offset = query.getOffset();
 		        int limit = query.getLimit();
+//		        if (limit > 200)
+//		        	limit = 200;
 		        List<QuerySortOrder> sortOrdersFields = query.getSortOrders();
 		        Collection<DynamicDBean> rows = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(variant),  filter,sortOrdersFields, hasNewRow, variant);
 		        if (rows.size() == 1 && sizeBE > 1)

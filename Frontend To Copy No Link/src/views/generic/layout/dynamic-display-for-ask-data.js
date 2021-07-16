@@ -6,7 +6,7 @@ import '@vaadin/vaadin-button/src/vaadin-button.js';
 import '@vaadin/vaadin-split-layout/src/vaadin-split-layout.js';
 import { html } from '@polymer/polymer/lib/utils/html-tag.js';
 import { PolymerElement } from '@polymer/polymer/polymer-element.js';
-class DynamicGridForPick extends PolymerElement {
+class DynamicDisplayForAskData extends PolymerElement {
   static get template() {
     return html`
    <style include="shared-styles">
@@ -18,20 +18,17 @@ class DynamicGridForPick extends PolymerElement {
  /*      height: 100%;  */
 }
 </style> 
-   <vaadin-split-layout orientation="vertical" style="height: 100%"> 
-    <div id="divQuery"  style="overflow: unset;"></div> 
+    <div id="divDisplay"  style="overflow: unset;"></div> 
     <div style="height: 100%"> 
-     <vaadin-button id="acceptPick">
-       Aceptar 
+     <vaadin-button id="acceptDataAndContinue">
+       Confirmar y continuar 
      </vaadin-button> 
-     <dynamic-grid id="grid"></dynamic-grid> 
     </div> 
-   </vaadin-split-layout> 
 `;
   }
 
   static get is() {
-      return 'dynamic-grid-for-pick';
+      return 'dynamic-display-for-ask-data';
   }
   static get properties() {
       return {
@@ -39,5 +36,5 @@ class DynamicGridForPick extends PolymerElement {
       };
   }
 }
-customElements.define(DynamicGridForPick.is, DynamicGridForPick);
+customElements.define(DynamicDisplayForAskData.is, DynamicDisplayForAskData);
 

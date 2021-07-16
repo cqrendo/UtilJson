@@ -28,6 +28,7 @@ import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
@@ -39,6 +40,7 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -400,6 +402,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //				form.setId(ResourceName+"_QRY");
 //				}
 			form.removeAll();
+			
 			form.getStyle().set("overflow", "inherit");
 			Div statusLabel = new Div();
 			statusLabel.getElement().getStyle().set("color", "var(--lumo-error-text-color)");
@@ -508,13 +511,21 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 							classNamesItem = classNamesItem + "." + tokens[iii];
 						iii ++;
 					}
-					if (nRow == 0)
+					if (nRow == 0) // first field
 					{
 						form.setClassName("");
 						if(isQuery)
+						{
+							form.setId(rowField[10]);
+				//			form.add(new H3("TITULO En QUERY"));
 							form = addClassNames(form,CLASSNAME_FOR_FORM_QUERY);
+						}
 						else
+						{
+				//			form.setId("TITULO En FORM");
+				//			form.add(new H3("TITULO En FORM"));
 							form = addClassNames(form,classNamesForm.trim());
+						}	
 						title = rowField[9];
 					
 					}
@@ -827,7 +838,50 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					if (fieldSize.length() > 0)						
 						tf.setMaxLength(new Integer(fieldSize));
 					}
-					
+				else if (idFieldType == 4 )// is checkBox (boolean); 
+				{
+					Checkbox checkB = new Checkbox();
+					setBeanValidators(validationRuleName, isQuery, cache) ;
+					if (isQuery)
+						{
+						checkB.setReadOnly(!editableQryByTag);
+						checkB.setValue(defaultValueForQuery.equals("1"));
+						}
+					else	
+						checkB.setReadOnly(isReadOnly || !editableByTag);
+			
+					if (isRequired && isQuery == false )
+					{	
+					binder.forField(checkB).asRequired()
+							.bind(d-> d.getColBoolean(fieldNameInUI), (d,v)-> d.setColBoolean(v,fieldNameInUI));
+					}
+					else 
+					{
+						binder.forField(checkB)
+							.bind(d-> d.getColBoolean(fieldNameInUI), (d,v)-> d.setColBoolean(v,fieldNameInUI));
+					}
+					boolean isRightLabel = false;
+//					if (label.endsWith("#"))isRightLabel = true;
+					Div l = alingLabel(label); 
+					FormLayout.FormItem item = form.addFormItem(checkB, l );
+//					if (isRightLabel)
+//						item.addClassName("filabelright");
+//					else
+					if (isQuery)
+						{
+//				        Tooltip tooltip = new Tooltip();
+//				        tooltip.attachToComponent(tf);
+//				        tooltip.setPosition(TooltipPosition.RIGHT);
+//				        tooltip.setAlignment(TooltipAlignment.LEFT);
+//				        tooltip.add("Hola");
+//				        tooltip.add(new Paragraph(TranslateResource.getFieldLocale("FABORRARAVISO", AppConst.PRE_CONF_PARAM)));
+						item.getElement().setAttribute("title","Ayuda busqueda...."); 
+						}
+					item = addClassNames(item, classNamesItem);
+					item.setId(fieldNameInUI);
+					form.setColspan(item, colspan);
+					checkB.setWidth(fieldWidth);
+					}	
 				else  // is Text
 				{
 					setBeanValidators(validationRuleName, isQuery, cache) ;
@@ -895,6 +949,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 
 //			form.add(statusLabel);
 //			form.setId(resourceName);
+
 			return form;
 	    }
     
@@ -1253,13 +1308,15 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		}
 		String filter="tableName='"+resourceName+"'%20AND%20FieldNameInUI='"+fieldName+"'";
 		String parentResource = "";
+		String titleGrid ="";
 		
-		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,cache,AppConst.PRE_CONF_PARAM_METADATA,"1");
+		JsonNode rowsList = JSonClient.get("CR-FieldTemplate",filter,cache,AppConst.PRE_CONF_PARAM_METADATA,"1");
 		for (JsonNode eachRow : rowsList)  {
 			if (eachRow.size() > 0)
 			{
 				parentResource = eachRow.get("parentResource").asText();
 				pickMapFields =  eachRow.get("pickMapFields").asText();
+//				titleGrid = eachRow.get("titleGrid").asText();
 				queryFormForPickClassName =  eachRow.get("queryFormForPickClassName").asText();
 			}
 		}
@@ -1275,6 +1332,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
 
 		setGrid.invoke(queryForm,grid);
+		String titleByID ="";
 		if (queryFormForPickClassName.indexOf("Generated") > -1)
 		{
 			
@@ -1289,9 +1347,15 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 //			Method createContent= dynamicQuery.getMethod("createDetails");
 //			queryForm = 
 			createContent.invoke(queryForm);
+			if (((GeneratedQuery) queryForm).getId().isPresent())
+			{
+				titleByID = ((GeneratedQuery) queryForm).getId().get();
+			}
 		}
+		if (titleByID  != null && titleByID.length() > 2)
+			dynamicGridForPick.getDivQuery().add(new H3(titleByID));	
 		dynamicGridForPick.getDivQuery().add((Component)queryForm);
-		
+		 
 		
 		grid.setButtonsRowVisible(false);
 		grid.setResourceName(parentResource);
@@ -1314,6 +1378,8 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		dialogForPick.removeAll();
 		dialogForPick.setModal(false);
 		dialogForPick.setCloseOnOutsideClick(false);
+		if (titleGrid.length() > 2)
+			dialogForPick.add(new H3(titleGrid));
 		dialogForPick.add(dynamicGridForPick);
 		dialogForPick.open();
 		

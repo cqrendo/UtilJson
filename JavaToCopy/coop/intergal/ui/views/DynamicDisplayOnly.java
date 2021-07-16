@@ -103,6 +103,15 @@ public class DynamicDisplayOnly extends PolymerTemplate<TemplateModel> implement
 
 	@Id("buttons")
 	private FormButtonsBar buttons;
+	
+	public FormButtonsBar getButtons() {
+		return buttons;
+	}
+
+	public void setButtons(FormButtonsBar buttons) {
+		this.buttons = buttons;
+	}
+
 	private String apiname;
 
 	public SplitLayout getDisplaySplitSubGrid() {

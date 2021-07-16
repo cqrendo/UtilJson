@@ -25,6 +25,9 @@ public class FormButtonsBar extends PolymerTemplate<TemplateModel> {
 	private Button delete;
 	@Id("add")
 	private Button add;
+	@Id("print")
+	private Button print;
+
 
 	public void setSaveText(String saveText) {
 		save.setText(saveText == null ? "" : saveText);
@@ -87,5 +90,14 @@ public class FormButtonsBar extends PolymerTemplate<TemplateModel> {
 
 	public Registration addDeleteListener(ComponentEventListener<DeleteEvent> listener) {
 		return delete.addClickListener(e -> listener.onComponentEvent(new DeleteEvent(this, true)));
+	}
+	public static class PrintEvent extends ComponentEvent<FormButtonsBar> {
+		public PrintEvent(FormButtonsBar source, boolean fromClient) {
+			super(source, fromClient);
+		}
+	}
+
+	public Registration addPrintListener(ComponentEventListener<PrintEvent> listener) {
+		return print.addClickListener(e -> listener.onComponentEvent(new PrintEvent(this, true)));
 	}
 }

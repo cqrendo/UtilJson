@@ -9,13 +9,18 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.polymertemplate.TemplateParser;
@@ -174,6 +179,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {  // when is call from a navigation
+		buttons.setVisible(false);
 		QueryParameters queryParameters = event.getLocation().getQueryParameters();
 		filter = null; 
 		List<String> parFIlter = queryParameters.getParameters().get("filter");
@@ -181,6 +187,8 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 			{
 			filter = parFIlter.get(0);
 			filter=filter.replace("EEQQ", "=");
+			filter=filter.replace("GGTT", "%3E"); // ">"
+			filter=filter.replace("LLTT", "%3C"); // "<"
 			}
 		title="..";
 		String queryFormClassName = null;
@@ -218,6 +226,8 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 			Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
 			setGrid.invoke(queryForm,grid);
 			divQuery.removeAll();
+//			String[] rowCol = rowsColList.iterator().next();
+//			divQuery.add(new H2("TITULO"));
 			if (queryFormClassName.indexOf("Generated") > -1)
 			{
 				
@@ -225,11 +235,17 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 				dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 				dataProvider.setResourceName(resourceName);
 				Method setDataProvider= dynamicQuery.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
-				Method createContent= dynamicQuery.getMethod("createDetails");
+				Method createDetails= dynamicQuery.getMethod("createDetails");
 				Method setRowsColList = dynamicQuery.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
 				setDataProvider.invoke(queryForm,dataProvider );
 				setRowsColList.invoke(queryForm,rowsColList);
-				divInDisplay =createContent.invoke(queryForm);
+				divInDisplay =createDetails.invoke(queryForm);
+				if (((GeneratedQuery) divInDisplay).getId().isPresent())
+					{
+					String titleByID = ((GeneratedQuery) divInDisplay).getId().get();
+					if (titleByID != null && titleByID.length() > 2)
+						divQuery.add(new H3(titleByID));
+					}
 				divQuery.add((Component)divInDisplay);
 			}
 			else 
@@ -285,6 +301,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		buttons.addCancelListener(e -> grid.undoSelectedRow());
 		buttons.addAddListener(e -> grid.insertANewRow());
 		buttons.addDeleteListener(e -> grid.DeleteARow());
+		buttons.addPrintListener(e -> grid.PrintARow());
 		
 	}
 

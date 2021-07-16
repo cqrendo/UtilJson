@@ -29,6 +29,7 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
+import coop.intergal.ui.components.FormButtonsBar;
 //import coop.intergal.tys.ui.views.comprasyventas.compras.ArticulosQueryForPick;//
 //import coop.intergal.tys.ui.views.comprasyventas.compras.ProveedorQueryForPick;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
@@ -103,6 +104,17 @@ public class DynamicDisplayForAskData extends PolymerTemplate<TemplateModel> imp
 	@Id("acceptDataAndContinue")
 	private Button acceptDataAndContinue;
 	
+//	@Id("buttons") // dummy for generic code
+	private FormButtonsBar buttons;
+	
+	public FormButtonsBar getButtons() {
+		return buttons;
+	}
+
+	public void setButtons(FormButtonsBar buttons) {
+		this.buttons = buttons;
+	}
+
 	public Div getDivDisplay() {
 		return divDisplay;
 	}
@@ -219,7 +231,7 @@ public class DynamicDisplayForAskData extends PolymerTemplate<TemplateModel> imp
 			filter = parFIlter.get(0);
 			filter=filter.replace("EEQQ", "=");
 			}
-		title="..";
+		title="";
 		String queryFormClassName = null;
 		String displayFormClassName  = null;
 //		String resourceSubGrid = null;

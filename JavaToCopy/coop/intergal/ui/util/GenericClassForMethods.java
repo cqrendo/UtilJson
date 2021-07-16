@@ -38,8 +38,11 @@ import coop.intergal.vaadin.rest.utils.RestData;
 public class GenericClassForMethods {
 	
 	private DynamicDBean rowOfAskData;
-
+	private DynamicDBean keepFirstParent;
 	public Object processButtonForNavigation(String idButton, DynamicDBean bean, Div divSubGrid, DynamicViewGrid grid) {
+		return processButtonForNavigation(idButton, bean, divSubGrid, grid, null);
+	}
+	public Object processButtonForNavigation(String idButton, DynamicDBean bean, Div divSubGrid, DynamicViewGrid grid, String filter2) {
 //		String titleOption = rowSubMenu.get("optionName").asText();
 		int idxIdMenu = idButton.indexOf("@IDM");
 		boolean isPopup = idButton.indexOf("@POP") > -1;
@@ -88,7 +91,12 @@ public class GenericClassForMethods {
 				}
 			}	
 			else
-				UI.getCurrent().getPage().executeJs("window.open('"+urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"', '_blank');") ;
+				{
+				if (filter2 != null)
+					UI.getCurrent().getPage().executeJs("window.open('"+urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"&filter="+filter2+"', '_blank');");
+				else
+					UI.getCurrent().getPage().executeJs("window.open('"+urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"', '_blank');");
+				}
 			}
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -185,14 +193,24 @@ public class GenericClassForMethods {
 		DynamicDBean rowOfInputData = null;
 		String dialogClassLayout = rowStep.get("dialogClassLayout").asText();
 		String dialogClassDisplayForm = rowStep.get("dialogClassDisplayForm").asText();
+		String filterForShowResult = rowStep.get("filterForShowResult").asText();
+		String idButtonForShowResult = rowStep.get("idButtonForShowResult").asText(); // format @POP (if popup) + @IDM<<idmenu>>
 		if (inputResourceForAskData != null && inputResourceForAskData.equals("null") == false && inputResourceForAskData.isEmpty() == false  )
 		{
 //			rowOfInputData = askInputData(inputResourceForAskData, grid, dialogClassLayout, dialogClassDisplayForm);
 			askForDataAndContinue(dialogClassLayout, inputResourceForAskData, grid, dialogClassDisplayForm, rowStep);
 		}
 		else
-		{
-			proccesDataInputOuput(rowStep, grid, dialogClassDisplayForm, rowOfInputData);//(rowPreviousStep,rowStep, grid, dialogClassDisplayForm, rowOfInputData);(rowPreviousStep,rowStep, grid, dialogClassDisplayForm, rowOfInputData);
+		{	
+			if (filterForShowResult != null && filterForShowResult.equals("null") == false && filterForShowResult.isEmpty() == false)
+			{
+				showResult(filterForShowResult,idButtonForShowResult);
+			}
+			else
+			{
+				proccesDataInputOuput(rowStep, grid, dialogClassDisplayForm, rowOfInputData);//(rowPreviousStep,rowStep, grid, dialogClassDisplayForm, rowOfInputData);(rowPreviousStep,rowStep, grid, dialogClassDisplayForm, rowOfInputData);
+				nextStepIfExist(rowStep, grid);
+		}
 		}
 //		JsonNode rowsStepOuput = rowStep.get("List-ProcessStepOutput");
 //		processInputOuput(grid, inputResourceForReadData, rowOfInputData, rowsStepOuput);
@@ -203,6 +221,27 @@ public class GenericClassForMethods {
 		}
 
 		
+	private void showResult(String filterForShowResult, String idButton) {
+		String filter = componeFilter(filterForShowResult);
+		processButtonForNavigation(idButton, null, null, null, filter);
+//		menuRow = 
+		
+	}
+	private String componeFilter(String filterForShowResult) { // sintasis -> field => <<FieldName1WithValue>> and .....<<FieldName2WithValue>> 
+		String resultFilter = filterForShowResult;
+		while (true)
+		{
+			int idxStartField = filterForShowResult.indexOf("<<");
+			int inxEndField = filterForShowResult.indexOf(">>");
+			if (idxStartField ==-1)
+				break;
+			String fieldToGetValue = filterForShowResult.substring(idxStartField+2,inxEndField);
+			String value = keepFirstParent.getRowJSon().get(fieldToGetValue).asText();
+			resultFilter = resultFilter.replace("<<"+fieldToGetValue+">>",value);
+			filterForShowResult = filterForShowResult.substring(inxEndField+2);
+		}
+		return resultFilter;
+	}
 	private void proccesDataInputOuput(JsonNode rowStep, DynamicViewGrid grid, String inputResourceForReadData, DynamicDBean rowOfInputData) {//(DynamicDBean rowPreviousStep, JsonNode rowStep, DynamicViewGrid grid, String inputResourceForReadData, DynamicDBean rowOfInputData) {
 		Stream<DynamicDBean> rowsStream = ((DataProvider<DynamicDBean, String>) grid.getGrid().getDataProvider()).fetch(createQuery(grid.getGrid()));
 //		grid.getGrid().getSelectedItems();j
@@ -210,8 +249,18 @@ public class GenericClassForMethods {
 		Hashtable<Integer, DynamicDBean> beansFromGrid = new Hashtable<Integer, DynamicDBean>();
 		Integer id=0;
 		while (rowsInput.hasNext()) {
-			beansFromGrid.put(id,rowsInput.next());
-			id++;
+			DynamicDBean rowInput = rowsInput.next();
+			if (rowInput.getRowJSon().get("NotProcessRow") == null)
+			{
+				beansFromGrid.put(id,rowInput);
+				id++;
+				System.out.println("GenericClassForMethods.proccesDataInputOuput() SI PROCESAR "+ rowInput.getRowJSon().get("cantidadPedirFinal"));
+			}
+			else
+			{
+				System.out.println("GenericClassForMethods.proccesDataInputOuput() NO PROCESAR "+ rowInput.getRowJSon().get("cantidadPedirFinal"));
+			}
+			
 		}
 		DynamicDBean row = null;
 		DynamicDBean lastParent = null;
@@ -225,21 +274,25 @@ public class GenericClassForMethods {
 			{
 				firstRowInput = beansFromGrid.get(0);
 				lastParent = insertOrUpdateOutput(firstRowInput, rowStep, true, lastParent);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
+				keepFirstParent = lastParent;
 				if (groupBy.equals("null") == false)
 					keepGroup = firstRowInput.getRowJSon().get(groupBy).asText();				
 			}
 			else
 			{
 				row = beansFromGrid.get(i);
-				System.out.println("GenericClassForMethods.proccesDataInputOuput() ROW INPUT --->"+ row.getRowJSon().get("DESCRIPCION").asText());
+				if (row != null)
+				{
+//	!!!!!			System.out.println("GenericClassForMethods.proccesDataInputOuput() ROW INPUT --->"+ row.getRowJSon().get("DESCRIPCION").asText());
 				if (keepGroup != null && row.getRowJSon().get(groupBy).asText().equals(keepGroup) == false) // Group change
-				{
-				  lastParent = insertOrUpdateOutput(row, rowStep, true, lastParent);
-				  keepGroup = row.getRowJSon().get(groupBy).asText();
-				}
+					{
+					lastParent = insertOrUpdateOutput(row, rowStep, true, lastParent);
+					keepGroup = row.getRowJSon().get(groupBy).asText();
+					}
 				else
-				{
-				insertOrUpdateOutput(row, rowStep, false, lastParent);//(row, rowStep, false, lastParent, rowOfInputData);
+					{
+					insertOrUpdateOutput(row, rowStep, false, lastParent);//(row, rowStep, false, lastParent, rowOfInputData);
+					}
 				}
 			}	
 			i++;
@@ -256,7 +309,7 @@ public class GenericClassForMethods {
 //			{
 //			System.out.println("GenericClassForMethods.processButtonForProcess() STEP OUTPUT "+ rowStepOuput.get("resource").asText());
 //			}
-		
+//		return keepFirstParent;
 	}
 	private DynamicDBean insertOrUpdateOutput(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent) {//(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean rowPreviousStep) {
 //		if (rowStep.get("filter"))
@@ -323,16 +376,21 @@ public class GenericClassForMethods {
 		ArrayList<String[]> colList = newBean.getRowsColList();
 		for (JsonNode rowStepOuputMap : rowsStepOuputMap) 
 		{
-			newBean.setCol(getValueForField(rowStepOuputMap.get("fieldValue").asText(), rowInputData), getColNameInUi(rowStepOuputMap.get("ouputField").asText(), colList));
+			newBean.setCol(getValueForField(rowStepOuputMap.get("fieldValue").asText(), rowInputData), getColNameInUi(rowStepOuputMap.get("ouputField").asText(), colList, rowStepOuput.get("resource").asText() ));
 		}
 		return newBean;
 	//	Orvisa@.03
 		
 	}
-	private String getColNameInUi(String colName, ArrayList<String[]> colList) {
+	private String getColNameInUi(String colName, ArrayList<String[]> colList, String resource) {
 //		colName
 		int idxCol = colList.indexOf(colName);
 		String[] col = findCol(colList, colName) ;
+		if (col == null)
+		{
+			DataService.get().showError("ERROR -> Campo sin definir en metaconfig : " +colName + " del recurso "+ resource);
+			return null;
+		}
 		System.out.println("GenericClassForMethods.getColNameInUi() colName "+ colName +  " col[2] " +col[2] );
 		return col[2];
 	}
@@ -352,7 +410,7 @@ public class GenericClassForMethods {
 		{
 			int idxStart = valueFormula.indexOf("rowID") + 6;
 			String colNameToGetValue = valueFormula.substring(idxStart);
-			String colNameInUi = getColNameInUi(colNameToGetValue, rowInputData.getRowsColList());
+			String colNameInUi = getColNameInUi(colNameToGetValue, rowInputData.getRowsColList(),rowInputData.getResourceName());
 			System.out.println("rowID GenericClassForMethods.getValueForField() valueFormula "+ valueFormula + " colNameInUi " + colNameInUi + " value "+ rowInputData.getCol(colNameInUi));
 			return rowInputData.getCol(colNameInUi);
 		}
@@ -361,7 +419,7 @@ public class GenericClassForMethods {
 			int idxStart = valueFormula.indexOf("rowAD") + 6;
 			String colNameToGetValue = valueFormula.substring(idxStart);
 			/// AQUI /////
-			String colNameInUi = getColNameInUi(colNameToGetValue, rowOfAskData.getRowsColList());
+			String colNameInUi = getColNameInUi(colNameToGetValue, rowOfAskData.getRowsColList(), rowInputData.getResourceName());
 			System.out.println("rowAD GenericClassForMethods.getValueForField() valueFormula "+ valueFormula + " colNameInUi " + colNameInUi + " value "+ rowInputData.getCol(colNameInUi));
 			return rowOfAskData.getCol(colNameInUi);
 		}
@@ -371,14 +429,14 @@ public class GenericClassForMethods {
 		DynamicDisplayForAskData dynamicDisplayForAskData = new DynamicDisplayForAskData();
 		
 		rowOfAskData = RestData.getOneRow(inputResourceForAskData, null, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
-		dynamicDisplayForAskData.addAcceptDataAndContinueListener(e -> nextStepAfterAskData(rowStep, grid));//(rowOfAskData, rowStep, grid));
+		dynamicDisplayForAskData.addAcceptDataAndContinueListener(e -> nextStepIfExist(rowStep, grid));//(rowOfAskData, rowStep, grid));
 		Object rowOfInputData = askInputData(inputResourceForAskData, grid, dialogClassLayout, dialogClassDisplayForm, dynamicDisplayForAskData, rowOfAskData);
 
 	}
 
 
 	
-	private Object nextStepAfterAskData(JsonNode step, DynamicViewGrid grid) {//(DynamicDBean rowtoShow, JsonNode step, DynamicViewGrid grid) {
+	private Object nextStepIfExist(JsonNode step, DynamicViewGrid grid) {//(DynamicDBean rowtoShow, JsonNode step, DynamicViewGrid grid) {
 		System.out.println("GenericClassForMethods.nextStepAfterAskData() " + rowOfAskData.getCol0());
 		JsonNode nextStep = foundNextStep(step);
 		if (nextStep != null)

@@ -279,6 +279,15 @@ public class RestData {
 		{
 			dB.setParams(dB.getParams()+"&classForLayout="+eachRow.get("classForLayout") );				
 		}
+		if (eachRow.get("reportName") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
+		{
+			dB.setParams(dB.getParams()+"&reportName="+eachRow.get("reportName") );				
+		}
+		if (eachRow.get("reportSf") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
+		{
+			dB.setParams(dB.getParams()+"&reportSf="+eachRow.get("reportSf") );				
+		}
+
 		if (eachRow.get("methodForRowSelected") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
 		{
 			dB.setMethodForRowSelected(eachRow.get("methodForRowSelected").asText());				
@@ -1163,7 +1172,6 @@ public class RestData {
 						else
 							fieldArr[18] = col.get("tabQuery").asText();	
 						fieldArr[19] = ""; // is only used for Form fields++;
-						fieldArr[20] = ""; // is only used for Form fields++; // @@ TODO implement combo in qrys
 						if ( col.get("tagsForVisibility").asText().isEmpty() || col.get("tagsForVisibility").asText().equals("null") )
 							fieldArr[21] = "";
 						else

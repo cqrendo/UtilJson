@@ -19,13 +19,14 @@
      margin-top:0px !important;
      text-align: right; 
  }
+ :host(.alignRight) {
+     text-align-last: right; 
+ }
 /* :host(.labelright) { */
 /* 	text-align: right;  */
 /* 	margin-right: 10px; */
 /*	}  */
-:host(.lineHeight1) {
-	height:30px;
-}
+
 :host(.lineHeight2) {
 	height:70px;
 }
@@ -59,6 +60,28 @@
 :host(.labelXXXXL) {
 	--vaadin-form-item-label-width: 25em;
 }
+:host(.titleInForm) {
+	--vaadin-form-item-label-width: 65em;
+	text-align: center;
+	--lumo-font-size-s: 19px;
+	background: green;
+	--lumo-secondary-text-color: white;
+}	
+:host(.colorGreen) {	
+
+--lumo-secondary-text-color: green;
+
+}
+
+
 vaadin-form-item {
   --vaadin-form-item-label-width: 5em;
 }
+/*yolaqr  intentando que cuando el label tiene 2 líneas no crezca hacia abajo y lo centre. No lo logré
+[part="label"] {
+	display: inline-block;
+	vertical-align: top;
+	height: 30px;
+	color:green;
+}*/
+
