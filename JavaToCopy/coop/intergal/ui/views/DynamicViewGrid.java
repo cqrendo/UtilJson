@@ -2300,7 +2300,7 @@ private boolean isBoolean(String header, String colType) {
 			String sf = "&sf=" + reportSf;
 			String datasource = "&DataSource=DB11_"+ UtilSessionData.getCompanyYear();
 			String url = AppConst.CLEAR_REPORT_SERVER+"?report="+reportName+"&init=htm"+sf+datasource;
-			System.out.println("DynamicViewGrid.PrintARow() URL->"+url);
+			System.out.println("DynamicViewGrid.PrintARow() URL para report ->"+url);
 			UI.getCurrent().getPage().executeJs("window.open('"+url+"', '_blank');");
 			}
 			else

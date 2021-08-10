@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.ldap.core.support.LdapContextSource;
-import org.springframework.security.authentication.AuthenticationProvider;
+//import org.springframework.ldap.core.support.LdapContextSource;
+//import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -14,13 +14,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.ldap.authentication.BindAuthenticator;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.authentication.LdapAuthenticator;
-import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
-import org.springframework.security.ldap.ppolicy.PasswordPolicyAwareContextSource;
-import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
-import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
+//import org.springframework.security.ldap.authentication.BindAuthenticator;
+//import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+//import org.springframework.security.ldap.authentication.LdapAuthenticator;
+//import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
+//import org.springframework.security.ldap.ppolicy.PasswordPolicyAwareContextSource;
+//import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
+//import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 
@@ -140,21 +140,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     	System.out.println("SecurityConfiguration.configure()----------------------------");
-    	if(Boolean.parseBoolean(ldapEnabled)){
-    	auth.ldapAuthentication() // uid=juanjo,cn=Usuarios,ou=anpa terronio,ou=anpas,dc=intergal,dc=coop
-	       .groupSearchBase("ou=groups")
-	       .userSearchFilter("uid={0}")
-	        .contextSource()
-	        .url(ldapUrls + "/" +ldapBaseDn)
-	        .managerDn(ldapSecurityPrincipal)
-	        .managerPassword(ldapPrincipalPassword)
-	        .and()
-	        .passwordCompare()
-	        .passwordEncoder(new BCryptPasswordEncoder())
-	        .passwordAttribute("userPassword");
- //   	auth.userDetailsService(userDetailsService());
-    	
-    } else {
+//    	if(Boolean.parseBoolean(ldapEnabled)){
+//    	auth.ldapAuthentication() // uid=juanjo,cn=Usuarios,ou=anpa terronio,ou=anpas,dc=intergal,dc=coop
+//	       .groupSearchBase("ou=groups")
+//	       .userSearchFilter("uid={0}")
+//	        .contextSource()
+//	        .url(ldapUrls + "/" +ldapBaseDn)
+//	        .managerDn(ldapSecurityPrincipal)
+//	        .managerPassword(ldapPrincipalPassword)
+//	        .and()
+//	        .passwordCompare()
+//	        .passwordEncoder(new BCryptPasswordEncoder())
+//	        .passwordAttribute("userPassword");
+// //   	auth.userDetailsService(userDetailsService());
+//    	
+//    } else {
     	System.out.println("SecurityConfiguration.configure()---------------------------- .inMemoryAuthentication()");
     	auth
     	.inMemoryAuthentication()  // password = admin
@@ -162,7 +162,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 //    	.and()
 //    	.withUser("admin").password("{noop}admin").roles("ADMIN");
     	}
-    }
+//    }
     
     /**
      * Require login to access internal pages and configure login form.
