@@ -648,7 +648,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					nf.setReadOnly(isReadOnly || !editableByTag);
 
 //					nf.setValueChangeMode(ValueChangeMode.EAGER); 
-					nf.setId("tf"+fieldNameInUI);
+					nf.setId("if"+fieldNameInUI);
 					nf.getElement().setAttribute("theme", "small");
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;

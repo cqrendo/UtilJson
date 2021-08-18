@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.FormItem;
@@ -261,7 +262,7 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 			if (!fieldName.isEmpty())
 				try {//		System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
 					String id = rowCol[2];
-					if (!fieldName.equals("null")) {
+					if (!fieldName.equals("null") && rowCol[0].equals("#SPACE#") == false ) {
 						Field field = null ;
 						Object fieldObj =null;
 						if (isGeneratedForm == false)
@@ -608,9 +609,21 @@ private void clearField(FormLayout form, String id) {
 //	.filter(HasValue.class::isInstance)
 //	.map(HasValue.class::cast)
 //	.ifPresent(HasValue::clear);
-	TextField tf = (TextField) UiComponentsUtils.findComponent(form, id).getChildren().findFirst().get();
-	if (tf != null)
-		tf.clear();
+	Component comp = UiComponentsUtils.findComponent(form, id).getChildren().findFirst().get();
+	if (comp instanceof com.vaadin.flow.component.textfield.TextField)
+		{		
+		TextField tf = (TextField) comp;//UiComponentsUtils.findComponent(form, id).getChildren().findFirst().get();
+		if (tf != null)
+			tf.clear();
+		}
+	else if (comp instanceof com.vaadin.flow.component.checkbox.Checkbox)
+	{
+		Checkbox cb = (Checkbox) comp;//UiComponentsUtils.findComponent(form, id).getChildren().findFirst().get();
+		if (cb != null)
+			cb.clear();
+		}
+	}
+		
 //	findComponent(UI.getCurrent(),"col2");
 //	for (Component child : form.getChildren().filter(c->c instanceof Div).collect(Collectors.toList()))
 //	{
@@ -638,7 +651,7 @@ private void clearField(FormLayout form, String id) {
 //    .map(HasValue.class::cast)
 //    .ifPresent(HasValue::clear);
 		
-	}
+	
 
 //}	
 
