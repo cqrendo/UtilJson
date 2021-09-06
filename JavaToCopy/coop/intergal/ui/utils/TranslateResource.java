@@ -19,7 +19,7 @@ public class TranslateResource {
 		Locale locale = UI.getCurrent().getLocale();
 		try
 		{
-		System.out.println("TranslateResource.getFieldLocale() " + locale.getCountry());
+//		System.out.println("TranslateResource.getFieldLocale() " + locale.getCountry());
 	    ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", locale);
 //		ResourceBundle labels = ResourceBundle.getBundle("ResourceBundle", new Locale("es", "ES"));
 //		Enumeration bundleKeys = labels.getKeys();

@@ -1236,6 +1236,8 @@ private String cleanMarks(String label) {
 		if (label.endsWith("#"))
 			{
 			l.addClassName("labelright");
+//			l.getElement().getStyle().set("text-align","right");
+//			l.getElement().getStyle().set("margin-right","10px");
 			label=label.substring(0,label.length()-1);
 			l.setText(label);
 			}

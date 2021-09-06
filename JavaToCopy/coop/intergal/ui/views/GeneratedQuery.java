@@ -36,9 +36,9 @@ import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 @JsModule("./src/views/generic/forms/generated-query.js")
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@Route(value = "queryGenerated")
+//@Route(value = "queryGenerated")
 
-@CssImport(value = STYLES_CSS, themeFor="dynamic-grid-display")
+//@CssImport(value = STYLES_CSS, themeFor="generated-query")
 @CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
 //@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-item")
 public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTitle, BeforeEnterObserver {//, AfterNavigationListener {

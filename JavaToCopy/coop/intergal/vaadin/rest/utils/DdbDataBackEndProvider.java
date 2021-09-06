@@ -49,6 +49,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 	private Consumer<Long> sizeChangeListener;
 private long sizeBE;
 
+
 	public String getVariant() {
 		return variant;
 	}
@@ -187,11 +188,11 @@ private long sizeBE;
 		        	System.out.println("DdbDataBackEndProvider.sizeInBackEnd() DEBUG GET_DATA_FROM_BACK_END <<Activado>>" );
 
 		        int offset = query.getOffset();
-		        int limit = query.getLimit();
-//		        if (limit > 200)
+		        int limit = query.getLimit(); // is determined by grid.setPageSize(int);
+//		        if (limit > 200) // no esta claro porque esta esta limitacion por ahora esta anulada, linit es 50npor defecto al no ser que se use grid.setPageSize(int);
 //		        	limit = 200;
 		        List<QuerySortOrder> sortOrdersFields = query.getSortOrders();
-		        Collection<DynamicDBean> rows = DataService.get().getAllDynamicDBean(query.getOffset(),query.getLimit(),cache, resourceName, preConfParam, getRowsColList(variant),  filter,sortOrdersFields, hasNewRow, variant);
+		        Collection<DynamicDBean> rows = DataService.get().getAllDynamicDBean(offset,limit,cache, resourceName, preConfParam, getRowsColList(variant),  filter,sortOrdersFields, hasNewRow, variant);
 		        if (rows.size() == 1 && sizeBE > 1)
 		        {
 		        	DynamicDBean row = rows.iterator().next();
@@ -230,7 +231,7 @@ private long sizeBE;
 
 			@Override
 		    protected int sizeInBackEnd(Query<DynamicDBean, CrudFilter> query) { 
-		        // For RDBMS just execute a SELECT COUNT(*) ... WHERE query
+		        // For RDBMS just execute a SELECT COUNT(*) ... WHERE query					
 		        long count = RestData.getCountRows(getTableDbForCount(resourceName), preConfParam, filter, false, hasNewRow); // // @@ ANTES CACHE fijo false   //fetchFromBackEnd(query).count();
 		        if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
 		        	System.out.println("DdbDataBackEndProvider.sizeInBackEnd() DEBUG GET_DATA_FROM_BACK_END <<Activado>>" );
