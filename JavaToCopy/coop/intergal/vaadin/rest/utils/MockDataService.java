@@ -166,6 +166,7 @@ public class MockDataService extends DataService {
 				JsonNode postResult;
 				try {
 					ObjectNode rowJsonChanged = putValuesOnObject(false, nodeFactory,dB, resourceName);
+					rowJsonChanged = addImagenIfExist(dB, rowJsonChanged);
 					postResult = JSonClient.put(resourceName, rowJsonChanged,  preConfParam); 
 
 					if (postResult.get("statusCode").intValue() != 200)
@@ -192,7 +193,7 @@ public class MockDataService extends DataService {
 							JsonNode eachRow =  lTxsumary.get(0);
 							putJSonData(eachRow, dB, true);
 						}
-						//		idEntity = lTxsumary.get(0).get("idEntity").intValue();
+						//	  	idEntity = lTxsumary.get(0).get("idEntity").intValue();
 						System.err.println(" result  "+ lTxsumary); 
 						showConfirmationSave("Registro salvado con éxito!");
 //						if (customerPickComponents != null)
