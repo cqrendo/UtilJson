@@ -140,29 +140,29 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     	System.out.println("SecurityConfiguration.configure()----------------------------");
-//    	if(Boolean.parseBoolean(ldapEnabled)){
-//    	auth.ldapAuthentication() // uid=juanjo,cn=Usuarios,ou=anpa terronio,ou=anpas,dc=intergal,dc=coop
-//	       .groupSearchBase("ou=groups")
-//	       .userSearchFilter("uid={0}")
-//	        .contextSource()
-//	        .url(ldapUrls + "/" +ldapBaseDn)
-//	        .managerDn(ldapSecurityPrincipal)
-//	        .managerPassword(ldapPrincipalPassword)
-//	        .and()
-//	        .passwordCompare()
-//	        .passwordEncoder(new BCryptPasswordEncoder())
-//	        .passwordAttribute("userPassword");
+    	if(Boolean.parseBoolean(ldapEnabled)){
+    	auth.ldapAuthentication() // uid=juanjo,cn=Usuarios,ou=anpa terronio,ou=anpas,dc=intergal,dc=coop
+	       .groupSearchBase("ou=groups")
+	       .userSearchFilter("uid={0}")
+	        .contextSource()
+	        .url(ldapUrls + "/" +ldapBaseDn)
+	        .managerDn(ldapSecurityPrincipal)
+	        .managerPassword(ldapPrincipalPassword)
+	        .and()
+	        .passwordCompare()
+	        .passwordEncoder(new BCryptPasswordEncoder())
+	        .passwordAttribute("userPassword");
 // //   	auth.userDetailsService(userDetailsService());
 //    	
-//    } else {
-    	System.out.println("SecurityConfiguration.configure()---------------------------- .inMemoryAuthentication()");
-    	auth
-    	.inMemoryAuthentication()  // password = admin
-    	.withUser("user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER");
+    	} else {
+    		System.out.println("SecurityConfiguration.configure()---------------------------- .inMemoryAuthentication()");
+    		auth
+    		.inMemoryAuthentication()  // password = admin
+    		.withUser("user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER");
 //    	.and()
 //    	.withUser("admin").password("{noop}admin").roles("ADMIN");
     	}
-//    }
+    }
     
     /**
      * Require login to access internal pages and configure login form.
