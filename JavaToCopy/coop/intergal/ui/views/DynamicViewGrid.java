@@ -263,7 +263,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		dataProvider.setResourceName(getResourceName());
 		dataProvider.setFilter(getFilter());
 //		grid = new Grid<>(DynamicDBean.class); 
-		grid.setPageSize(333);
+//		grid.setPageSize(333);
 		grid.removeAllColumns();
 		grid.setDataProvider(dataProvider);
 		grid.setEnterNextRow(true);
