@@ -254,10 +254,10 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		grid.addCellEditStartedListener(ev->grid.select(ev.getItem()));
 		GridContextMenu<DynamicDBean> contextMenu = new GridContextMenu<>(grid);
 //		GridMenuItem<DynamicDBean> opcion = contextMenu.addItem("Opcion");
-		contextMenu.addItem("Remove", e -> {
-		    e.getItem().ifPresent(dB -> {
-		    System.out.println("context menu " + dB.getCol0());});
-		});
+//		contextMenu.addItem("Remove", e -> {
+//		    e.getItem().ifPresent(dB -> {
+//		    System.out.println("context menu " + dB.getCol0());});
+//		});
 		dataProvider = new DdbDataBackEndProvider();
 		dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 		dataProvider.setResourceName(getResourceName());
