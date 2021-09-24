@@ -1905,7 +1905,14 @@ private boolean isBoolean(String header, String colType) {
 			String fKfieldName = fKfilter.substring(step+1, idXEqual - 2  );
 			String parentfieldName = fKfilter.substring(4+idXEqual, idXMark - 1  );
 			String parentValue = bean.getRowJSon().get(parentfieldName).asText();
-			componFilter = componFilter + fKfieldName + "='" + parentValue + "'%20and%20";
+			if (isADate(parentValue) && AppConst.FORMAT_FOR_DATETIME.length() > 0) {
+				parentValue = "=" +AppConst.FORMAT_FOR_DATETIME.replace("#value#",parentValue ) + "%20and%20";
+				}
+			else 
+			{
+				parentValue = "='" +parentValue+ "'%20and%20";
+			}
+			componFilter = componFilter + fKfieldName + parentValue;
 			lengthFKfilter = lengthFKfilter - idXMark;
 			fKfilter = fKfilter.substring(idXMark+1);
 			
@@ -1913,6 +1920,15 @@ private boolean isBoolean(String header, String colType) {
 		if (componFilter.length()>9)
 			componFilter = componFilter.substring(0, componFilter.length()-9); // to delete last and
 		return componFilter;
+	}
+
+	private boolean isADate(String parentValue) {
+//		2021-01-11T00:00:00
+		if (parentValue.length() != 19)
+			return false;
+		if (parentValue.substring(10,11).equals("T") && parentValue.substring(13,14).equals(":") && parentValue.substring(16,17).equals(":"))
+			return true;
+		return false;
 	}
 
 	@Override
