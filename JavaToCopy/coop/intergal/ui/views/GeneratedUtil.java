@@ -1616,11 +1616,12 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 							col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header).setResizable(true);				
 					else if (isGridEditable && isCOlEditable == false ) 
 					{
-						if (isNotAParentField || isPick == false)
-							{
-							col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
-							}
-						else if (isPIckFor(colData [1],"pickMapFields")){
+//						if (isNotAParentField || isPick == false)
+//							{
+//							col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+//							}
+//						else 
+						if (isPIckFor(colData [1],"pickMapFields")){
 							col = grid.addColumn(new ComponentRenderer<Label,DynamicDBean>(item->{
 								 Label l = new Label("Buscar....");
 								 if (item.getCol(colName) != null && item.getCol(colName).isEmpty() == false)
@@ -1630,12 +1631,18 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 								 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
 							
 						}
+						else
+						if (isNotAParentField || isPick == false)
+						{
+							col = grid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+						}
+
 						else {
 							col = grid.addColumn(new ComponentRenderer<Label,DynamicDBean>(item->{
 								 Label l = new Label("Buscar....");
 								 if (item.getCol(colName) != null && item.getCol(colName).isEmpty() == false)
 									 l = new Label(item.getCol(colName));
-								 l.getElement().addEventListener("click", ev->showDialogForPick(null, null,dynamicViewGrid, item,null, colName, false, false) );//ev->dynamicViewGrid.pickParent(colName, item));
+								 l.getElement().addEventListener("click", ev->showDialogForPick(null, item.getResourceName(),dynamicViewGrid, item,null, colName, false, false) );//ev->dynamicViewGrid.pickParent(colName, item));
 								 return l;
 								 })).setResizable(true).setHeader(header).setSortProperty(colData[0]);
 							

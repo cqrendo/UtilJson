@@ -13,6 +13,10 @@ import { html } from '@polymer/polymer/lib/utils/html-tag.js';
     <vaadin-button id="cancel" slot="left" theme="raised">
       Cancelar 
     </vaadin-button> 
+    <vaadin-button id="print" slot="left" theme="raised">
+      <iron-icon icon="vaadin:print" slot="prefix"></iron-icon>
+      Imprimir 
+    </vaadin-button> 
     <vaadin-button id="add" slot="right" theme="raised primary">
       Nuevo 
     </vaadin-button> 

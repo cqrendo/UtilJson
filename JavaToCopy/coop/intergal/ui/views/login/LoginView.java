@@ -73,8 +73,10 @@ public class LoginView extends FlexLayout implements AfterNavigationObserver {
  
     private void aceptar(Notification notification) {
     	if (!user.isEmpty()) {
-    		elUser = user.getValue();
-			if (compruebaEmail(elUser) == true) {
+//          elUser = user.getValue();
+            elUser = user.getValue().replace(" ", "");
+            elUser = elUser.toLowerCase();
+            if (compruebaEmail(elUser) == true) {
 				usuario = "uid="+elUser+AppConst.LDAP_BASE;
 				psw = getPassword(CARACTERES,5);
 				try {
