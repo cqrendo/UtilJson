@@ -810,6 +810,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	
 					ComboBox<DynamicDBean> cB = fillComboBox(parentResource);
 					cB.setReadOnly(isReadOnly || !editableByTag);
+					cB.setId("cb"+fieldNameInUI);
 					
 
 //					setBeanValidators(validationRuleName, isQuery, cache) ;

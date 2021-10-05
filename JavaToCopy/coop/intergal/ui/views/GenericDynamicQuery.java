@@ -20,6 +20,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -340,6 +341,20 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 							System.out.println("GenericDynamicForm.getFieldsData() fieldName " + fieldName + " valor :"
 									+ ((TextArea) fieldObj).getValue());
 						}
+						else if (rowCol[3].equals("6")) { // Combo box
+							String value = getValueFromField(form, "cb"+id, fieldObj, isGeneratedForm);								
+							if (!value.isEmpty()) {
+						//		value=addAutoComodin(value);
+								System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
+									+ " valor :" + value + "");
+							// filter=componefilter(filter, rowCol[0], ((TextField) fieldObj).getValue());
+								if (filter.length() > 1)
+									filter = filter + "%20AND%20" + rowCol[0]
+											+ componeNumberFilter(value);// determineOperator(value);
+								else
+									filter = rowCol[0] + componeNumberFilter(value);// determineOperator(value);
+							}
+					} 
 					}
 
 				} catch (NoSuchFieldException | SecurityException e) {
@@ -385,8 +400,15 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		String value = "";
 		if (isGeneratedForm)
 		{
-			id = "tf"+id;
-			value = (String) getValueFromField(form, id );
+			if (id.startsWith("cB") || id.startsWith("cb")) // is a combobox
+			{
+				value = (String) getValueFromField(form, id );
+			}
+			else
+			{
+				id = "tf"+id;
+				value = (String) getValueFromField(form, id );
+			}	
 		}
 		else
 			value = ((TextField) fieldObj).getValue() + "";
@@ -510,12 +532,30 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 //			.map(HasValue.class::cast)
 //			    .map(HasValue::getValue)
 //			    .orElse(null);
-		TextField tf= (TextField) UiComponentsUtils.findComponent(form, id);
-		Object value = tf.getValue();
-		if (value == null)
-			value = "";
-		System.out.println("VALUE........"+ value);
-		return value;
+		if (id.startsWith("cB")|| id.startsWith("cb")) {
+			ComboBox<DynamicDBean> cB= (ComboBox<DynamicDBean>) UiComponentsUtils.findComponent(form, id);
+			DynamicDBean valueDB = cB.getValue();
+			String value = null;
+			if (valueDB == null)
+				value = "";
+			else
+				value = valueDB.getCol0();
+		
+			System.out.println("VALUE........"+ value);
+			return value;
+
+			
+		}
+		else 
+		{
+			TextField tf= (TextField) UiComponentsUtils.findComponent(form, id);
+			Object value = tf.getValue();
+			if (value == null)
+				value = "";
+		
+			System.out.println("VALUE........"+ value);
+			return value;
+		}
 	}
 
 //	private Object clearValueFromField(FormLayout form, String id) {
@@ -626,6 +666,12 @@ private void clearField(FormLayout form, String id) {
 	else if (comp instanceof com.vaadin.flow.component.checkbox.Checkbox)
 	{
 		Checkbox cb = (Checkbox) comp;//UiComponentsUtils.findComponent(form, id).getChildren().findFirst().get();
+		if (cb != null)
+			cb.clear();
+		}
+	else if (comp instanceof com.vaadin.flow.component.combobox.ComboBox)
+	{
+		ComboBox<DynamicDBean> cb = (ComboBox<DynamicDBean>) comp;//UiComponentsUtils.findComponent(form, id).getChildren().findFirst().get();
 		if (cb != null)
 			cb.clear();
 		}
