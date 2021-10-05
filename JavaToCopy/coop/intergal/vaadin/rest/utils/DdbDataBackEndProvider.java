@@ -243,7 +243,11 @@ private long sizeBE;
 		        return (int) count;
 		    }
 
-		    void setSizeChangeListener(Consumer<Long> listener) {
+		    public long getSizeBE() {
+				return sizeBE;
+			}
+
+			void setSizeChangeListener(Consumer<Long> listener) {
 		        sizeChangeListener = listener;
 		    }
 
