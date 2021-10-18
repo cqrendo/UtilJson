@@ -847,6 +847,14 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 						{
 						checkB.setReadOnly(!editableQryByTag);
 						checkB.setValue(defaultValueForQuery.equals("1"));
+						checkB.setIndeterminate(true);
+						checkB.setId("chb"+fieldNameInUI);
+					//	checkB = new Checkbox();
+						checkB.addClickListener(ev->{
+				            if (ev.getClickCount()>1) {
+				            	checkB.setIndeterminate(true);
+				            }
+				        });
 						}
 					else	
 						checkB.setReadOnly(isReadOnly || !editableByTag);

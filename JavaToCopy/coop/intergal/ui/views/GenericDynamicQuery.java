@@ -33,6 +33,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
+import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.utils.UiComponentsUtils;
 import coop.intergal.ui.util.UtilSessionData;
@@ -135,12 +136,24 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 			if (value.startsWith("<"))
 				op = "%3C";
 			String value1 = changeFromAAAAMMDDtoDDMMAAAA(value.substring(1));
+			if (AppConst.FORMAT_FOR_SHORTDATETIME != null && AppConst.FORMAT_FOR_SHORTDATETIME.length() >1)
+			{	
+				value1 = AppConst.FORMAT_FOR_SHORTDATETIME.replaceAll("#value#",value1);
+				return field + op +  value1.replaceAll(" ", "%20");
+			}
 			return field + op + "'" + value1.replaceAll(" ", "%20") + "'";
 		}
 		// DD-MM-AAAA HH:MM
 		if (value.length() < 17) {
 			String value1 = changeFromAAAAMMDDtoDDMMAAAA(value);
 			String value2 = changeFromAAAAMMDDtoDDMMAAAANextDay(value);
+			if (AppConst.FORMAT_FOR_SHORTDATETIME != null && AppConst.FORMAT_FOR_SHORTDATETIME.length() >1)
+			{	
+				value1 = AppConst.FORMAT_FOR_SHORTDATETIME.replaceAll("#value#",value1);
+				value2 = AppConst.FORMAT_FOR_SHORTDATETIME.replaceAll("#value#",value2);
+				return field + "%3E=" + value1.replaceAll(" ", "%20") + "%20AND%20" + field + "%3C"
+				+ value2.replaceAll(" ", "%20");
+			}
 			return field + "%3E='" + value1.replaceAll(" ", "%20") + "'%20AND%20" + field + "%3C'"
 					+ value2.replaceAll(" ", "%20") + "'";
 		} else // a date range DD-MM-AAAA::DD-MM-AAAA or DD-MM-AAAA hh:mm::DD-MM-AAAA hh:mm
@@ -148,11 +161,25 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 			String[] tokens = value.split("::"); // the :: is use to avoid conflict with : of HH:mm
 			String date1 = changeFromAAAAMMDDtoDDMMAAAA(tokens[0]);
 			String date2 = changeFromAAAAMMDDtoDDMMAAAA(tokens[1]);
-			if (date2.indexOf(":") == -1) // is time is not included then 23:59 is add to consider the last date
+			if (date1.indexOf(":") == -1) // is time is not included then 23:59 is add to consider the last date
 											// inclusive
+				date1 = date1 + " 00:00:00";
+			else
+				date1 = date1 + ":00"; // the last time is complement with 59 seconds to be inclusive
+			if (date2.indexOf(":") == -1) // is time is not included then 23:59 is add to consider the last date
+				// inclusive	
 				date2 = date2 + " 23:59:59";
 			else
 				date2 = date2 + ":59"; // the last time is complement with 59 seconds to be inclusive
+
+			if (AppConst.FORMAT_FOR_DATETIME != null && AppConst.FORMAT_FOR_SHORTDATETIME.length() >1)
+			{	
+			//	date2.replaceAll(" 23:59:59", "T23:59:59" );  
+				date1 = AppConst.FORMAT_FOR_DATETIME.replaceAll("#value#",date1);
+				date2 = AppConst.FORMAT_FOR_DATETIME.replaceAll("#value#",date2);
+				return field + "%3E=" + date1.replaceAll(" ", "%20") + "%20AND%20" + field + "%3C="
+				+ date2.replaceAll(" ", "%20");
+			}
 			return field + "%3E='" + date1.replaceAll(" ", "%20") + "'%20AND%20" + field + "%3C='"
 					+ date2.replaceAll(" ", "%20") + "'";
 
@@ -354,8 +381,23 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 								else
 									filter = rowCol[0] + componeNumberFilter(value);// determineOperator(value);
 							}
+						}
+							else if (rowCol[3].equals("4")) { // check box
+								String value = getValueFromField(form, "chb"+id, fieldObj, isGeneratedForm);								
+								if (!value.isEmpty()) {
+							//		value=addAutoComodin(value);
+									System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
+										+ " valor :" + value + "");
+								// filter=componefilter(filter, rowCol[0], ((TextField) fieldObj).getValue());
+									if (filter.length() > 1)
+										filter = filter + "%20AND%20" + rowCol[0]
+												+ componeNumberFilter(value);// determineOperator(value);
+									else
+										filter = rowCol[0] + componeNumberFilter(value);// determineOperator(value);
+								}	
 					} 
 					}
+					
 
 				} catch (NoSuchFieldException | SecurityException e) {
 					System.err.println("Field not defined in Form... " + e.toString());
@@ -405,6 +447,11 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 				value = (String) getValueFromField(form, id );
 			}
 			else
+			if (id.startsWith("chb")) // is a checkbox
+			{
+					value = (String) getValueFromField(form, id );
+			}
+			else	
 			{
 				id = "tf"+id;
 				value = (String) getValueFromField(form, id );
@@ -546,6 +593,24 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 
 			
 		}
+		else if (id.startsWith("chb")) {
+			Checkbox cB= (Checkbox) UiComponentsUtils.findComponent(form, id);
+			Boolean valueDB = cB.getValue();
+			String value = null;
+			if (valueDB == null || cB.isIndeterminate())
+				value = "";
+			else
+			{
+				if (valueDB)
+					value = AppConst.VALUE_TRUE_FOR_BOOLEANS;
+				else 
+					value = AppConst.VALUE_FALSE_FOR_BOOLEANS;
+			}	
+			System.out.println("VALUE........"+ value);
+			return value;
+
+			
+		}
 		else 
 		{
 			TextField tf= (TextField) UiComponentsUtils.findComponent(form, id);
@@ -667,7 +732,10 @@ private void clearField(FormLayout form, String id) {
 	{
 		Checkbox cb = (Checkbox) comp;//UiComponentsUtils.findComponent(form, id).getChildren().findFirst().get();
 		if (cb != null)
+			{
 			cb.clear();
+			cb.setIndeterminate(true);
+			}
 		}
 	else if (comp instanceof com.vaadin.flow.component.combobox.ComboBox)
 	{

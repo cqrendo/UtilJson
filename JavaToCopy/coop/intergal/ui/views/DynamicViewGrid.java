@@ -1802,7 +1802,9 @@ private boolean isBoolean(String header, String colType) {
 				return bean.getRowJSon().get("tableName").asText();
 			}
 		int idxResourceSubResource = rowJson.indexOf(bean.getResourceName() +".");
-		if (idxResourceSubResource > -1 && rowJson.substring(idxResourceSubResource -12 ).startsWith("\"resource\"") == false  ) // when beside to "Resource"  is ExtForm
+		if (rowJson.substring(idxResourceSubResource + bean.getResourceName().length()).startsWith(".FK") )
+			idxResourceSubResource = -1;    //   to avoid the use as subresources the FK, not combined	
+		if (idxResourceSubResource > -1 && rowJson.substring(idxResourceSubResource -12 ).startsWith("\"resource\"") == false) // when beside to "Resource"  is ExtForm
 		{
 			int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("/")+idxResourceSubResource;
 			String pathSubreourceName = null;
@@ -1905,8 +1907,8 @@ private boolean isBoolean(String header, String colType) {
 			String fKfieldName = fKfilter.substring(step+1, idXEqual - 2  );
 			String parentfieldName = fKfilter.substring(4+idXEqual, idXMark - 1  );
 			String parentValue = bean.getRowJSon().get(parentfieldName).asText();
-			if (isADate(parentValue) && AppConst.FORMAT_FOR_DATETIME.length() > 0) {
-				parentValue = "=" +AppConst.FORMAT_FOR_DATETIME.replace("#value#",parentValue ) + "%20and%20";
+			if (isADate(parentValue) && AppConst.FORMAT_FOR_DATETIME_FOR_JOIN.length() > 0) {
+				parentValue = "=" +AppConst.FORMAT_FOR_DATETIME_FOR_JOIN.replace("#value#",parentValue ) + "%20and%20";
 				}
 			else 
 			{
