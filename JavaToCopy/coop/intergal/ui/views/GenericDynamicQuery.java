@@ -614,6 +614,8 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 		else 
 		{
 			TextField tf= (TextField) UiComponentsUtils.findComponent(form, id);
+			if (tf == null)  // could happen that is a hide component, then findComponent doesn't found it	 
+				return "";
 			Object value = tf.getValue();
 			if (value == null)
 				value = "";
