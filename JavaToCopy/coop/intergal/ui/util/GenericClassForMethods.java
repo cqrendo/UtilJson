@@ -123,7 +123,7 @@ public class GenericClassForMethods {
 
 	private String componFilterFromSubgridRowSelected(String filterForNavigation, Div divSubGrid) { // @@ TODO prepare for multi filter
 	
-		return ProcessParams.componFilterFromParams(filterForNavigation,getRowSelected(divSubGrid));
+		return ProcessParams.componFilterFromParams("",filterForNavigation,getRowSelected(divSubGrid));
 
 		
 		

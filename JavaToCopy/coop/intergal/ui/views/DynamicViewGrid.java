@@ -963,9 +963,11 @@ private boolean isBoolean(String header, String colType) {
 				Method setResourceName = dynamicLayout.getMethod("setResourceName",new Class[] {String.class} );
 				Method setFilter = dynamicLayout.getMethod("setFilter",new Class[] {String.class} );
 				Method setupGrid = dynamicLayout.getMethod("setupGrid",new Class[] {Boolean.class, Boolean.class} );
-				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class, Boolean.class} );
+//				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class, Boolean.class} );
+				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class} );
+
 				setResourceName.invoke(layoutPopup, resourcePopup);
-				String filter = ProcessParams.componFilterFromParams(filterForPopup, bean);
+				String filter = ProcessParams.componFilterFromParams("",filterForPopup, bean);
 				setFilter.invoke(layoutPopup, filter);
 				setupGrid.invoke(layoutPopup, true, true);
 				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
@@ -1685,7 +1687,7 @@ private boolean isBoolean(String header, String colType) {
 		
 	}
 
-	public void setButtonsRowVisible(boolean b) {
+	public void setButtonsRowVisible(Boolean b) {
 		newRow.setVisible(b);
 		deleteRow.setVisible(b);
 		

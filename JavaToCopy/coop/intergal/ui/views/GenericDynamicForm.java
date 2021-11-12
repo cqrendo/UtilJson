@@ -15,9 +15,11 @@ import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
@@ -106,6 +108,7 @@ private String pickMapFields;
 			String fieldNameInUI = rowCol [2];
 			String tagsForVisibility = rowCol[21].toString();
 			String tagsForEdition = rowCol[22].toString();
+			String label = rowCol[7].toString();
 			boolean isPick = isPick (rowCol [1]);
 
 			boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
@@ -117,7 +120,7 @@ private String pickMapFields;
 			boolean isReadOnly = !editableByTag || isReadOnly( rowCol [1]);
 			if (!fieldName.isEmpty())
 			try {
-//				System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
+				System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
 				if (!fieldName.equals("null"))
 				{	
 					Field field = ((class1)).getDeclaredField(fieldName);//.get(instancia);
@@ -239,7 +242,14 @@ private String pickMapFields;
 						.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
 
 //						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
-					}	
+					}
+					else if (idFieldType == 10) // is a button
+					{
+			//			Button b = new Button(label);
+						Button b =((Button) fieldObj);;
+						b.setId(label);
+						b.addClickListener(e-> proccesButton(b));
+						}
 				}
 					
 			} catch (NoSuchFieldException | SecurityException e) {
@@ -260,6 +270,14 @@ private String pickMapFields;
 //		}
 		
 	}
+	private Object proccesButton(Button b) {
+	System.out.println("proccesButton for col0 " + binder.getBean().getRowJSon().asText());
+	GeneratedUtil generatedUtil = new GeneratedUtil();
+//	binder.getBean().getCol0();
+	generatedUtil.proccesButton(b);
+	return null;
+}
+
 	private static boolean isPick(String params) {
 		
 		if (params == null)

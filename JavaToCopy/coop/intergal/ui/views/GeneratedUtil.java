@@ -973,7 +973,7 @@ private String cleanMarks(String label) {
 }
 
 // ******* PROCESAR BOTONES *********    
-	private Object proccesButton(Button b) {
+	Object proccesButton(Button b) {
 		String idButton = b.getId().get();
 		System.out.println("GeneratedUtil.proccesButton() " + idButton);
 		if (idButton.indexOf("@POP@IDM") > -1)
