@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="UtilsJSON">
+        
+    <wb-module deploy-name="UtilJSON-1.0-SNAPSHOT">
+                
         <wb-resource deploy-path="/" source-path="/src"/>
+                
         <wb-resource deploy-path="/" source-path="/srcAVOIDErrors"/>
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <property name="context-root" value="UtilJSON"/>
+        <property name="java-output-path" value="/UtilJSON/target/classes"/>
+            
     </wb-module>
+    
 </project-modules>
