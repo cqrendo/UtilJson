@@ -46,6 +46,15 @@ public class GenericClassForMethods {
 //		String titleOption = rowSubMenu.get("optionName").asText();
 		int idxIdMenu = idButton.indexOf("@IDM");
 		boolean isPopup = idButton.indexOf("@POP") > -1;
+		String filterInButton = "";
+		int idxFIB = idButton.indexOf("@FILTER");
+		if (idxFIB > -1) {
+			filterInButton = idButton.substring(idxFIB+7);
+			if (filterInButton.indexOf("@") > -1) { // to avoid other params
+				filterInButton = filterInButton.substring(0,filterInButton.indexOf("@"));
+			}
+			
+		}
 		if (idxIdMenu == -1)
 		{
 			DataService.get().showError("Id de menu sin indicar, se debe de especificar en el formato nombreopcion#IDMnumero");
@@ -53,6 +62,9 @@ public class GenericClassForMethods {
 		}
 		try {
 		String idMenu = idButton.substring(idxIdMenu+4);
+		if (idMenu.indexOf("@") > -1) { // to avoid other params
+			idMenu = idMenu.substring(0,idMenu.indexOf("@"));
+		}
 		
 		String filter = "idMenu="+idMenu;
 		JsonNode rowsList = JSonClient.get("menu",filter,false,AppConst.PRE_CONF_PARAM_METADATA,1+"");
@@ -73,29 +85,64 @@ public class GenericClassForMethods {
 				queryFormClassName = PACKAGE_VIEWS+queryFormClassName;
 			if (displayFormClassName.startsWith("coop.intergal.ui.views") == false)
 				displayFormClassName = PACKAGE_VIEWS+displayFormClassName;
-		
+			if (filterInButton.length() > 0 && filterForPopup != null && filterForPopup.equals("null") == false && filterForPopup.length() > 0)
+			{
+				filterForPopup = filterForPopup + ";"+ filterInButton;
+			}
+			else if (filterInButton.length() > 0)
+			{
+				filterForPopup = filterInButton;
+			}
+			
+			
 //		titleOption = titleOption.replace(" ", "%20");
 			if (isPopup)
 			{
 //				String filterForNavigation = "row.subgrid.CLAVEARTICULO=rowtarget.CLAVE_ARTICULO";
-				if ( layoutClassName.indexOf("DynamicViewGrid") > -1)  // when is a grid list is send the origin row to filter the list in the target 
+				if ( layoutClassName.indexOf("DynamicViewGrid") > -1 || layoutClassName.indexOf("DynamicQryGridDisplay") > -1)  // when is a grid list is send the origin row to filter the list in the target 
 				{
-					DynamicDBean sourceRow = getRowSelected(divSubGrid);
+					DynamicDBean sourceRow = getRowSelected(divSubGrid, grid, bean);
 					showDialog(sourceRow, resource, layoutClassName, displayFormClassName, grid, filterForPopup, null );
 				}
 				else // // when is a Display is send the target row to be show as target
 				{
-				DynamicDBean beanToShow = getBeanToShow(bean, filterForPopup, resource, divSubGrid);
+				DynamicDBean beanToShow = getBeanToShow(bean, filterForPopup, resource, divSubGrid, grid);
 				if (beanToShow != null )
 					showDialog(beanToShow, resource, layoutClassName, displayFormClassName, grid, filterForPopup, null );
 				}
 			}	
-			else
+			else // is new tab open, the filter must be made with " for values
 				{
+				if (filterInButton.length() > 0)
+				{
+					if (bean == null) // comes from a grid
+					{
+						bean = grid.getSelectedRow();
+						if (bean == null)
+						{
+							DataService.get().showError("Debe seleccionar un registro");
+							return null;
+						}
+					}
+					filterInButton = ProcessParams.componFilterFromParams(filterInButton, bean);
+//					filterInButton = filterInButton.replace("'","\"");
+				}
+					
+				if (filter2 != null && filter2.length() > 0 && filter2 != null && filter2.equals("null") == false && filter2.length() > 0)
+				{
+					filter2 = filter2 + "%20AND%20"+ filterInButton;
+				}
+				else if (filterInButton != null && filterInButton.length() > 0)
+				{
+					filter2 = filterInButton;
+				}
 				if (filter2 != null)
-					UI.getCurrent().getPage().executeJs("window.open('"+urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"&filter="+filter2+"', '_blank');");
+				{
+					String url = urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"&filter="+filter2;
+					UI.getCurrent().getPage().executeJs("window.open(\""+url+"\", \"_blank\");");
+				}
 				else
-					UI.getCurrent().getPage().executeJs("window.open('"+urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"', '_blank');");
+					UI.getCurrent().getPage().executeJs("window.open(\""+urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"\", \"_blank\");");
 				}
 			}
 		} catch (UnknownHostException e) {
@@ -108,10 +155,10 @@ public class GenericClassForMethods {
 		
 		return null;
 	}
-	private DynamicDBean getBeanToShow(DynamicDBean bean2, String filterForNavigation, String resource, Div divSubGrid) {
-		if (filterForNavigation.startsWith("row.subgrid"))
+	private DynamicDBean getBeanToShow(DynamicDBean bean2, String filterForNavigation, String resource, Div divSubGrid, DynamicViewGrid grid) {
+		if (filterForNavigation.startsWith("row."))
 		{				
-			String filter = componFilterFromSubgridRowSelected(filterForNavigation, divSubGrid);
+			String filter = componFilterFromSubgridRowSelected(filterForNavigation, divSubGrid, grid, bean2);
 			if (filter != null)
 				{
 				DynamicDBean rowtoShow = RestData.getOneRow(resource, filter, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);					
@@ -121,16 +168,20 @@ public class GenericClassForMethods {
 		return null;
 	}
 
-	private String componFilterFromSubgridRowSelected(String filterForNavigation, Div divSubGrid) { // @@ TODO prepare for multi filter
+	private String componFilterFromSubgridRowSelected(String filterForNavigation, Div divSubGrid, DynamicViewGrid grid, DynamicDBean bean2) { // @@ TODO prepare for multi filter
 	
-		return ProcessParams.componFilterFromParams("",filterForNavigation,getRowSelected(divSubGrid));
+		return ProcessParams.componFilterFromParams(filterForNavigation,getRowSelected(divSubGrid, grid, bean2));
 
 		
 		
 	}
 
-	private DynamicDBean getRowSelected(Div divSubGrid) {
-		DynamicViewGrid dvGrid = (DynamicViewGrid) divSubGrid.getChildren().findFirst().get().getChildren().findFirst().get().getChildren().findFirst().get();
+	private DynamicDBean getRowSelected(Div divSubGrid, DynamicViewGrid dvGrid, DynamicDBean bean2) {
+		if (bean2 != null) {
+			return bean2;
+		}
+		if (dvGrid == null)
+			dvGrid = (DynamicViewGrid) divSubGrid.getChildren().findFirst().get().getChildren().findFirst().get().getChildren().findFirst().get();
 		Set<DynamicDBean> seletedItems = dvGrid.getGrid().getSelectedItems();
 		if (seletedItems.isEmpty())
 		{

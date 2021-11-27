@@ -5,6 +5,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.shared.Registration;
@@ -27,7 +28,17 @@ public class FormButtonsBar extends PolymerTemplate<TemplateModel> {
 	private Button add;
 	@Id("print")
 	private Button print;
+	@Id("customButtons")
+	private Div customButtons;
 
+
+	public Div getCustomButtons() {
+		return customButtons;
+	}
+
+	public void setCustomButtons(Div customButtons) {
+		this.customButtons = customButtons;
+	}
 
 	public void setSaveText(String saveText) {
 		save.setText(saveText == null ? "" : saveText);

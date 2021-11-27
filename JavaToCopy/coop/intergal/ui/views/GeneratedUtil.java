@@ -27,6 +27,7 @@ import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -66,6 +67,7 @@ import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FlexBoxLayout;
+import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.security.SecurityUtils;
 import coop.intergal.ui.util.UtilSessionData;
@@ -116,7 +118,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //	private FormLayout form;
 	private static Dialog dialogForPick;
 	private static String pickMapFields; 
+	private FormButtonsBar buttonsForm;
 	
+	public FormButtonsBar getButtonsForm() {
+		return buttonsForm;
+	}
+
+	public void setButtonsForm(FormButtonsBar buttonsForm) {
+		this.buttonsForm = buttonsForm;
+	}
 	private Hashtable<String, String[]> resourceAndSubresources = new Hashtable<String, String[]>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
 
 	private Div divSubGrid; 
@@ -492,6 +502,8 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				String tagsForVisibility = rowField[21].toString();
 				String tagsForEdition = rowField[22].toString();
 				String tagsForQueryEdition = rowField[23].toString();
+				String idButtonBarForButtons = rowField[25].toString();
+
 				boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 				boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
 				boolean editableQryByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForQueryEdition);
@@ -573,13 +585,21 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				else if (idFieldType == 10) // is a button
 				{
 		//			Button b = new Button(label);
-					Button b =coop.intergal.ui.util.UIUtils.createPrimaryButton(cleanMarks(label));
+					Button b =coop.intergal.ui.util.UIUtils.createPrimaryButton(label);
 					b.setId(label);
 					b.addClickListener(e-> proccesButton(b));
-					FormLayout.FormItem item = form.addFormItem(b, "");
-					item = addClassNames(item, classNamesItem);
-					item.setId(fieldNameInUI);
-					form.setColspan(item, colspan);
+					//		Div ib = (Div) UiComponentsUtils.findComponent(UI.getCurrent(), "itemButtons");
+					if (idButtonBarForButtons.equals("2")) // Botonera formulario
+					{
+						buttonsForm.getCustomButtons().add(b);
+					}
+					else if (idButtonBarForButtons.equals("3")) // Formulario
+					{
+						FormLayout.FormItem item = form.addFormItem(b, "");
+						item = addClassNames(item, classNamesItem);
+						item.setId(fieldNameInUI);
+						form.setColspan(item, colspan);
+					}	
 				}
 				else if (fieldName.equals("#SPACE#"))
 				{
@@ -963,16 +983,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	    }
     
     
-private String cleanMarks(String label) {
-	int idxMarkIDM = label.indexOf("@");
-	if (idxMarkIDM > -1)
-	{
-		return label.substring(0, idxMarkIDM);
-	}
-	return label;
+
+
+// ******* PROCESAR BOTONES *********   
+public void proccesButton(Button b, DynamicDBean bean2) {
+	this.bean = bean2;
+	proccesButton(b);
+	
 }
 
-// ******* PROCESAR BOTONES *********    
 	Object proccesButton(Button b) {
 		String idButton = b.getId().get();
 		System.out.println("GeneratedUtil.proccesButton() " + idButton);
@@ -997,6 +1016,7 @@ private String cleanMarks(String label) {
 		}
 		return null;
 	}
+
 	private void runMethodFor(String methodName, String idButton) {
 		System.out.println("method to run "+ methodName);
 //		Class<?> dynamicQuery;
@@ -1458,7 +1478,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 	}
 
 	// ******* COLUMNS ********
-	public Column<DynamicDBean> addFormatedColumn(int i, ArrayList<String[]> rowsColListGrid, DynamicViewGrid dynamicViewGrid, GridPro<DynamicDBean> grid, boolean isGridEditable) {  // for now grid is not editable , then was copy and adapted from DynamicViewGrid
+	public Column<DynamicDBean> addFormatedColumn(int i, ArrayList<String[]> rowsColListGrid, DynamicViewGrid dynamicViewGrid, GridPro<DynamicDBean> grid, boolean isGridEditable, Div itemButtoms) {  // for now grid is not editable , then was copy and adapted from DynamicViewGrid
 //		String colName = "col"+i;
 		
 		String[] colData = rowsColListGrid.get(i);
@@ -1466,7 +1486,8 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		String idFieldTypeStr = colData[3];
 		String tagsForVisibility = colData[21].toString();
 		String tagsForEdition = colData[22].toString();
-		boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
+		String idButtonBarForButtons = colData[25].toString();
+ 		boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 		boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
 		if (visibleByTag == false)
 			return null;
@@ -1483,6 +1504,15 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 			isCOlEditable = false;
 		if (editableByTag == false)
 			isCOlEditable = false;
+		if (idFieldType == 10) // is button
+		{
+			String buttonLabel = colData[7];
+			Button b =coop.intergal.ui.util.UIUtils.createPrimaryButton(buttonLabel);
+			b.setId(buttonLabel);
+			b.addClickListener(e-> proccesButton(b));
+			if (idButtonBarForButtons.equals("1")) // Botonera Listado
+				itemButtoms.add(b);
+		}
 		if (colData[1].indexOf("#SIG#")>-1) { // #SIG# = Show In Grid
 //			String header = TranslateResource.getFieldLocale(colData[0], preConfParam);
 			String header = colHeader;
@@ -1766,6 +1796,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 			return "null";
 		}
 	}
+
 
   
  

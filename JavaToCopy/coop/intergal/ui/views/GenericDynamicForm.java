@@ -36,6 +36,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
+import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
@@ -53,6 +54,7 @@ protected Binder<DynamicDBean> binder;
 private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
 private Dialog dialogForPick;
 private String pickMapFields; 
+
 
 //	public interface CrudForm<E> {
 //		FormButtonsBar getButtons();
@@ -79,6 +81,25 @@ private String pickMapFields;
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private FormButtonsBar buttonsForm;
+	public FormButtonsBar getButtonsForm() {
+		return buttonsForm;
+	}
+
+	public void setButtonsForm(FormButtonsBar buttonsForm) {
+		this.buttonsForm = buttonsForm;
+	}
+	
+	private DynamicViewGrid dVGrid;
+	public DynamicViewGrid getDVGrid() {
+		return dVGrid;
+	}
+
+	public void setDVGrid(DynamicViewGrid dVGrid) {
+		this.dVGrid = dVGrid;
+	}
+
 
 //	public void setBean(DynamicDBean bean) {
 //		// TODO Auto-generated method stub
@@ -99,7 +120,8 @@ private String pickMapFields;
 //	}
 	public void bindFields(Class<?> class1, Object object) {
 		Iterator<String[]> itRowsColList = getRowsColList().iterator();
-		
+		if (buttonsForm != null)
+			buttonsForm.getCustomButtons().removeAll();
 		while(itRowsColList.hasNext())
 		{
 			String[] rowCol = itRowsColList.next();
@@ -108,12 +130,20 @@ private String pickMapFields;
 			String fieldNameInUI = rowCol [2];
 			String tagsForVisibility = rowCol[21].toString();
 			String tagsForEdition = rowCol[22].toString();
+			String idButtonBarForButtons = rowCol[25].toString();
 			String label = rowCol[7].toString();
 			boolean isPick = isPick (rowCol [1]);
-
+//			System.out.println("GenericDynamicForm.bindFields() col 0 ---> "+ binder.getBean().getCol0() + "/" +binder.getBean().getCol1());
 			boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 			boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
- 
+			if (tagsForVisibility.indexOf("row.") > -1) { // visibility of the filed depends in a value of the row, create a virtual field that returns true or false , depending on condition
+				int idxStart = tagsForVisibility.indexOf("row.")+4;
+				int idxEnd = tagsForVisibility.length();
+				if (tagsForVisibility.indexOf(",") > -1 )
+					idxEnd = tagsForVisibility.indexOf(",");
+				String tagKey = tagsForVisibility.substring(idxStart, idxEnd )	;
+				visibleByTag = binder.getBean().getRowJSon().get(tagKey).asBoolean();
+			}
 			int idFieldType = 0;
 			if ( idFieldTypeStr.isEmpty() == false)
 				idFieldType = new Integer (idFieldTypeStr);
@@ -249,6 +279,19 @@ private String pickMapFields;
 						Button b =((Button) fieldObj);;
 						b.setId(label);
 						b.addClickListener(e-> proccesButton(b));
+						if ((idButtonBarForButtons.equals("2") && visibleByTag)) // Botonera formulario
+						{
+							b.setVisible(false); 
+						//	Button bCustom = new Button(label);
+							Button bCustom =coop.intergal.ui.util.UIUtils.createPrimaryButton(label);							
+							bCustom.setId(label);
+							bCustom.addClickListener(e-> proccesButton(bCustom));
+							buttonsForm.getCustomButtons().add(bCustom);
+						}
+						else if (idButtonBarForButtons.equals("3")) // Formulario
+						{
+							b.setVisible(visibleByTag);
+						}	
 						}
 				}
 					
@@ -274,7 +317,9 @@ private String pickMapFields;
 	System.out.println("proccesButton for col0 " + binder.getBean().getRowJSon().asText());
 	GeneratedUtil generatedUtil = new GeneratedUtil();
 //	binder.getBean().getCol0();
-	generatedUtil.proccesButton(b);
+	generatedUtil.setBinder(binder);
+	generatedUtil.setGrid(dVGrid);
+	generatedUtil.proccesButton(b, binder.getBean());
 	return null;
 }
 

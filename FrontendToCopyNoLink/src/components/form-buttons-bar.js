@@ -17,6 +17,8 @@ import { html } from '@polymer/polymer/lib/utils/html-tag.js';
       <iron-icon icon="vaadin:print" slot="prefix"></iron-icon>
       Imprimir 
     </vaadin-button> 
+    <div id="customButtons" slot="left" >
+    </div>  
     <vaadin-button id="add" slot="right" theme="raised primary">
       Nuevo 
     </vaadin-button> 

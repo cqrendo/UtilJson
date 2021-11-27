@@ -292,7 +292,9 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 		{
 		//	Column<DynamicDBean> col = addFormatedColumn(i, isGridEditable);
 			GeneratedUtil generatedUtil = new GeneratedUtil();
-			Column<DynamicDBean> col = generatedUtil.addFormatedColumn(i, rowsColListGrid, this, grid, isGridEditable);
+			generatedUtil.setGrid(this);
+		//	generatedUtil.setDivSubGrid(divSubGrid); // to run methods for buttons
+			Column<DynamicDBean> col = generatedUtil.addFormatedColumn(i, rowsColListGrid, this, grid, isGridEditable, itemButtons);
 			if (col != null)
 				col.setAutoWidth(true);
 		}
@@ -326,6 +328,7 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 //		grid.getColumns().forEach(column -> column.setAutoWidth(true));
 
 }
+
 
 private void methodForRowSelected(DynamicDBean selectedRow2) {
 		
@@ -673,7 +676,13 @@ private boolean isBoolean(String header, String colType) {
 //				navigateToEntity(entity.toString());
 //			setBean(DynamicDBean bean)
 			if (e.getFirstSelectedItem().isPresent())
-				showBean((DynamicDBean)e.getFirstSelectedItem().get());
+			{
+				selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
+				showBean(selectedRow);
+				methodForRowSelected(selectedRow); 
+
+				
+			}	
 //				getGrid().deselectAll();
 			});
 		}
@@ -715,21 +724,26 @@ private boolean isBoolean(String header, String colType) {
 			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
 			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
 			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
-			
+			Method getButtonsForm= dynamicForm.getMethod("setButtonsForm",new Class[] { FormButtonsBar.class});
 			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 			setRowsColList.invoke(display,rowsColListGrid);
+			getButtonsForm.invoke(display, buttonsForm);
+			setBean.invoke(display,bean);
 			setBinder.invoke(display,binder);
 			
-			setBean.invoke(display,bean);
+			
 			setDataProvider.invoke(display, dataProvider);
 			divDisplay.removeAll();
+			Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
+			setdVGrid.invoke(display, this); // to use methods in this class
+
 			if (displayFormClassName.indexOf("Generated") > -1)
 			{
 			//	setDataProvider.invoke(display, dataProvider);
-				Method createContent= dynamicForm.getMethod("createContent");
-				Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
-				setdVGrid.invoke(display, this); // to use methods in this class
-				divInDisplay = createContent.invoke(display);
+				Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
+//				Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
+//				setdVGrid.invoke(display, this); // to use methods in this class
+				divInDisplay = createContent.invoke(display, buttonsForm );
 				divDisplay.add((Component)divInDisplay);
 			}
 			else
@@ -748,6 +762,8 @@ private boolean isBoolean(String header, String colType) {
 			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
 				Div content0=new Div(); 
 				divSubGrid.add(fillContent(content0, 0 , bean));	
+//				generatedUtil.setDivSubGrid(divSubGrid); // to run methods for buttons
+				
 				Method setDivSubGrid= dynamicForm.getMethod("setDivSubGrid", new Class[] {com.vaadin.flow.component.html.Div.class});
 				setDivSubGrid.invoke(display, divSubGrid); // to use methods in this class
 
@@ -795,7 +811,7 @@ private boolean isBoolean(String header, String colType) {
 				if (bean.getParams() == null || bean.getParams().indexOf("splitGridDisplay") == -1)
 		//			layout.getGrid().getElement().getStyle().set("flex-basis", "70px");
 					System.out.println("DynamicViewGrid.showBean() NOT splitGridDisplay");
-				if (bean.getParams() != null || bean.getParams().indexOf("splitGridDisplay") != -1) 
+				if (bean.getParams() != null && bean.getParams().indexOf("splitGridDisplay") != -1) 
 					{
 					String params = bean.getParams().substring(bean.getParams().indexOf("splitGridDisplay")+17);
 					int idxNextAnd = params.indexOf("&");
@@ -811,7 +827,7 @@ private boolean isBoolean(String header, String colType) {
 					{
 					layout.getGridSplitDisplay().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_GRID_DISPLAY);
 					}
-				if (bean.getParams() != null || bean.getParams().indexOf("splitQuery") != -1) 
+				if (bean.getParams() != null && bean.getParams().indexOf("splitQuery") != -1) 
 					{
 					String params = bean.getParams().substring(bean.getParams().indexOf("splitQuery")+11);
 					int idxNextAnd = params.indexOf("&");
@@ -826,7 +842,7 @@ private boolean isBoolean(String header, String colType) {
 					{
 					layout.getQuerySplitGrid().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_QUERY_GRID);
 					}
-				if (bean.getParams() != null || bean.getParams().indexOf("splitDisplaySubGrid") != -1) 
+				if (bean.getParams() != null && bean.getParams().indexOf("splitDisplaySubGrid") != -1) 
 					{
 					String params = bean.getParams().substring(bean.getParams().indexOf("splitDisplaySubGrid")+20);
 					int idxNextAnd = params.indexOf("&");
@@ -967,13 +983,34 @@ private boolean isBoolean(String header, String colType) {
 				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class} );
 
 				setResourceName.invoke(layoutPopup, resourcePopup);
-				String filter = ProcessParams.componFilterFromParams("",filterForPopup, bean);
+				String filter = ProcessParams.componFilterFromParams(filterForPopup, bean);
 				setFilter.invoke(layoutPopup, filter);
 				setupGrid.invoke(layoutPopup, true, true);
-				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
+				if (bean != null && (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName()))) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
 					{
-					setButtonsRowVisible.invoke(layoutPopup, true);
+					setButtonsRowVisible.invoke("layoutPopup", "true");
 					}
+
+			}
+			else if (layoutClassName.indexOf("DynamicQryGridDisplay") > -1) // is a Layout that shows a QRY with Grid
+			{
+				Method setResourceName = dynamicLayout.getMethod("setResourceName",new Class[] {String.class} );
+				Method setFilter = dynamicLayout.getMethod("setFilter",new Class[] {String.class} );
+				Method prepareLayout = dynamicLayout.getMethod("prepareLayout",new Class[] {String.class, String.class} );
+//@@?				Method setupGrid = dynamicLayout.getMethod("setupGrid",new Class[] {Boolean.class, Boolean.class} );
+//				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class, Boolean.class} );
+//				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class} );
+
+				setResourceName.invoke(layoutPopup, resourcePopup);
+				String filter = ProcessParams.componFilterFromParams(filterForPopup, bean);
+				setFilter.invoke(layoutPopup, filter);
+				String classForQuery = "coop.intergal.ui.views.GeneratedQuery"; // @@ TODO for now is using automatic query form, inthe future use a parameter 
+				prepareLayout.invoke(layoutPopup,classForQuery, displayFormClassNamePopup);
+//@@?				setupGrid.invoke(layoutPopup, true, true);
+//				if (bean != null && (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName()))) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
+//					{
+//					setButtonsRowVisible.invoke(layoutPopup, true);
+//					}
 
 			}
 			else if (displayFormClassNamePopup != null && displayFormClassNamePopup.isEmpty() == false) // is a layout that shows one row + children if exist
@@ -1022,8 +1059,10 @@ private boolean isBoolean(String header, String colType) {
 				if (displayFormClassNamePopup.indexOf("Generated") > -1)
 				{
 			//	setDataProvider.invoke(display, dataProvider);
-					Method createContent= dynamicForm.getMethod("createContent");
-					divInDisplayPopup = createContent.invoke(displayPopup);
+					Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
+//					Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
+//					setdVGrid.invoke(display, this); // to use methods in this class
+					divInDisplayPopup = createContent.invoke(displayPopup, buttonsForm );
 					divDisplayPopup.add((Component)divInDisplayPopup);
 				}
 				else

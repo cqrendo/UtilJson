@@ -43,6 +43,7 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
 @Tag("dynamic-qry-grid-display")
 @JsModule("./src/views/generic/layout/dynamic-qry-grid-display.js")
+//@CssImport(value = "./styles/dialog-overlay.css", themeFor = "vaadin-dialog-overlay")
 @CssImport(value = STYLES_CSS, themeFor = "dynamic-qry-grid-display")
 public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
@@ -176,6 +177,22 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		return null;
 		
 	}
+	public String getResourceName() {
+		return resourceName;
+	}
+
+	public void setResourceName(String resourceName) {
+		this.resourceName = resourceName;
+	}
+
+
+	public String getFilter() {
+		return filter;
+	}
+
+	public void setFilter(String filter) {
+		this.filter = filter;
+	}
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {  // when is call from a navigation
@@ -193,10 +210,6 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		title="..";
 		String queryFormClassName = null;
 		String displayFormClassName  = null;
-		querySplitGrid.setOrientation(Orientation.VERTICAL);
-		gridSplitDisplay.setOrientation(Orientation.HORIZONTAL);
-		gridSplitDisplay.getStyle().set("height", "83vh"); 
-		displaySplitSubGrid.setOrientation(Orientation.VERTICAL);
 		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
 		{
 			title=queryParameters.getParameters().get("title").get(0);
@@ -220,6 +233,15 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 				displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
 			
 		}
+		prepareLayout(queryFormClassName, displayFormClassName);
+	}
+		public void prepareLayout(String queryFormClassName, String displayFormClassName)
+		{
+			querySplitGrid.setOrientation(Orientation.VERTICAL);
+			gridSplitDisplay.setOrientation(Orientation.HORIZONTAL);
+			gridSplitDisplay.getStyle().set("height", "83vh"); 
+			displaySplitSubGrid.setOrientation(Orientation.VERTICAL);
+
 		try {
 			Class<?> dynamicQuery = Class.forName(queryFormClassName);
 			Object queryForm = dynamicQuery.newInstance();
@@ -304,6 +326,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		buttons.addPrintListener(e -> grid.PrintARow());
 		
 	}
+
 
 	@Override
 	public String getPageTitle() {

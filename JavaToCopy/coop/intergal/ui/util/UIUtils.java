@@ -48,7 +48,7 @@ public class UIUtils {
     // Styles
 
     public static Button createPrimaryButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_PRIMARY);
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_PRIMARY);
     }
 
     public static Button createPrimaryButton(VaadinIcon icon) {
@@ -56,11 +56,11 @@ public class UIUtils {
     }
 
     public static Button createPrimaryButton(String text, VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_PRIMARY);
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_PRIMARY);
     }
 
     public static Button createTertiaryButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_TERTIARY);
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_TERTIARY);
     }
 
     public static Button createTertiaryButton(VaadinIcon icon) {
@@ -68,11 +68,11 @@ public class UIUtils {
     }
 
     public static Button createTertiaryButton(String text, VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_TERTIARY);
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_TERTIARY);
     }
 
     public static Button createTertiaryInlineButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_TERTIARY_INLINE);
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_TERTIARY_INLINE);
     }
 
     public static Button createTertiaryInlineButton(VaadinIcon icon) {
@@ -81,11 +81,11 @@ public class UIUtils {
 
     public static Button createTertiaryInlineButton(String text,
             VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_TERTIARY_INLINE);
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_TERTIARY_INLINE);
     }
 
     public static Button createSuccessButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_SUCCESS);
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_SUCCESS);
     }
 
     public static Button createSuccessButton(VaadinIcon icon) {
@@ -93,11 +93,11 @@ public class UIUtils {
     }
 
     public static Button createSuccessButton(String text, VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_SUCCESS);
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_SUCCESS);
     }
 
     public static Button createSuccessPrimaryButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_SUCCESS,
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_SUCCESS,
                 ButtonVariant.LUMO_PRIMARY);
     }
 
@@ -108,12 +108,12 @@ public class UIUtils {
 
     public static Button createSuccessPrimaryButton(String text,
             VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_SUCCESS,
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_SUCCESS,
                 ButtonVariant.LUMO_PRIMARY);
     }
 
     public static Button createErrorButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_ERROR);
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_ERROR);
     }
 
     public static Button createErrorButton(VaadinIcon icon) {
@@ -121,11 +121,11 @@ public class UIUtils {
     }
 
     public static Button createErrorButton(String text, VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_ERROR);
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_ERROR);
     }
 
     public static Button createErrorPrimaryButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_ERROR,
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_ERROR,
                 ButtonVariant.LUMO_PRIMARY);
     }
 
@@ -136,12 +136,12 @@ public class UIUtils {
 
     public static Button createErrorPrimaryButton(String text,
             VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_ERROR,
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_ERROR,
                 ButtonVariant.LUMO_PRIMARY);
     }
 
     public static Button createContrastButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_CONTRAST);
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_CONTRAST);
     }
 
     public static Button createContrastButton(VaadinIcon icon) {
@@ -149,11 +149,11 @@ public class UIUtils {
     }
 
     public static Button createContrastButton(String text, VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_CONTRAST);
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_CONTRAST);
     }
 
     public static Button createContrastPrimaryButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_CONTRAST,
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_CONTRAST,
                 ButtonVariant.LUMO_PRIMARY);
     }
 
@@ -164,14 +164,14 @@ public class UIUtils {
 
     public static Button createContrastPrimaryButton(String text,
             VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_CONTRAST,
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_CONTRAST,
                 ButtonVariant.LUMO_PRIMARY);
     }
 
     // Size
 
     public static Button createSmallButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_SMALL);
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_SMALL);
     }
 
     public static Button createSmallButton(VaadinIcon icon) {
@@ -179,11 +179,11 @@ public class UIUtils {
     }
 
     public static Button createSmallButton(String text, VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_SMALL);
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_SMALL);
     }
 
     public static Button createLargeButton(String text) {
-        return createButton(text, ButtonVariant.LUMO_LARGE);
+        return createButton(cleanMarks(text), ButtonVariant.LUMO_LARGE);
     }
 
     public static Button createLargeButton(VaadinIcon icon) {
@@ -191,13 +191,13 @@ public class UIUtils {
     }
 
     public static Button createLargeButton(String text, VaadinIcon icon) {
-        return createButton(text, icon, ButtonVariant.LUMO_LARGE);
+        return createButton(cleanMarks(text), icon, ButtonVariant.LUMO_LARGE);
     }
 
     // Text
 
     public static Button createButton(String text, ButtonVariant... variants) {
-        Button button = new Button(text);
+        Button button = new Button(cleanMarks(text));
         button.addThemeVariants(variants);
         button.getElement().setAttribute("aria-label", text);
         return button;
@@ -218,7 +218,7 @@ public class UIUtils {
             ButtonVariant... variants) {
         Icon i = new Icon(icon);
         i.getElement().setAttribute("slot", "prefix");
-        Button button = new Button(text, i);
+        Button button = new Button(cleanMarks(text), i);
         button.addThemeVariants(variants);
         return button;
     }
@@ -564,6 +564,14 @@ public class UIUtils {
         for (Component component : components) {
             component.getElement().setAttribute("aria-label", value);
         }
+    }
+    private static String cleanMarks(String label) {
+    	int idxMarkIDM = label.indexOf("@");
+    	if (idxMarkIDM > -1)
+    	{
+    		return label.substring(0, idxMarkIDM);
+    	}
+    	return label;
     }
 
 }

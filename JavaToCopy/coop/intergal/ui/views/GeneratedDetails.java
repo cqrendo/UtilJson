@@ -24,6 +24,7 @@ import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import coop.intergal.AppConst;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FlexBoxLayout;
+import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.util.FontSize;
 import coop.intergal.ui.util.LumoStyles;
@@ -67,10 +68,6 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 	private Div divSubGrid; 
 	
 	GeneratedUtil generatedUtil = new GeneratedUtil();
-
-
-
-    
     public DynamicDBean getBean() {
 		return bean;
 	}
@@ -101,6 +98,14 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 
 	public void setRowsColList(ArrayList<String[]> rowsColList) {
 		this.rowsColList = rowsColList;
+	}
+	private FormButtonsBar buttonsForm;
+	public FormButtonsBar getButtonsForm() {
+		return buttonsForm;
+	}
+
+	public void setButtonsForm(FormButtonsBar buttonsForm) {
+		this.buttonsForm = buttonsForm;
 	}
 
 	@Override
@@ -196,7 +201,8 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
         detailsDrawer.show();
        
     }
-	  public Component createContent() {
+	  public Component createContent(FormButtonsBar buttonsForm) {
+		  this.buttonsForm = buttonsForm;
 	    		
 	    FlexBoxLayout content = new FlexBoxLayout(createDetails());
 	    //		content.setBoxSizing(BoxSizing.BORDER_BOX);
@@ -220,6 +226,7 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 			generatedUtil.setGrid(dVGrid);
 			generatedUtil.setBinder(binder);
 			generatedUtil.setBean(bean);
+			generatedUtil.setButtonsForm(buttonsForm);
 //			generatedUtil.setDivSubGrid(divSubGrid);
 	//		if (cache == false)
 			rowsFieldList = dataProvider.getRowsFieldList();

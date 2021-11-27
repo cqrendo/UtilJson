@@ -614,7 +614,7 @@ public class RestData {
 						int maxColNumber = 0;
 						for (JsonNode col :cols)
 						{
-							String[] fieldArr  = new String[25];
+							String[] fieldArr  = new String[26];
 							fieldArr[0] = col.get("fieldName").asText();
 							if ( col.get("showInGrid").asBoolean())
 								fieldArr[1] = "#SIG#";
@@ -721,7 +721,11 @@ public class RestData {
 								fieldArr[22] = col.get("tagsForEdition").asText();
 							fieldArr[23] = ""; // only used in query 
 							fieldArr[24] = ""; // only used in query 
-			
+							if ( col.get("idButtonBarForButtons").asText().isEmpty() || col.get("idButtonBarForButtons").asText().equals("null") )
+								fieldArr[25] = "";
+							else
+								fieldArr[25] = col.get("idButtonBarForButtons").asText();
+
 							rowsColList.add(fieldArr);
 							i++;
 						}
@@ -820,7 +824,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[25];
+						String[] fieldArr  = new String[26];
 						fieldArr[0] = col.get("fieldName").asText();
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -926,6 +930,11 @@ public class RestData {
 							fieldArr[22] = col.get("tagsForEdition").asText();
 						fieldArr[23] = ""; // only used in query
 						fieldArr[24] = ""; // only used in query 
+						if ( col.get("idButtonBarForButtons").asText().isEmpty() || col.get("idButtonBarForButtons").asText().equals("null") )
+							fieldArr[25] = "";
+						else
+							fieldArr[25] = col.get("idButtonBarForButtons").asText();
+
 						rowsColList.add(fieldArr);
 						i++;
 					}
@@ -964,7 +973,7 @@ public class RestData {
 		Iterator<String> fN = cols.get(0).fieldNames();
 		int i = 0;
 		while (fN.hasNext()) {
-			String[] fieldArr  = new String[25];
+			String[] fieldArr  = new String[26];
 			String fieldName = fN.next();
 			fieldArr[0] =fieldName;
 			
@@ -993,6 +1002,7 @@ public class RestData {
 			fieldArr[22] = ""; // is only used for metadata config:
 			fieldArr[23] = ""; // only used in query
 			fieldArr[24] = ""; // only used in query 
+			fieldArr[25] = "";
 			if (type.equals("Date"))
 				fieldArr[3] = "1";
 			rowsColList.add(fieldArr);
@@ -1083,7 +1093,7 @@ public class RestData {
 					int i = 0;
 					for (JsonNode col :cols)
 					{
-						String[] fieldArr  = new String[25];
+						String[] fieldArr  = new String[26];
 						fieldArr[0] = col.get("fieldName").asText();
 //						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())  // Query fields are always editable
 //							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
@@ -1185,6 +1195,12 @@ public class RestData {
 							fieldArr[24] = "";
 						else
 							fieldArr[24] = col.get("defaultValueForQuery").asText();
+						if ( col.get("idButtonBarForButtons").asText().isEmpty() || col.get("idButtonBarForButtons").asText().equals("null") )
+							fieldArr[25] = "";
+			
+						else
+							fieldArr[25] = col.get("idButtonBarForButtons").asText();
+
 
 
 					}
