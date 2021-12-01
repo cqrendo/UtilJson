@@ -162,7 +162,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		this.divQuery = divQuery;
 	}
 
-	private boolean cache = true;
+	private boolean cache = UtilSessionData.getCache();
 	private Object divInDisplay;
 	protected String getBasePage() {
 		return PAGE_PRODUCTS;
@@ -196,7 +196,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {  // when is call from a navigation
-		buttons.setVisible(false);
+//		buttons.setVisible(false);
 		QueryParameters queryParameters = event.getLocation().getQueryParameters();
 		filter = null; 
 		List<String> parFIlter = queryParameters.getParameters().get("filter");

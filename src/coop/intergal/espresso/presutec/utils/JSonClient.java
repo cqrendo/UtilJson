@@ -83,6 +83,7 @@ public class JSonClient {
 	static Hashtable<String, Hashtable<String, JsonNode>> parentsResource = new Hashtable<String, Hashtable<String, JsonNode>>();
 	private static String resourceTableName;
 	private static String kbaseURL = "";
+	private static Hashtable<String, String> keepIdent = new Hashtable<String, String>();;
 //	private static CloseableHttpClient clientStream;
 	private JsonNode keepJson ;
 	public static void main(String[] args) throws Exception {
@@ -663,6 +664,11 @@ public class JSonClient {
 	
 	public static String getIdentOfResuorce(String resourceName, boolean cache, String preConfParam) {
 		String ident = null;
+		if (keepIdent!= null && keepIdent.get(resourceName) != null)
+			{
+			ident = keepIdent.get(resourceName);
+			return ident;
+			}
 		JsonNode resource = null;
 		try {
 			
@@ -674,11 +680,15 @@ public class JSonClient {
 		if (resource == null ||resource.get("statusCode") != null) 
 			return null;
 		for (JsonNode eachRow : resource) {            // scan the list to found ident
-			String fieldName = eachRow.get("name").asText();
-			if (fieldName.equals(resourceName))
+			String name = eachRow.get("name").asText();
+			String ident1 = eachRow.get("ident").asText();
+		System.out.println("JSonClient.getIdentOfResuorce() "+ name + " ident :"+ ident1);
+			if (name.equals(resourceName))
 				{
 				ident = eachRow.get("ident").asText(); 
+				keepIdent.put(resourceName, ident);
 				return ident;
+				
 				}
 			}
 		return null;

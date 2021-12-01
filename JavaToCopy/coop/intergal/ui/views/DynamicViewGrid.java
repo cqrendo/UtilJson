@@ -199,7 +199,7 @@ private Button deleteRow;
 private FormButtonsBar buttonsForm;
 private boolean hasSideDisplay = true;
 private boolean autoSaveGrid = true;
-private boolean cache = true;
+private boolean cache = UtilSessionData.getCache();
 private Object divInDisplay;
 @Id("divExporter")
 private Div divExporter;

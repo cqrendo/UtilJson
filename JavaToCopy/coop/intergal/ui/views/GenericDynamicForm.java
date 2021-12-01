@@ -279,9 +279,10 @@ private String pickMapFields;
 						Button b =((Button) fieldObj);;
 						b.setId(label);
 						b.addClickListener(e-> proccesButton(b));
+						b.setVisible(false); 
 						if ((idButtonBarForButtons.equals("2") && visibleByTag)) // Botonera formulario
 						{
-							b.setVisible(false); 
+						//	b.setVisible(false); 
 						//	Button bCustom = new Button(label);
 							Button bCustom =coop.intergal.ui.util.UIUtils.createPrimaryButton(label);							
 							bCustom.setId(label);

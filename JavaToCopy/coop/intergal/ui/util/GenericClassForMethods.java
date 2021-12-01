@@ -128,7 +128,9 @@ public class GenericClassForMethods {
 //					filterInButton = filterInButton.replace("'","\"");
 				}
 					
-				if (filter2 != null && filter2.length() > 0 && filter2 != null && filter2.equals("null") == false && filter2.length() > 0)
+				if((filter2 != null && filter2.length() > 0 && filter2 != null && filter2.equals("null") == false && filter2.length() > 0)
+					&&
+					(filterInButton != null && filterInButton.length() > 0 && filterInButton != null && filterInButton.equals("null") == false && filterInButton.length() > 0))
 				{
 					filter2 = filter2 + "%20AND%20"+ filterInButton;
 				}

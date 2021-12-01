@@ -212,7 +212,7 @@ public class RestData {
 		{
 //			field.setInt(eachRow.get("code_customer").asInt());
 			try {
-				if (field.getName().equals("col"+i) && i < maxNumberOfFields)//rowsColList.size())
+				if (field.getName().equals("col"+i) && i <= maxNumberOfFields)//rowsColList.size())
 					{
 					field.setAccessible(true);
 					String colName = getColName(rowsColList,i,resourceName);
