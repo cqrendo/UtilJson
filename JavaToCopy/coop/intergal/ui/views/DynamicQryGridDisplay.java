@@ -3,16 +3,27 @@ import static coop.intergal.AppConst.PACKAGE_VIEWS;
 import static coop.intergal.AppConst.PAGE_PRODUCTS;
 import static coop.intergal.AppConst.STYLES_CSS;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -31,7 +42,14 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.QueryParameters;
+import com.vaadin.flow.server.InitialPageSettings;
+import com.vaadin.flow.server.PageConfigurator;
+import com.vaadin.flow.server.SynchronizedRequestHandler;
+import com.vaadin.flow.server.VaadinRequest;
+import com.vaadin.flow.server.VaadinResponse;
 import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
@@ -45,7 +63,7 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 @JsModule("./src/views/generic/layout/dynamic-qry-grid-display.js")
 //@CssImport(value = "./styles/dialog-overlay.css", themeFor = "vaadin-dialog-overlay")
 @CssImport(value = STYLES_CSS, themeFor = "dynamic-qry-grid-display")
-public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {
+public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, PageConfigurator{//, VaadinServiceInitListener  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
 	public ArrayList<String> getRowsColList() {
 		return rowsColList;
@@ -54,9 +72,22 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	public void setRowsColList(ArrayList<String> rowsColList) {
 		this.rowsColList = rowsColList;
 	}	
+	private final Div thisIdText = new Div();
+	private final Div log = new Div();
 
 	public DynamicQryGridDisplay() {
 		super();
+//		Date now = new Date();
+//		String id = "QRDView";// + now.getTime();
+//		 setId(id);
+//		 UI.getCurrent().getPage().executeJs("window.onbeforeunload = function (e) { var e = e || window.event; document.getElementById(\""+id+"\").$server.browserIsLeaving(); return; };");
+//***** ACTIVATE FOR DEBUG
+//		getDivDisplay().add(thisIdText, log);
+//
+//      log.getStyle().set("white-space", "pre");
+//
+//      refreshLog();
+
 		
 	}
 
@@ -164,8 +195,18 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 
 	private boolean cache = UtilSessionData.getCache();
 	private Object divInDisplay;
+
 	protected String getBasePage() {
 		return PAGE_PRODUCTS;
+	}
+	
+	private String idMenu =  null;
+	public String getIdMenu() {
+		return idMenu;
+	}
+
+	public void setIdMenu(String idMenu) {
+		this.idMenu = idMenu;
 	}
 
 	protected Binder<DynamicDBean> getBinder() {
@@ -197,6 +238,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {  // when is call from a navigation
 //		buttons.setVisible(false);
+
 		QueryParameters queryParameters = event.getLocation().getQueryParameters();
 		filter = null; 
 		List<String> parFIlter = queryParameters.getParameters().get("filter");
@@ -224,6 +266,11 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 				else
 					cache = true;
 				}
+			List<String> parIdMenu = queryParameters.getParameters().get("idMenu");
+			if (parIdMenu != null)
+			{
+				idMenu = parIdMenu.get(0);
+			}
 			//*** PACKAGE_VIEWS is used when the class is no generic for several projects. and corresponds a particular class for the form
 			queryFormClassName = queryParameters.getParameters().get("queryFormClassName").get(0);
 			displayFormClassName= queryParameters.getParameters().get("displayFormClassName").get(0);
@@ -339,4 +386,145 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		return UtilSessionData.addCompanyToTitle(title);
 	}
 
+//	@Override
+//	public void configurePage(InitialPageSettings settings) {
+//        String script = "window.onbeforeunload = function (e) { var e = e || window.event; document.getElementById(\"SomeView\").$server.browserIsLeaving(); return; };";		
+//        settings.addInlineWithContents(InitialPageSettings.Position.PREPEND, script, InitialPageSettings.WrapMode.JAVASCRIPT);
+//    }
+//	@ClientCallable
+//	public void browserIsLeaving() {
+//	        System.out.println("Called browserIsLeaving");
+//	}
+	@ClientCallable
+	public void browserIsLeaving() {
+			getUI().ifPresent(ui -> closeUi(ui));//;ui.close());
+	}
+
+	private Object closeUi(UI ui) {
+		System.out.println("Called browserIsLeaving ->" + ui.getId());
+		ui.close();
+		return null;
+	}
+	public static class BeaconEvent extends ComponentEvent<UI> {
+
+        public BeaconEvent(UI source, boolean fromClient) {
+            super(source, fromClient);
+        }
+    }
+
+    public static class BeaconHandler extends SynchronizedRequestHandler {
+        private final UI ui;
+        private final String beaconPath = "/beacon/" + UUID.randomUUID().toString();
+
+        public BeaconHandler(UI ui) {
+            this.ui = ui;
+        }
+
+        @Override
+        protected boolean canHandleRequest(VaadinRequest request) {
+            return beaconPath.equals(request.getPathInfo());
+        }
+
+        @Override
+        public boolean synchronizedHandleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response)
+            throws IOException {
+            ComponentUtil.fireEvent(ui, new BeaconEvent(ui, true));
+            return true;
+        }
+
+        public static Registration addBeaconListener(UI ui, ComponentEventListener<BeaconEvent> listener) {
+            ensureInstalledForUi(ui);
+            return ComponentUtil.addListener(ui, BeaconEvent.class, listener);
+        }
+
+        private static void ensureInstalledForUi(UI ui) {
+            if (ComponentUtil.getData(ui, BeaconHandler.class) != null) {
+                // Already installed, nothing to do
+                return;
+            }
+
+            BeaconHandler beaconHandler = new BeaconHandler(ui);
+
+            // ./beacon/<random uuid>
+            String relativeBeaconPath = "." + beaconHandler.beaconPath;
+
+            ui
+                .getElement()
+                .executeJs(
+                    "window.addEventListener('unload', function() {navigator.sendBeacon && navigator.sendBeacon($0)})",
+                    relativeBeaconPath
+                );
+
+            VaadinSession session = ui.getSession();
+            session.addRequestHandler(beaconHandler);
+            ui.addDetachListener(detachEvent -> session.removeRequestHandler(beaconHandler));
+
+            ComponentUtil.setData(ui, BeaconHandler.class, beaconHandler);
+        }
+    }
+
+//    private final Div thisIdText = new Div();
+//    private final Div log = new Div();
+
+//    public NoticeClosed() {
+//        add(thisIdText, log);
+//
+//        log.getStyle().set("white-space", "pre");
+//
+//        refreshLog();
+//    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        UI ui = attachEvent.getUI();
+        int uiId = ui.getUIId();
+
+        thisIdText.setText("This UI has id " + uiId);
+
+        addLogMessage("Attached " + uiId);
+
+        Registration beaconRegistration = BeaconHandler.addBeaconListener(
+            ui,
+            beaconEvent -> {
+                addLogMessage("Browser close event for " + uiId);
+                ui.close();
+            }
+        );
+
+        // Polling only needed for the demo
+        ui.setPollInterval(1000);
+        Registration pollRegistration = ui.addPollListener(
+            pollEvent -> {
+                refreshLog();
+            }
+        );
+
+        addDetachListener(
+            detachEvent -> {
+                detachEvent.unregisterListener();
+                beaconRegistration.remove();
+
+                // Polling only needed for the demo
+                ui.setPollInterval(-1);
+                pollRegistration.remove();
+            }
+        );
+    }
+
+    private void addLogMessage(String message) {
+        VaadinSession.getCurrent().setAttribute("log", getLogValue() + "\n" + LocalTime.now() + " " + message);
+
+        refreshLog();
+    }
+
+    private void refreshLog() {
+        log.setText(getLogValue());
+    }
+
+    private static String getLogValue() {
+        return Objects.toString(VaadinSession.getCurrent().getAttribute("log"), "");
+    }
 }
+
+

@@ -830,11 +830,14 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 			if (idXEqual == -1)
 				break;
 			int idXMark = fKfilter.indexOf("]");
-			if (fKfilter.startsWith("\n and")) 
+			if ((fKfilter.startsWith("\n and"))|| 
+				(fKfilter.startsWith("\n AND"))) 
 				step = 6;
-			else if ((fKfilter.indexOf("and") > -1 && fKfilter.indexOf("and") < 5))
+			else if (((fKfilter.indexOf("and") > -1 && fKfilter.indexOf("and") < 5)) ||
+				     ((fKfilter.indexOf("AND") > -1 && fKfilter.indexOf("AND") < 5)))
+				     
 			{
-				step = fKfilter.indexOf("and") + 4;
+				step = fKfilter.indexOf("AND") + 4;
 			}
 			else
 				step = 0;

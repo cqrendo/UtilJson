@@ -32,6 +32,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import coop.intergal.vaadin.rest.utils.DataService;
+
 /**
  * A very simple, self-contained demo REST client that exercises an Espresso Logic API.<br><br>
  * 
@@ -682,7 +684,7 @@ public class JSonClient {
 		for (JsonNode eachRow : resource) {            // scan the list to found ident
 			String name = eachRow.get("name").asText();
 			String ident1 = eachRow.get("ident").asText();
-		System.out.println("JSonClient.getIdentOfResuorce() "+ name + " ident :"+ ident1);
+	///	System.out.println("JSonClient.getIdentOfResuorce() "+ name + " ident :"+ ident1);
 			if (name.equals(resourceName))
 				{
 				ident = eachRow.get("ident").asText(); 
@@ -975,12 +977,16 @@ public class JSonClient {
 	}
 		
 	private static String cleanEmptyJoin(String join) {  // this extra condition in the join is to get the resources with less data, but must be clean to get real data
-		int posEmptyJoin = join.indexOf("EmptyJoin");
+		int posEmptyJoin = join.indexOf("EMPTYJOIN");
 		if (join.indexOf("EMPTYJOIN") > -1)
 		{			
 			int lastIdx = join.substring(11).indexOf("AND") +15;
 			String newJoin = join.substring(lastIdx);
 			printLog(" newJoin " + newJoin);
+			if (newJoin.indexOf("EMPTYJOIN") > -1)
+ 				{
+				DataService.get().showError("JOIN que incluye EMPTYJOIN mal definido, ha de ir por delante del JOIN real y ha de ser exactamente respectando Mayúsculas y blancos -> \"EMPTYJOIN\" = [\"EMPTYJOIN\"] \n" + " AND ");
+ 				}
 			return newJoin;
 		}	
 		return join;

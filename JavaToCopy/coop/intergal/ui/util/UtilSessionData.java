@@ -2,12 +2,17 @@ package coop.intergal.ui.util;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinSession;
 
 import coop.intergal.AppConst;
 import coop.intergal.ui.security.SecurityUtils;
+import coop.intergal.ui.views.DynamicQryGridDisplay;
 
 public class UtilSessionData {
 	
@@ -83,6 +88,30 @@ public class UtilSessionData {
 //			}
 			return  title;
 		}
+	public static Component  getOpenUI(String idMenu) {
+		
+		Iterator<UI> uIs = VaadinSession.getCurrent().getUIs().iterator();
+		while (uIs.hasNext()) {
+			UI uI = uIs.next(); 
+			Iterator<Component> components = uI.getChildren().iterator();
+			while (components.hasNext()) {
+				Component comp = components.next();
+//				comp.isAttached();
+				if (comp instanceof DynamicQryGridDisplay)
+				{
+					DynamicQryGridDisplay dQGD = (DynamicQryGridDisplay) comp;
+//					isInBrowser = comp.isAttached();
+					System.out.println("UtilSessionData. comp "+ dQGD.getPageTitle() );
+					if (dQGD.getIdMenu().equals(idMenu)) 
+						return dQGD;
+				}
+				
+			}
+			
+		}
+		return null;
+		
+	}
 
 
 }

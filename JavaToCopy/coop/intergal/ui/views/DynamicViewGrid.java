@@ -736,7 +736,14 @@ private boolean isBoolean(String header, String colType) {
 			divDisplay.removeAll();
 			Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
 			setdVGrid.invoke(display, this); // to use methods in this class
-
+			if (displayFormClassName.indexOf("NODISPLAY") > -1)
+			{
+				divDisplay.setVisible(false);
+			}
+			else
+			{
+				divDisplay.setVisible(true);
+			}
 			if (displayFormClassName.indexOf("Generated") > -1)
 			{
 			//	setDataProvider.invoke(display, dataProvider);
@@ -745,6 +752,7 @@ private boolean isBoolean(String header, String colType) {
 //				setdVGrid.invoke(display, this); // to use methods in this class
 				divInDisplay = createContent.invoke(display, buttonsForm );
 				divDisplay.add((Component)divInDisplay);
+				
 			}
 			else
 			{
@@ -1754,8 +1762,9 @@ private boolean isBoolean(String header, String colType) {
 
 			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 			setRowsColList.invoke(display,rowsColListGrid);
-			setBinder.invoke(display,binder);
 			setBean.invoke(display,bean);
+			setBinder.invoke(display,binder);
+			
 			setDataProvider.invoke(display, dataProvider);
 			divDisplay.removeAll();
 			if (displayFormClassName.indexOf("Generated") > -1)
@@ -1937,11 +1946,14 @@ private boolean isBoolean(String header, String colType) {
 			if (idXEqual == -1)
 				break;
 			int idXMark = fKfilter.indexOf("]");
-			if (fKfilter.startsWith("\n and")) 
+			if ((fKfilter.startsWith("\n and"))|| 
+			    (fKfilter.startsWith("\n AND"))) 
 				step = 6;
-			else if ((fKfilter.indexOf("and") > -1 && fKfilter.indexOf("and") < 5))
+			else if (((fKfilter.indexOf("and") > -1 && fKfilter.indexOf("and") < 5)) ||
+				     ((fKfilter.indexOf("AND") > -1 && fKfilter.indexOf("AND") < 5)))
+				     
 			{
-				step = fKfilter.indexOf("and") + 4;
+				step = fKfilter.indexOf("AND") + 4;
 			}
 			else
 				step = 0;
@@ -1953,7 +1965,7 @@ private boolean isBoolean(String header, String colType) {
 				}
 			else 
 			{
-				parentValue = "='" +parentValue+ "'%20and%20";
+				parentValue = "='" +parentValue+ "'%20AND%20";
 			}
 			componFilter = componFilter + fKfieldName + parentValue;
 			lengthFKfilter = lengthFKfilter - idXMark;
@@ -2188,6 +2200,8 @@ private boolean isBoolean(String header, String colType) {
 	}
 
 	public Object undoSelectedRow() {
+		if (keepRowBeforChanges != null)
+			return null;
 		System.out.println("DynamicViewGrid.undoSelectedRow() --->" + keepRowBeforChanges.getRowJSon().toString());
 //		dataProvider.save(selectedRow);	
 //		((Binder<DynamicDBean>) display).setBean(selectedRow);

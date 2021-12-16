@@ -28,6 +28,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.utils.ProcessParams;
 import coop.intergal.ui.views.DynamicDisplayForAskData;
 import coop.intergal.ui.views.DynamicGridForPick;
+import coop.intergal.ui.views.DynamicQryGridDisplay;
 import coop.intergal.ui.views.DynamicViewGrid;
 import coop.intergal.ui.views.GeneratedUtil;
 import coop.intergal.vaadin.rest.utils.DataService;
@@ -248,7 +249,18 @@ public class GenericClassForMethods {
 		String dialogClassDisplayForm = rowStep.get("dialogClassDisplayForm").asText();
 		String filterForShowResult = rowStep.get("filterForShowResult").asText();
 		String idButtonForShowResult = rowStep.get("idButtonForShowResult").asText(); // format @POP (if popup) + @IDM<<idmenu>>
-		if (inputResourceForAskData != null && inputResourceForAskData.equals("null") == false && inputResourceForAskData.isEmpty() == false  )
+		String idMenuOpenUIToProcess = rowStep.get("idMenuOpenUIToProcess").asText();
+		if (idMenuOpenUIToProcess != null && idMenuOpenUIToProcess.equals("null") == false )
+		{
+			DynamicQryGridDisplay dQGD = (DynamicQryGridDisplay) getOpenUI(idMenuOpenUIToProcess);  // @@TODO for now all the option are of the type DynamicQryGridDisplay, consider to add more types
+			if (dQGD ==  null) 
+			{
+				DataService.get().showError("Formulario para recibir dato sin abrir");
+			}
+			else
+				System.out.println("GenericClassForMethods.processSteps() UI found!" + dQGD.getPageTitle());
+		}
+		else if (inputResourceForAskData != null && inputResourceForAskData.equals("null") == false && inputResourceForAskData.isEmpty() == false  )
 		{
 //			rowOfInputData = askInputData(inputResourceForAskData, grid, dialogClassLayout, dialogClassDisplayForm);
 			askForDataAndContinue(dialogClassLayout, inputResourceForAskData, grid, dialogClassDisplayForm, rowStep);
@@ -274,6 +286,10 @@ public class GenericClassForMethods {
 		}
 
 		
+	private DynamicQryGridDisplay getOpenUI(String idMenuOpenUIToProcess) {
+		// TODO Auto-generated method stub
+		return (DynamicQryGridDisplay) UtilSessionData.getOpenUI(idMenuOpenUIToProcess);
+	}
 	private void showResult(String filterForShowResult, String idButton) {
 		String filter = componeFilter(filterForShowResult);
 		processButtonForNavigation(idButton, null, null, null, filter);
