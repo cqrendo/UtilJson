@@ -22,7 +22,7 @@ class DynamicQryGridDisplay extends ThemableMixin(PolymerElement) {
 	 
 }
 </style>
-<vaadin-split-layout orientation="vertical" id="querySplitGrid">
+<div id="querySplitGrid">
  <div id="divQuery" style="flex:none"></div>
  <div>
   <vaadin-split-layout id="gridSplitDisplay" style="height: 99%;">
@@ -38,7 +38,7 @@ class DynamicQryGridDisplay extends ThemableMixin(PolymerElement) {
    </div>
   </vaadin-split-layout>
  </div>
-</vaadin-split-layout>
+</div>
 `;
   }
 

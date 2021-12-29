@@ -30,6 +30,7 @@ import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.ui.components.FormButtonsBar;
+import coop.intergal.ui.util.GenericClassForMethods;
 //import coop.intergal.tys.ui.views.comprasyventas.compras.ArticulosQueryForPick;//
 //import coop.intergal.tys.ui.views.comprasyventas.compras.ProveedorQueryForPick;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
@@ -106,7 +107,6 @@ public class DynamicDisplayForAskData extends PolymerTemplate<TemplateModel> imp
 	
 //	@Id("buttons") // dummy for generic code
 	private FormButtonsBar buttons;
-	
 	public FormButtonsBar getButtons() {
 		return buttons;
 	}
@@ -114,6 +114,18 @@ public class DynamicDisplayForAskData extends PolymerTemplate<TemplateModel> imp
 	public void setButtons(FormButtonsBar buttons) {
 		this.buttons = buttons;
 	}
+	
+	private GenericClassForMethods genericClassForMethods;
+	
+	public GenericClassForMethods getGenericClassForMethods() {
+	return genericClassForMethods;
+}
+
+	public void setGenericClassForMethods(GenericClassForMethods genericClassForMethods) {
+	this.genericClassForMethods = genericClassForMethods;
+}
+
+
 
 	public Div getDivDisplay() {
 		return divDisplay;
@@ -334,6 +346,11 @@ public class DynamicDisplayForAskData extends PolymerTemplate<TemplateModel> imp
 
 	public void setDivQuery(Div divQuery) {
 		this.divDisplay = divQuery;
+	}
+
+	public void setClassForMethod(GenericClassForMethods genericClassForMethods) {
+		this.genericClassForMethods = genericClassForMethods;
+		
 	}
 
 

@@ -70,6 +70,7 @@ import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.security.SecurityUtils;
+import coop.intergal.ui.util.GenericClassForMethods;
 import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.UiComponentsUtils;
@@ -126,6 +127,14 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 
 	public void setButtonsForm(FormButtonsBar buttonsForm) {
 		this.buttonsForm = buttonsForm;
+	}
+	private GenericClassForMethods genericClassForMethods;
+	public GenericClassForMethods getGenericClassForMethods() {
+		return genericClassForMethods;
+	}
+
+	public void setGenericClassForMethods(GenericClassForMethods genericClassForMethods) {
+		this.genericClassForMethods = genericClassForMethods;
 	}
 	private Hashtable<String, String[]> resourceAndSubresources = new Hashtable<String, String[]>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
 
@@ -1009,6 +1018,12 @@ public void proccesButton(Button b, DynamicDBean bean2) {
 			runMethodFor("processButtonForProcess",idButton);
 //			processButtonForNavigation(idButton);
 		}
+		else if (idButton.indexOf("@CPOption") > -1)
+		{
+			runMethodFor("proccesButtonForContinueProcess",idButton);
+//			processButtonForNavigation(idButton);
+		}
+
 
 		else
 		{
@@ -1021,8 +1036,10 @@ public void proccesButton(Button b, DynamicDBean bean2) {
 		System.out.println("method to run "+ methodName);
 //		Class<?> dynamicQuery;
 		try {
-			Class<?> classForMethods = Class.forName(AppConst.CLASS_FOR_METHODS);
+			Class<?> classForMethods = Class.forName(AppConst.CLASS_FOR_METHODS);		
 			Object oClassForMethods = classForMethods.newInstance();
+			if (genericClassForMethods != null)
+				oClassForMethods = genericClassForMethods;
 			Method method = classForMethods.getMethod(methodName, new Class[] {String.class, coop.intergal.vaadin.rest.utils.DynamicDBean.class, com.vaadin.flow.component.html.Div.class, DynamicViewGrid.class} );
 //			this.getParent().get().getParent().get().getParent().get().getParent().get().getParent().get().getChildren().findFirst();
 //			UI.getCurrent().getChildren().findFirst();

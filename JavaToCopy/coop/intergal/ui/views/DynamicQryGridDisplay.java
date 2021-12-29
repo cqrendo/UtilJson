@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,9 +75,21 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	}	
 	private final Div thisIdText = new Div();
 	private final Div log = new Div();
+	
+	private Hashtable<String, DynamicViewGrid> dvgIntheForm = new Hashtable<String, DynamicViewGrid>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
+
+
+	public Hashtable<String, DynamicViewGrid> getDvgIntheForm() {
+		return dvgIntheForm;
+	}
+
+	public void setDvgIntheForm(Hashtable<String, DynamicViewGrid> dvgIntheForm) {
+		this.dvgIntheForm = dvgIntheForm;
+	}
 
 	public DynamicQryGridDisplay() {
 		super();
+		setId("DQGD");
 //		Date now = new Date();
 //		String id = "QRDView";// + now.getTime();
 //		 setId(id);
@@ -140,7 +153,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	private String filter;
 
 	@Id("querySplitGrid")
-	private SplitLayout querySplitGrid;
+	private Div querySplitGrid;
 
 	@Id("gridSplitDisplay")
 	private SplitLayout gridSplitDisplay;
@@ -165,11 +178,11 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		this.displaySplitSubGrid = displaySplitSubGrid;
 	}
 
-	public SplitLayout getQuerySplitGrid() {
+	public Div getQuerySplitGrid() {
 		return querySplitGrid;
 	}
 
-	public void setQuerySplitGrid(SplitLayout querySplitGrid) {
+	public void setQuerySplitGrid(Div querySplitGrid) {
 		this.querySplitGrid = querySplitGrid;
 	}
 
@@ -284,9 +297,9 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	}
 		public void prepareLayout(String queryFormClassName, String displayFormClassName)
 		{
-			querySplitGrid.setOrientation(Orientation.VERTICAL);
+//			querySplitGrid.setOrientation(Orientation.VERTICAL);
 			gridSplitDisplay.setOrientation(Orientation.HORIZONTAL);
-			gridSplitDisplay.getStyle().set("height", "83vh"); 
+//			gridSplitDisplay.getStyle().set("height", "83vh"); 
 			displaySplitSubGrid.setOrientation(Orientation.VERTICAL);
 
 		try {
@@ -364,7 +377,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		grid.setFilter(filter);
 		System.out.println("DynamicQryGridDisplay.beforeEnter() CACHE "+ cache);
 		grid.setCache(cache);
-		grid.setupGrid(false, true);
+		grid.setupGrid(false, true, true);
 		buttons.setVisible(false);
 		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
 		buttons.addCancelListener(e -> grid.undoSelectedRow());

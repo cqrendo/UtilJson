@@ -309,11 +309,13 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 						if (rowCol[4].length() > 0) // it means a parent field , the field "PathToParentField" comes in 4 position  if have FK the field the path is fill it 
 							{
 							String value = getValueFromField(form, id, fieldObj, isGeneratedForm);
-							if (isNumber == false)
-								value=addAutoComodin(value);
-							else 
-								value=componeNumberFilter(value);
-							setFKIdsForFilter(rowCol[4], value);
+							if (!value.isEmpty()) {
+								if (isNumber == false)
+									value=addAutoComodin(value);
+								else 
+									value=componeNumberFilter(value);
+								setFKIdsForFilter(rowCol[4], value);
+							}
 							}	
 						else if (rowCol[3].isEmpty() || rowCol[3].equals("0")) { // text field 
 								String value = getValueFromField(form, id, fieldObj, isGeneratedForm);								

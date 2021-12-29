@@ -47,6 +47,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -64,14 +65,17 @@ import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.metadata.ui.views.dev.lac.FieldTemplateComboRelatedForPick;
 import coop.intergal.ui.components.FormButtonsBar;
+import coop.intergal.ui.util.GenericClassForMethods;
 import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.ui.utils.ProcessParams;
+import coop.intergal.ui.utils.UiComponentsUtils;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.ui.utils.converters.DecimalFormatter;
 import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 import coop.intergal.vaadin.rest.utils.RestData;
+
 
 //@Tag("dynamic-view-grid")
 @Tag("dynamic-grid")
@@ -180,6 +184,14 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 	@Id("newRow")
 	private Button newRow;
 	private DynamicDBean rowIsInserted;
+	public DynamicDBean getRowIsInserted() {
+		return rowIsInserted;
+	}
+
+	public void setRowIsInserted(DynamicDBean rowIsInserted) {
+		this.rowIsInserted = rowIsInserted;
+	}
+
 	private DynamicDBean parentRow;
 	private Method setBeanParent;
 public Div getDivDisplay() {
@@ -204,12 +216,15 @@ private Object divInDisplay;
 @Id("divExporter")
 private Div divExporter;
 private Boolean isResourceReadOnly;
+private int position = 20;
 //private Dialog dialogForShow;
 //private Dialog dialogForShow;
 //private Button bCloseDialog = new Button ("X", e -> dialogForShow.close());
 //private String openIds = "";
 //private DdbDataBackEndProvider dataProviderpopup;
 //private String displayFormClassNamePopup;
+@Id("showHideQuery")
+private Button showHideQuery;
 
 
 //	@Autowired()
@@ -235,8 +250,13 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 	setupGrid(false, false);
 	
 }
+public void setupGrid(Boolean isGridEditable, Boolean isGridEditableon) {
+	setupGrid(isGridEditable, isGridEditable, false);
+	
+}
 
-	public void setupGrid(Boolean isGridEditable, Boolean hasExportButton) {
+
+	public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean hasShowQueryButton ) {
 	
 	//	grid.scrollTo(1); 
 	//	grid.getDataProvider().
@@ -308,7 +328,15 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 //			i++;
 //		}
 	//	Anchor anchor = new Anchor(new StreamResource("my-excel.xlsx", Exporter.exportAsExcel(grid)), "Download As Excel");
-        if (hasExportButton && grid.getColumns().isEmpty() == false)
+        if (hasShowQueryButton)
+        {
+        	showHideQuery.addClickListener(e -> showHideQuery());
+        }
+        else
+        {
+        	showHideQuery.setVisible(false);
+        }
+		if (hasExportButton && grid.getColumns().isEmpty() == false)
         {
      //   	export.setVisible(true);
         	divExporter.removeAll();
@@ -329,6 +357,14 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 
 }
 
+
+private Object showHideQuery() {
+		if (layout.getDivQuery().isVisible())
+			layout.getDivQuery().setVisible(false);
+		else
+			layout.getDivQuery().setVisible(true);
+		return null;
+	}
 
 private void methodForRowSelected(DynamicDBean selectedRow2) {
 		
@@ -835,42 +871,55 @@ private boolean isBoolean(String header, String colType) {
 					{
 					layout.getGridSplitDisplay().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_GRID_DISPLAY);
 					}
-				if (bean.getParams() != null && bean.getParams().indexOf("splitQuery") != -1) 
-					{
-					String params = bean.getParams().substring(bean.getParams().indexOf("splitQuery")+11);
-					int idxNextAnd = params.indexOf("&");
-					int  idxLast = params.length();
-					if (idxNextAnd > -1)
-						idxLast = idxNextAnd;
-					String splitPos = params.substring(1,idxLast-1);
-					System.out.println("DynamicViewGrid.showBean() splitPos splitQuery <"+ splitPos +">");
-					layout.getQuerySplitGrid().setSplitterPosition(new Double(splitPos));
-					}
-				else
-					{
-					layout.getQuerySplitGrid().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_QUERY_GRID);
-					}
-				if (bean.getParams() != null && bean.getParams().indexOf("splitDisplaySubGrid") != -1) 
-					{
-					String params = bean.getParams().substring(bean.getParams().indexOf("splitDisplaySubGrid")+20);
-					int idxNextAnd = params.indexOf("&");
-					int  idxLast = params.length();
-					if (idxNextAnd > -1)
-						idxLast = idxNextAnd;
-					String splitPos = params.substring(1,idxLast-1);
-					System.out.println("DynamicViewGrid.showBean() splitPos splitDisplaySubGrid <"+ splitPos +">");
-					layout.getDisplaySplitSubGrid().setSplitterPosition(new Double(splitPos));
-					}
-			}
-			else
-				{
-				layout.getDisplaySplitSubGrid().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_DISPLAY_SUBGRID);
 				}
-				
+				layout.getDivQuery().setVisible(false); /// each time yoy select a row QUERY is hide
+// ************ SPLITTER POSITION Doesn't work for now this code is comented				
+//				if (bean.getParams() != null && bean.getParams().indexOf("splitQuery") != -1) 
+//					{
+//					String params = bean.getParams().substring(bean.getParams().indexOf("splitQuery")+11);
+//					int idxNextAnd = params.indexOf("&");
+//					int  idxLast = params.length();
+//					if (idxNextAnd > -1)
+//						idxLast = idxNextAnd;
+//					String splitPos = params.substring(1,idxLast-1);
+//					System.out.println("DynamicViewGrid.showBean() splitPos splitQuery <"+ splitPos +">");
+//					layout.getQuerySplitGrid().setSplitterPosition(new Double(splitPos));
+//					}
+//				else
+//					{
+//					SplitLayout splitLayout = layout.getQuerySplitGrid();//.setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_QUERY_GRID);
+//					layout.getDivQuery().setVisible(false);
+//					layout.getDivDisplay().add(new Button("+", e->{
+//		                position += 10;
+//		                splitLayout.setSplitterPosition(position);
+//		                System.out.println("DynamicViewGrid.showBean() splitPos splitQuery + <"+ position +">");
+//		               }), new Button("-", e->{
+//		                 position -= 10;
+//		                 splitLayout.setSplitterPosition(position);
+//		                 System.out.println("DynamicViewGrid.showBean() splitPos splitQuery - <"+ position +">");
+//		       	              }));
+//					}
+//				if (bean.getParams() != null && bean.getParams().indexOf("splitDisplaySubGrid") != -1) 
+//					{
+//					String params = bean.getParams().substring(bean.getParams().indexOf("splitDisplaySubGrid")+20);
+//					int idxNextAnd = params.indexOf("&");
+//					int  idxLast = params.length();
+//					if (idxNextAnd > -1)
+//						idxLast = idxNextAnd;
+//					String splitPos = params.substring(1,idxLast-1);
+//					System.out.println("DynamicViewGrid.showBean() splitPos splitDisplaySubGrid <"+ splitPos +">");
+//					layout.getDisplaySplitSubGrid().setSplitterPosition(new Double(splitPos));
+//					}
+//			}
+//			else
+//				{
+//				layout.getDisplaySplitSubGrid().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_DISPLAY_SUBGRID);
+//				}
+	/// **************FIN ANULA SPLITTER 			
 //				layout.getDivQuery().getStyle().set("flex-basis", "65px");
 //				Div div = (Div) layout.getDivDisplay().get;
 //				div.getStyle().set("flex-basis", "650px");
-			}	
+//				}	
 //		GenericDynamicForm  display = null; 
 //		if (className.equals("C0")r
 //			display = (GenericDynamicForm)new DynamicForm(); 
@@ -884,7 +933,7 @@ private boolean isBoolean(String header, String colType) {
 //			divDisplay.removeAll();
 //			divDisplay.add((Component)display);
 //
-//			}
+			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1067,10 +1116,10 @@ private boolean isBoolean(String header, String colType) {
 				if (displayFormClassNamePopup.indexOf("Generated") > -1)
 				{
 			//	setDataProvider.invoke(display, dataProvider);
-					Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
+					Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class, GenericClassForMethods.class});
 //					Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
 //					setdVGrid.invoke(display, this); // to use methods in this class
-					divInDisplayPopup = createContent.invoke(displayPopup, buttonsForm );
+					divInDisplayPopup = createContent.invoke(displayPopup, buttonsForm, dynamicDisplayForAskData.getGenericClassForMethods() );
 					divDisplayPopup.add((Component)divInDisplayPopup);
 				}
 				else
@@ -1201,11 +1250,18 @@ private boolean isBoolean(String header, String colType) {
 		subDynamicViewGrid.setDisplayParent(display);
 		subDynamicViewGrid.setBeanParent(setBean);
 		divSubGrid.add(subDynamicViewGrid );
+		keepSubGridToBeAlterExternally(subDynamicViewGrid);
 		Div divTab = new Div();
 		divTab.add(subDynamicViewGrid );
 		return divTab;
 		
 	}
+	private void keepSubGridToBeAlterExternally(DynamicViewGrid subDynamicViewGrid) {
+		DynamicQryGridDisplay dQGD = (DynamicQryGridDisplay) UiComponentsUtils.findComponent(UI.getCurrent(), "DQGD");
+		dQGD.getDvgIntheForm().put(subDynamicViewGrid.getResourceName(),subDynamicViewGrid );
+		
+	}
+
 	private boolean isSubResourceReadOnly(String resourceSubGrid2) {
 		try {
 //			if (isResourceReadOnly != null)
@@ -2225,7 +2281,7 @@ private boolean isBoolean(String header, String colType) {
 		insertBean();
 		return null;
 	}
-	private Object insertBeanInList() {
+	public Object insertBeanInList() {
 		System.out.println("DynamicViewGrid.insertBeanInList()");
 		if (!dataProvider.getHasNewRow() ) // in this case the row is Inserted
 			{
@@ -2388,6 +2444,7 @@ private boolean isBoolean(String header, String colType) {
 		}
 		return null;
 	}
- 
+
+
 
 }

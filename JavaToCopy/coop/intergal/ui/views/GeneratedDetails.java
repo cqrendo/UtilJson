@@ -27,6 +27,7 @@ import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.util.FontSize;
+import coop.intergal.ui.util.GenericClassForMethods;
 import coop.intergal.ui.util.LumoStyles;
 import coop.intergal.ui.util.TextColor;
 import coop.intergal.ui.util.UIUtils;
@@ -100,6 +101,7 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 		this.rowsColList = rowsColList;
 	}
 	private FormButtonsBar buttonsForm;
+	private GenericClassForMethods genericClassForMethods;
 	public FormButtonsBar getButtonsForm() {
 		return buttonsForm;
 	}
@@ -201,9 +203,14 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
         detailsDrawer.show();
        
     }
-	  public Component createContent(FormButtonsBar buttonsForm) {
+	public Component createContent(FormButtonsBar buttonsForm) {
+		return createContent(buttonsForm, null);
+	
+	}
+	  public Component createContent(FormButtonsBar buttonsForm, GenericClassForMethods genericClassForMethods) {
 		  this.buttonsForm = buttonsForm;
-	    		
+		  if (genericClassForMethods != null)
+			  this.genericClassForMethods = genericClassForMethods;		
 	    FlexBoxLayout content = new FlexBoxLayout(createDetails());
 	    //		content.setBoxSizing(BoxSizing.BORDER_BOX);
 	    //		content.setHeightFull();
@@ -227,6 +234,7 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 			generatedUtil.setBinder(binder);
 			generatedUtil.setBean(bean);
 			generatedUtil.setButtonsForm(buttonsForm);
+			generatedUtil.setGenericClassForMethods(genericClassForMethods);
 //			generatedUtil.setDivSubGrid(divSubGrid);
 	//		if (cache == false)
 			rowsFieldList = dataProvider.getRowsFieldList();

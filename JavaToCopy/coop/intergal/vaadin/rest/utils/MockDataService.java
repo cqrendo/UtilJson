@@ -369,7 +369,9 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 					newEntityinfo.put(fieldName, fieldValue);
 					beginIndex = fKfilter.indexOf("%20and%20")+ 9;
 					if (beginIndex < 9)
-						break;
+						beginIndex = fKfilter.indexOf("%20AND%20")+ 9;
+						if (beginIndex < 9)
+							break;
 					fKfilter = fKfilter.substring(beginIndex);
 					endIndex = fKfilter.indexOf("=");
 					beginIndex = 0;

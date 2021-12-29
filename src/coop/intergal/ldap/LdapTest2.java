@@ -22,7 +22,7 @@ public class LdapTest2 {
     public void run() {
         try {
             DirContext context = getContext();
-            String name = "uid=terra2, ou=anpas";
+            String name = "cn=terra3,dc=intergal,dc=coop";
  //           createLDAPObject(context, name);
             createLDAPUser(name, "password", null, "snvalue", "cnvalue" );
 //            createAttribute(context, name, "displayName", "JOBS");
@@ -226,9 +226,9 @@ public class LdapTest2 {
         Properties properties = new Properties();
         properties.put(Context.INITIAL_CONTEXT_FACTORY,
                 "com.sun.jndi.ldap.LdapCtxFactory");
-        properties.put(Context.PROVIDER_URL, "ldap://intergal03.cloud.netimaging.net:389/dc=cloud");
+        properties.put(Context.PROVIDER_URL, "ldap://lac1.intergal.coop:389");
         properties.put(Context.SECURITY_CREDENTIALS, "intergalldapadmin");
-        properties.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=cloud");
+        properties.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=intergal,dc=coop");
         return new InitialDirContext(properties);
     }
  
