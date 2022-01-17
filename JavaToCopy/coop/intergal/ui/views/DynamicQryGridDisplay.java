@@ -265,6 +265,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		title="..";
 		String queryFormClassName = null;
 		String displayFormClassName  = null;
+		String addFormClassName  = null;
 		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
 		{
 			title=queryParameters.getParameters().get("title").get(0);
@@ -287,15 +288,19 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 			//*** PACKAGE_VIEWS is used when the class is no generic for several projects. and corresponds a particular class for the form
 			queryFormClassName = queryParameters.getParameters().get("queryFormClassName").get(0);
 			displayFormClassName= queryParameters.getParameters().get("displayFormClassName").get(0);
+			addFormClassName= queryParameters.getParameters().get("addFormClassName").get(0);
+
 			if (queryFormClassName.startsWith("coop.intergal.ui.views") == false)
 				queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
 			if (displayFormClassName.startsWith("coop.intergal.ui.views") == false)
 				displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
-			
+			if (addFormClassName.startsWith("coop.intergal.ui.views") == false)
+				addFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("addFormClassName").get(0);
+
 		}
-		prepareLayout(queryFormClassName, displayFormClassName);
+		prepareLayout(queryFormClassName, displayFormClassName, addFormClassName);
 	}
-		public void prepareLayout(String queryFormClassName, String displayFormClassName)
+		public void prepareLayout(String queryFormClassName, String displayFormClassName, String addFormClassName)
 		{
 //			querySplitGrid.setOrientation(Orientation.VERTICAL);
 			gridSplitDisplay.setOrientation(Orientation.HORIZONTAL);
@@ -376,12 +381,15 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		}
 		grid.setFilter(filter);
 		System.out.println("DynamicQryGridDisplay.beforeEnter() CACHE "+ cache);
+		grid.setiAmRootGrid(true);
 		grid.setCache(cache);
 		grid.setupGrid(false, true, true);
+		grid.setAddFormClassName(addFormClassName);
+
 		buttons.setVisible(false);
 		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
 		buttons.addCancelListener(e -> grid.undoSelectedRow());
-		buttons.addAddListener(e -> grid.insertANewRow());
+		buttons.addAddListener(e -> grid.insertANewRow(addFormClassName));
 		buttons.addDeleteListener(e -> grid.DeleteARow());
 		buttons.addPrintListener(e -> grid.PrintARow());
 		

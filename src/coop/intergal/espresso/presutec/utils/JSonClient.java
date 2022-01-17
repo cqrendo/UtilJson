@@ -939,6 +939,43 @@ public class JSonClient {
 		rowFields.add(listFields);
 		return rowFields;
 	}
+	public static void keepFKinHT(String resourceName, String subResourceName, boolean cache, String preConfParam) {  
+		String ident = "";
+		if (resourceName == null)
+		{
+			resourceName = subResourceName.substring(5);   // when a List- (subresource) is sent the name of the table is after List-  
+		}
+		JsonNode resource = null;
+		// TODO revisar , al activar no carga bien el rootTableName 
+//		if (resourceName.startsWith("CR-") == false) // CR- means custom 
+//														// resource, then is not
+//														// a table not sense to
+//														// get @tables
+//		{
+
+			int posPointForSubR = resourceName.indexOf(".");
+			//String subResourceName = null;
+			if (posPointForSubR > -1)
+			{
+				subResourceName = resourceName.substring(posPointForSubR+1 );
+				resourceName = resourceName.substring(0, posPointForSubR);
+			} 
+			ident = getIdentOfResuorce(resourceName, cache,preConfParam);
+			try {
+				if (ident != null)
+				{
+					resource = JSonClient.get("@resources/"+ident,null,cache,preConfParam);  
+					keepJoinConditionSubResources(resource); // is used later for childFilters
+					}
+				else
+				{
+					System.err.println("************ IDENT resource not found ***********--->" + resourceName);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
 	public static void keepJoinConditionSubResources(JsonNode resource) { // Keeps Join Condition for all resources 3 levels deep
 		// @@ TODO analice the posibility to avoid re-scan in case of already exist in HT
 		String parentResource = resource.get("name").asText(); // is add to sub-resource to avoid conflicts when a child have more than one parent

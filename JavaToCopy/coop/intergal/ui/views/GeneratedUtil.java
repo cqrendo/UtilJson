@@ -1424,7 +1424,10 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 //		if (dialogForPick == null)
 			dialogForPick = new Dialog();
 		dialogForPick.removeAll();
-		dialogForPick.setModal(false);
+		dialogForPick.setModal(true);
+		dialogForPick.setDraggable(true);
+		dialogForPick.setCloseOnEsc(true);
+		dialogForPick.setResizable(true);
 		dialogForPick.setCloseOnOutsideClick(false);
 		if (titleGrid.length() > 2)
 			dialogForPick.add(new H3(titleGrid));

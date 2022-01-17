@@ -136,13 +136,15 @@ private String pickMapFields;
 //			System.out.println("GenericDynamicForm.bindFields() col 0 ---> "+ binder.getBean().getCol0() + "/" +binder.getBean().getCol1());
 			boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 			boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
-			if (tagsForVisibility.indexOf("row.") > -1) { // visibility of the filed depends in a value of the row, create a virtual field that returns true or false , depending on condition
+			if (tagsForVisibility.indexOf("row.") > -1 && binder.getBean() != null && binder.getBean().getRowJSon() != null)  // visibility of the filed depends in a value of the row, create a virtual field that returns true or false , depending on condition
+			{
 				int idxStart = tagsForVisibility.indexOf("row.")+4;
 				int idxEnd = tagsForVisibility.length();
 				if (tagsForVisibility.indexOf(",") > -1 )
 					idxEnd = tagsForVisibility.indexOf(",");
 				String tagKey = tagsForVisibility.substring(idxStart, idxEnd )	;
-				visibleByTag = binder.getBean().getRowJSon().get(tagKey).asBoolean();
+				if (binder.getBean().getRowJSon().get(tagKey) != null)
+					visibleByTag = binder.getBean().getRowJSon().get(tagKey).asBoolean();
 			}
 			int idFieldType = 0;
 			if ( idFieldTypeStr.isEmpty() == false)
@@ -405,6 +407,11 @@ private String pickMapFields;
 		if (dialogForPick == null)
 			dialogForPick = new Dialog();
 		dialogForPick.removeAll();
+		dialogForPick.setDraggable(true);
+		dialogForPick.setCloseOnEsc(true);
+		dialogForPick.setResizable(true);
+		
+
 		dialogForPick.add(dynamicGridForPick);
 		dialogForPick.open();
 		

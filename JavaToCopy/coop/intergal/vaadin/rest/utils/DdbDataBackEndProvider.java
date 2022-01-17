@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -309,9 +310,15 @@ private long sizeBE;
 		        DataService.get().updateDynamicDBean(ResourceTobeSave, beansToSaveAndRefresh);
 		        boolean hashasError = false;
 		        if (beansToSaveAndRefresh.get("ERROR") != null)
-		        	hashasError = true;
-		        if (newRow) {
+		        	hashasError = true;		        
+		        else if (newRow) {
 		            refreshAll();
+//		            Enumeration<DynamicDBean> beans = beansToSaveAndRefresh.elements();
+//		            while (beans.hasMoreElements())
+//		            {
+//		            	DynamicDBean bean = beans.nextElement();
+//		            	refreshItem(bean);
+//		            }
 		        } else if (hashasError == false){
 		            refreshItem(firstBean);
 		        }

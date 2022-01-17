@@ -45,6 +45,8 @@ public class MockDataService extends DataService {
 
 	private boolean errorSaving;
 
+	private Boolean aceptOrCancel;
+
     private MockDataService() {
 //        categories = MockDataGenerator.createCategories();
 //        products = MockDataGenerator.createProducts(categories);
@@ -261,6 +263,11 @@ public void showError(String error) {
 	notification.open();
 		
 	}
+private Boolean closeAndSet(Notification notification, boolean b) {
+	notification.close();
+	return b;
+}
+
 private String transalateError(String error) {
 	if  ( error.startsWith("Parent main:"))
 		return transErrorParentMIssing(error);

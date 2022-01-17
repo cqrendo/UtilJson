@@ -64,6 +64,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.metadata.ui.views.dev.lac.FieldTemplateComboRelatedForPick;
+import coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.GenericClassForMethods;
 import coop.intergal.ui.util.UtilSessionData;
@@ -225,6 +226,17 @@ private int position = 20;
 //private String displayFormClassNamePopup;
 @Id("showHideQuery")
 private Button showHideQuery;
+private boolean isSaveFromCustomInserting= false;
+private boolean iAmRootGrid=false;
+private String addFormClassName;
+
+private DynamicViewGrid parentGrid;
+
+private void setParentGrid(DynamicViewGrid parentGrid) {
+	this.parentGrid = parentGrid;
+	
+}
+
 
 
 //	@Autowired()
@@ -237,6 +249,14 @@ private Button showHideQuery;
 //		setupGrid();
 ////		presenter.setView(this);
 //	}
+
+public String getAddFormClassName() {
+	return addFormClassName;
+}
+
+public void setAddFormClassName(String addFormClassName) {
+	this.addFormClassName = addFormClassName;
+}
 
 public boolean isCache() {
 	return cache;
@@ -303,8 +323,16 @@ public void setupGrid(Boolean isGridEditable, Boolean isGridEditableon) {
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
         
 		rowsColListGrid = dataProvider.getRowsColList();
-		newRow.addClickListener(e -> insertBeanInList());
-		deleteRow.addClickListener(e -> deleteBeanFromList());
+		if (iAmRootGrid)
+		{
+			newRow.addClickListener(e -> insertANewRow(addFormClassName));
+			deleteRow.addClickListener(e ->DeleteARow());
+		}	
+		else
+		{
+			newRow.addClickListener(e -> insertBeanInList());
+			deleteRow.addClickListener(e -> deleteBeanFromList());
+		}	
 //		grid.removeAllColumns();
 		int numberOFCols = rowsColListGrid.size();//length;
 	//       addColumn(Customer::getId, new NumberRenderer()).setCaption("Id");
@@ -357,6 +385,14 @@ public void setupGrid(Boolean isGridEditable, Boolean isGridEditableon) {
 
 }
 
+
+public boolean isiAmRootGrid() {
+		return iAmRootGrid;
+	}
+
+	public void setiAmRootGrid(boolean iAmRootGrid) {
+		this.iAmRootGrid = iAmRootGrid;
+	}
 
 private Object showHideQuery() {
 		if (layout.getDivQuery().isVisible())
@@ -562,7 +598,7 @@ private Object fillDataForPickAndAcceptComboMap(FieldTemplateComboRelatedForPick
 public Object pickParentOLD(String colName, DynamicDBean item) {
 	return null;
 }
-public Object pickParentOLD1(String colName, DynamicDBean item) {
+public Object pickParentOLD1x(String colName, DynamicDBean item) {
 	System.out.println("clicked "+colName + item.getCol(colName));
 //	return null;
 	try {
@@ -745,7 +781,7 @@ private boolean isBoolean(String header, String colType) {
 
 	void showBean(DynamicDBean bean ) {
 		try {
-
+			System.out.println("DynamicViewGrid.showBean()");
 			setVisibleRowData(true);
 			if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
 				buttonsForm.setVisible(false);
@@ -804,6 +840,7 @@ private boolean isBoolean(String header, String colType) {
 			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
 			{
 			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
+				System.out.println("DynamicViewGrid.showBean() ADD SUBGRID");
 				Div content0=new Div(); 
 				divSubGrid.add(fillContent(content0, 0 , bean));	
 //				generatedUtil.setDivSubGrid(divSubGrid); // to run methods for buttons
@@ -1249,6 +1286,7 @@ private boolean isBoolean(String header, String colType) {
 		subDynamicViewGrid.setParentRow(selectedRow);
 		subDynamicViewGrid.setDisplayParent(display);
 		subDynamicViewGrid.setBeanParent(setBean);
+		subDynamicViewGrid.setParentGrid(this);
 		divSubGrid.add(subDynamicViewGrid );
 		keepSubGridToBeAlterExternally(subDynamicViewGrid);
 		Div divTab = new Div();
@@ -1256,6 +1294,7 @@ private boolean isBoolean(String header, String colType) {
 		return divTab;
 		
 	}
+
 	private void keepSubGridToBeAlterExternally(DynamicViewGrid subDynamicViewGrid) {
 		DynamicQryGridDisplay dQGD = (DynamicQryGridDisplay) UiComponentsUtils.findComponent(UI.getCurrent(), "DQGD");
 		dQGD.getDvgIntheForm().put(subDynamicViewGrid.getResourceName(),subDynamicViewGrid );
@@ -1324,13 +1363,24 @@ private boolean isBoolean(String header, String colType) {
 //		int i = 0;
 //	   	Div contentyDiv0 = new Div(); 
 		Tab tab0 =null ;Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;Tab tab5=null ;Tab tab6=null ;Tab tab7=null ;
+		Tab tab8 =null ;Tab tab9=null ;Tab tab10=null ;Tab tab11=null ;Tab tab12=null ;Tab tab13=null ;Tab tab14=null ;Tab tab15=null ;
 		Div content0=new Div(); 
 		Div content1=new Div();
-		Div content2=new Div(); Div content3=new Div();
+		Div content2=new Div(); 
+		Div content3=new Div();
 		Div content4=new Div(); 
 		Div content5=new Div(); 
 		Div content6=new Div(); 
 		Div content7=new Div(); 
+		Div content8=new Div(); 
+		Div content9=new Div();
+		Div content10=new Div(); 
+		Div content11=new Div();
+		Div content12=new Div(); 
+		Div content13=new Div(); 
+		Div content14=new Div(); 
+		Div content15=new Div(); 
+
 //		FlexBoxLayout content7=null; 
 
 	   	int nTabs = tokens.length;
@@ -1349,7 +1399,6 @@ private boolean isBoolean(String header, String colType) {
 				tabTitle = tokens[1];
 				tab1 = new Tab(tabTitle);
 				content1.setId("1");
-//				content1 = fillContent(content1, 1, bean);	
 //				content1.setVisible(false);
 				
 			}
@@ -1358,7 +1407,6 @@ private boolean isBoolean(String header, String colType) {
 				tabTitle = tokens[2];
 				tab2 = new Tab(tabTitle);
 				content2.setId("2");
-//				content2 = fillContent(content2, 2, bean);	
 				content2.setVisible(false);
 				
 			}
@@ -1367,8 +1415,7 @@ private boolean isBoolean(String header, String colType) {
 				tabTitle = tokens[3];
 				tab3 = new Tab(tabTitle);
 				content3.setId("3");
-//				content3 = fillContent(content3, 3, bean);	
-				content3.setVisible(false);
+//				content3.setVisible(false);
 
 				
 			}
@@ -1377,8 +1424,7 @@ private boolean isBoolean(String header, String colType) {
 				tabTitle = tokens[4];
 				tab4 = new Tab(tabTitle);
 				content4.setId("4");
-//				content4 = fillContent(content4, 4, bean);	
-				content4.setVisible(false);
+//				content4.setVisible(false);
 
 			}
 			if (nTabs > 5)
@@ -1386,8 +1432,7 @@ private boolean isBoolean(String header, String colType) {
 				tabTitle = tokens[5];
 				tab5 = new Tab(tabTitle);
 				content5.setId("5");
-//				content5 = fillContent(content5, 5, bean);	
-				content5.setVisible(false);
+//				content5.setVisible(false);
 				
 			}
 			if (nTabs > 6)
@@ -1395,8 +1440,7 @@ private boolean isBoolean(String header, String colType) {
 				tabTitle = tokens[6];
 				tab6 = new Tab(tabTitle);
 				content6.setId("6");
-//				content6 = fillContent(content6, 6, bean);	
-				content6.setVisible(false);
+//				content6.setVisible(false);
 
 				
 			}
@@ -1405,10 +1449,75 @@ private boolean isBoolean(String header, String colType) {
 				tabTitle = tokens[7];
 				tab7 = new Tab(tabTitle);
 				content7.setId("7");
-//				content7 = fillContent(content7, 7, bean);	
 				content7.setVisible(false);
 
+			}
+			if (nTabs > 8)
+			{
+				tabTitle = tokens[8];
+				tab8 = new Tab(tabTitle);				
+				content8 = fillContent(content0, 8, bean);	
+				content8.setId("8");
+			}
+			if (nTabs > 9)
+			{
+				tabTitle = tokens[9];
+				tab9 = new Tab(tabTitle);
+				content9.setId("9");
+//				content1.setVisible(false);
+				
+			}
+			if (nTabs > 10)
+			{
+				tabTitle = tokens[10];
+				tab10 = new Tab(tabTitle);
+				content10.setId("10");
+				content10.setVisible(false);
+				
+			}
+			if (nTabs > 11)
+			{
+				tabTitle = tokens[11];
+				tab11 = new Tab(tabTitle);
+				content11.setId("11");
+//				content3.setVisible(false);
+
+				
+			}
+			if (nTabs > 12)
+			{
+				tabTitle = tokens[12];
+				tab12 = new Tab(tabTitle);
+				content12.setId("12");
+//				content4.setVisible(false);
+
+			}
+			if (nTabs > 13)
+			{
+				tabTitle = tokens[13];
+				tab13 = new Tab(tabTitle);
+				content13.setId("13");
+//				content5.setVisible(false);
+				
+			}
+			if (nTabs > 14)
+			{
+				tabTitle = tokens[14];
+				tab14 = new Tab(tabTitle);
+				content14.setId("14");
+//				content6.setVisible(false);
+
+				
+			}
+			if (nTabs > 15)
+			{
+				tabTitle = tokens[15];
+				tab15 = new Tab(tabTitle);
+				content15.setId("15");
+				content15.setVisible(false);
+
 			}				
+
 //			i++;
 //		}
 
@@ -1418,6 +1527,267 @@ private boolean isBoolean(String header, String colType) {
 
  //   	Tabs tabs = new Tabs(tab0,tab1);
     	Div pages =null ;
+     	if (nTabs > 11)
+    		{
+          		tabsToPages.put(tab0, content0);
+          		tabsToPages.put(tab1, content1);
+          		tabsToPages.put(tab2, content2);
+          		tabsToPages.put(tab3, content3);
+          		tabsToPages.put(tab4, content4);
+          		tabsToPages.put(tab5, content5);
+          		tabsToPages.put(tab6, content6);
+          		tabsToPages.put(tab7, content7);
+          		tabsToPages.put(tab8, content8);
+          		tabsToPages.put(tab9, content9);
+          		tabsToPages.put(tab10, content10);
+          		tabsToPages.put(tab11, content11);
+          		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8, tab9, tab10, tab11);
+      //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+          		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8, content9, content10, content11);
+        		tabs.addSelectedChangeListener(event -> {
+        			pages2.removeAll();
+        			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+        			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+        			pages2.add(selectedPage);
+        		});
+        		Div content = new Div();
+        		content.add(tabs, pages2);
+        		return content;
+    		}
+        else  
+     	if (nTabs > 15)
+    		{
+          		tabsToPages.put(tab0, content0);
+          		tabsToPages.put(tab1, content1);
+          		tabsToPages.put(tab2, content2);
+          		tabsToPages.put(tab3, content3);
+          		tabsToPages.put(tab4, content4);
+          		tabsToPages.put(tab5, content5);
+          		tabsToPages.put(tab6, content6);
+          		tabsToPages.put(tab7, content7);
+          		tabsToPages.put(tab8, content8);
+          		tabsToPages.put(tab9, content9);
+          		tabsToPages.put(tab10, content10);
+          		tabsToPages.put(tab11, content11);
+          		tabsToPages.put(tab12, content12);
+          		tabsToPages.put(tab13, content13);
+          		tabsToPages.put(tab14, content14);
+          		tabsToPages.put(tab14, content15);
+
+          		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8, tab9, tab10, tab11,tab12, tab13, tab14, tab15);
+      //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+          		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8, content9, content10, content11, content12, content13, content14, content15);
+        		tabs.addSelectedChangeListener(event -> {
+        			pages2.removeAll();
+        			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+        			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+        			pages2.add(selectedPage);
+        		});
+        		Div content = new Div();
+        		content.add(tabs, pages2);
+        		return content;
+    		}
+        else  
+     	if (nTabs > 14)
+    		{
+          		tabsToPages.put(tab0, content0);
+          		tabsToPages.put(tab1, content1);
+          		tabsToPages.put(tab2, content2);
+          		tabsToPages.put(tab3, content3);
+          		tabsToPages.put(tab4, content4);
+          		tabsToPages.put(tab5, content5);
+          		tabsToPages.put(tab6, content6);
+          		tabsToPages.put(tab7, content7);
+          		tabsToPages.put(tab8, content8);
+          		tabsToPages.put(tab9, content9);
+          		tabsToPages.put(tab10, content10);
+          		tabsToPages.put(tab11, content11);
+        		tabsToPages.put(tab12, content12);
+          		tabsToPages.put(tab13, content13);
+          		tabsToPages.put(tab14, content14);
+
+          		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8, tab9, tab10, tab11, tab12, tab13, tab14);
+      //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+          		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8, content9, content10, content11, content12, content13, content14);
+        		tabs.addSelectedChangeListener(event -> {
+        			pages2.removeAll();
+        			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+        			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+        			pages2.add(selectedPage);
+        		});
+        		Div content = new Div();
+        		content.add(tabs, pages2);
+        		return content;
+    		}
+        else  
+     	if (nTabs > 13)
+    		{
+          		tabsToPages.put(tab0, content0);
+          		tabsToPages.put(tab1, content1);
+          		tabsToPages.put(tab2, content2);
+          		tabsToPages.put(tab3, content3);
+          		tabsToPages.put(tab4, content4);
+          		tabsToPages.put(tab5, content5);
+          		tabsToPages.put(tab6, content6);
+          		tabsToPages.put(tab7, content7);
+          		tabsToPages.put(tab8, content8);
+          		tabsToPages.put(tab9, content9);
+          		tabsToPages.put(tab10, content10);
+          		tabsToPages.put(tab11, content11);
+         		tabsToPages.put(tab10, content12);
+          		tabsToPages.put(tab11, content13);
+
+          		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8, tab9, tab10, tab11, tab12, tab13);
+      //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+          		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8, content9, content10, content11, content12, content13);
+        		tabs.addSelectedChangeListener(event -> {
+        			pages2.removeAll();
+        			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+        			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+        			pages2.add(selectedPage);
+        		});
+        		Div content = new Div();
+        		content.add(tabs, pages2);
+        		return content;
+    		}
+        else  
+     	if (nTabs > 12)
+    		{
+          		tabsToPages.put(tab0, content0);
+          		tabsToPages.put(tab1, content1);
+          		tabsToPages.put(tab2, content2);
+          		tabsToPages.put(tab3, content3);
+          		tabsToPages.put(tab4, content4);
+          		tabsToPages.put(tab5, content5);
+          		tabsToPages.put(tab6, content6);
+          		tabsToPages.put(tab7, content7);
+          		tabsToPages.put(tab8, content8);
+          		tabsToPages.put(tab9, content9);
+          		tabsToPages.put(tab10, content10);
+          		tabsToPages.put(tab11, content11);
+          		tabsToPages.put(tab11, content12);
+          		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8, tab9, tab10, tab11, tab12);
+      //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+          		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8, content9, content10, content11, content12);
+        		tabs.addSelectedChangeListener(event -> {
+        			pages2.removeAll();
+        			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+        			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+        			pages2.add(selectedPage);
+        		});
+        		Div content = new Div();
+        		content.add(tabs, pages2);
+        		return content;
+    		}
+        else  
+       	if (nTabs > 11)
+    		{
+          		tabsToPages.put(tab0, content0);
+          		tabsToPages.put(tab1, content1);
+          		tabsToPages.put(tab2, content2);
+          		tabsToPages.put(tab3, content3);
+          		tabsToPages.put(tab4, content4);
+          		tabsToPages.put(tab5, content5);
+          		tabsToPages.put(tab6, content6);
+          		tabsToPages.put(tab7, content7);
+          		tabsToPages.put(tab8, content8);
+          		tabsToPages.put(tab9, content9);
+          		tabsToPages.put(tab10, content10);
+          		tabsToPages.put(tab11, content11);
+          		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8, tab9, tab10, tab11);
+      //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+          		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8, content9, content10, content11);
+        		tabs.addSelectedChangeListener(event -> {
+        			pages2.removeAll();
+        			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+        			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+        			pages2.add(selectedPage);
+        		});
+        		Div content = new Div();
+        		content.add(tabs, pages2);
+        		return content;
+    		}
+        else  
+    	if (nTabs > 10)
+		{
+      		tabsToPages.put(tab0, content0);
+      		tabsToPages.put(tab1, content1);
+      		tabsToPages.put(tab2, content2);
+      		tabsToPages.put(tab3, content3);
+      		tabsToPages.put(tab4, content4);
+      		tabsToPages.put(tab5, content5);
+      		tabsToPages.put(tab6, content6);
+      		tabsToPages.put(tab7, content7);
+      		tabsToPages.put(tab8, content8);
+      		tabsToPages.put(tab9, content9);
+      		tabsToPages.put(tab10, content10);
+      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8, tab9, tab10);
+  //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+      		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8, content9, content10);
+    		tabs.addSelectedChangeListener(event -> {
+    			pages2.removeAll();
+    			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+    			pages2.add(selectedPage);
+    		});
+    		Div content = new Div();
+    		content.add(tabs, pages2);
+    		return content;
+		}
+      	else    
+
+    	if (nTabs > 9)
+		{
+      		tabsToPages.put(tab0, content0);
+      		tabsToPages.put(tab1, content1);
+      		tabsToPages.put(tab2, content2);
+      		tabsToPages.put(tab3, content3);
+      		tabsToPages.put(tab4, content4);
+      		tabsToPages.put(tab5, content5);
+      		tabsToPages.put(tab6, content6);
+      		tabsToPages.put(tab7, content7);
+      		tabsToPages.put(tab8, content8);
+      		tabsToPages.put(tab9, content9);
+      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8, tab9);
+  //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+      		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8, content9);
+    		tabs.addSelectedChangeListener(event -> {
+    			pages2.removeAll();
+    			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+    			pages2.add(selectedPage);
+    		});
+    		Div content = new Div();
+    		content.add(tabs, pages2);
+    		return content;
+		}
+      	else    
+
+     	if (nTabs > 8)
+		{
+      		tabsToPages.put(tab0, content0);
+      		tabsToPages.put(tab1, content1);
+      		tabsToPages.put(tab2, content2);
+      		tabsToPages.put(tab3, content3);
+      		tabsToPages.put(tab4, content4);
+      		tabsToPages.put(tab5, content5);
+      		tabsToPages.put(tab6, content6);
+      		tabsToPages.put(tab7, content7);
+      		tabsToPages.put(tab8, content8);
+      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8);
+  //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+      		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8);
+    		tabs.addSelectedChangeListener(event -> {
+    			pages2.removeAll();
+    			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+    			pages2.add(selectedPage);
+    		});
+    		Div content = new Div();
+    		content.add(tabs, pages2);
+    		return content;
+		}
+      	else    
       	if (nTabs > 7)
 		{
       		tabsToPages.put(tab0, content0);
@@ -1438,7 +1808,7 @@ private boolean isBoolean(String header, String colType) {
     			pages2.add(selectedPage);
     		});
     		Div content = new Div();
-    		content.add(tabs, pages);
+    		content.add(tabs, pages2);
     		return content;
 		}
       	else     	    	
@@ -1461,7 +1831,7 @@ private boolean isBoolean(String header, String colType) {
     			pages2.add(selectedPage);
     		});
     		Div content = new Div();
-    		content.add(tabs, pages);
+    		content.add(tabs, pages2);
     		return content;
 		}
       	else     	
@@ -1483,7 +1853,7 @@ private boolean isBoolean(String header, String colType) {
     			pages2.add(selectedPage);
     		});
     		Div content = new Div();
-    		content.add(tabs, pages);
+    		content.add(tabs, pages2);
     		return content;
 		}
       	else     	
@@ -1718,8 +2088,8 @@ private boolean isBoolean(String header, String colType) {
 			if (subFormClassName.indexOf("Generated") > -1)
 			{
 			//	setDataProvider.invoke(display, dataProvider);
-				Method createContent= dynamicForm.getMethod("createContent");
-				Object divInSubDisplay = createContent.invoke(display);
+				Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
+				Object divInSubDisplay = createContent.invoke(display, buttonsForm);
 				divSubForm.add((Component)divInSubDisplay);
 			}
 			else
@@ -1795,8 +2165,13 @@ private boolean isBoolean(String header, String colType) {
 		deleteRow.setVisible(b);
 		
 	}
-
 	private void insertBean() {
+		insertBean(null);
+		
+	}
+
+
+	private void insertBean(String addFormClassName) {
 		try {
 	//		selectedRow = new bean;
 			keepRowBeforChanges = new DynamicDBean(); 
@@ -1810,31 +2185,37 @@ private boolean isBoolean(String header, String colType) {
 			keepRowBeforChanges = RestData.copyDatabean(bean);
 //			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
 			Class<?> dynamicForm = Class.forName(displayFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
-			display = dynamicForm.newInstance();
+			
+			if (addFormClassName != null && addFormClassName.isEmpty() == false && addFormClassName.indexOf("null") == -1)
+			{
+				dynamicForm = Class.forName(addFormClassName);
+				isSaveFromCustomInserting = true;
+			}
+			Object displayForAdd = dynamicForm.newInstance();
 			
 			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
 			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
 			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
 
 			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
-			setRowsColList.invoke(display,rowsColListGrid);
-			setBean.invoke(display,bean);
-			setBinder.invoke(display,binder);
+			setRowsColList.invoke(displayForAdd,rowsColListGrid);
+			setBean.invoke(displayForAdd,bean);
+			setBinder.invoke(displayForAdd,binder);
 			
-			setDataProvider.invoke(display, dataProvider);
+			setDataProvider.invoke(displayForAdd, dataProvider);
 			divDisplay.removeAll();
-			if (displayFormClassName.indexOf("Generated") > -1)
+			if (displayFormClassName.indexOf("Generated") > -1 || addFormClassName.indexOf("Generated") > -1)
 			{
 			//	setDataProvider.invoke(display, dataProvider);
-				Method createContent= dynamicForm.getMethod("createContent");
-				divInDisplay = createContent.invoke(display);
+				Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
+				divInDisplay = createContent.invoke(displayForAdd, buttonsForm);
 				divDisplay.add((Component)divInDisplay);
 				
 
 			}
 			else
 			{
-				divDisplay.add((Component)display);
+				divDisplay.add((Component)displayForAdd);
 			}
 //			String resourceSubGrid = extractResourceSubGrid(bean);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO send by param
 			divSubGrid.removeAll();
@@ -1994,7 +2375,11 @@ private boolean isBoolean(String header, String colType) {
 		if (fKfilter != null)
 			lengthFKfilter = fKfilter.length();
 		else
+			{
 			System.err.println("ERROR FK NO CARGADA -------"+ resourceSubGrid );
+			JSonClient.keepFKinHT(resourceSubGrid, null, cache, AppConst.PRE_CONF_PARAM);
+			fKfilter = JSonClient.getHt().get(resourceSubGrid);
+			}
 //		int leftLength = lengthFKfilter;
 		while (lengthFKfilter > 0 || fKfilter.length()  > 0)
 		{
@@ -2044,7 +2429,8 @@ private boolean isBoolean(String header, String colType) {
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {
-		setButtonsRowVisible(false); // only subgrid have newRow button, and they don't have beforeEnter event
+//		setButtonsRowVisible(false); // only subgrid have newRow button, and they don't have beforeEnter event
+		iAmRootGrid= true;
 		QueryParameters queryParameters = event.getLocation().getQueryParameters();
 //		filter = null; 
 		List<String> parFIlter = queryParameters.getParameters().get("filter");
@@ -2156,12 +2542,17 @@ private boolean isBoolean(String header, String colType) {
 		dataProvider.save(selectedRow.getResourceName(), beansToSaveAndRefresh);	
 //		((Binder<DynamicDBean>) display).setBean(selectedRow);
 		keepRowBeforChanges =  RestData.copyDatabean(selectedRow);
-		try {
-			setBean.invoke(display,selectedRow);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		showBean(selectedRow);
+		if (isSaveFromCustomInserting == false)
+		{
+			try {
+				if (display != null)
+					setBean.invoke(display,selectedRow);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		
+			showBean(selectedRow);
+		}	
 		return null;
 	}
 	private String getApiID(String apiname) { // sets Id ApiTemplate see APITemplate table
@@ -2232,14 +2623,17 @@ private boolean isBoolean(String header, String colType) {
 				e.printStackTrace();
 			}
 		}
-//		((Binder<DynamicDBean>) display).setBean(selectedRow);
+//		((Binder<DynamicDBean>) display).setBean(beansToSaveAndRefresh2.get("CR-PED_PROVEED_CAB"));
 //		try {
 //			setBean.invoke(display,selectedRow);
 //		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-//		showBean(selectedRow);
+//		showBean(beansToSaveAndRefresh2.get("CR-PED_PROVEED_CAB"));
+//		PedidoProveedorForm displayXX = (PedidoProveedorForm) display;
+//		displayXX.getBean().setCol25("1000");//beansToSaveAndRefresh2.get("CR-PED_PROVEED_CAB"));
+		parentGrid.showBean(parentGrid.getSelectedRow());
 		return null;
 	}
 	public Object deleteRowInGrid(Hashtable<String, DynamicDBean> beansToSaveAndRefresh2, String beanTobeDelete) {
@@ -2252,6 +2646,7 @@ private boolean isBoolean(String header, String colType) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			parentGrid.showBean(parentGrid.getSelectedRow());
 		return null;
 	}
 
@@ -2273,11 +2668,18 @@ private boolean isBoolean(String header, String colType) {
 //		showBean(selectedRow);
 		return null;
 	}
+	
+	public Object insertANewRow(String addFormClassName) {
+		System.out.println("DynamicViewGrid.insertANewRow( SPECIAL FORM )");
+		layout.getDivQuery().setVisible(false);
+		buttonsForm.setVisible(true);
+		insertBean(addFormClassName);
+		return null;
+	}
+
 
 	public Object insertANewRow() {
 		System.out.println("DynamicViewGrid.insertANewRow()");
-		// TODO Auto-generated method stub
-//		dataProvider.insertANewRow();	
 		insertBean();
 		return null;
 	}
@@ -2324,20 +2726,41 @@ private boolean isBoolean(String header, String colType) {
 	public Object DeleteARow() {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + selectedRow.getRowJSon().toString());
 		beansToSaveAndRefresh.clear();
-		beansToSaveAndRefresh.put(selectedRow.getResourceName(), selectedRow);
-		dataProvider.delete(selectedRow.getResourceName(), beansToSaveAndRefresh);	
-//		((Binder<DynamicDBean>) display).setBean(selectedRow);
-//		keepRowBeforChanges =  RestData.copyDatabean(selectedRow);
-//		try {
-//			setBean.invoke(display,selectedRow);
-		if (beansToSaveAndRefresh.containsKey("ERROR") == false)
+		if (selectedRow == null)
 		{
-			setVisibleRowData(false);
+			DataService.get().showError("no hay registro seleccionado para eliminar");
+			return null;
 		}	
-//		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-//			e.printStackTrace();
-//		}
-//		showBean(selectedRow);
+		Label content = new Label("Comfirmar Baja ");
+		NativeButton buttonAccept = new NativeButton(" Aceptar ");
+		NativeButton buttonCancel = new NativeButton(" Cancelar ");
+		Notification notification = new Notification(content, buttonAccept, buttonCancel);
+	//final Boolean aceptOrCancel;
+		//	notification.setDuration(3000);
+		buttonAccept.addClickListener(event -> doDelete(notification,true));
+		buttonCancel.addClickListener(event -> doDelete(notification,false));
+		notification.setPosition(Position.MIDDLE);
+		notification.open();
+		return null;
+	}
+
+		private Object doDelete(Notification notification, boolean aceptOrCancel) {	
+		notification.close();
+		if (aceptOrCancel)
+		{
+			beansToSaveAndRefresh.put(selectedRow.getResourceName(), selectedRow);
+			dataProvider.delete(selectedRow.getResourceName(), beansToSaveAndRefresh);	
+			if (beansToSaveAndRefresh.containsKey("ERROR") == false)
+			{
+				setVisibleRowData(false);
+			}
+		}	
+		return null;
+	}
+
+
+	private Object doDelete(boolean b) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -2444,6 +2867,7 @@ private boolean isBoolean(String header, String colType) {
 		}
 		return null;
 	}
+
 
 
 
