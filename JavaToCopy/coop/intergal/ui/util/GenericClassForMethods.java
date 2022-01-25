@@ -323,9 +323,17 @@ public class GenericClassForMethods {
 			if (idxStartField ==-1)
 				break;
 			String fieldToGetValue = filterForShowResult.substring(idxStartField+2,inxEndField);
-			String value = keepFirstParent.getRowJSon().get(fieldToGetValue).asText();
-			resultFilter = resultFilter.replace("<<"+fieldToGetValue+">>",value);
-			filterForShowResult = filterForShowResult.substring(inxEndField+2);
+			if (keepFirstParent == null)
+				{
+				DataService.get().showError("ERROR -> NO se ha creado ninún registro");
+				break;
+				}
+			else
+			{
+				String value = keepFirstParent.getRowJSon().get(fieldToGetValue).asText();
+				resultFilter = resultFilter.replace("<<"+fieldToGetValue+">>",value);
+				filterForShowResult = filterForShowResult.substring(inxEndField+2);
+			}	
 		}
 		return resultFilter;
 	}
@@ -372,7 +380,8 @@ public class GenericClassForMethods {
 					lastParent = insertOrUpdateOutput(firstRowInput, rowStep, true, lastParent);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
 					keepFirstParent = lastParent;
 					if (groupBy.equals("null") == false && groupBy.equals("row") == false)
-						keepGroup = firstRowInput.getRowJSon().get(groupBy).asText();				
+						if (firstRowInput.getRowJSon() != null && firstRowInput.getRowJSon().get(groupBy) != null )
+							keepGroup = firstRowInput.getRowJSon().get(groupBy).asText();				
 				}
 				else
 				{
@@ -439,11 +448,17 @@ public class GenericClassForMethods {
 			}
 			else if (rowStepOuput.get("childOf").asText().equals("null")) // is root ouput row
 			{
+				String filter = rowStepOuput.get("filter").asText();
 				if (rowStepOuput.get("filter").asText().equals("null") && isNewForGroupChange) // is new row for groupBy change in root 
 				{
 					lastParent = //insertAnOuputRow(rowStepOuput, null, rowPreviousStep);
 								 insertAnOuputRow(rowStepOuput, null, rowInputData);//(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean rowPreviousStep) {
 				}
+//				else if (filter.equals("null") == false && filter.indexOf("rowAD.") > -1 ) // if the rowAD.field has data it means that the a row is not created
+//				{
+//					System.out.println("PROCEESS AN UPDATE or INSERT for " +rowStepOuput.get("resource"));
+//					lastParent = checkIfParentExistAndHaveSameData(rowStepOuput);
+//				}
 				else if (isNewForGroupChange) // is a new row by a group change but is not a insert it updates the ouput
 				{
 					System.out.println("PROCEESS AN UPDATE for " +rowStepOuput.get("resource"));
@@ -462,6 +477,11 @@ public class GenericClassForMethods {
 
 		
 	}
+	/// instead of ask for a key, we do with 2 buttons combined with a form open where the childs will be add, 
+//	private DynamicDBean checkIfParentExistAndHaveSameData(JsonNode rowStepOuput) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 	private DynamicDBean insertAnOuputRow(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData) {//(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
 		String ouputResource = rowStepOuput.get("resource").asText();
 		System.out.println("PROCEESS AN INSERT for " +ouputResource);
@@ -597,7 +617,7 @@ public class GenericClassForMethods {
 		this.actualGrid = grid;
 		this.actualRowOfInputData = rowOfInputData;
 		dynamicDisplayForAskData.setClassForMethod(this);
-		dynamicDisplayForAskData.addAcceptDataAndContinueListener(e -> nextStepIfExist(rowStep, grid, rowOfInputData, null));//(rowOfAskData, rowStep, grid));
+// 		dynamicDisplayForAskData.addAcceptDataAndContinueListener(e -> nextStepIfExist(rowStep, grid, rowOfInputData, null));//(rowOfAskData, rowStep, grid)); // is not use a generic button, all the buttons are paint in generated form
 		//Object rowOfInputData = 
 		askInputData(inputResourceForAskData, grid, dialogClassLayout, dialogClassDisplayForm, dynamicDisplayForAskData, rowOfAskData);
 
@@ -616,7 +636,7 @@ public class GenericClassForMethods {
 		int idProcces = step.get("idProcess").asInt();
 		int sequence = step.get("sequence").asInt()+1;
 		String filter = "idProcess="+idProcces+"%20AND%20sequence="+sequence;
-		if (idNextStep !=null)
+		if (idNextStep !=null && idNextStep.length() > 0)
 			filter = "idProcess="+idProcces+"%20AND%20idNextStep='"+idNextStep+"'";
 		try {
 			JsonNode rowsList = JSonClient.get("CR-Process.List-ProcessStep",filter,false,AppConst.PRE_CONF_PARAM_METADATA,100+"");  // 100 maximun number of rows in child nodes, ouputs, ouputMap

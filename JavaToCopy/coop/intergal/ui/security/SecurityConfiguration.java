@@ -158,9 +158,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     		System.out.println("SecurityConfiguration.configure()---------------------------- .inMemoryAuthentication()");
     		auth
     		.inMemoryAuthentication()  // password = admin
-    		.withUser("user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER");
-//    	.and()
-//    	.withUser("admin").password("{noop}admin").roles("ADMIN");
+    		.withUser("user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER")
+    	.and()
+    		.withUser("20user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER")//.roles("ADMIN");
+        .and()
+    		.withUser("24user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER");//.roles("ADMIN");
+
     	}
     }
     

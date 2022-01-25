@@ -288,14 +288,18 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 			//*** PACKAGE_VIEWS is used when the class is no generic for several projects. and corresponds a particular class for the form
 			queryFormClassName = queryParameters.getParameters().get("queryFormClassName").get(0);
 			displayFormClassName= queryParameters.getParameters().get("displayFormClassName").get(0);
-			addFormClassName= queryParameters.getParameters().get("addFormClassName").get(0);
-
-			if (queryFormClassName.startsWith("coop.intergal.ui.views") == false)
-				queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
-			if (displayFormClassName.startsWith("coop.intergal.ui.views") == false)
+			
+			if (queryParameters.getParameters().get("addFormClassName") != null)
+				{
+				addFormClassName= queryParameters.getParameters().get("addFormClassName").get(0);
+				if (addFormClassName.startsWith("coop.intergal") == false)
+					addFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("addFormClassName").get(0);
+				}
+			if (displayFormClassName.startsWith("coop.intergal") == false)
 				displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
-			if (addFormClassName.startsWith("coop.intergal.ui.views") == false)
-				addFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("addFormClassName").get(0);
+			if (queryFormClassName.startsWith("coop.intergal") == false)
+				queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
+
 
 		}
 		prepareLayout(queryFormClassName, displayFormClassName, addFormClassName);

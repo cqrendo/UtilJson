@@ -697,6 +697,8 @@ public class JSonClient {
 	}
 
 	private static JsonNode getSubResourceTable(JsonNode resource, String childName) { // SCAN all sub-resources to get the table name
+		int idxAfterLastPoint = childName.lastIndexOf(".")+1;
+		childName = childName.substring(idxAfterLastPoint); // to get last child name 
 		JsonNode subResources = resource.get("subresources");
 		if (subResources != null)
 			{
@@ -891,39 +893,52 @@ public class JSonClient {
 				if (ident != null)
 				{
 					resource = JSonClient.get("@resources/"+ident,null,cache,preConfParam);  
+					if (resource != null)
+					{
 					keepJoinConditionSubResources(resource); // is used later for childFilters
 					if (subResourceName != null && subResourceName.length() > 1) 
 						{
 						resource = getSubResourceTable(resource, subResourceName);
-						}
-					JsonNode fieldList = resource.get("attributes");
-					String tableName = resource.get("table_name").asText();
-					setResourceTableName(tableName);
-					for (JsonNode eachRow : fieldList) {
-						String fieldName = eachRow.get("column_name").asText();
-						String dataType = getDataTypeFromTable(tableName, fieldName, cache,preConfParam);
-						listFields.put(fieldName,dataType);
-						}
+						
+						if (resource != null)
+						{
+							JsonNode fieldList = resource.get("attributes");
+							String tableName = resource.get("table_name").asText();
+							setResourceTableName(tableName);
+							for (JsonNode eachRow : fieldList) {
+								String fieldName = eachRow.get("column_name").asText();
+								String dataType = getDataTypeFromTable(tableName, fieldName, cache,preConfParam);
+								listFields.put(fieldName,dataType);
+							}
 				// *** get Atributes for subresources
-					JsonNode subresources = resource.get("subresources");
+							JsonNode subresources = resource.get("subresources");
 //				tableName = resource.get("table_name").asText();
 //				setResourceTableName(tableName);
 //				if (subResourceName != null) // only when you send a subResourceName you want his attributes names in the list
 //				{
-					for (JsonNode eachRow : subresources) {
-						JsonNode fieldListSR = eachRow.get("attributes");
-						tableName = eachRow.get("table_name").asText();
-						String name = eachRow.get("name").asText();
-						if (name.equals(subResourceName) || name.startsWith("FK-")) // only when you are getting a subresourceList or is  FK you want add the fields to the list
-							{
-							for (JsonNode eachRowSR : fieldListSR) {
-								String fieldName = eachRowSR.get("column_name").asText();
-								String dataType = getDataTypeFromTable(tableName, fieldName, cache,preConfParam);
-								listFields.put(fieldName,dataType);
+							for (JsonNode eachRow : subresources) {
+								JsonNode fieldListSR = eachRow.get("attributes");
+								tableName = eachRow.get("table_name").asText();
+								String name = eachRow.get("name").asText();
+								if (name.equals(subResourceName) || name.startsWith("FK-")) // only when you are getting a subresourceList or is  FK you want add the fields to the list
+								{
+									for (JsonNode eachRowSR : fieldListSR) {
+										String fieldName = eachRowSR.get("column_name").asText();
+										String dataType = getDataTypeFromTable(tableName, fieldName, cache,preConfParam);
+										listFields.put(fieldName,dataType);
+									}
+								}	
 							}
-							}	
-						}
 					
+						}
+						}
+					else // no exite subresource
+					{
+						System.err.println("************ERROR subResourceName NO EXISTE : "+ subResourceName);
+					}
+				}				
+				else 	
+					System.err.println("************ STRANGE ERROR----> resource not found After found IDENT ***********--->" + resourceName);					
 				}
 				else
 				{

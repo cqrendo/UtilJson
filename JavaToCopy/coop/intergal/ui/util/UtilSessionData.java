@@ -102,8 +102,11 @@ public class UtilSessionData {
 					DynamicQryGridDisplay dQGD = (DynamicQryGridDisplay) comp;
 //					isInBrowser = comp.isAttached();
 					System.out.println("UtilSessionData. comp "+ dQGD.getPageTitle() );
-					if (dQGD.getIdMenu().equals(idMenu)) 
-						return dQGD;
+					if (dQGD.getIdMenu() != null)
+					{
+						if (dQGD.getIdMenu().equals(idMenu)) 
+							return dQGD;
+					}
 				}
 				
 			}

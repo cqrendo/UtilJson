@@ -131,6 +131,7 @@ public String getQueryFormClassName() {
 //	private SplitLayout splitQryAndResult;
 	private String displayFormClassName;
 
+
 //	@Autowired()
 //	public DynamicViewGrid(CrudEntityPresenter<DynamicDBean> presenter, CrudForm<DynamicDBean> form) {
 //		super(EntityUtil.getName(DynamicDBean.class), form);
@@ -302,6 +303,7 @@ public String getResourceName() {
 
 		public Component createContent() {
 //		splitQryAndResult.setSplitterPosition(2);
+//		gridDisplaySubGrid.setMinWidth("20px");
 
 		grid.setDisplayFormClassName(displayFormClassName);
 		grid.setDisplay(divDisplay);

@@ -263,6 +263,37 @@ public class RestData {
 		}
 		else
 			dB.setReadOnly(false);
+		if (eachRow.get("insertNotAllow") != null) // to mark as read only add row.insertNotAllow=true to the event of the resource in LAC 
+		{
+			if (eachRow.get("insertNotAllow").asBoolean())
+				dB.setInsertNotAllow(true);
+			else
+				dB.setInsertNotAllow(false);
+				
+		}
+		else
+			dB.setInsertNotAllow(false);
+		if (eachRow.get("deleteNotAllow") != null) // to mark as read only add row.insertNotAllow=true to the event of the resource in LAC 
+		{
+			if (eachRow.get("deleteNotAllow").asBoolean())
+				dB.setDeleteNotAllow(true);
+			else
+				dB.setDeleteNotAllow(false);
+				
+		}
+		else
+			dB.setUpdateNotAllow(false);
+		if (eachRow.get("updateNotAllow") != null) // to mark as read only add row.insertNotAllow=true to the event of the resource in LAC 
+		{
+			if (eachRow.get("updateNotAllow").asBoolean())
+				dB.setUpdateNotAllow(true);
+			else
+				dB.setUpdateNotAllow(false);
+				
+		}
+		else
+			dB.setUpdateNotAllow(false);
+
 		if (eachRow.get("splitGridDisplay") != null) // to indicate add row.splitGridDisplay=..px to the event of the resource in LAC 
 		{
 			dB.setParams(dB.getParams()+"&splitGridDisplay="+eachRow.get("splitGridDisplay") );				
@@ -474,15 +505,16 @@ public class RestData {
 		JsonNode rowsList = null;
 		if (resourceName.startsWith("@")) // is to handle @resources by example because the resource name it changes @ by _
 			resourceName = resourceName.replace("@", "_");
-		if (resourceName.indexOf(".") > -1) // for susb.sub.sub resources
-			resourceName = resourceName.replace(".", "_");
+//		if (resourceName.indexOf(".") > -1) // for susb.sub.sub resources
+//			resourceName = resourceName.replace(".", "_");
 		try { //TODO CACHE IS FALSE always , put as param
 		//	String filtro = null;
 			String countName = "Count_";
-			if (resourceName.length() > 44)
-				countName = countName+ resourceName.substring(0,44);
-			else
-				countName = countName+ resourceName;
+			countName = countName + getDeeperTableName(resourceName);
+//			if (resourceName.length() > 44)
+//				countName = countName+ resourceName.substring(0,44);
+//			else
+//				countName = countName+ resourceName;
 			//the max length for resource name is 50 
 			System.out.println("RestData.getCountRows() resourceName " + countName + " filter " + filter +  " preConfParam " + preConfParam);
 			rowsList = JSonClient.get(countName,filter,cache,preConfParam,"1"); 
@@ -517,6 +549,35 @@ public class RestData {
 		return count;
 	}
 
+	private static String getDeeperTableName(String countName) {
+		int lastPoint = countName.lastIndexOf(".");
+		if (lastPoint >-1)
+		{
+			countName = countName.substring(lastPoint);
+		}
+		int idxList = countName.indexOf("List-");
+		int idxList_FE = countName.indexOf("List-FormExt");
+		if (idxList_FE >-1)
+			{
+			countName=countName.substring(idxList_FE+14);
+			}
+		else if (idxList >-1)
+			{
+			countName=countName.substring(idxList+5);
+			}
+			
+		else if (countName.startsWith("CR-"))
+				countName=countName.substring(3);
+		if (countName.indexOf("_SF") ==-1)
+			{
+			int idx__ = countName.indexOf("__");
+			if ( idx__ >-1)
+			{
+			countName.substring(0,idx__);
+			}
+		}
+		return countName;
+	}
 	public static JsonNode getDataValueFromAFieldOfAResource(String resourceName, String field, String filter, String preConfParam) {
 		JsonNode value = null;
 		try {
@@ -544,16 +605,19 @@ public class RestData {
 		try {
 			JsonNode rowsList = JSonClient.get(resourceName,filter,false,preConfParam,"20");
 			rowsColList =  getRowsColList(rowsColList, resourceName, preConfParam, null);//, "");
-			for (JsonNode eachRow : rowsList)  {
-				if (eachRow.get(rowsColList.get(0)[0]) !=null)
+			if (rowsColList.isEmpty() == false)
 				{
-					DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam, resourceName);//, cols.get(0)); 
-					d.setResourceName(resourceName);
-					d.setPreConfParam(preConfParam);
-					d.setFilter(filter);
-					return d;
+				for (JsonNode eachRow : rowsList)  {
+					if (eachRow.get(rowsColList.get(0)[0]) !=null)
+					{
+						DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam, resourceName);//, cols.get(0)); 
+						d.setResourceName(resourceName);
+						d.setPreConfParam(preConfParam);
+						d.setFilter(filter);
+						return d;
+					}
 				}
-			}	
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

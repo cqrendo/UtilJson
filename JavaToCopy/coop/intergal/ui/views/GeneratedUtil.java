@@ -1782,9 +1782,31 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 	//				String colName = getColName(rowsColList,i);
 					String defaultValue = getDefaultValue(rowsColList,i);
 					if (defaultValue != null && ! defaultValue.equals("null") && defaultValue.length() > 0)
-						if (defaultValue.equals("user()"))
+						if (defaultValue.startsWith("user("))
 						{
-							field.set(bean, SecurityUtils.getUsername());
+							if (defaultValue.equals("user()"))
+								field.set(bean, SecurityUtils.getUsername());
+							else // is in the mode user(n,n) // where indicates start and end for substring
+								{
+								int idxStart = defaultValue.indexOf("(")+ 1;
+								int idxComma = defaultValue.indexOf(",");
+								int idxEnd = defaultValue.indexOf(")"); 
+								try 
+									{
+									int beginIdx   = new Integer (defaultValue.substring(idxStart,idxComma));
+									int endIdx     = new Integer (defaultValue.substring(idxComma+1,idxEnd));
+									field.set(bean, SecurityUtils.getUsername().substring(beginIdx,endIdx));
+									}
+									catch (NumberFormatException e)
+									{
+										System.out.println("GeneratedUtil.fillDefaultValues()   NO HAY NUMEROS EN la deficion del valor por defecto");
+									}
+									catch (IndexOutOfBoundsException e)
+									{
+										System.out.println("GeneratedUtil.fillDefaultValues()  el valor del usuario es mas pequeño la deficion del valor por defecto");																	
+									}
+								
+								}
 						}
 						else
 							field.set(bean, defaultValue);

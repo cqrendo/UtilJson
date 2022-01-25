@@ -234,7 +234,8 @@ public class DynamicDisplayForAskData extends PolymerTemplate<TemplateModel> imp
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {
-		acceptDataAndContinue.addClickShortcut(Key.F10);
+//		acceptDataAndContinue.addClickShortcut(Key.F10);
+		acceptDataAndContinue.setVisible(false); // for now this generic button is hide is left the code to reactivate
 		QueryParameters queryParameters = event.getLocation().getQueryParameters();
 		filter = null; 
 		List<String> parFIlter = queryParameters.getParameters().get("filter");
@@ -336,9 +337,9 @@ public class DynamicDisplayForAskData extends PolymerTemplate<TemplateModel> imp
 		}
 	}
 
-	public Registration addAcceptDataAndContinueListener(ComponentEventListener<AcceptDataAndContinueEvent> listener) {
-		return acceptDataAndContinue.addClickListener(e -> listener.onComponentEvent(new AcceptDataAndContinueEvent(this, true)));
-}
+//	public Registration addAcceptDataAndContinueListener(ComponentEventListener<AcceptDataAndContinueEvent> listener) {
+//		return acceptDataAndContinue.addClickListener(e -> listener.onComponentEvent(new AcceptDataAndContinueEvent(this, true)));
+//}
 
 	public Div getDivQuery() {
 		return divDisplay;

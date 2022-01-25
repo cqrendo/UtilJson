@@ -12,8 +12,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -105,7 +108,7 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements B
 	private String displayFormClassName;
 	private String resourceSubGrid;
 	private Hashtable<String, DynamicDBean> beansToSaveAndRefresh = new Hashtable<String, DynamicDBean>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
-	private Hashtable<String, String[]> resourceAndSubresources = new Hashtable<String, String[]>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
+	private Hashtable<String, String[]> resourceAndSubresources = new Hashtable<String, String[]>(); 
 	Map<String, Dialog> allDialogs = new HashMap<>();
 	//	Dialog dialogForShow = new Dialog();
 	//public DynamicViewGrid() {
@@ -323,6 +326,7 @@ public void setupGrid(Boolean isGridEditable, Boolean isGridEditableon) {
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
         
 		rowsColListGrid = dataProvider.getRowsColList();
+		setButtonsVisibiltyFromExtendedProperties(resourceName);
 		if (iAmRootGrid)
 		{
 			newRow.addClickListener(e -> insertANewRow(addFormClassName));
@@ -784,9 +788,16 @@ private boolean isBoolean(String header, String colType) {
 			System.out.println("DynamicViewGrid.showBean()");
 			setVisibleRowData(true);
 			if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
+				{
 				buttonsForm.setVisible(false);
+				setButtonsRowVisible(false);
+				}
 			else
+				{
 				buttonsForm.setVisible(true);
+				setButtonsRowVisible(false);
+				}
+
 			selectedRow = bean;
 			keepRowBeforChanges = new DynamicDBean(); 
 			keepRowBeforChanges = RestData.copyDatabean(bean);
@@ -816,6 +827,7 @@ private boolean isBoolean(String header, String colType) {
 			{
 				divDisplay.setVisible(true);
 			}
+			setButtonsVisibiltyFromExtendedProperties(resourceName);
 			if (displayFormClassName.indexOf("Generated") > -1)
 			{
 			//	setDataProvider.invoke(display, dataProvider);
@@ -1322,6 +1334,68 @@ private boolean isBoolean(String header, String colType) {
 		}
 		return false;
 	}
+	private void setButtonsVisibiltyFromExtendedProperties(String resource) {
+		try {
+			
+//			to fill in extended properties
+//			{
+//			    "insertNotAllow":true,
+//			    "deleteNotAllow":true,
+//			    "updateNotAllow":true
+//			}
+			JsonNode extProp = JSonClient.get("JS_ExtProp", resource, cache, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+			if (extProp.get("insertNotAllow") != null)
+			{
+				boolean insertNotAllow = extProp.get("insertNotAllow").asBoolean();
+				if (insertNotAllow)
+					{
+					newRow.setVisible(false);
+					if (buttonsForm != null)
+						buttonsForm.setAddVisible(false);
+					}
+			}
+			else
+			{
+				newRow.setVisible(true);
+				if (buttonsForm != null)
+					buttonsForm.setAddVisible(true);
+			}
+			if (extProp.get("deleteNotAllow") != null)
+			{
+				boolean deleteNotAllow = extProp.get("deleteNotAllow").asBoolean();
+				if (deleteNotAllow)
+					{
+					if (buttonsForm != null)
+						buttonsForm.setDeleteVisible(false);
+					deleteRow.setVisible(false);
+					}
+			}
+			else
+			{
+				deleteRow.setVisible(true);
+				if (buttonsForm != null)
+					buttonsForm.setDeleteVisible(true);
+			}
+			if (extProp.get("updateNotAllow") != null)
+			{
+				boolean updateNotAllow = extProp.get("updateNotAllow").asBoolean();
+				if (updateNotAllow && buttonsForm != null)
+					{
+					buttonsForm.setSaveVisible(false);
+					buttonsForm.setCancelVisible(false);
+					}
+			}
+			else if (buttonsForm != null)
+			{
+				buttonsForm.setSaveVisible(true);
+				buttonsForm.setCancelVisible(true);
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public Component  dummy2 ()
 	{
@@ -1456,7 +1530,7 @@ private boolean isBoolean(String header, String colType) {
 			{
 				tabTitle = tokens[8];
 				tab8 = new Tab(tabTitle);				
-				content8 = fillContent(content0, 8, bean);	
+//				content8 = fillContent(content0, 8, bean);	
 				content8.setId("8");
 			}
 			if (nTabs > 9)
@@ -1527,34 +1601,7 @@ private boolean isBoolean(String header, String colType) {
 
  //   	Tabs tabs = new Tabs(tab0,tab1);
     	Div pages =null ;
-     	if (nTabs > 11)
-    		{
-          		tabsToPages.put(tab0, content0);
-          		tabsToPages.put(tab1, content1);
-          		tabsToPages.put(tab2, content2);
-          		tabsToPages.put(tab3, content3);
-          		tabsToPages.put(tab4, content4);
-          		tabsToPages.put(tab5, content5);
-          		tabsToPages.put(tab6, content6);
-          		tabsToPages.put(tab7, content7);
-          		tabsToPages.put(tab8, content8);
-          		tabsToPages.put(tab9, content9);
-          		tabsToPages.put(tab10, content10);
-          		tabsToPages.put(tab11, content11);
-          		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8, tab9, tab10, tab11);
-      //    		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
-          		Div pages2 = new Div(content0, content1, content2,content3, content4, content5, content6 , content7, content8, content9, content10, content11);
-        		tabs.addSelectedChangeListener(event -> {
-        			pages2.removeAll();
-        			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
-        			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
-        			pages2.add(selectedPage);
-        		});
-        		Div content = new Div();
-        		content.add(tabs, pages2);
-        		return content;
-    		}
-        else  
+  
      	if (nTabs > 15)
     		{
           		tabsToPages.put(tab0, content0);
@@ -1951,7 +1998,8 @@ private boolean isBoolean(String header, String colType) {
 
 	private Div fillContent(Div content, int i, DynamicDBean bean) {
 		String resourceSubGrid = extractResourceSubGrid(bean,i);
-		int idxFormExt = resourceSubGrid.indexOf("FormExt");
+		int idxLastResource = resourceSubGrid.lastIndexOf(".");
+		int idxFormExt = resourceSubGrid.substring(idxLastResource+1).indexOf("FormExt"); // to avoid false identification as formExt in the parents
 		if ( idxFormExt> -1)
 			content = new Div(componSubForm(bean, resourceSubGrid));
 		else
@@ -1963,33 +2011,59 @@ private boolean isBoolean(String header, String colType) {
 	private Component componSubForm(DynamicDBean bean, String resourceSubGrid0) {
 		Div divSubForm = new Div();
 //		divSubForm.add(new Label(" FORMULARIO "));
-		JsonNode jsonNode = bean.getRowJSon();
-		int idxPoint = resourceSubGrid0.indexOf(".");
-		if (idxPoint > -1)
-			resourceSubGrid0 = resourceSubGrid0.substring(idxPoint+1);
-		JsonNode subGridFormExt = jsonNode.get(resourceSubGrid0); 
-		String subLayoutClassName = "NO LAYOUT";
-		if (subGridFormExt.get("subLayoutClassName") != null)
-			subLayoutClassName = subGridFormExt.get("subLayoutClassName").asText();
-		String subFormClassName = subGridFormExt.get("displaySubFormClassName").asText();
-		String subFormFilter = subGridFormExt.get("filter").asText();
-		String subFormResource = subGridFormExt.get("resource").asText();
-		DdbDataBackEndProvider dataProviderSub = new DdbDataBackEndProvider();
-		dataProviderSub.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
-		dataProviderSub.setResourceName(subFormResource);
-		dataProviderSub.setFilter(subFormFilter);
-		if (subLayoutClassName.indexOf("DynamicGridDisplay") > -1)
-		{
-			return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
+		JsonNode extProp;
+		try {
+			extProp = JSonClient.get("JS_ExtProp", resourceSubGrid0, cache, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+			String displaySubFormClassName = null;
+			String subLayoutClassName =  "NO LAYOUT";
+			if (extProp.get("subLayoutClassName") != null)
+			{
+				subLayoutClassName = extProp.get("subLayoutClassName").asText();
+			}
+			if (extProp.get("displaySubFormClassName") != null)
+			{
+				displaySubFormClassName = extProp.get("displaySubFormClassName").asText();
+			}
+			else
+			{
+				showError("sin definir displaySubFormClassName en extended properties ");
+			}	
+			JsonNode jsonNode = bean.getRowJSon();
+//			int idxPoint = resourceSubGrid0.indexOf(".");
+//			if (idxPoint > -1)
+//				resourceSubGrid0 = resourceSubGrid0.substring(idxPoint+1);
+//			idxPoint = resourceSubGrid0.indexOf(".");
+//			if (idxPoint > -1)
+//				resourceSubGrid0 = resourceSubGrid0.substring(idxPoint+1);
+//		JsonNode subGridFormExt = jsonNode.get(resourceSubGrid0); 
+//		String subLayoutClassName = "NO LAYOUT";
+//		if (subGridFormExt.get("subLayoutClassName") != null)
+//			subLayoutClassName = subGridFormExt.get("subLayoutClassName").asText();
+			String subFormClassName = displaySubFormClassName;
+			String subFormFilter = componFKFilter(bean, resourceSubGrid0);
+			String subFormResource = resourceSubGrid0;
+			DdbDataBackEndProvider dataProviderSub = new DdbDataBackEndProvider();
+			dataProviderSub.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+			dataProviderSub.setResourceName(subFormResource);
+			dataProviderSub.setFilter(subFormFilter);
+			if (subLayoutClassName.indexOf("DynamicGridDisplay") > -1)
+			{
+				return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
+//			return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
+			}
+			else
+			{	
+				DynamicDBean subBean = RestData.getOneRow(subFormResource, subFormFilter, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+				if (subBean != null)
+					return componForm (dataProviderSub, subBean, subFormClassName, divSubForm, true );
+				else
+					return new Label ("Sin datos");
 		}
-		else
-		{	
-		DynamicDBean subBean = RestData.getOneRow(subFormResource, subFormFilter, AppConst.PRE_CONF_PARAM);
-		if (subBean != null)
-			return componForm (dataProviderSub, subBean, subFormClassName, divSubForm, true );
-		else
-			return new Label ("Sin datos");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		return new Label ("Sin datos error en la carga de Propiedades extendidas");
 	}
 	private Component componDynamicGridDisplay(String subLayoutClassName, String subFormResource, String subFormFilter,
 			String subFormClassName, Div divSubForm, boolean b) {
@@ -2174,6 +2248,7 @@ private boolean isBoolean(String header, String colType) {
 	private void insertBean(String addFormClassName) {
 		try {
 	//		selectedRow = new bean;
+			buttonsForm.getCustomButtons().setVisible(false);
 			keepRowBeforChanges = new DynamicDBean(); 
 			DynamicDBean bean = new DynamicDBean(); 
 			
@@ -2272,65 +2347,99 @@ private boolean isBoolean(String header, String colType) {
 //}
 
 	private String extractResourceSubGrid(DynamicDBean bean, int idx) {
-		// TODO Auto-generated method stub CR-entradas_cab.List-entradas_lin/
-		if (resourceAndSubresources.get(bean.getResourceName()+idx) != null)
+		if (resourceAndSubresources.get(bean.getResourceName()+idx)!= null && resourceAndSubresources.get(bean.getResourceName()+idx)[0] != null)
+		{
+		String[] subResourcesOfResource = resourceAndSubresources.get(bean.getResourceName()+idx);
+		if (subResourcesOfResource.length > idx)
 			{
-			String[] subResourcesOfResource = resourceAndSubresources.get(bean.getResourceName()+idx);
-			if (subResourcesOfResource.length > idx)
-				{
-				if (subResourcesOfResource[idx].isEmpty() == false)
-					return subResourcesOfResource[idx];
-				}
-			}	
+			if (subResourcesOfResource[idx].isEmpty() == false)
+				return subResourcesOfResource[idx];
+			}
+		}
 		String rowJson = bean.getRowJSon().toString();
 		if (bean.getRowJSon().get("tableName") != null)
 			{
 			if (bean.getRowJSon().get("tableName").asText().equals("CR-FormTemplate.List-FieldTemplate")) // // the resource is the formTemplate or FieldTemplate, to configure themselves, then there is a conflict with the names 
 				return bean.getRowJSon().get("tableName").asText();
 			}
-		int idxResourceSubResource = rowJson.indexOf(bean.getResourceName() +".");
-		if (rowJson.substring(idxResourceSubResource + bean.getResourceName().length()).startsWith(".FK") )
-			idxResourceSubResource = -1;    //   to avoid the use as subresources the FK, not combined	
-		if (idxResourceSubResource > -1 && rowJson.substring(idxResourceSubResource -12 ).startsWith("\"resource\"") == false) // when beside to "Resource"  is ExtForm
+
+		Enumeration<String> keysHt = JSonClient.getHt().keys();
+		String parentResourceName = bean.getResourceName();
+		Hashtable<String, String> htChildren = new Hashtable<String, String>();
+
+		while (keysHt.hasMoreElements())
 		{
-			int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("/")+idxResourceSubResource;
-			String pathSubreourceName = null;
-			if (idxResourceSubResource > -1 && idxEndSubreourceName >-1)
-				pathSubreourceName = rowJson.substring(idxResourceSubResource, idxEndSubreourceName);
-			keepSubResourcesNames(bean.getResourceName()+idx,pathSubreourceName);	
-			return pathSubreourceName;
-		}
-		else
-		{
-			idxResourceSubResource = rowJson.indexOf("List-");
-		//	idxResourceSubResource = addBackwardsChars(idxResourceSubResource, rowJson);
-			if (idx > 0)
+			String keyHt = keysHt.nextElement();
+			if (keyHt.startsWith(parentResourceName+"."))
 			{
-				int i=0;//idx-1;
-				int keepIdx = 0;
-				while (i < idx)
-				{
-					
-					idxResourceSubResource = rowJson.substring(idxResourceSubResource+idx).indexOf("List-")+idxResourceSubResource+1;	
-					keepIdx = idxResourceSubResource;
-					i++;
-				}
+				String child = keyHt.substring(keyHt.lastIndexOf(".")+1);
+				if (child.indexOf("List-") > -1) // to process only subresources List , not FK 
+					htChildren.put(keyHt, child);
+			}	
+			
+		}
+		String pathSubreourceName = getSubResourcePathByOrderPosition(htChildren, idx); // sorts the HT and gets the value by idx position
+		keepSubResourcesNames(bean.getResourceName()+idx,pathSubreourceName);
+		return pathSubreourceName;
+		
+
+//		int idxResourceSubResource = rowJson.indexOf(bean.getResourceName() +".");
+//		if (rowJson.substring(idxResourceSubResource + bean.getResourceName().length()).startsWith(".FK") )
+//			idxResourceSubResource = -1;    //   to avoid the use as subresources the FK, not combined	
+//		if (idxResourceSubResource > -1 && rowJson.substring(idxResourceSubResource -12 ).startsWith("\"resource\"") == false) // when beside to "Resource"  is ExtForm
+//		{
+//			int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("/")+idxResourceSubResource;
+//			String pathSubreourceName = null;
+//			if (idxResourceSubResource > -1 && idxEndSubreourceName >-1)
+//				pathSubreourceName = rowJson.substring(idxResourceSubResource, idxEndSubreourceName);
+//			keepSubResourcesNames(bean.getResourceName()+idx,pathSubreourceName);	
+//			return pathSubreourceName;
+//		}
+//		else
+//		{
+//			idxResourceSubResource = rowJson.indexOf("List-");
+//		//	idxResourceSubResource = addBackwardsChars(idxResourceSubResource, rowJson);
+//			if (idx > 0)
+//			{
+//				int i=0;//idx-1;
+//				int keepIdx = 0;
+//				while (i < idx)
+//				{
+//					
+//					idxResourceSubResource = rowJson.substring(idxResourceSubResource+idx).indexOf("List-")+idxResourceSubResource+1;	
+//					keepIdx = idxResourceSubResource;
+//					i++;
+//				}
+////				idxResourceSubResource =addBackwardsChars(idxResourceSubResource, rowJson);
+//				idxResourceSubResource = idxResourceSubResource+idx-1;
+//			}
+//			if (idxResourceSubResource > -1)
+//			{
 //				idxResourceSubResource =addBackwardsChars(idxResourceSubResource, rowJson);
-				idxResourceSubResource = idxResourceSubResource+idx-1;
-			}
-			if (idxResourceSubResource > -1)
-			{
-				idxResourceSubResource =addBackwardsChars(idxResourceSubResource, rowJson);
-				int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("\":")+idxResourceSubResource;//indexOf("\":[")+idxResourceSubResource;
-				String pathSubreourceName = rowJson.substring(idxResourceSubResource, idxEndSubreourceName);		
-				pathSubreourceName = bean.getResourceName()+"."+pathSubreourceName;
-				keepSubResourcesNames(bean.getResourceName()+idx,pathSubreourceName);	
-				return pathSubreourceName;
-			}
-			else
-				return null;
-		}
+//				int idxEndSubreourceName = rowJson.substring(idxResourceSubResource).indexOf("\":")+idxResourceSubResource;//indexOf("\":[")+idxResourceSubResource;
+//				String pathSubreourceName = rowJson.substring(idxResourceSubResource, idxEndSubreourceName);		
+//				pathSubreourceName = bean.getResourceName()+"."+pathSubreourceName;
+//				keepSubResourcesNames(bean.getResourceName()+idx,pathSubreourceName);	
+//				return pathSubreourceName;
+//			}
+//			else
+//				return null;
+//		}
 	}
+
+	private String getSubResourcePathByOrderPosition(Hashtable<String, String> htChildren, int idx) {
+		List<String> tmp = Collections.list(htChildren.keys());
+		Collections.sort(tmp);
+		Iterator<String> it = tmp.iterator();
+		int i = 0;
+		while(it.hasNext()){
+		    String element =it.next();
+		    if (i==idx)
+		    	return element;
+		    i++;
+		}
+		return null;
+}
 
 	private int addBackwardsChars(int idxResourceSubResource, String rowJson) {
 		while (true) // search backwards to add extra numbers in List
@@ -2377,7 +2486,7 @@ private boolean isBoolean(String header, String colType) {
 		else
 			{
 			System.err.println("ERROR FK NO CARGADA -------"+ resourceSubGrid );
-			JSonClient.keepFKinHT(resourceSubGrid, null, cache, AppConst.PRE_CONF_PARAM);
+			JSonClient.keepFKinHT(resourceSubGrid, null, cache, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 			fKfilter = JSonClient.getHt().get(resourceSubGrid);
 			}
 //		int leftLength = lengthFKfilter;

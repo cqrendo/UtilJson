@@ -29,6 +29,9 @@ public class DynamicDBean {// implements Serializable {
 	private String filter; 
 	private JsonNode rowJSon;
 	private boolean isReadOnly ;
+	private boolean insertNotAllow ;
+	private boolean deleteNotAllow ;
+	private boolean updateNotAllow ;
 	private String params ;
 //	private StreamResource streamResource;
 	private InputStream inputStream; // is use to keep the blob data read from LAC
@@ -2091,6 +2094,30 @@ public class DynamicDBean {// implements Serializable {
 		}
 
 		return null;//col3Date;
+	}
+
+	public boolean isInsertNotAllow() {
+		return insertNotAllow;
+	}
+
+	public void setInsertNotAllow(boolean insertNotAllow) {
+		this.insertNotAllow = insertNotAllow;
+	}
+
+	public boolean isDeleteNotAllow() {
+		return deleteNotAllow;
+	}
+
+	public void setDeleteNotAllow(boolean deleteNotAllow) {
+		this.deleteNotAllow = deleteNotAllow;
+	}
+
+	public boolean isUpdateNotAllow() {
+		return updateNotAllow;
+	}
+
+	public void setUpdateNotAllow(boolean updateNotAllow) {
+		this.updateNotAllow = updateNotAllow;
 	}
 
 

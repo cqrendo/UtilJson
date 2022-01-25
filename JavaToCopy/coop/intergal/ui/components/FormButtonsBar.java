@@ -51,6 +51,25 @@ public class FormButtonsBar extends PolymerTemplate<TemplateModel> {
 	public void setDeleteText(String deleteText) {
 		delete.setText(deleteText == null ? "" : deleteText);
 	}
+	public void setAddVisible(boolean visible) {
+		add.setVisible(visible);
+	}
+
+	public void setSaveVisible(boolean visible) {
+		save.setVisible(visible);
+	}
+
+	public void setCancelVisible(boolean visible) {
+		cancel.setVisible(visible);
+	}
+
+	public void setDeleteVisible(boolean visible) {
+		delete.setVisible(visible);
+	}
+	
+	public void setAddDisabled(boolean addDisabled) {
+		add.setEnabled(!addDisabled);
+	}
 
 	public void setSaveDisabled(boolean saveDisabled) {
 		save.setEnabled(!saveDisabled);
@@ -63,6 +82,7 @@ public class FormButtonsBar extends PolymerTemplate<TemplateModel> {
 	public void setDeleteDisabled(boolean deleteDisabled) {
 		delete.setEnabled(!deleteDisabled);
 	}
+
 
 	public static class SaveEvent extends ComponentEvent<FormButtonsBar> {
 		public SaveEvent(FormButtonsBar source, boolean fromClient) {
