@@ -289,7 +289,8 @@ private String pickMapFields;
 							Button bCustom =coop.intergal.ui.util.UIUtils.createPrimaryButton(label);							
 							bCustom.setId(label);
 							bCustom.addClickListener(e-> proccesButton(bCustom));
-							buttonsForm.getCustomButtons().add(bCustom);
+							if (buttonsForm != null)
+								buttonsForm.getCustomButtons().add(bCustom);
 						}
 						else if (idButtonBarForButtons.equals("3")) // Formulario
 						{

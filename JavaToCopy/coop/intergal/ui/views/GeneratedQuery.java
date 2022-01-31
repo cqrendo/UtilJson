@@ -1,8 +1,11 @@
 package coop.intergal.ui.views;
 
+import static coop.intergal.AppConst.PACKAGE_VIEWS;
 import static coop.intergal.AppConst.STYLES_CSS;
 import static coop.intergal.AppConst.STYLES_FORM_ITEM_CSS;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +19,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -36,7 +40,7 @@ import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 @JsModule("./src/views/generic/forms/generated-query.js")
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-//@Route(value = "queryGenerated")
+@Route(value = "qG")
 
 @CssImport(value = STYLES_CSS, themeFor="generated-query")
 @CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
@@ -78,7 +82,16 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 	private FormLayout form;
 	@Id("queryButtonsBar")
 	private QueryButtonsBar queryButtonsBar;
+	private String filter = null; 
 
+	public String getFilter() {
+		return filter;
+	}
+	@Override
+	public void setFilter(String filter) {
+		this.filter = filter;
+//		super.setFilter(filter);
+	}
 	public GeneratedQuery() {
 		super();
 		super.preConfParam = UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM;
@@ -178,8 +191,10 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
  			Component generatedForm = generatedUtil.createDetails(dataProvider.getResourceName(), rowsQueryFieldList, true, cache,"noTAB");
  			Div content = new Div(generatedForm);
  			form.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
+ 			form.getElement().getStyle().set("overflow","hidden"); // to take off bar 
  			content.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
- 			content.setHeight("100%");
+ 			content.setHeight("98%");
+ //			content.getElement().getStyle().set("overflow","hidden");
  			form.add(content);
  			if (generatedForm.getId().isPresent())
  				setId(generatedForm.getId().get());
@@ -251,6 +266,85 @@ public class GeneratedQuery extends GenericDynamicQuery implements HasDynamicTit
 //	       showDetails(dynamicDBean);
 //	       setViewContent(createContent(resource));
 //	        setViewDetails(createDetailsDrawer());
+			String queryFormClassName = queryParameters.getParameters().get("queryFormClassName").get(0);
+			String displayFormClassName = queryParameters.getParameters().get("displayFormClassName").get(0);
+			String resourceName = queryParameters.getParameters().get("resourceName").get(0);
+			if (queryParameters.getParameters().get("addFormClassName") != null)
+				{
+				String addFormClassName = queryParameters.getParameters().get("addFormClassName").get(0);
+				if (addFormClassName.startsWith("coop.intergal") == false)
+					addFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("addFormClassName").get(0);
+				}
+			if (displayFormClassName.startsWith("coop.intergal") == false)
+				displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
+			if (queryFormClassName.startsWith("coop.intergal") == false)
+				queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
+
+
+		
+		prepareLayout(queryFormClassName,resourceName);
+	}
+		public void prepareLayout(String queryFormClassName, String resourceName)
+		{
+
+
+		try {
+			Class<?> dynamicQuery = Class.forName(queryFormClassName);
+			Object queryForm = dynamicQuery.newInstance();
+			Method setGrid = dynamicQuery.getMethod("setGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class} );
+			setGrid.invoke(queryForm,grid);
+//			String[] rowCol = rowsColList.iterator().next();
+//			divQuery.add(new H2("TITULO"));
+//			divQuery.removeAll();
+//			String[] rowCol = rowsColList.iterator().next();
+//			divQuery.add(new H2("TITULO"));
+			if (queryFormClassName.indexOf("Generated") > -1)
+			{
+				
+				DdbDataBackEndProvider dataProvider = new DdbDataBackEndProvider();
+				dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+				dataProvider.setResourceName(resourceName);
+				Method setDataProvider= dynamicQuery.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+				Method createDetails= dynamicQuery.getMethod("createDetails");
+				Method setRowsColList = dynamicQuery.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+				setDataProvider.invoke(queryForm,dataProvider );
+				Object rowsColList = null;
+				setRowsColList.invoke(queryForm,rowsColList);
+				Object divInDisplay = createDetails.invoke(queryForm);
+				if (((GeneratedQuery) divInDisplay).getId().isPresent())
+					{
+					String titleByID = ((GeneratedQuery) divInDisplay).getId().get();
+					if (titleByID != null && titleByID.length() > 2)
+						form.add(new H3(titleByID));
+					}
+				form.add((Component)divInDisplay);
+			}
+			else 
+			{				
+				form.add((Component)queryForm);
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		
 	}

@@ -518,12 +518,12 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
         );
 
         // Polling only needed for the demo
-        ui.setPollInterval(1000);
-        Registration pollRegistration = ui.addPollListener(
-            pollEvent -> {
-                refreshLog();
-            }
-        );
+//        ui.setPollInterval(1000);
+//        Registration pollRegistration = ui.addPollListener(
+//            pollEvent -> {
+//                refreshLog();
+//            }
+//        );
 
         addDetachListener(
             detachEvent -> {
@@ -531,8 +531,8 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
                 beaconRegistration.remove();
 
                 // Polling only needed for the demo
-                ui.setPollInterval(-1);
-                pollRegistration.remove();
+//                ui.setPollInterval(-1);
+//                pollRegistration.remove();
             }
         );
     }

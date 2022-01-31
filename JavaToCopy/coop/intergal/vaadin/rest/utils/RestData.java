@@ -573,7 +573,7 @@ public class RestData {
 			int idx__ = countName.indexOf("__");
 			if ( idx__ >-1)
 			{
-			countName.substring(0,idx__);
+				countName = countName.substring(0,idx__);
 			}
 		}
 		return countName;

@@ -119,7 +119,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 	private boolean cache = true;
 //	private Object divInDisplay;
 	private String queryFormClassName;
-public String getQueryFormClassName() {
+	public String getQueryFormClassName() {
 		return queryFormClassName;
 	}
 

@@ -87,6 +87,7 @@ public class GenericClassForMethods {
 			String displayFormClassName = rowSubMenu.get("displayFormClassName").asText();
 			String layoutClassName = rowSubMenu.get("layout").asText();
 			String filterForPopup = rowSubMenu.get("filterForPopup").asText();
+//			String idMenu = rowSubMenu.get("idMenu").asText();
 			if (queryFormClassName.startsWith("coop.intergal.ui.views") == false)
 				queryFormClassName = PACKAGE_VIEWS+queryFormClassName;
 			if (displayFormClassName.startsWith("coop.intergal.ui.views") == false)
@@ -146,11 +147,11 @@ public class GenericClassForMethods {
 				}
 				if (filter2 != null)
 				{
-					String url = urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"&filter="+filter2;
+					String url = urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"&idMenu="+idMenu+"&filter="+filter2;
 					UI.getCurrent().getPage().executeJs("window.open(\""+url+"\", \"_blank\");");
 				}
 				else
-					UI.getCurrent().getPage().executeJs("window.open(\""+urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"\", \"_blank\");");
+					UI.getCurrent().getPage().executeJs("window.open(\""+urlBase+"?resourceName="+resource+"&queryFormClassName="+queryFormClassName+"&displayFormClassName="+displayFormClassName+"&title="+optionName+"&idMenu="+idMenu+"\", \"_blank\");");
 				}
 			}
 		} catch (UnknownHostException e) {
@@ -378,6 +379,8 @@ public class GenericClassForMethods {
 				{
 					firstRowInput = beansFromGrid.get(0);
 					lastParent = insertOrUpdateOutput(firstRowInput, rowStep, true, lastParent);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
+					if ((lastParent == null && dQGD == null) || (lastParent != null && lastParent.getParams() != null && lastParent.getParams().startsWith("ERROR WITH INSERT")))	 // it means a error , not more rows are proccesed 	 // when is the type dQGD it means that there is a form to add items, then not parent 
+						i=999999;
 					keepFirstParent = lastParent;
 					if (groupBy.equals("null") == false && groupBy.equals("row") == false)
 						if (firstRowInput.getRowJSon() != null && firstRowInput.getRowJSon().get(groupBy) != null )
@@ -392,11 +395,16 @@ public class GenericClassForMethods {
 					if (keepGroup != null && row.getRowJSon().get(groupBy).asText().equals(keepGroup) == false) // Group change
 						{
 						lastParent = insertOrUpdateOutput(row, rowStep, true, lastParent);
+						if (lastParent == null || (lastParent.getParams() != null && lastParent.getParams().startsWith("ERROR WITH INSERT")))	 // it means a error , not more rows are proccesed 	 // it means a error , not more rows are processed 
+							i=999999;
+
 						keepGroup = row.getRowJSon().get(groupBy).asText();
 						}
 					else
 						{
-						insertOrUpdateOutput(row, rowStep, false, lastParent);//(row, rowStep, false, lastParent, rowOfInputData);
+						DynamicDBean newRow = insertOrUpdateOutput(row, rowStep, false, lastParent);
+						if (newRow == null || newRow.getCol0().equals("ERROR WITH INSERT"))	 // it) //(row, rowStep, false, lastParent, rowOfInputData);
+							i=999999;
 						}
 					}
 				}	
@@ -408,7 +416,6 @@ public class GenericClassForMethods {
 		{
 			DynamicDBean RowInput = beansFromGrid.get(0);
 			lastParent = insertOrUpdateOutput(RowInput, rowStep, true, lastParent);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
-	
 		}
 //		JsonNode rowsStepOuput = rowStep.get("List-ProcessStepOutput");
 //		processInputOuput(grid, inputResourceForReadData, rowOfInputData, rowsStepOuput);
@@ -467,7 +474,13 @@ public class GenericClassForMethods {
 			else // is a ChildRow
 			{
 	//			insertAnOuputRow(rowStepOuput, lastParent, rowPreviousStep);
-				insertAnOuputRow(rowStepOuput, lastParent, rowInputData);//(rowStepOuput, lastParent, rowInputData, rowPreviousStep);
+				DynamicDBean newChild = insertAnOuputRow(rowStepOuput, lastParent, rowInputData);//(rowStepOuput, lastParent, rowInputData, rowPreviousStep);
+				if (newChild.getCol0().equals("ERROR WITH INSERT"))			
+					{
+					lastParent.setParams("ERROR WITH INSERT##"+lastParent.getParams());
+					return lastParent;
+					}
+						
 			}
 				
 //			System.out.println("GenericClassForMethods.processButtonForProcess() STEP OUTPUT "+ rowStepOuput.get("resource").asText());
@@ -506,8 +519,12 @@ public class GenericClassForMethods {
 
 		}
 
-		dataProviderOuput.save(newBean.getResourceName(), beansToSaveAndRefresh);	
-
+		if (dataProviderOuput.save(newBean.getResourceName(), beansToSaveAndRefresh)==true)	
+		{
+			DynamicDBean beanWithError = new DynamicDBean();
+			beanWithError.setCol0("ERROR WITH INSERT");
+			return beanWithError;
+		}
 		return newBean;
 
 		

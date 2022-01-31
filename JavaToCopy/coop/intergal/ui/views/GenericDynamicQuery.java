@@ -60,6 +60,14 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 	private String childFkField = "";
 	protected String preConfParam;
 	private ArrayList<String[]> rowsQueryFieldList;
+	private String filter;
+	public String getFilter() {
+		return filter;
+	}
+
+	public void setFilter(String filter) {
+		this.filter = filter;
+	}
 
 //	public interface CrudForm<E> {
 //		FormButtonsBar getButtons();
@@ -426,9 +434,19 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 			filter = filter + "%20AND%20" + parentKeys;
 		else if (parentKeys.length() > 1)
 			filter = parentKeys;
+		String externalFilter = this.getFilter();
+		if (externalFilter != null)
+		{
+			if (filter != null && filter.length() >0)
+				filter = "("+externalFilter+")%20AND%20("+filter+")";
+			else
+				filter = externalFilter;
+		}
 		System.err.println("filter------" + filter);
 		return filter;
 	}
+
+
 
 	private String componeNumberFilter(String value) {
 		if (value.indexOf(":")> 0)  // is a range
