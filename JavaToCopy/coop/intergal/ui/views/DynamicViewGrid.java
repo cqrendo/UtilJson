@@ -69,7 +69,6 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.metadata.ui.views.dev.lac.FieldTemplateComboRelatedForPick;
-import coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.GenericClassForMethods;
 import coop.intergal.ui.util.UtilSessionData;
