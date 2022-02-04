@@ -495,7 +495,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 				}
 				else if(colNameInUI != null && colNameInTable !=null && colNameInTable.startsWith("FK-") == false && colNameInUI.startsWith("col") == true && isAlreadyFill == false)  // FILL NULLS
 				{
-					if((value == null || value.toString().equals("") ==  true) && colNameInUI.equals("null") == false && colNameInUI.startsWith("FK-") == false)// && isCheckBox(o) == false)// to process when you empty the field
+					if((value == null || value.toString().equals("") ==  true || value.toString().equals("null") ==  true) && colNameInUI.equals("null") == false && colNameInUI.startsWith("FK-") == false)// && isCheckBox(o) == false)// to process when you empty the field
 					{
 						if (value == null || colType == 3 || colType == 5 || colType == 4 || colType > 100) // 3 currency, 5 number , 4 = boolean > 100 decimal
 							newEntityinfo.put(colNameInTable, NullNode.getInstance()); 
@@ -642,8 +642,11 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 						colName = colNameAndType[1];
 						}
 	//				String colName = getColName(rowsColList,i);
-					if (eachRow.get(colName) != null && eachRow.get(colName).asText().equals("null") == false)
-						field.set(dB, eachRow.get(colName).asText());
+					if (eachRow.get(colName) != null)
+						if (eachRow.get(colName).asText().equals("null") == false)
+							field.set(dB, eachRow.get(colName).asText());
+						else // is "null"
+							field.set(dB, "");
 					i++;
 					}
 			} catch (IllegalArgumentException | IllegalAccessException e) {

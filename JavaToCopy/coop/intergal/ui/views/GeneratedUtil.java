@@ -1507,6 +1507,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		String tagsForVisibility = colData[21].toString();
 		String tagsForEdition = colData[22].toString();
 		String idButtonBarForButtons = colData[25].toString();
+		
  		boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 		boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
 		if (visibleByTag == false)
@@ -1536,6 +1537,24 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		if (colData[1].indexOf("#SIG#")>-1) { // #SIG# = Show In Grid
 //			String header = TranslateResource.getFieldLocale(colData[0], preConfParam);
 			String header = colHeader;
+			// @@1
+//			if (colData[1].indexOf("#SIG#")>-1)
+//			{
+////				col = grid.addEditColumn(d -> d.getCol0()).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue));	
+//				col = grid.addEditColumn(d -> d.getCol0()).text((item, newValue) -> colChanged(item,colName,newValue));	
+//
+////				col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header).setResizable(true);	
+////				col = grid.addEditColumn(d -> d.getCol0()).text((d, newValue) -> d.setCol0(newValue)).setHeader(header).setResizable(true);	
+//
+////				col=   grid.addEditColumn(DynamicDBean::getCol0)
+////	                .text(DynamicDBean::setCol0)
+////	                .setHeader("First name");
+//
+//				col.setKey(colName);
+//				return col;			
+//			}
+			// @@1
+
 			if (isDate(header, idFieldType)) { /// ********** DATE **************
 				if (header.indexOf("#")>0)
 					header = header.substring(2); // to avoid date typ indicator "D#"
@@ -1573,12 +1592,12 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 				if (isCOlEditable  && isGridEditable) 
 					if (isNotAParentField)
 					{
-						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
+						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header+" (Editable)")
 						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
 					}
 					else
 					{
-						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
+						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header+" (Editable)")
 						.setTextAlign(ColumnTextAlign.END).setResizable(true);
 					}
 				else
@@ -1601,12 +1620,12 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 				if (isCOlEditable  && isGridEditable) 
 					if (isNotAParentField)
 					{
-						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
+						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header+" (Editable)")
 						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
 					}
 					else
 					{
-						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
+						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header+" (Editable)")
 						.setTextAlign(ColumnTextAlign.END).setResizable(true);
 					}
 				else
@@ -1669,10 +1688,13 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 				}
 				else
 					if ((isCOlEditable && isGridEditable))
+					{
 						if (isNotAParentField)						
 							col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header).setResizable(true).setSortProperty(colData[0]);
 						else
 							col = grid.addEditColumn(d -> d.getCol(colName)).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header).setResizable(true);				
+						col.setClassNameGenerator(e->{return"editable";});
+					}
 					else if (isGridEditable && isCOlEditable == false ) 
 					{
 //						if (isNotAParentField || isPick == false)
@@ -1726,6 +1748,17 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 	}
 	  
 
+
+//	private Object colChanged(DynamicDBean item, String colName, String newValue) {
+//		// @@1
+//		
+//		if (newValue.equals("11"))
+//			item.setCol0(newValue); //<- It works fine 
+//		else
+//			item.setCol("col0", newValue); //<- It fails
+//		// @@1
+//		return newValue;	
+//		}
 
 	private static boolean isDate(String header, int idFieldType) {
     	if (header.startsWith("D#")) // when there is nmot the type defined in FiledTemplate it can be defined in the name with the prefix "d#"
