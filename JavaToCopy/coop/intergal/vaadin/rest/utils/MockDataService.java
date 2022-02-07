@@ -115,7 +115,7 @@ public class MockDataService extends DataService {
 			//	Item fieldBeforeCommit = fieldGroup.getItemDataSource();
 			//	fieldGroup.commit();
 			//				insertRow();
-			//				fireEvent(new EditorSavedEvent(this, comentarioItem)); 
+///xxx			//				fireEvent(new EditorSavedEvent(this, comentarioItem)); 
 			final JsonNodeFactory nodeFactory = JsonNodeFactory.instance;
 			JsonNode rowJson = dB.getRowJSon();
 			String resourceName = dB.getResourceName();
@@ -330,6 +330,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 
 	//	@SuppressWarnings("unchecked")
 	private ObjectNode putValuesOnObject(boolean isInsert, JsonNodeFactory nodeFactory, DynamicDBean dB, String resourceName) {
+//xxx
 		ObjectNode newEntityinfo = new ObjectNode(nodeFactory);
 		JsonNode rowJSon = dB.getRowJSon();
 		String tableName = resourceName;
@@ -421,7 +422,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 				String[] colNameAndType = new String[2];
 				
 				boolean isAlreadyFill = false;
-				if (colNameInUI.startsWith("col") == true)
+				if (colNameInUI.startsWith("col") == true && colNameInUI.length() > 3)
 					{
 					int iFromColname = new Integer (colNameInUI.substring(3));
 					colNameAndType = getColNameAndType(rowsColList,iFromColname);

@@ -1755,7 +1755,8 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 //		if (newValue.equals("11"))
 //			item.setCol0(newValue); //<- It works fine 
 //		else
-//			item.setCol("col0", newValue); //<- It fails
+//		//	item.setCol(newValue);
+//			item.setCol(newValue, "col0"); //<- It fails
 //		// @@1
 //		return newValue;	
 //		}

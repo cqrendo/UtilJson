@@ -428,7 +428,7 @@ private Object showHideQuery() {
 	}
 
 private void methodForRowSelected(DynamicDBean selectedRow2) {
-		
+//xxx		
 		String method = selectedRow2.getMethodForRowSelected();
 		if (method != null)
 		{
@@ -1069,139 +1069,9 @@ private boolean isBoolean(String header, String colType) {
 		return null;
 	}
 
-	public void showBeaninPopup	(DynamicDBean bean, String resourcePopup,String layoutClassName, String displayFormClassNamePopup, Dialog dialogForShow2, String filterForPopup , DynamicDisplayForAskData dynamicDisplayForAskData) {
-		Binder<DynamicDBean> binderForDialog = new Binder<>(DynamicDBean.class);
-		try {
-//			if (dialogForShow2 != null)
-//				dialogForShow = dialogForShow2;
-
-			DdbDataBackEndProvider dataProviderPopup = new DdbDataBackEndProvider();
-			dataProviderPopup.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
-			dataProviderPopup.setResourceName(resourcePopup);
-			
-			Class<?> dynamicLayout = Class.forName(layoutClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
-			Object layoutPopup = dynamicLayout.newInstance();
-			if ( dynamicDisplayForAskData != null)
-				layoutPopup = dynamicDisplayForAskData;
-			if (layoutClassName.indexOf("DynamicViewGrid") > -1) // is a Layout that shows a Grid
-			{
-				Method setResourceName = dynamicLayout.getMethod("setResourceName",new Class[] {String.class} );
-				Method setFilter = dynamicLayout.getMethod("setFilter",new Class[] {String.class} );
-				Method setupGrid = dynamicLayout.getMethod("setupGrid",new Class[] {Boolean.class, Boolean.class} );
-//				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class, Boolean.class} );
-				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class} );
-
-				setResourceName.invoke(layoutPopup, resourcePopup);
-				String filter = ProcessParams.componFilterFromParams(filterForPopup, bean);
-				setFilter.invoke(layoutPopup, filter);
-				setupGrid.invoke(layoutPopup, true, true);
-				if (bean != null && (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName()))) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
-					{
-					setButtonsRowVisible.invoke("layoutPopup", "true");
-					}
-
-			}
-			else if (layoutClassName.indexOf("DynamicQryGridDisplay") > -1) // is a Layout that shows a QRY with Grid
-			{
-				Method setResourceName = dynamicLayout.getMethod("setResourceName",new Class[] {String.class} );
-				Method setFilter = dynamicLayout.getMethod("setFilter",new Class[] {String.class} );
-				Method prepareLayout = dynamicLayout.getMethod("prepareLayout",new Class[] {String.class, String.class} );
-//@@?				Method setupGrid = dynamicLayout.getMethod("setupGrid",new Class[] {Boolean.class, Boolean.class} );
-//				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class, Boolean.class} );
-//				Method setButtonsRowVisible = dynamicLayout.getMethod("setButtonsRowVisible",new Class[] {Boolean.class} );
-
-				setResourceName.invoke(layoutPopup, resourcePopup);
-				String filter = ProcessParams.componFilterFromParams(filterForPopup, bean);
-				setFilter.invoke(layoutPopup, filter);
-				String classForQuery = "coop.intergal.ui.views.GeneratedQuery"; // @@ TODO for now is using automatic query form, inthe future use a parameter 
-				prepareLayout.invoke(layoutPopup,classForQuery, displayFormClassNamePopup);
-//@@?				setupGrid.invoke(layoutPopup, true, true);
-//				if (bean != null && (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName()))) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
-//					{
-//					setButtonsRowVisible.invoke(layoutPopup, true);
-//					}
-
-			}
-			else if (displayFormClassNamePopup != null && displayFormClassNamePopup.isEmpty() == false) // is a layout that shows one row + children if exist
-				{
-				Div divSubGridPopup = null;
-				Method getDivDisplay = dynamicLayout.getMethod("getDivDisplay");
-				Method getButtons = dynamicLayout.getMethod("getButtons");
-				FormButtonsBar formButtonsBar = (FormButtonsBar)getButtons.invoke(layoutPopup);
-				if (formButtonsBar != null &&(bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName()))) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
-					formButtonsBar.setVisible(false);
-				Div divDisplayPopup = (Div) getDivDisplay.invoke(layoutPopup);
-				if (layoutClassName.indexOf("DynamicDisplayForAskData") == -1) // is a form thta ask data for a process
-					{
-					Method getDivSubGrid = dynamicLayout.getMethod("getDivSubGrid");
-					divSubGridPopup = (Div) getDivSubGrid.invoke(layoutPopup);
-					}
-					
-				
-			
-//			DynamicDisplaySubgrid dynamicDisplaySubgrid = new DynamicDisplaySubgrid();
-//			Div divDisplayPopup = dynamicDisplaySubgrid.getDivDisplay();
-//			Div divSubGridPopup =  dynamicDisplaySubgrid.getDivSubGrid();//new Div();
-				Object divInDisplayPopup = new Div();
-				setVisibleRowData(true);
-//				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
-//					buttonsForm.setVisible(false);
-				selectedRow = bean;
-				keepRowBeforChanges = new DynamicDBean(); 
-				keepRowBeforChanges = RestData.copyDatabean(bean);
-//			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
-				Class<?> dynamicForm = Class.forName(displayFormClassNamePopup);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
-				Object displayPopup = dynamicForm.newInstance();
-				Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
-				Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
-				Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
-			
-				setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
-				ArrayList<String[]> rowsColListGridPopup = dataProviderPopup.getRowsColList();
-				setRowsColList.invoke(displayPopup,rowsColListGridPopup);
-				setBean.invoke(displayPopup,bean);
-				setBinder.invoke(displayPopup,binderForDialog);
-				setDataProvider.invoke(displayPopup, dataProviderPopup);
-//				setBean.invoke(displayPopup,bean);
-				resourcePopup = bean.getResourceName(); // when is a display the bean is the on e to show and has the resourcename
- 
-				divDisplayPopup.removeAll();
-				if (displayFormClassNamePopup.indexOf("Generated") > -1)
-				{
-			//	setDataProvider.invoke(display, dataProvider);
-					Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class, GenericClassForMethods.class});
-//					Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
-//					setdVGrid.invoke(display, this); // to use methods in this class
-					divInDisplayPopup = createContent.invoke(displayPopup, buttonsForm, dynamicDisplayForAskData.getGenericClassForMethods() );
-					divDisplayPopup.add((Component)divInDisplayPopup);
-				}
-				else
-				{
-					divDisplayPopup.add((Component)displayPopup);
-				}
-			
-			
-	//		divDisplay.remove((Component) display);
-				if (layoutClassName.indexOf("DynamicDisplayForAskData") == -1 && (layoutClassName.indexOf("DynamicDisplayOnly") == -1)) // this layout for now doesn't have subgrid
-					{
-					String resourceSubGrid = extractResourceSubGrid(bean,0);
-					divSubGridPopup.removeAll();
-					String tabsList = rowsColListGrid.get(0)[12];
-					if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
-						{
-			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
-						Div content0=new Div(); 
-						divSubGridPopup.add(fillContent(content0, 0 , bean));	
-	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
-					}
-					else if (resourceSubGrid != null)
-					{
-						divSubGridPopup.removeAll();
-						divSubGridPopup.add(createSubTabs(bean, tabsList));
-					}
-				}
-			}
-			String idForDialog = resourcePopup+"@DFC@"+displayFormClassNamePopup+"@F@"+filterForPopup+"@L@"+layoutClassName;
+	public void showBeaninPopup	(DynamicDBean subBean, String subFormResource,String subLayoutClassName, String subFormClassName, Dialog dialogForShow2, String subFormFilter , DynamicDisplayForAskData dynamicDisplayForAskData) {
+			Component layoutPopup = componExternalForm(subBean, subLayoutClassName, subFormResource, subFormFilter, subFormClassName, null, dynamicDisplayForAskData);
+			String idForDialog = subFormResource+"@DFC@"+subFormClassName+"@F@"+subFormFilter+"@L@"+subLayoutClassName;
 //			if (dialogForShow != null && dialogForShow.getId().isPresent() )
 //			{ 
 			final Dialog dialogForShow;// = new Dialog();
@@ -1241,29 +1111,8 @@ private boolean isBoolean(String header, String colType) {
 //			dialogForShow.setId(idForDialog);
 //			if (dialogForShow.isOpened() == false)
 //				dialogForShow.open();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
+		        
 
 
 //		display.beforeEnter(null);
@@ -2068,7 +1917,7 @@ private boolean isBoolean(String header, String colType) {
 			else if (subLayoutClassName.indexOf("DynamicDisplayOnly") > -1)
 			{
 				DynamicDBean subBean = RestData.getOneRow(subFormResource, subFormFilter, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
-				return componDynamicDisplayOnly(subBean, subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true, null ); // for now not DynamicDisplayForAskData form is create here, then is null
+				return componExternalForm(subBean, subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, null ); // for now not DynamicDisplayForAskData form is create here, then is null
 //			return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
 			}
 
@@ -2086,8 +1935,8 @@ private boolean isBoolean(String header, String colType) {
 		}
 		return new Label ("Sin datos error en la carga de Propiedades extendidas");
 	}
-	private Component componDynamicDisplayOnly(DynamicDBean subBean, String subLayoutClassName, String subFormResource, String subFormFilter,
-			String subFormClassName, Div divSubForm, boolean b, DynamicDisplayForAskData dynamicDisplayForAskData) {
+	private Component componExternalForm(DynamicDBean subBean, String subLayoutClassName, String subFormResource, String subFormFilter,
+			String subFormClassName, Div divSubForm, DynamicDisplayForAskData dynamicDisplayForAskData) {
 		Binder<DynamicDBean> binderForDialog = new Binder<>(DynamicDBean.class);
 		try {
 //			if (dialogForShow2 != null)
@@ -3036,6 +2885,7 @@ private boolean isBoolean(String header, String colType) {
 	}
 	public Object colChanged(DynamicDBean item, String colName, String newValue) {
 		System.out.println("DynamicViewGrid.colChanged()..."+  "...colName "+ colName +"...newValue "+ newValue+"...item " + item.getRowJSon() + "...newValue "+ newValue);
+//	@@1	
 		if (colName != null) // is call by the acceptPick
 			item.setCol(newValue, colName );
 		beansToSaveAndRefresh.clear();	
@@ -3047,7 +2897,7 @@ private boolean isBoolean(String header, String colType) {
 			isInsertingALine = false;
 			saveRowGridIfNotInserting(beansToSaveAndRefresh,item.getResourceName() );
 		}
-		rowIsInserted = item;
+//	@@1	rowIsInserted = item;
 //		// @@1
 //		item.setCol1(newValue);
 //		// @@1

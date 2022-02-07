@@ -40,6 +40,16 @@ public class DynamicDBean {// implements Serializable {
 	private ArrayList<String[]> rowsColList = new ArrayList<String[]>();
 	private int maxColNumber ;
 	private String methodForRowSelected ;
+	private String col;
+	public String getCol() {
+		return col;
+	}
+
+	public void setCol(String col) {
+		this.col = col;
+		col0= col;
+	}
+
 	private String col0;
 	private String col1;
 	private String col2;
