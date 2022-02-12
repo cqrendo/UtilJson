@@ -39,6 +39,7 @@ import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
+import coop.intergal.ui.utils.converters.DecimalFormatter;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 import coop.intergal.vaadin.rest.utils.RestData;
@@ -54,6 +55,8 @@ protected Binder<DynamicDBean> binder;
 private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
 private Dialog dialogForPick;
 private String pickMapFields; 
+private static DecimalFormatter decimalFormatter = new DecimalFormatter();
+
 
 
 //	public interface CrudForm<E> {
@@ -212,7 +215,8 @@ private String pickMapFields;
 						new NumeralFieldFormatter(".", ",", nDecimals).extend(((TextField) fieldObj));
 						binder.forField((TextField) fieldObj)
 		//					.bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldName))), (d,v)-> d.setColInteger(v,fieldName));
-							.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldName));
+		//					.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldName));
+							.bind(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(fieldName),nDecimals)), (d,v)-> d.setColInteger(v,fieldName));
 					}
 					else if (rowCol[3].equals("4")) // is Boolean
 					{
@@ -408,7 +412,7 @@ private String pickMapFields;
 		if (dialogForPick == null)
 			dialogForPick = new Dialog();
 		dialogForPick.removeAll();
-		dialogForPick.setDraggable(true);
+	//	dialogForPick.setDraggable(true);
 		dialogForPick.setCloseOnEsc(true);
 		dialogForPick.setResizable(true);
 		

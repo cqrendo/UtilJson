@@ -8,9 +8,13 @@ import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -796,8 +800,10 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 						binder.forField(bdf).asRequired()
 //						withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
 //						ValidationMetadata.of(String.class)))
-						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
-
+//						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
+						.bind(d-> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(fieldNameInUI),nDecimals)), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
+						
+//						decimalFormatter
 //						binder.forField(bdf).withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
 //								ValidationMetadata.of(BigDecimal.class)))
 //								.bind(d-> d.getColBigDecimal(fieldNameInUI), (d,v)-> d.setColBigDecimal(v,fieldNameInUI));
@@ -817,8 +823,10 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 						if (fieldSize.isEmpty() == false)
 							bdf.setMaxLength(new Integer(fieldSize));
 						binder.forField(bdf)
-						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
-//						binder.forField(bdf).bind(d-> d.getColBigDecimal(fieldNameInUI), (d,v)-> d.setColBigDecimal(v,fieldNameInUI));
+//						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
+						.bind(d-> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(fieldNameInUI),nDecimals)), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
+
+						//						binder.forField(bdf).bind(d-> d.getColBigDecimal(fieldNameInUI), (d,v)-> d.setColBigDecimal(v,fieldNameInUI));
 					
 					}	
 //********
@@ -1425,7 +1433,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 			dialogForPick = new Dialog();
 		dialogForPick.removeAll();
 		dialogForPick.setModal(true);
-		dialogForPick.setDraggable(true);
+	///	dialogForPick.setDraggable(true);
 		dialogForPick.setCloseOnEsc(true);
 		dialogForPick.setResizable(true);
 		dialogForPick.setCloseOnOutsideClick(false);
@@ -1592,12 +1600,12 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 				if (isCOlEditable  && isGridEditable) 
 					if (isNotAParentField)
 					{
-						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header+" (Editable)")
+						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
 						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
 					}
 					else
 					{
-						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header+" (Editable)")
+						col = grid.addEditColumn(d -> currencyFormatter.encode(currencyFormatter.getCents(d.getCol(colName)))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
 						.setTextAlign(ColumnTextAlign.END).setResizable(true);
 					}
 				else
@@ -1620,12 +1628,12 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 				if (isCOlEditable  && isGridEditable) 
 					if (isNotAParentField)
 					{
-						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header+" (Editable)")
+						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
 						.setTextAlign(ColumnTextAlign.END).setResizable(true).setSortProperty(colData[0]);
 					}
 					else
 					{
-						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header+" (Editable)")
+						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
 						.setTextAlign(ColumnTextAlign.END).setResizable(true);
 					}
 				else
@@ -1816,8 +1824,15 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 	//				String colName = getColName(rowsColList,i);
 					String defaultValue = getDefaultValue(rowsColList,i);
 					if (defaultValue != null && ! defaultValue.equals("null") && defaultValue.length() > 0)
-						if (defaultValue.startsWith("user("))
+						{						if (defaultValue.equalsIgnoreCase("Date()"))
 						{
+							DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+							String newValue = df.format(java.sql.Date.valueOf(LocalDate.now()));
+							field.set(bean, newValue);
+						}
+
+					else if (defaultValue.startsWith("user("))
+							{
 							if (defaultValue.equals("user()"))
 								field.set(bean, SecurityUtils.getUsername());
 							else // is in the mode user(n,n) // where indicates start and end for substring
@@ -1841,9 +1856,10 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 									}
 								
 								}
-						}
-						else
-							field.set(bean, defaultValue);
+							}						
+					else
+						field.set(bean, defaultValue);
+						}	
 					i++;
 					}
 			} catch (IllegalArgumentException | IllegalAccessException e) {

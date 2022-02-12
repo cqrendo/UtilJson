@@ -62,6 +62,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Value("${ldap.enabled}")
 
 	private String ldapEnabled;
+	
+	@Value("${security.enabled}")
+
+	private String securityEnabled;
+
 
 
 //    private final UserDetailsService userDetailsService;
@@ -162,9 +167,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     	.and()
     		.withUser("20user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER")//.roles("ADMIN");
         .and()
-    		.withUser("24user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER");//.roles("ADMIN");
+    		.withUser("24user").password("$2y$12$kKMEWgLzpj/Dfg7LzJVXSOAQlzAa3TMCa8XCwuFhP2YOPICnAUHKe").roles("USER");//.roles("ADMIN")
 
-    	}
+    	}   	
     }
     
     /**
@@ -173,7 +178,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Not using Spring CSRF here to be able to use plain HTML for the login page
-
+    	
+       	if (Boolean.parseBoolean(securityEnabled) == false){
+ //      		http.httpBasic().disable();
+       		http.csrf().disable().authorizeRequests().anyRequest().permitAll()
+       	    .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll();
+       	    //.successHandler(new SavedRequestAwareAuthenticationSuccessHandler());
+//       		http.csrf().disable()
+//            // Register our CustomRequestCache, that saves unauthorized access attempts, so
+//            // the user is redirected after login.
+//            .requestCache().requestCache(new CustomRequestCache());
+    	}
+    	else 
+    	{
     	http.csrf().disable()
                 // Register our CustomRequestCache, that saves unauthorized access attempts, so
                 // the user is redirected after login.
@@ -200,6 +217,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 // Configure logout
                 .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
+    	}
     }
 
     /**

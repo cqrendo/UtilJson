@@ -74,9 +74,11 @@ public class UtilSessionData {
 		return false;
 	}
 	private static Object getKeyValue(String tagkey) {
+		if (AppConst.TAGS_LIST.indexOf(tagkey) == -1)
+			
 		if (tagkey.equals("user"))
 			return SecurityUtils.getUsername();
-		return VaadinSession.getCurrent().getAttribute(tagkey);
+		return VaadinSession.getCurrent().getAttribute(tagkey); // gets other attributtes fill in the session
 	}
 	public static String addCompanyToTitle(String optionName) {
 			String title = optionName+" ("+UtilSessionData.getCompanyYear()+")";

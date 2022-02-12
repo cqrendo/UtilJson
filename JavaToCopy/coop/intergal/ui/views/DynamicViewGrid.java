@@ -49,6 +49,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
+import com.vaadin.flow.component.page.PendingJavaScriptResult;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
@@ -230,13 +231,14 @@ private int position = 20;
 //private String openIds = "";
 //private DdbDataBackEndProvider dataProviderpopup;
 //private String displayFormClassNamePopup;
-@Id("showHideQuery")
-private Button buttonShowHideQuery;
+//@Id("showHideQuery")
+//private Button buttonShowHideQuery;
 private boolean isSaveFromCustomInserting= false;
 private boolean iAmRootGrid=false;
 private String addFormClassName;
 
 private DynamicViewGrid parentGrid;
+private Integer keepHeight;
 
 
 private void setParentGrid(DynamicViewGrid parentGrid) {
@@ -318,6 +320,12 @@ public void setupGrid(Boolean isGridEditable, Boolean isGridEditableon) {
 		grid.setEnterNextRow(true);
 		grid.setMultiSort(true);
 		grid.addClassNames("editable-custom-effect");
+		int largo = grid.getDataProvider().size(null); // contar numero de registros
+	     if (largo > 10) {
+	    	 grid.setAllRowsVisible(false);
+	    	 this.getElement().getStyle().set("height", "100%");
+	     	}
+	     else grid.setAllRowsVisible(true);
 //		grid.setHeightByRows(true);  /// Is you use it breaks pagination 
 
 //    @@1 
@@ -370,14 +378,14 @@ public void setupGrid(Boolean isGridEditable, Boolean isGridEditableon) {
 //			i++;
 //		}
 	//	Anchor anchor = new Anchor(new StreamResource("my-excel.xlsx", Exporter.exportAsExcel(grid)), "Download As Excel");
-        if (hasShowQueryButton)
-        {
-        	buttonShowHideQuery.addClickListener(e -> showHideQuery());
-        }
-        else
-        {
-        	buttonShowHideQuery.setVisible(false);
-        }
+//        if (hasShowQueryButton)
+//        {
+//        	buttonShowHideQuery.addClickListener(e -> showHideQuery());
+//        }
+//        else
+//        {
+////        	buttonShowHideQuery.setVisible(false);
+//        }
 		if (hasExportButton && grid.getColumns().isEmpty() == false)
         {
      //   	export.setVisible(true);
@@ -408,24 +416,44 @@ public boolean isiAmRootGrid() {
 		this.iAmRootGrid = iAmRootGrid;
 	}
 
-private Object showHideQuery() {
-		if (layoutQGD !=null)
-		{
-			if (layoutQGD.getDivQuery().isVisible())
-				layoutQGD.getDivQuery().setVisible(false);
-			else
-				layoutQGD.getDivQuery().setVisible(true);
-		}
-		else if (layoutQG !=null)
-		{
-			if (layoutQG.getDivQuery().isVisible())
-				layoutQG.getDivQuery().setVisible(false);
-			else
-				layoutQG.getDivQuery().setVisible(true);
-		}
-		
-		return null;
-	}
+//private Object showHideQuery() {
+//		if (layoutQGD !=null)
+//		{
+//			if (layoutQGD.getDivQuery().isVisible())
+//			{
+//				layoutQGD.getDivQuery().getElement().executeJs("return this.offsetHeight")
+//				.then(Integer.class,height -> {System.out.println("height 1........." + height);});          //keepHeight =height ;});
+//				
+//				getElement().executeJs("return this.offsetHeight")
+//				.then(Integer.class, height  -> {System.out.println("height 2........." + height);});
+//				
+//				layoutQGD.getQuerySplitGrid().getElement().getStyle().set("height", "100%"); 
+//			//	layoutQGD.getDivQuery().setVisible(false);   /// you can not hide using setVisible(false) if you use executeJS to that element, use  instead -> .getStyle().set("display", "none"); 
+//				layoutQGD.getDivQuery().getStyle().set("display", "none"); 
+//			}	 
+//			else
+//			{	
+////				String js = "var elmnt = document.getElementById('divQuery');"+
+////						"var c = 'calc(100% - '+elmnt.offsetHeight+'px)';"+
+////						"document.getElementById('querySplitGrid').style.setProperty('height', c);"	;	
+//////				"var txt = \"Height with padding and border: " + elmnt.offsetHeight + "px<br>";
+//////				txt += "Width with padding and border: " + elmnt.offsetWidth + "px";"
+////				UI.getCurrent().getPage().executeJs(js);
+////				System.out.println("keepHeight........." + keepHeight);
+////				layoutQGD.getQuerySplitGrid().getElement().getStyle().set("height", "calc(100% - 220px)"); 
+//				layoutQGD.getDivQuery().setVisible(true);
+//			}	
+//		}
+//		else if (layoutQG !=null)
+//		{
+//			if (layoutQG.getDivQuery().isVisible())
+//				layoutQG.getDivQuery().setVisible(false);
+//			else
+//				layoutQG.getDivQuery().setVisible(true);
+//		}
+//		
+//		return null;
+//	}
 
 private void methodForRowSelected(DynamicDBean selectedRow2) {
 //xxx		
@@ -789,6 +817,7 @@ private boolean isBoolean(String header, String colType) {
 	void showBean(DynamicDBean bean ) {
 		try {
 			System.out.println("DynamicViewGrid.showBean()");
+			
 			setVisibleRowData(true);
 			if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
 				{
@@ -924,7 +953,11 @@ private boolean isBoolean(String header, String colType) {
 					layoutQGD.getGridSplitDisplay().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_GRID_DISPLAY);
 					}
 				}
-				layoutQGD.getDivQuery().setVisible(false); /// each time yoy select a row QUERY is hide
+				/// each time you select a row, QUERY is hide
+	//			layoutQGD.getQuerySplitGrid().getElement().getStyle().set("height", "100%"); 
+				showQueryForm(false);
+	//			layoutQGD.getDivQuery().setVisible(false); /// each time yoy select a row QUERY is hide
+				
 // ************ SPLITTER POSITION Doesn't work for now this code is comented				
 //				if (bean.getParams() != null && bean.getParams().indexOf("splitQuery") != -1) 
 //					{
@@ -1016,6 +1049,15 @@ private boolean isBoolean(String header, String colType) {
 
 //	UI.getCurrent().navigate("dymanic");
 }
+	private void showQueryForm(boolean show) {
+		if (show == false)
+		{
+			layoutQGD.getDivQuery().getElement().getStyle().set("display", "none"); 
+			layoutQGD.getQuerySplitGrid().getElement().getStyle().set("height", "calc(100% - 60px)"); 			
+		}	
+		
+	}
+
 	public void showBeaninPopupXX	(DynamicDBean bean, String resourcePopup,String layoutClassName, String displayFormClassNamePopup, Dialog dialogForShow2, String filterForPopup ) {
 			showBeaninPopup(resourcePopup);
 		}
@@ -1155,6 +1197,7 @@ private boolean isBoolean(String header, String colType) {
 		divSubGrid.add(subDynamicViewGrid );
 		keepSubGridToBeAlterExternally(subDynamicViewGrid);
 		Div divTab = new Div();
+		divTab.getStyle().set("height","100%");
 		divTab.add(subDynamicViewGrid );
 		return divTab;
 		
@@ -1854,10 +1897,15 @@ private boolean isBoolean(String header, String colType) {
 		int idxLastResource = resourceSubGrid.lastIndexOf(".");
 		int idxFormExt = resourceSubGrid.substring(idxLastResource+1).indexOf("FormExt"); // to avoid false identification as formExt in the parents
 		if ( idxFormExt> -1)
+			{
 			content = new Div(componSubForm(bean, resourceSubGrid));
+			}
 		else
+			{
 			content = new Div(componSubgrid(bean, resourceSubGrid));
+			}
 		content.setWidthFull();
+		content.getStyle().set("height", "100%");
 		return content;
 	}
 
@@ -2260,6 +2308,7 @@ private boolean isBoolean(String header, String colType) {
 			String resourceSubGrid = extractResourceSubGrid(bean2,0);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO adapt to use more than one subresource , use a variable instead of 9
 //			divSubForm.removeAll();
 			Div divSubFormSubGrid = new Div(); 
+//			divSubFormSubGrid.getStyle().set("height","100%");
 			String tabsList = rowsColList.get(0)[12];
 			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
 			{
@@ -2335,7 +2384,7 @@ private boolean isBoolean(String header, String colType) {
 		try {
 	//		selectedRow = new bean;
 			buttonsForm.getCustomButtons().setVisible(false);
-			keepRowBeforChanges = new DynamicDBean(); 
+	//		keepRowBeforChanges = new DynamicDBean(); 
 			DynamicDBean bean = new DynamicDBean(); 
 			
 			bean.setResourceName(resourceName);
@@ -2343,7 +2392,7 @@ private boolean isBoolean(String header, String colType) {
 			bean.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 			GeneratedUtil.fillDefaultValues(bean);
 			selectedRow = bean;
-			keepRowBeforChanges = RestData.copyDatabean(bean);
+	//		keepRowBeforChanges = RestData.copyDatabean(bean);
 //			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
 			Class<?> dynamicForm = Class.forName(displayFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
 			
@@ -2897,7 +2946,8 @@ private boolean isBoolean(String header, String colType) {
 			isInsertingALine = false;
 			saveRowGridIfNotInserting(beansToSaveAndRefresh,item.getResourceName() );
 		}
-//	@@1	rowIsInserted = item;
+//	@@1	
+		rowIsInserted = item;
 //		// @@1
 //		item.setCol1(newValue);
 //		// @@1
@@ -2960,27 +3010,27 @@ private boolean isBoolean(String header, String colType) {
 	}
 
 	public Object undoSelectedRow() {
-		if (keepRowBeforChanges != null)
+		if (keepRowBeforChanges == null)
 			return null;
-		System.out.println("DynamicViewGrid.undoSelectedRow() --->" + keepRowBeforChanges.getRowJSon().toString());
+//		System.out.println("DynamicViewGrid.undoSelectedRow() --->" + keepRowBeforChanges.getRowJSon().toString());
 //		dataProvider.save(selectedRow);	
 //		((Binder<DynamicDBean>) display).setBean(selectedRow);
 //		dataProvider.refresh(selectedRow);	
 		selectedRow = RestData.copyDatabean(keepRowBeforChanges);
-		dataProvider.setHasNewRow(true);
+//		dataProvider.setHasNewRow(true);
 		try {
 			setBean.invoke(display,selectedRow);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		showBean(selectedRow);
+		showBean(selectedRow);
 		return null;
 	}
 	
 	public Object insertANewRow(String addFormClassName) {
 		System.out.println("DynamicViewGrid.insertANewRow( SPECIAL FORM )");
-		layoutQGD.getDivQuery().setVisible(false);
+		showQueryForm(false); 
 		buttonsForm.setVisible(true);
 		insertBean(addFormClassName);
 		return null;
@@ -2989,6 +3039,7 @@ private boolean isBoolean(String header, String colType) {
 
 	public Object insertANewRow() {
 		System.out.println("DynamicViewGrid.insertANewRow()");
+		showQueryForm(false); 
 		insertBean();
 		return null;
 	}

@@ -161,6 +161,9 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	@Id("displaySplitSubGrid")
 	private SplitLayout displaySplitSubGrid;
 
+	@Id("divTitle")
+	private Div divTitle;
+	
 	@Id("divQuery")
 	private Div divQuery;
 	@Id("buttons")
@@ -308,9 +311,15 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		{
 //			querySplitGrid.setOrientation(Orientation.VERTICAL);
 			gridSplitDisplay.setOrientation(Orientation.HORIZONTAL);
-//			gridSplitDisplay.getStyle().set("height", "83vh"); 
 			displaySplitSubGrid.setOrientation(Orientation.VERTICAL);
-
+			
+			/// the following code is for adjust height depending on the size off divQuery, but is already made in JS in js file
+//			divQuery.getElement().executeJs("return this.offsetHeight")
+//			.then(Integer.class,height -> {
+//				System.out.println("height xx1........." + height);
+//				querySplitGrid.getElement().getStyle().set("height", "calc(100% - "+height+"px - 60px");
+//				});
+	
 		try {
 			Class<?> dynamicQuery = Class.forName(queryFormClassName);
 			Object queryForm = dynamicQuery.newInstance();
@@ -335,7 +344,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 					{
 					String titleByID = ((GeneratedQuery) divInDisplay).getId().get();
 					if (titleByID != null && titleByID.length() > 2)
-						divQuery.add(new H3(titleByID));
+						divTitle.add(new H3(titleByID));
 					}
 				divQuery.add((Component)divInDisplay);
 			}
