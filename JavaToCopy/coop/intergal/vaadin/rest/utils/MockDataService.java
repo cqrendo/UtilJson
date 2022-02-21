@@ -19,6 +19,7 @@ import com.vaadin.flow.data.provider.QuerySortOrder;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.ui.security.SecurityUtils;
 import coop.intergal.ui.util.UtilSessionData;
 
 
@@ -128,6 +129,7 @@ public class MockDataService extends DataService {
 				//					Iterator<Component> fieldList = editorForm.iterator(); 
 				//@@CQR gestionar PK auto numbers				newEntityinfo.put("idEntity", 0);
 				newEntityinfo = addImagenIfExist(dB, newEntityinfo);
+				newEntityinfo = addUserIfCorresponds(resourceName, newEntityinfo);
 				JsonNode postResult;
 				try {
 					
@@ -169,6 +171,7 @@ public class MockDataService extends DataService {
 				try {
 					ObjectNode rowJsonChanged = putValuesOnObject(false, nodeFactory,dB, resourceName);
 					rowJsonChanged = addImagenIfExist(dB, rowJsonChanged);
+					rowJsonChanged = addUserIfCorresponds(resourceName, rowJsonChanged);
 					postResult = JSonClient.put(resourceName, rowJsonChanged,  preConfParam); 
 
 					if (postResult.get("statusCode").intValue() != 200)
@@ -243,7 +246,15 @@ private ObjectNode addImagenIfExist(DynamicDBean dB, ObjectNode newEntityinfo) {
 			
 		return newEntityinfo;
 	}
-
+private ObjectNode addUserIfCorresponds(String resourceName, ObjectNode newEntityinfo) {  // it must exists a field call "Imagen" of the the type BLOD use to keep a imagen
+	if (AppConst.RESOURCES_WITH_USER.indexOf(resourceName) > -1)
+	{
+//			bytes = IOUtils.toByteArray(dB.getInputStream());			
+			newEntityinfo.put("USERUPDATE", SecurityUtils.getUsername());
+	}
+		
+	return newEntityinfo;
+}
 public static String bytesToHex(byte[] in) {
     final StringBuilder builder = new StringBuilder();
     for(byte b : in) {

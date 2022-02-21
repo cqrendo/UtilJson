@@ -57,6 +57,7 @@ import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -106,7 +107,15 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements  
 //PolymerTemplate<TemplateModel> 
 //	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
 	private ArrayList<String[]> rowsColListGrid;//=new ArrayListString[]();
-//	private ArrayList<String[]> rowsColListForm;
+	private ArrayList<String[]> rowsFieldList;
+	public ArrayList<String[]> getRowsFieldList() {
+		return rowsFieldList;
+	}
+
+	public void setRowsFieldList(ArrayList<String[]> rowsFieldList) {
+		this.rowsFieldList = rowsFieldList;
+	}
+
 	private String preConfParam;
 	private String displayFormClassName;
 	private String resourceSubGrid;
@@ -239,6 +248,8 @@ private String addFormClassName;
 
 private DynamicViewGrid parentGrid;
 private Integer keepHeight;
+private String keepSplitDS = null;
+private Object keepSplitGD =null;
 
 
 private void setParentGrid(DynamicViewGrid parentGrid) {
@@ -321,11 +332,16 @@ public void setupGrid(Boolean isGridEditable, Boolean isGridEditableon) {
 		grid.setMultiSort(true);
 		grid.addClassNames("editable-custom-effect");
 		int largo = grid.getDataProvider().size(null); // contar numero de registros
-	     if (largo > 10) {
+	     if (largo > 6) {
 	    	 grid.setAllRowsVisible(false);
 	    	 this.getElement().getStyle().set("height", "100%");
 	     	}
-	     else grid.setAllRowsVisible(true);
+	     else 
+	    	 {
+	    	 grid.setAllRowsVisible(true);
+//	    	 this.getElement().getStyle().set("max-height", "100%");
+	    	 }
+//	     this.getElement().getStyle().set("height", "100%");
 //		grid.setHeightByRows(true);  /// Is you use it breaks pagination 
 
 //    @@1 
@@ -344,6 +360,7 @@ public void setupGrid(Boolean isGridEditable, Boolean isGridEditableon) {
 //		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
         
 		rowsColListGrid = dataProvider.getRowsColList();
+//		rowsFieldList = dataProvider.getRowsFieldList();
 		setButtonsVisibiltyFromExtendedProperties(resourceName);
 		if (iAmRootGrid)
 		{
@@ -819,17 +836,19 @@ private boolean isBoolean(String header, String colType) {
 			System.out.println("DynamicViewGrid.showBean()");
 			
 			setVisibleRowData(true);
-			if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
+			if (buttonsForm !=null )
 				{
-				buttonsForm.setVisible(false);
-				setButtonsRowVisible(false);
-				}
-			else
+				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
 				{
-				buttonsForm.setVisible(true);
-				setButtonsRowVisible(false);
+					buttonsForm.setVisible(false);
+					setButtonsRowVisible(false);
 				}
-
+				else
+				{
+					buttonsForm.setVisible(true);
+					setButtonsRowVisible(false);
+				}
+			}
 			selectedRow = bean;
 			keepRowBeforChanges = new DynamicDBean(); 
 			keepRowBeforChanges = RestData.copyDatabean(bean);
@@ -841,7 +860,7 @@ private boolean isBoolean(String header, String colType) {
 			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
 			Method getButtonsForm= dynamicForm.getMethod("setButtonsForm",new Class[] { FormButtonsBar.class});
 			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
-			setRowsColList.invoke(display,rowsColListGrid);
+			setRowsColList.invoke(display,rowsColListGrid);//rowsColListGrid);rowsFieldList // @@ TODO change method names to setRowsFieldList
 			getButtonsForm.invoke(display, buttonsForm);
 			setBean.invoke(display,bean);
 			setBinder.invoke(display,binder);
@@ -938,24 +957,28 @@ private boolean isBoolean(String header, String colType) {
 					System.out.println("DynamicViewGrid.showBean() NOT splitGridDisplay");
 				if (bean.getParams() != null && bean.getParams().indexOf("splitGridDisplay") != -1) 
 					{
-					String params = bean.getParams().substring(bean.getParams().indexOf("splitGridDisplay")+17);
-					int idxNextAnd = params.indexOf("&");
-					int  idxLast = params.length();
-					if (idxNextAnd > -1)
-						idxLast = idxNextAnd;
-					String splitPos = params.substring(1,idxLast-1);
-					System.out.println("DynamicViewGrid.showBean() splitPos <"+ splitPos +">");
-					layoutQGD.getGridSplitDisplay().setSplitterPosition(new Double(splitPos));
+					if ( keepSplitGD == null)
+						{
+						String params = bean.getParams().substring(bean.getParams().indexOf("splitGridDisplay")+17);
+						int idxNextAnd = params.indexOf("&");
+						int  idxLast = params.length();
+						if (idxNextAnd > -1)
+							idxLast = idxNextAnd;
+						String splitPos = params.substring(1,idxLast-1);
+						keepSplitGD = splitPos;
+						System.out.println("DynamicViewGrid.showBean() splitPos <"+ splitPos +">");
+						layoutQGD.getGridSplitDisplay().setSplitterPosition(new Double(splitPos));
 	//				layout.getDisplaySplitSubGrid().setSplitterPosition(50);
-					}
-				else
+						}
+					}	
+				else if ( keepSplitGD == null)
 					{
+					keepSplitGD = AppConst.DEFAULT_SPLIT_POS_GRID_DISPLAY + "";
 					layoutQGD.getGridSplitDisplay().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_GRID_DISPLAY);
-					}
-				}
+					}				
 				/// each time you select a row, QUERY is hide
 	//			layoutQGD.getQuerySplitGrid().getElement().getStyle().set("height", "100%"); 
-				showQueryForm(false);
+				
 	//			layoutQGD.getDivQuery().setVisible(false); /// each time yoy select a row QUERY is hide
 				
 // ************ SPLITTER POSITION Doesn't work for now this code is comented				
@@ -984,22 +1007,28 @@ private boolean isBoolean(String header, String colType) {
 //		                 System.out.println("DynamicViewGrid.showBean() splitPos splitQuery - <"+ position +">");
 //		       	              }));
 //					}
-//				if (bean.getParams() != null && bean.getParams().indexOf("splitDisplaySubGrid") != -1) 
-//					{
-//					String params = bean.getParams().substring(bean.getParams().indexOf("splitDisplaySubGrid")+20);
-//					int idxNextAnd = params.indexOf("&");
-//					int  idxLast = params.length();
-//					if (idxNextAnd > -1)
-//						idxLast = idxNextAnd;
-//					String splitPos = params.substring(1,idxLast-1);
-//					System.out.println("DynamicViewGrid.showBean() splitPos splitDisplaySubGrid <"+ splitPos +">");
-//					layout.getDisplaySplitSubGrid().setSplitterPosition(new Double(splitPos));
-//					}
-//			}
-//			else
-//				{
-//				layout.getDisplaySplitSubGrid().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_DISPLAY_SUBGRID);
-//				}
+				if (bean.getParams() != null && bean.getParams().indexOf("splitDisplaySubGrid") != -1) 
+					{
+					if (keepSplitDS == null)
+						{
+						
+						String params = bean.getParams().substring(bean.getParams().indexOf("splitDisplaySubGrid")+20);
+						int idxNextAnd = params.indexOf("&");
+						int  idxLast = params.length();
+						if (idxNextAnd > -1)
+							idxLast = idxNextAnd;
+						String splitPos = params.substring(1,idxLast-1);
+						keepSplitDS  = splitPos;
+						System.out.println("DynamicViewGrid.showBean() splitPos splitDisplaySubGrid <"+ splitPos +">");
+						layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(new Double(splitPos));
+						}
+					}
+			}
+			else if (keepSplitDS == null)
+				{
+				keepSplitDS = AppConst.DEFAULT_SPLIT_POS_DISPLAY_SUBGRID + "";
+				layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_DISPLAY_SUBGRID);
+				}
 	/// **************FIN ANULA SPLITTER 			
 //				layout.getDivQuery().getStyle().set("flex-basis", "65px");
 //				Div div = (Div) layout.getDivDisplay().get;
@@ -1019,6 +1048,7 @@ private boolean isBoolean(String header, String colType) {
 //			divDisplay.add((Component)display);
 //
 			}
+		showQueryForm(false);	
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1050,7 +1080,7 @@ private boolean isBoolean(String header, String colType) {
 //	UI.getCurrent().navigate("dymanic");
 }
 	private void showQueryForm(boolean show) {
-		if (show == false)
+		if (show == false && layoutQGD != null)
 		{
 			layoutQGD.getDivQuery().getElement().getStyle().set("display", "none"); 
 			layoutQGD.getQuerySplitGrid().getElement().getStyle().set("height", "calc(100% - 60px)"); 			
@@ -2889,6 +2919,15 @@ private boolean isBoolean(String header, String colType) {
 
 	public Object saveSelectedRow(String apiname) {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + selectedRow.getRowJSon().toString());
+		binder.readBean(selectedRow);
+		BinderValidationStatus<DynamicDBean> validate = binder.validate();
+//		validate.getBeanValidationErrors();
+//		validate.getBeanValidationResults();
+		validate.getFieldValidationErrors();
+		if (validate.hasErrors())
+			System.out.println("DynamicViewGrid.saveSelectedRow()  ERROR " );
+		else
+		{
 		if (selectedRow.getResourceName().equals("CR-FormTemplate")) 
 			selectedRow.setCol9(getApiID(apiname));
 		beansToSaveAndRefresh.clear();
@@ -2907,6 +2946,7 @@ private boolean isBoolean(String header, String colType) {
 		
 			showBean(selectedRow);
 		}	
+		}
 		return null;
 	}
 	private String getApiID(String apiname) { // sets Id ApiTemplate see APITemplate table

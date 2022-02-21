@@ -33,6 +33,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.polymertemplate.TemplateParser;
@@ -344,7 +345,12 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 					{
 					String titleByID = ((GeneratedQuery) divInDisplay).getId().get();
 					if (titleByID != null && titleByID.length() > 2)
-						divTitle.add(new H3(titleByID));
+						{
+						H4 h4 = new H4(titleByID);
+						h4.getStyle().set("padding", "0");
+						h4.getStyle().set("margin", "0");
+						divTitle.add(h4);
+						}
 					}
 				divQuery.add((Component)divInDisplay);
 			}

@@ -122,20 +122,20 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 //		super.bindFields(class1, object, getRowsColList().iterator(), binder); 
 //	}
 	public void bindFields(Class<?> class1, Object object) {
-		Iterator<String[]> itRowsColList = getRowsColList().iterator();
+		Iterator<String[]> itRowsColList = getRowsColList().iterator(); // even is a field it uses RowColList (columns) , because is for a custom form where his field doesn't need to be defined as showInDisplay
 		if (buttonsForm != null)
 			buttonsForm.getCustomButtons().removeAll();
 		while(itRowsColList.hasNext())
 		{
 			String[] rowCol = itRowsColList.next();
-			String fieldName = rowCol [2];
-			String idFieldTypeStr = rowCol [3];
 			String fieldNameInUI = rowCol [2];
+			String idFieldTypeStr = rowCol [3];
 			String tagsForVisibility = rowCol[21].toString();
 			String tagsForEdition = rowCol[22].toString();
 			String idButtonBarForButtons = rowCol[25].toString();
-			String label = rowCol[7].toString();
+			String label = rowCol[7].toString();//rowField[7].toString();
 			boolean isPick = isPick (rowCol [1]);
+			boolean isRequired = isRequired( rowCol [1]);
 //			System.out.println("GenericDynamicForm.bindFields() col 0 ---> "+ binder.getBean().getCol0() + "/" +binder.getBean().getCol1());
 			boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 			boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
@@ -153,12 +153,12 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 			if ( idFieldTypeStr.isEmpty() == false)
 				idFieldType = new Integer (idFieldTypeStr);
 			boolean isReadOnly = !editableByTag || isReadOnly( rowCol [1]);
-			if (!fieldName.isEmpty())
+			if (!fieldNameInUI.isEmpty())
 			try {
-				System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldName);
-				if (!fieldName.equals("null"))
+				System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldNameInUI);
+				if (!fieldNameInUI.equals("null"))
 				{	
-					Field field = ((class1)).getDeclaredField(fieldName);//.get(instancia);
+					Field field = ((class1)).getDeclaredField(fieldNameInUI);//.get(instancia);
 					field.setAccessible(true);
 					Object fieldObj = field.get(object);
 					if (idFieldType == 0)  // is Text Field
@@ -171,26 +171,49 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 			//			tf.setVisible(visibleByTag);
 						if (isPick)
 						{
-							tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldName, tf));
+							tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldNameInUI, tf));
 							Icon icon = new Icon(VaadinIcon.DOWNLOAD_ALT);
 							tf.setSuffixComponent(icon);
 						}
-						binder.bind(tf, fieldName);
+						if (isRequired)
+							binder.forField(tf).asRequired("Requerido").bind(fieldNameInUI);
+						else
+							binder.bind(tf, fieldNameInUI);
 					}
 					else if (rowCol[3].equals("1")) // is Date
 						{
-						((EsDatePicker) fieldObj).setReadOnly(isReadOnly);
-						binder.forField((EsDatePicker) fieldObj)
-						.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
-						.bind(d-> d.getColDate(fieldName), (d,v)-> d.setColDate(v,fieldName));//DynamicDBean::setCol2Date);				
+						if (isRequired)
+						{
+							((EsDatePicker) fieldObj).setReadOnly(isReadOnly);
+							binder.forField((EsDatePicker) fieldObj).asRequired("Requerido")
+							.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
+							.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
+	
+						}
+						else
+						{
+							((EsDatePicker) fieldObj).setReadOnly(isReadOnly);
+							binder.forField((EsDatePicker) fieldObj)
+							.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
+							.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
+						}
 					}
 					else if (rowCol[3].equals("2")) // is TextArea
 					{
-						
-						((TextArea) fieldObj).setReadOnly(isReadOnly);
-						if (!visibleByTag)
-							((TextArea) fieldObj).getElement().getStyle().set("visibility","hidden");
-						binder.bind((TextArea) fieldObj, fieldName);
+						if (isRequired)
+						{	((TextArea) fieldObj).setReadOnly(isReadOnly);
+							if (!visibleByTag)
+								((TextArea) fieldObj).getElement().getStyle().set("visibility","hidden");
+							binder.forField((TextArea) fieldObj).asRequired("Requerido").bind(fieldNameInUI);
+	//						binder.bind((TextArea) fieldObj, fieldName);
+						}	
+						else
+						{
+							((TextArea) fieldObj).setReadOnly(isReadOnly);
+							if (!visibleByTag)
+								((TextArea) fieldObj).getElement().getStyle().set("visibility","hidden");
+							binder.bind((TextArea) fieldObj, fieldNameInUI);
+						}	
 					}
 					else if (rowCol[3].equals("3")) // is currency
 					{
@@ -199,7 +222,10 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 						((TextField) fieldObj).setReadOnly(isReadOnly);
 						if (!visibleByTag)
 							((TextField) fieldObj).getElement().getStyle().set("visibility","hidden");
-						binder.forField((TextField) fieldObj).bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldName))), (d,v)-> d.setColInteger(v,fieldName));
+						if (isRequired)
+							binder.forField((TextField) fieldObj).asRequired("Requerido").bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
+						else
+							binder.forField((TextField) fieldObj).bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
 			//			binder.forField((AmountField) fieldObj).bind(d-> d.getColInteger(fieldName), (d,v)-> d.setColInteger(v,fieldName));//DynamicDBean::setCol2Date);				
 
 					}
@@ -213,28 +239,36 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 						int nDecimals = idFieldType - 100 ; 
 
 						new NumeralFieldFormatter(".", ",", nDecimals).extend(((TextField) fieldObj));
-						binder.forField((TextField) fieldObj)
-		//					.bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldName))), (d,v)-> d.setColInteger(v,fieldName));
-		//					.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldName));
-							.bind(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(fieldName),nDecimals)), (d,v)-> d.setColInteger(v,fieldName));
+						if (isRequired)
+							binder.forField((TextField) fieldObj)
+							.asRequired("Requerido")
+							.bind(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(fieldNameInUI),nDecimals)), (d,v)-> d.setColInteger(v,fieldNameInUI));
+						else
+							binder.forField((TextField) fieldObj)
+							.bind(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(fieldNameInUI),nDecimals)), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					}
 					else if (rowCol[3].equals("4")) // is Boolean
 					{
 						((Checkbox) fieldObj).setReadOnly(isReadOnly);
 						if (!visibleByTag)
 							((Checkbox) fieldObj).getElement().getStyle().set("visibility","hidden");
-						binder.forField((Checkbox) fieldObj).bind(d -> d.getColBoolean(fieldName), (d,v)-> d.setColBoolean(v,fieldName));//DynamicDBean::setCol2Date);				
+						if (isRequired)
+							binder.forField((Checkbox) fieldObj)
+							.asRequired("Requerido")
+							.bind(d -> d.getColBoolean(fieldNameInUI), (d,v)-> d.setColBoolean(v,fieldNameInUI));
+						else
+							binder.forField((Checkbox) fieldObj).bind(d -> d.getColBoolean(fieldNameInUI), (d,v)-> d.setColBoolean(v,fieldNameInUI));
 					}
 					else if (idFieldType == 5 ) // is Number
 					{
 						IntegerField nf = ((IntegerField) fieldObj);
-//						nf.setValueChangeMode(ValueChangeMode.EAGER); 
-//						nf.setId("tf"+fieldNameInUI);
-//						nf.getElement().setAttribute("theme", "small");
 						nf.setReadOnly(isReadOnly);
 						if (!visibleByTag)
 							nf.getElement().getStyle().set("visibility","hidden");
-						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+						if (isRequired)
+							binder.forField(nf).asRequired("Requerido").bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+						else
+							binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					}
 					else if (idFieldType == 6 ) // is Combobox
 					{
@@ -272,11 +306,18 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 						if (!visibleByTag)
 							cB.getElement().getStyle().set("visibility","hidden");
 //						cB.setVisible(visibleByTag);  // in this way it covers the space with next field
-						binder.forField(cB).withConverter(
+						if (isRequired)
+							binder.forField(cB).withConverter(
 								item-> Optional.ofNullable(item).map(DynamicDBean::getCol0).orElse(null),
 								id-> getRowById(id, cB))
-						.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
-
+							.asRequired("Requerido")
+							.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+						else
+							binder.forField(cB).withConverter(
+									item-> Optional.ofNullable(item).map(DynamicDBean::getCol0).orElse(null),
+									id-> getRowById(id, cB))
+								.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
+							
 //						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					}
 					else if (idFieldType == 10) // is a button
@@ -351,6 +392,15 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 				return bean;
 		}
 		return null;
+	}
+	
+	private boolean isRequired(String params) {
+		if (params == null)
+			return false;
+		if (params.indexOf("#REQ#")>-1)
+			return true;
+		else 
+			return false;
 	}
 
 	private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {

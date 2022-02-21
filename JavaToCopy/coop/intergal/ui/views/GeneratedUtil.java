@@ -642,7 +642,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //						}
 					if (isRequired && isQuery == false )
 					{	
-					binder.forField(ta).asRequired()
+					binder.forField(ta).asRequired("Requerido")
 //						.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
 //							ValidationMetadata.of(String.class)))
 							.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
@@ -690,7 +690,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					setBeanValidators(validationRuleName, isQuery, cache) ;
 					if (isRequired && isQuery == false && fieldSize.length() == 0)
 					{
-						binder.forField(nf).asRequired()
+						binder.forField(nf).asRequired("Requerido")
 //						.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
 //								ValidationMetadata.of(Integer.class)))
 								.bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
@@ -708,7 +708,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 						System.out.println("****** FIELD WITH WARNING "+ nf.getId());
 						if (isRequired)
 							{
-							binder.forField(nf).asRequired()
+							binder.forField(nf).asRequired("Requerido")
 						
 							.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.lessThan#"+getMaxValueForNumber(fieldSize),//+";"+isRequired,
 								ValidationMetadata.of(Integer.class)))
@@ -762,7 +762,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					Div l = alingLabel(label); 
 //					binder.bind(cTf, fieldNameInUI);
 					if (isRequired)
-						binder.forField(cTf).asRequired()
+						binder.forField(cTf).asRequired("Requerido")
 						.bind(d-> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
 
 					else
@@ -797,7 +797,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					setBeanValidators(validationRuleName, isQuery, cache) ;
 					if (isRequired && isQuery == false && fieldSize.length() == 0)
 					{
-						binder.forField(bdf).asRequired()
+						binder.forField(bdf).asRequired("Requerido")
 //						withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
 //						ValidationMetadata.of(String.class)))
 //						.bind(d-> d.getColDecimalPoint(fieldNameInUI,nDecimals), (d,v)-> d.setColDecimalPoint(v,fieldNameInUI));
@@ -898,7 +898,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			
 					if (isRequired && isQuery == false )
 					{	
-					binder.forField(checkB).asRequired()
+					binder.forField(checkB).asRequired("Requerido")
 							.bind(d-> d.getColBoolean(fieldNameInUI), (d,v)-> d.setColBoolean(v,fieldNameInUI));
 					}
 					else 
@@ -941,10 +941,10 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			
 					if (isRequired && isQuery == false )
 					{	
-					binder.forField(tf).asRequired()
+					binder.forField(tf).asRequired("Requerido")
+					.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
 //						.withValidator(new DynValidator<>("org.vaadin.intergal.validation.Constraints.isRequired",
 //							ValidationMetadata.of(String.class)))
-							.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
 
 					}
 					else 
@@ -1831,9 +1831,9 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 							field.set(bean, newValue);
 						}
 
-					else if (defaultValue.startsWith("user("))
+					else if (defaultValue.startsWith("user(") || defaultValue.startsWith("User("))
 							{
-							if (defaultValue.equals("user()"))
+							if (defaultValue.equalsIgnoreCase("user()"))
 								field.set(bean, SecurityUtils.getUsername());
 							else // is in the mode user(n,n) // where indicates start and end for substring
 								{

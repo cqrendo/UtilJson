@@ -229,7 +229,8 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 
 	private Component createDetails() {
 //			GeneratedUtil generatedUtil = new GeneratedUtil();
-			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
+			if (binder == null)
+				this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
 			generatedUtil.setGrid(dVGrid);
 			generatedUtil.setBinder(binder);
 			generatedUtil.setBean(bean);

@@ -341,6 +341,7 @@ public class DynamicQryGrid extends PolymerTemplate<TemplateModel> implements Be
 //		grid.setDivSubGrid(divGrid);
 //		grid.setButtonsForm(buttons);
 		grid.setLayout(this);
+		grid.setHasSideDisplay(false);
 		grid.setResourceName(resourceName);
 		if ((apiname == null || apiname.length() == 0) == false)
 		{

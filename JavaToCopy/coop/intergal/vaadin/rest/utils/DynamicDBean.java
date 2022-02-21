@@ -1681,6 +1681,8 @@ public class DynamicDBean {// implements Serializable {
 	}
 	public void setColDate(Date colDate, String colName ) {
 		Object dbean = this;
+		if (colDate!= null)
+		{
 		try {
 			String methodName = "setCol" + colName;
 			if (colName.startsWith("col"))
@@ -1696,6 +1698,7 @@ public class DynamicDBean {// implements Serializable {
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
+		}
 		}
 //		Method getColX = ((DynamicDBean.class)).getMethod("setCol"+i);
 //		this.col2Date = col2Date;

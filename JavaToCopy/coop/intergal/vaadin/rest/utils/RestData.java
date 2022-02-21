@@ -700,6 +700,14 @@ public class RestData {
 									fieldArr[1] = fieldArr[1]+"#PCK#";
 			
 							}
+							if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
+							{
+							if (fieldArr[1] != null && fieldArr[1].equals("null") == false)
+								fieldArr[1] = fieldArr[1]+"#REQ#";
+							else
+								fieldArr[1] ="#REQ#";
+							
+							}
 							if (fieldArr[0].equals("pickMapFields"))  // is a field with a special PICK
 								fieldArr[1] = fieldArr[1]+"#PCK#FOR#pickMapFields";
 //							if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
@@ -893,7 +901,15 @@ public class RestData {
 						if ( col.get("isReadOnly") != null && col.get("isReadOnly").asBoolean())
 							fieldArr[1] = fieldArr[1]+"#CNoEDT#";
 						if ( col.get("isRequired") != null && col.get("isRequired").asBoolean())
-							fieldArr[1] = fieldArr[1]+"#REQ#";
+							{
+							if (fieldArr[1] != null && fieldArr[1].equals("null") == false)
+								fieldArr[1] = fieldArr[1]+"#REQ#";
+							else
+								fieldArr[1] ="#REQ#";
+							
+							}
+						if ((fieldArr[1] == null) || fieldArr[1].equals("null"))
+							fieldArr[1] = "";
 						if ( col.get("parentResource") != null && col.get("parentResource").asText().trim().length() > 1 && col.get("parentResource").asText().trim().equals("null")== false) 
 						{
 						
