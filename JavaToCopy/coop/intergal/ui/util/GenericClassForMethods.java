@@ -443,11 +443,16 @@ public class GenericClassForMethods {
 	}
 	private DynamicDBean insertOrUpdateOutput(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent) {//(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean rowPreviousStep) {
 //		if (rowStep.get("filter"))
+		
 		JsonNode rowsStepOuput = rowStep.get("List-ProcessStepOutput");
 		for (JsonNode rowStepOuput : rowsStepOuput) 
 		{ //
 			JsonNode ouputResource = rowStepOuput.get("resource"); 
-			if (ouputResource != null && ouputResource.asText().indexOf("@form@") > -1) // the output is in a resource of a form 
+			if (rowStep.get("inputResourceForReadData").equals(rowStepOuput.get("resource"))) // when the input and output are the same row then is an update
+			{
+				lastParent = updateAnOuputRow(rowStepOuput, null, rowInputData);
+			}
+			else if (ouputResource != null && ouputResource.asText().indexOf("@form@") > -1) // the output is in a resource of a form 
 			{
 				System.out.println("GenericClassForMethods.insertOrUpdateOutput() + TITULO  form a procesar: " + dQGD.getPageTitle());
 				String ouputResourceStr = ouputResource.asText().substring(6);
@@ -540,6 +545,28 @@ public class GenericClassForMethods {
 
 		
 	}
+	private DynamicDBean updateAnOuputRow(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData) {//(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
+		String ouputResource = rowStepOuput.get("resource").asText();
+		System.out.println("PROCEESS AN UPDATE for " +ouputResource);
+		DdbDataBackEndProvider dataProviderOuput = new DdbDataBackEndProvider();
+		dataProviderOuput.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+		dataProviderOuput.setResourceName(ouputResource);
+		
+		rowInputData = fillDataOuput(rowStepOuput, rowInputData);//(newBean, rowStepOuput, rowInputData, rowPreviousStep);
+		Hashtable<String, DynamicDBean> beansToSaveAndRefresh = new Hashtable<String, DynamicDBean>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
+		beansToSaveAndRefresh.clear();
+		beansToSaveAndRefresh.put(rowInputData.getResourceName(), rowInputData);
+
+		if (dataProviderOuput.save(rowInputData.getResourceName(), beansToSaveAndRefresh)==true)	
+		{
+			DynamicDBean beanWithError = new DynamicDBean();
+			beanWithError.setCol0("ERROR WITH INSERT");
+			return beanWithError;
+		}
+		return rowInputData;
+
+		
+	}
 	private DynamicDBean insertAnOuputRowInAForm(JsonNode rowStepOuput, DynamicDBean rowInputData) {//(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
 		String ouputResource = rowStepOuput.get("resource").asText().substring(6); // to clean @form@
 		System.out.println("PROCEESS AN INSERT for " +ouputResource);
@@ -567,6 +594,17 @@ public class GenericClassForMethods {
 
 		return newBean;
 
+		
+	}
+	private DynamicDBean fillDataOuput( JsonNode rowStepOuput, DynamicDBean rowInputData) {//fillDataOuput(DynamicDBean newBean, JsonNode rowStepOuput, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
+		JsonNode rowsStepOuputMap = rowStepOuput.get("List-ProcessStepOutputMap");
+		ArrayList<String[]> colList = rowInputData.getRowsColList();
+		for (JsonNode rowStepOuputMap : rowsStepOuputMap) 
+		{
+			rowInputData.setCol(rowStepOuputMap.get("fieldValue").asText(), getColNameInUi(rowStepOuputMap.get("ouputField").asText(), colList, rowStepOuput.get("resource").asText() ));
+		}
+		return rowInputData;
+	//	Orvisa@.03
 		
 	}
 	private DynamicDBean fillDataOuput(DynamicDBean newBean, JsonNode rowStepOuput, DynamicDBean rowInputData) {//fillDataOuput(DynamicDBean newBean, JsonNode rowStepOuput, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
