@@ -3123,15 +3123,21 @@ private boolean isBoolean(String header, String colType) {
 		return null;
 	}
 
+	@SuppressWarnings("unused")
 	public Object DeleteARow() {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + selectedRow.getRowJSon().toString());
+		if (AppConst.CONFIRM_DELETE == false)
+		{
+			doDelete(null, true);
+			return null;
+		}
 		beansToSaveAndRefresh.clear();
 		if (selectedRow == null)
 		{
 			DataService.get().showError("no hay registro seleccionado para eliminar");
 			return null;
 		}	
-		Label content = new Label("Comfirmar Baja ");
+		Label content = new Label("Confirmar Baja ");
 		NativeButton buttonAccept = new NativeButton(" Aceptar ");
 		NativeButton buttonCancel = new NativeButton(" Cancelar ");
 		Notification notification = new Notification(content, buttonAccept, buttonCancel);
@@ -3145,7 +3151,8 @@ private boolean isBoolean(String header, String colType) {
 	}
 
 		private Object doDelete(Notification notification, boolean aceptOrCancel) {	
-		notification.close();
+			if (notification != null)
+				notification.close();
 		if (aceptOrCancel)
 		{
 			beansToSaveAndRefresh.put(selectedRow.getResourceName(), selectedRow);
