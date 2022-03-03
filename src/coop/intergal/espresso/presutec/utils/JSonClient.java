@@ -895,13 +895,13 @@ public class JSonClient {
 					resource = JSonClient.get("@resources/"+ident,null,cache,preConfParam);  
 					if (resource != null)
 					{
-					keepJoinConditionSubResources(resource); // is used later for childFilters
-					if (subResourceName != null && subResourceName.length() > 1) 
-						{
-						resource = getSubResourceTable(resource, subResourceName);
-						
+						keepJoinConditionSubResources(resource); // is used later for childFilters
+						if (subResourceName != null && subResourceName.length() > 1) 
+							{
+							resource = getSubResourceTable(resource, subResourceName);
+							}
 						if (resource != null)
-						{
+							{
 							JsonNode fieldList = resource.get("attributes");
 							String tableName = resource.get("table_name").asText();
 							setResourceTableName(tableName);
@@ -914,7 +914,7 @@ public class JSonClient {
 							JsonNode subresources = resource.get("subresources");
 //				tableName = resource.get("table_name").asText();
 //				setResourceTableName(tableName);
-//				if (subResourceName != null) // only when you send a subResourceName you want his attributes names in the list
+//				if (subResourceName != null) // only when you send a subResourceName you want its attribute names in the list
 //				{
 							for (JsonNode eachRow : subresources) {
 								JsonNode fieldListSR = eachRow.get("attributes");
@@ -929,10 +929,8 @@ public class JSonClient {
 									}
 								}	
 							}
-					
 						}
-						}
-					else // no exite subresource
+					else // no existe subresource
 					{
 						System.err.println("************ERROR subResourceName NO EXISTE : "+ subResourceName);
 					}
