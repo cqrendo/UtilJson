@@ -1,16 +1,22 @@
 package coop.intergal.ui.views;
+import static coop.intergal.AppConst.DEFAULT_API_NAME;
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
 import static coop.intergal.AppConst.PAGE_DYNAMIC_TREE;
 import static coop.intergal.AppConst.PAGE_PRODUCTS;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.polymertemplate.TemplateParser;
@@ -25,6 +31,11 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
+import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.tys.ui.SubMenu;
+import coop.intergal.tys.ui.SubSubmenu;
+import coop.intergal.tys.ui.components.navigation.drawer.NaviItem;
+import coop.intergal.tys.ui.components.navigation.drawer.NaviMenu;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.UtilSessionData;
@@ -112,6 +123,7 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 	private TreeGrid<DynamicDBean> treeGrid = new TreeGrid<>();
 	private DdbHierarchicalDataProvider dataProvider;
 	private ArrayList<String[]> rowsColListGrid;
+	private NaviMenu menu;
 	private static final String CLASS_NAME = "root";
 	
 
@@ -241,14 +253,16 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 		{
 			title=queryParameters.getParameters().get("title").get(0);
 			resourceName = queryParameters.getParameters().get("resourceName").get(0);
-			apiname = queryParameters.getParameters().get("apiname").get(0);
+			if (queryParameters.getParameters().get("apiname") != null)
+				apiname = queryParameters.getParameters().get("apiname").get(0);
 			queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
 			displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
 			
 //			resourceSubGrid =  queryParameters.getParameters().get("resourceSubGrid").get(0);
 		}
 		
-		setupGrid();
+	//	setupGrid();
+		
 //		grid.setDisplayFormClassName(displayFormClassName);
 //		grid.setDisplay(divDisplay);
 //		grid.setDivSubGrid(divSubGrid);
@@ -256,19 +270,19 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 //		grid.setLayout(this);
 ////		grid.setGridSplitDisplay(gridSplitDisplay);
 //		grid.setResourceName(resourceName);
-		if (filter != null  && filter.length() > 0)
-		{
-			filter = filter + "%20%AND%20APIname='"+apiname+"'";
-		}
-		else
-		{
-			filter = "APIname='"+apiname+"'";
-		}
-		
+//		if (filter != null  && filter.length() > 0)
+//		{
+//			filter = filter + "%20%AND%20APIname='"+apiname+"'";
+//		}
+//		else
+//		{
+//			filter = "APIname='"+apiname+"'";
+//		}
+		initNaviItems();
 //		grid.setFilter(filter);
 //		grid.setupGrid(false);
 //		divGrid.add(grid );
-		divTree.add(treeGrid);
+		divTree.add(menu);
 		buttons.setVisible(false);
 //		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
 //		buttons.addCancelListener(e -> grid.undoSelectedRow());
@@ -334,5 +348,68 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 		// TODO Auto-generated method stub
 		return col;
 	}
+	   
+	   public void initNaviItems() {
+	        menu = new NaviMenu();//naviDrawer.getMenu();
+	        menu.removeAll();
+			try {
+				JsonNode rowsList = JSonClient.get(resourceName,filter,false,UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM,500+"");
+				for (JsonNode eachRow : rowsList)  {
+					String optionName = eachRow.get("DESCRIPCION").asText();
+					String subLevel= "";
+					if (eachRow.get("subLevel") != null)
+						{
+						subLevel =  eachRow.get("subLevel").asText();
+						String subLevelFilter = eachRow.get("subLevelFilter").asText();
+						String resourceName1 = resourceName+"."+subLevel;
+						NaviItem submenu = menu.addNaviItem(VaadinIcon.ACCORDION_MENU, optionName,
+						                SubSubmenu.class);
+						 JsonNode rowsList1 = JSonClient.get(resourceName1,subLevelFilter,false,UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM,500+"");
+						 for (JsonNode eachRow1 : rowsList1)  
+								{
+									String optionName1 = eachRow1.get("DESCRIPCION").asText();
+									String subLevel1= "";
+									if (eachRow1.get("subLevel") != null)
+										{
+										subLevel1 =  eachRow1.get("subLevel").asText();
+										String subLevelFilter1 = eachRow1.get("subLevelFilter").asText();
+										String resourceName2 = resourceName1+"."+subLevel1;
+										NaviItem submenu1 = menu.addNaviItem(submenu, optionName1,
+								                null);
+										JsonNode rowsList2 = JSonClient.get(resourceName2,subLevelFilter1,false,UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM,500+"");
+
+										 for (JsonNode eachRow2 : rowsList2)  {
+												{
+													String optionName2 = eachRow2.get("DESCRIPCION").asText();
+													String subLevel2= "";
+													if (eachRow2.get("subLevel") != null)
+														{
+														subLevel2 =  eachRow2.get("subLevel").asText();
+														String subLevelFilter2 = eachRow2.get("subLevelFilter").asText();
+														resourceName = resourceName+"."+subLevel2;
+														NaviItem submenu2 = menu.addNaviItem(submenu1, optionName2,
+												                null);
+														}
+												}	
+											//			JsonNode rowsList2 = JSonClient.get(resourceName,subLevelFilter,false,AppConst.PRE_CONF_PARAM_METADATA,500+"");
+										 }
+										}
+								}
+						}
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//	        menu.addNaviItem(VaadinIcon.HOME, "Home", Home.class);
+//	        menu.addNaviItem(VaadinIcon.INSTITUTION, "Accounts", GenericGrid.class);
+//	        menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", GenericGridDetails.class);
+//	        menu.addNaviItem(VaadinIcon.CHART, "Statistics", Statistics.class);
+	//
+//	        NaviItem personnel = menu.addNaviItem(VaadinIcon.USERS, "Personnel",
+//	                null);
+//	        menu.addNaviItem(personnel, "Accountants", Accountants.class);
+//	        menu.addNaviItem(personnel, "Managers", Managers.class);
+	    }
 
 }

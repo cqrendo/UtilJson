@@ -35,6 +35,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.tys.ui.views.comprasyventas.articulos.HistogramaEvolMesForm;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.UtilSessionData;
@@ -122,12 +123,25 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 //		super.bindFields(class1, object, getRowsColList().iterator(), binder); 
 //	}
 	public void bindFields(Class<?> class1, Object object) {
+		bindFields(class1, object,null,null);
+	}
+	protected void bindFields(Class<?> class1, Object object,
+			Binder<DynamicDBean> altBinder, String prefix) {
 		Iterator<String[]> itRowsColList = getRowsColList().iterator(); // even is a field it uses RowColList (columns) , because is for a custom form where his field doesn't need to be defined as showInDisplay
+		if (altBinder == null)
+			altBinder = binder;
+		else 
+			itRowsColList = altBinder.getBean().getRowsColList().iterator();
 		if (buttonsForm != null)
 			buttonsForm.getCustomButtons().removeAll();
 		while(itRowsColList.hasNext())
 		{
 			String[] rowCol = itRowsColList.next();
+			String altField;
+			if (prefix != null) 
+				altField = rowCol [2].replace("col", prefix);
+			else
+				altField = rowCol [2];
 			String fieldNameInUI = rowCol [2];
 			String idFieldTypeStr = rowCol [3];
 			String tagsForVisibility = rowCol[21].toString();
@@ -136,18 +150,18 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 			String label = rowCol[7].toString();//rowField[7].toString();
 			boolean isPick = isPick (rowCol [1]);
 			boolean isRequired = isRequired( rowCol [1]);
-//			System.out.println("GenericDynamicForm.bindFields() col 0 ---> "+ binder.getBean().getCol0() + "/" +binder.getBean().getCol1());
+//			System.out.println("GenericDynamicForm.bindFields() col 0 ---> "+ altBinder.getBean().getCol0() + "/" +altBinder.getBean().getCol1());
 			boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 			boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
-			if (tagsForVisibility.indexOf("row.") > -1 && binder.getBean() != null && binder.getBean().getRowJSon() != null)  // visibility of the filed depends in a value of the row, create a virtual field that returns true or false , depending on condition
+			if (tagsForVisibility.indexOf("row.") > -1 && altBinder.getBean() != null && altBinder.getBean().getRowJSon() != null)  // visibility of the filed depends in a value of the row, create a virtual field that returns true or false , depending on condition
 			{
 				int idxStart = tagsForVisibility.indexOf("row.")+4;
 				int idxEnd = tagsForVisibility.length();
 				if (tagsForVisibility.indexOf(",") > -1 )
 					idxEnd = tagsForVisibility.indexOf(",");
 				String tagKey = tagsForVisibility.substring(idxStart, idxEnd )	;
-				if (binder.getBean().getRowJSon().get(tagKey) != null)
-					visibleByTag = binder.getBean().getRowJSon().get(tagKey).asBoolean();
+				if (altBinder.getBean().getRowJSon().get(tagKey) != null)
+					visibleByTag = altBinder.getBean().getRowJSon().get(tagKey).asBoolean();
 			}
 			int idFieldType = 0;
 			if ( idFieldTypeStr.isEmpty() == false)
@@ -158,7 +172,7 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 				System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldNameInUI);
 				if (!fieldNameInUI.equals("null"))
 				{	
-					Field field = ((class1)).getDeclaredField(fieldNameInUI);//.get(instancia);
+					Field field = ((class1)).getDeclaredField(altField);//.get(instancia);
 					field.setAccessible(true);
 					Object fieldObj = field.get(object);
 					if (idFieldType == 0)  // is Text Field
@@ -176,16 +190,16 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 							tf.setSuffixComponent(icon);
 						}
 						if (isRequired)
-							binder.forField(tf).asRequired("Requerido").bind(fieldNameInUI);
+							altBinder.forField(tf).asRequired("Requerido").bind(fieldNameInUI);
 						else
-							binder.bind(tf, fieldNameInUI);
+							altBinder.bind(tf, fieldNameInUI);
 					}
 					else if (rowCol[3].equals("1")) // is Date
 						{
 						if (isRequired)
 						{
 							((EsDatePicker) fieldObj).setReadOnly(isReadOnly);
-							binder.forField((EsDatePicker) fieldObj).asRequired("Requerido")
+							altBinder.forField((EsDatePicker) fieldObj).asRequired("Requerido")
 							.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
 							.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
 	
@@ -193,7 +207,7 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 						else
 						{
 							((EsDatePicker) fieldObj).setReadOnly(isReadOnly);
-							binder.forField((EsDatePicker) fieldObj)
+							altBinder.forField((EsDatePicker) fieldObj)
 							.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
 							.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
 						}
@@ -204,29 +218,29 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 						{	((TextArea) fieldObj).setReadOnly(isReadOnly);
 							if (!visibleByTag)
 								((TextArea) fieldObj).getElement().getStyle().set("visibility","hidden");
-							binder.forField((TextArea) fieldObj).asRequired("Requerido").bind(fieldNameInUI);
-	//						binder.bind((TextArea) fieldObj, fieldName);
+							altBinder.forField((TextArea) fieldObj).asRequired("Requerido").bind(fieldNameInUI);
+	//						altBinder.bind((TextArea) fieldObj, fieldName);
 						}	
 						else
 						{
 							((TextArea) fieldObj).setReadOnly(isReadOnly);
 							if (!visibleByTag)
 								((TextArea) fieldObj).getElement().getStyle().set("visibility","hidden");
-							binder.bind((TextArea) fieldObj, fieldNameInUI);
+							altBinder.bind((TextArea) fieldObj, fieldNameInUI);
 						}	
 					}
 					else if (rowCol[3].equals("3")) // is currency
 					{
-			//			binder.bind((AmountField) fieldObj, fieldName);
+			//			altBinder.bind((AmountField) fieldObj, fieldName);
 						((TextField) fieldObj).addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
 						((TextField) fieldObj).setReadOnly(isReadOnly);
 						if (!visibleByTag)
 							((TextField) fieldObj).getElement().getStyle().set("visibility","hidden");
 						if (isRequired)
-							binder.forField((TextField) fieldObj).asRequired("Requerido").bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
+							altBinder.forField((TextField) fieldObj).asRequired("Requerido").bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
 						else
-							binder.forField((TextField) fieldObj).bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
-			//			binder.forField((AmountField) fieldObj).bind(d-> d.getColInteger(fieldName), (d,v)-> d.setColInteger(v,fieldName));//DynamicDBean::setCol2Date);				
+							altBinder.forField((TextField) fieldObj).bind(d -> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
+			//			altBinder.forField((AmountField) fieldObj).bind(d-> d.getColInteger(fieldName), (d,v)-> d.setColInteger(v,fieldName));//DynamicDBean::setCol2Date);				
 
 					}
 					else if (idFieldType > 100 ) // is Decimal
@@ -240,11 +254,11 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 
 						new NumeralFieldFormatter(".", ",", nDecimals).extend(((TextField) fieldObj));
 						if (isRequired)
-							binder.forField((TextField) fieldObj)
+							altBinder.forField((TextField) fieldObj)
 							.asRequired("Requerido")
 							.bind(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(fieldNameInUI),nDecimals)), (d,v)-> d.setColInteger(v,fieldNameInUI));
 						else
-							binder.forField((TextField) fieldObj)
+							altBinder.forField((TextField) fieldObj)
 							.bind(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(fieldNameInUI),nDecimals)), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					}
 					else if (rowCol[3].equals("4")) // is Boolean
@@ -253,11 +267,11 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 						if (!visibleByTag)
 							((Checkbox) fieldObj).getElement().getStyle().set("visibility","hidden");
 						if (isRequired)
-							binder.forField((Checkbox) fieldObj)
+							altBinder.forField((Checkbox) fieldObj)
 							.asRequired("Requerido")
 							.bind(d -> d.getColBoolean(fieldNameInUI), (d,v)-> d.setColBoolean(v,fieldNameInUI));
 						else
-							binder.forField((Checkbox) fieldObj).bind(d -> d.getColBoolean(fieldNameInUI), (d,v)-> d.setColBoolean(v,fieldNameInUI));
+							altBinder.forField((Checkbox) fieldObj).bind(d -> d.getColBoolean(fieldNameInUI), (d,v)-> d.setColBoolean(v,fieldNameInUI));
 					}
 					else if (idFieldType == 5 ) // is Number
 					{
@@ -266,9 +280,9 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 						if (!visibleByTag)
 							nf.getElement().getStyle().set("visibility","hidden");
 						if (isRequired)
-							binder.forField(nf).asRequired("Requerido").bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+							altBinder.forField(nf).asRequired("Requerido").bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 						else
-							binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+							altBinder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					}
 					else if (idFieldType == 6 ) // is Combobox
 					{
@@ -307,18 +321,18 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 							cB.getElement().getStyle().set("visibility","hidden");
 //						cB.setVisible(visibleByTag);  // in this way it covers the space with next field
 						if (isRequired)
-							binder.forField(cB).withConverter(
+							altBinder.forField(cB).withConverter(
 								item-> Optional.ofNullable(item).map(DynamicDBean::getCol0).orElse(null),
 								id-> getRowById(id, cB))
 							.asRequired("Requerido")
 							.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
 						else
-							binder.forField(cB).withConverter(
+							altBinder.forField(cB).withConverter(
 									item-> Optional.ofNullable(item).map(DynamicDBean::getCol0).orElse(null),
 									id-> getRowById(id, cB))
 								.bind(d-> d.getCol(fieldNameInUI), (d,v)-> d.setCol(v,fieldNameInUI));
 							
-//						binder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
+//						altBinder.forField(nf).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 					}
 					else if (idFieldType == 10) // is a button
 					{
