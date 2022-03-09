@@ -65,6 +65,7 @@ import com.vaadin.flow.data.converter.LocalDateToDateConverter;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
 
 import coop.intergal.AppConst;
@@ -1515,6 +1516,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		String tagsForVisibility = colData[21].toString();
 		String tagsForEdition = colData[22].toString();
 		String idButtonBarForButtons = colData[25].toString();
+		boolean isHTMLCode = false;
 		
  		boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 		boolean editableByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForEdition);
@@ -1563,6 +1565,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 //			}
 			// @@1
 
+			
 			if (isDate(header, idFieldType)) { /// ********** DATE **************
 				if (header.indexOf("#")>0)
 					header = header.substring(2); // to avoid date typ indicator "D#"
@@ -1694,6 +1697,12 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 					}
 						
 				}
+				else if (isHTMLCode((idFieldType)))
+				{
+				grid.addColumn(TemplateRenderer.<DynamicDBean> of("<div inner-h-t-m-l='[[item.html"+i+"]]'></div>")
+		    	        .withProperty("html"+i, e -> {
+		    	        	 return e.getCol(colName); })).setHeader(header).setResizable(true);
+				}
 				else
 					if ((isCOlEditable && isGridEditable))
 					{
@@ -1757,6 +1766,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 	  
 
 
+
 //	private Object colChanged(DynamicDBean item, String colName, String newValue) {
 //		// @@1
 //		
@@ -1799,6 +1809,13 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
     		return true;
     	return false;
     }
+    private static boolean isHTMLCode(int idFieldType) {
+     	if (idFieldType == 11)
+    		return true;
+    	return false;
+
+    	}
+
 
 	public static void fillDefaultValues(DynamicDBean bean) {  
 		ArrayList<String[]> rowsColList = bean.getRowsColList();
