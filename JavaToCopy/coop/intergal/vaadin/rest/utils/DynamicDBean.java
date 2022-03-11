@@ -1573,47 +1573,47 @@ public class DynamicDBean {// implements Serializable {
 		this.col140 = col140;
 	}
 
-	public String getcol141() {
+	public String getCol141() {
 		return col141;
 	}
 
-	public void setcol141(String col141) {
+	public void setCol141(String col141) {
 		this.col141 = col141;
 	}
 
-	public String getcol142() {
+	public String getCol142() {
 		return col142;
 	}
 
-	public void setcol142(String col142) {
+	public void setCol142(String col142) {
 		this.col142 = col142;
 	}
 
-	public String getcol143() {
+	public String getCol143() {
 		return col143;
 	}
 
-	public void setcol143(String col143) {
+	public void setCol143(String col143) {
 		this.col143 = col143;
 	}
 
-	public String getcol144() {
+	public String getCol144() {
 		return col144;
 	}
 
-	public void setcol144(String col144) {
+	public void setCol144(String col144) {
 		this.col144 = col144;
 	}
 
-	public String getcol145() {
+	public String getCol145() {
 		return col145;
 	}
 
-	public void setcol145(String col145) {
+	public void setCol145(String col145) {
 		this.col145 = col145;
 	}
 
-	public String getcol146() {
+	public String getCol146() {
 		return col146;
 	}
 
@@ -1621,7 +1621,7 @@ public class DynamicDBean {// implements Serializable {
 		this.col146 = col146;
 	}
 
-	public String getcol147() {
+	public String getCol147() {
 		return col147;
 	}
 
@@ -1629,7 +1629,7 @@ public class DynamicDBean {// implements Serializable {
 		this.col147 = col147;
 	}
 
-	public String getcol148() {
+	public String getCol148() {
 		return col148;
 	}
 
@@ -1637,7 +1637,7 @@ public class DynamicDBean {// implements Serializable {
 		this.col148 = col148;
 	}
 
-	public String getcol149() {
+	public String getCol149() {
 		return col149;
 	}
 

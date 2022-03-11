@@ -28,6 +28,36 @@ public class UtilSessionData {
 		VaadinSession.getCurrent().setAttribute("cache", cache);
 		System.out.println("UtilSessionData.setCache() ->" + cache);
 	}
+	public static String getFormParams(String key) {
+		String actualFormParams = (String) VaadinSession.getCurrent().getAttribute("formParams");
+		if (actualFormParams == null)
+			return null;
+		if (key.equals("ALL"))
+			return actualFormParams;
+		if ( actualFormParams.indexOf(key) == -1)
+			return null;
+		int idxStart = actualFormParams.indexOf(key) + key.length()+1;
+		int idxEnd =idxStart+actualFormParams.substring(idxStart).indexOf("#");
+		return actualFormParams.substring(idxStart, idxEnd);
+	}
+	public static void setFormParams(String key, String formParams) { // format key=value# where key is className.varName
+		String actualFormParams = getFormParams("ALL");
+		if (actualFormParams != null && actualFormParams.indexOf(key) > -1) 
+		{
+			int idxStart = actualFormParams.indexOf(key) + key.length()+1;
+			int idxEnd =idxStart+actualFormParams.substring(idxStart).indexOf("#");
+			actualFormParams = actualFormParams.substring(0,idxStart) + formParams + actualFormParams.substring(idxEnd);			
+		}
+		else
+		{
+			if (actualFormParams!= null)
+				actualFormParams = actualFormParams + key + "=" + formParams +"#";
+			else
+				actualFormParams = key + "=" + formParams +"#";
+		}
+		VaadinSession.getCurrent().setAttribute("formParams", actualFormParams);
+		System.out.println("UtilSessionData.setformParams() ->" + actualFormParams);
+	}
 	public static String getCompanyYear() {
 		Object companyYear = VaadinSession.getCurrent().getAttribute("companyYear");
 		System.out.println("UtilSessionData.getCompanyYear() ->" +companyYear );
