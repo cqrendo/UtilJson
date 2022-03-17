@@ -735,6 +735,20 @@ public class JSonClient {
 								{
 									return eachRow2; 
 								}
+								JsonNode subResources3 = eachRow2.get("subresources");
+								if (subResources3 != null)
+									{
+									if (ht.get(childName) == null)
+										ht.put(childName, eachRow.get("join_condition").asText()); // keeps 
+
+									for (JsonNode eachRow3 : subResources2) {
+										String resourceName3 = eachRow3.get("name").asText();
+										if (resourceName3.equals(childName))
+										{
+											return eachRow3; 
+										}
+									}
+								}	
 							}
 						}
 					}
@@ -997,27 +1011,46 @@ public class JSonClient {
 			{
 			for (JsonNode eachRow : subResources) {
 				String childResource = eachRow.get("name").asText();
-				String resourceName = getResourceName(parentResource,childResource);
-				if (ht.get(resourceName) == null)
-					ht.put(resourceName, cleanEmptyJoin(eachRow.get("join_condition").asText())); // keeps 
-
+				String resourceNameWithParent = getResourceName(parentResource,childResource);
+				if (ht.get(resourceNameWithParent) == null)
+					ht.put(resourceNameWithParent, cleanEmptyJoin(eachRow.get("join_condition").asText())); // keeps 
 				JsonNode subResources1 = eachRow.get("subresources");
-				if (subResources1 != null)
+				if (subResources1 != null && subResources1.elements().hasNext())
 					{
 					for (JsonNode eachRow1 : subResources1) {
 						String childResource1 = eachRow1.get("name").asText();
-						String resourceName1 = getResourceName(childResource,childResource1);
-						resourceName1 = getResourceName(parentResource, resourceName1);
+						String resourceNameWithParent1 = getResourceName(resourceNameWithParent,childResource1);
+						if (ht.get(resourceNameWithParent1) == null)
+							ht.put(resourceNameWithParent1, cleanEmptyJoin(eachRow1.get("join_condition").asText())); // keeps 
+						String resourceName1 = getResourceName(childResource, childResource1);
 						if (ht.get(resourceName1) == null)
 							ht.put(resourceName1, cleanEmptyJoin(eachRow1.get("join_condition").asText())); // keeps 
+
 						JsonNode subResources2 = eachRow1.get("subresources");
-						if (subResources2 != null)
+						if (subResources2 != null && subResources2.elements().hasNext())
 							{
 							for (JsonNode eachRow2 : subResources2) {
 								String childResource2 = eachRow2.get("name").asText();
-								String resourceName2 = getResourceName(childResource1,childResource2);
+								String resourceNameWithParent2 = getResourceName(resourceNameWithParent1,childResource2);
+								if (ht.get(resourceNameWithParent2) == null)
+									ht.put(resourceNameWithParent2, cleanEmptyJoin(eachRow2.get("join_condition").asText())); // keeps 
+								String resourceName2 = getResourceName(childResource1, childResource2);
 								if (ht.get(resourceName2) == null)
 									ht.put(resourceName2, cleanEmptyJoin(eachRow1.get("join_condition").asText())); // keeps 
+
+								JsonNode subResources3 = eachRow2.get("subresources");
+								if (subResources3 != null && subResources3.elements().hasNext())
+									{
+									for (JsonNode eachRow3 : subResources2) {
+										String childResource3 = eachRow3.get("name").asText();
+										String resourceNameWithParent3 = getResourceName(resourceNameWithParent2,childResource3); //(childResource2,childResource3);
+										if (ht.get(resourceNameWithParent3) == null)
+											ht.put(resourceNameWithParent3, cleanEmptyJoin(eachRow3.get("join_condition").asText())); // keeps 									
+										String resourceName3 = getResourceName(childResource2, childResource3);
+										if (ht.get(resourceName3) == null)
+											ht.put(resourceName3, cleanEmptyJoin(eachRow1.get("join_condition").asText())); // keeps 
+									}
+								}
 							}
 						}
 					}

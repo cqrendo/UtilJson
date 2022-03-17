@@ -82,7 +82,7 @@ public class UtilSessionData {
 	}
 
 	public static boolean isVisibleOrEditableByTag(String tagsForVisibility) {
-		if (tagsForVisibility.isEmpty())
+		if (tagsForVisibility == null || tagsForVisibility.isEmpty())
 			return true;
 	    StringTokenizer tokens = new StringTokenizer(tagsForVisibility,","); 
 	      int i = 0;
@@ -105,7 +105,7 @@ public class UtilSessionData {
 	}
 	private static Object getKeyValue(String tagkey) {
 		if (AppConst.TAGS_LIST.indexOf(tagkey) == -1)
-			
+			System.out.println("tag not in TAGS_LIST");
 		if (tagkey.equals("user"))
 			return SecurityUtils.getUsername();
 		return VaadinSession.getCurrent().getAttribute(tagkey); // gets other attributtes fill in the session

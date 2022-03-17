@@ -22,6 +22,7 @@ import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.ui.components.FormButtonsBar;
+import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
@@ -109,6 +110,14 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 	}
 
 //	private CurrencyFormatter currencyFormatter = new CurrencyFormatter();
+	private String extraFilterToSelect;
+	public String getExtraFilterToSelect() {
+		return extraFilterToSelect;
+	}
+
+	public void setExtraFilterToSelect(String extraFilterToSelect) {
+		this.extraFilterToSelect = extraFilterToSelect;
+	}
 
 	private String resourceName;
 	private String title;
@@ -300,8 +309,11 @@ public String getResourceName() {
 		}
 		createContent() ;
 	}
-
 		public Component createContent() {
+			return createContent(null);
+		}
+		public Component createContent(DynamicDBean preSelectRow) {
+		
 //		splitQryAndResult.setSplitterPosition(2);
 //		gridDisplaySubGrid.setMinWidth("20px");
 
@@ -314,8 +326,14 @@ public String getResourceName() {
 //		grid.setGridSplitDisplay(gridSplitDisplay);
 		grid.setResourceName(resourceName);
 		grid.getGrid().addSelectionListener(e -> {
+			DynamicDBean seletedRow;
 			if (e.getFirstSelectedItem().isPresent())
-					grid.showBean((DynamicDBean)e.getFirstSelectedItem().get());
+				{
+					seletedRow = (DynamicDBean)e.getFirstSelectedItem().get();
+					if (extraFilterToSelect != null)
+						keepSessionDataForFilter(seletedRow,extraFilterToSelect);
+					grid.showBean(seletedRow);
+				}
 			});
 		if ((apiname == null || apiname.length() == 0) == false)
 		{
@@ -332,6 +350,8 @@ public String getResourceName() {
 		System.out.println("DynamicGridDisplay.beforeEnter() CACHE "+ cache);
 		grid.setCache(cache);
 		grid.setupGrid(false, true);
+		if (preSelectRow != null)
+			grid.showBean(preSelectRow);
 //		divGrid.add(grid );
 		buttons.setVisible(false);
 		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
@@ -344,6 +364,19 @@ public String getResourceName() {
 
 		return this;
 	}
+
+	private void keepSessionDataForFilter(DynamicDBean seletedRow, String extraFilterToSelect2) {
+		if (extraFilterToSelect2 != null &&extraFilterToSelect2.indexOf("#SVKN#") > -1) // #SVN = Session Variable Key Name  By Example- > CLAVE_ALMACEN=#SVKN#"DynamicViewGrid.lastAlmacen#SVNKEnd#
+		{
+			int idxStart = extraFilterToSelect.indexOf("#SVKN#")+6;
+			int idxEnd = extraFilterToSelect.indexOf("#SVNKEnd#");
+			String sVkn = extraFilterToSelect.substring(idxStart,idxEnd );
+			String field = extraFilterToSelect.substring(0,idxStart-7);
+			String valueOfField = seletedRow.getRowJSon().get(field).asText();
+			UtilSessionData.setFormParams(sVkn,valueOfField);
+		}	
+			
+		}
 
 	public String getDisplayFormClassName() {
 			return displayFormClassName;

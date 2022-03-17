@@ -1225,6 +1225,7 @@ private boolean isBoolean(String header, String colType) {
 		subDynamicViewGrid.setDisplayParent(display);
 		subDynamicViewGrid.setBeanParent(setBean);
 		subDynamicViewGrid.setParentGrid(this);
+		subDynamicViewGrid.getGrid().select(getKeepSelectedChild());
 		divSubGrid.add(subDynamicViewGrid );
 		keepSubGridToBeAlterExternally(subDynamicViewGrid);
 		Div divTab = new Div();
@@ -1232,6 +1233,11 @@ private boolean isBoolean(String header, String colType) {
 		divTab.add(subDynamicViewGrid );
 		return divTab;
 		
+	}
+
+	private DynamicDBean getKeepSelectedChild() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private void keepSubGridToBeAlterExternally(DynamicViewGrid subDynamicViewGrid) {
@@ -1271,57 +1277,120 @@ private boolean isBoolean(String header, String colType) {
 //			    "updateNotAllow":true
 //			}
 			JsonNode extProp = JSonClient.get("JS_ExtProp", resource, cache, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+			if (extProp.get("insertAllow") != null)
+			{
+				String insertAllow = extProp.get("insertAllow").asText();
+				if (isActionAllow(insertAllow))
+					{
+					setInsertButtonsVisible(true);
+					}
+				else
+					{
+					setInsertButtonsVisible(false);
+					}
+					
+				
+			}
+			
 			if (extProp.get("insertNotAllow") != null)
 			{
-				boolean insertNotAllow = extProp.get("insertNotAllow").asBoolean();
-				if (insertNotAllow)
+				String insertNotAllow = extProp.get("insertNotAllow").asText();
+				if (isActionAllow(insertNotAllow))
 					{
-					newRow.setVisible(false);
-					if (buttonsForm != null)
-						buttonsForm.setAddVisible(false);
+					setInsertButtonsVisible(false);
 					}
 			}
-			else
+			else if (extProp.get("insertAllow") == null)
 			{
-				newRow.setVisible(true);
-				if (buttonsForm != null)
-					buttonsForm.setAddVisible(true);
+				setInsertButtonsVisible(true);
+			}
+			
+			if (extProp.get("deleteAllow") != null)
+			{
+				String deleteAllow = extProp.get("deleteAllow").asText();
+				if (isActionAllow(deleteAllow))
+					{
+					setDeleteButtonsVisible(true);
+					}
+				else
+					{
+					setDeleteButtonsVisible(false);
+					}
+					
+				
 			}
 			if (extProp.get("deleteNotAllow") != null)
 			{
-				boolean deleteNotAllow = extProp.get("deleteNotAllow").asBoolean();
-				if (deleteNotAllow)
+				String deleteNotAllow = extProp.get("deleteNotAllow").asText();
+				if (isActionAllow(deleteNotAllow))
 					{
-					if (buttonsForm != null)
-						buttonsForm.setDeleteVisible(false);
-					deleteRow.setVisible(false);
+					setDeleteButtonsVisible(false);
 					}
 			}
-			else
+			else if (extProp.get("deleteAllow") == null)
 			{
-				deleteRow.setVisible(true);
-				if (buttonsForm != null)
-					buttonsForm.setDeleteVisible(true);
+				setDeleteButtonsVisible(true);
+			}
+			if (extProp.get("updateAllow") != null)
+			{
+				String updateAllow = extProp.get("updateAllow").asText();
+				if (isActionAllow(updateAllow))
+					{
+					setUpdateButtonsVisible(true);
+					}
+				else
+					{
+					setUpdateButtonsVisible(false);
+					}
+					
+				
 			}
 			if (extProp.get("updateNotAllow") != null)
 			{
-				boolean updateNotAllow = extProp.get("updateNotAllow").asBoolean();
-				if (updateNotAllow && buttonsForm != null)
+				String updateNotAllow = extProp.get("updateNotAllow").asText();
+				if (isActionAllow(updateNotAllow) && buttonsForm != null)
 					{
-					buttonsForm.setSaveVisible(false);
-					buttonsForm.setCancelVisible(false);
+					setUpdateButtonsVisible(false);
 					}
 			}
-			else if (buttonsForm != null)
+			else if ((buttonsForm != null) && (extProp.get("updateAllow") == null))
 			{
-				buttonsForm.setSaveVisible(true);
-				buttonsForm.setCancelVisible(true);
+				setUpdateButtonsVisible(true);
 			}
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private void setUpdateButtonsVisible(boolean b) {
+		buttonsForm.setSaveVisible(b);
+		buttonsForm.setCancelVisible(b);
+
+		
+	}
+
+	private void setDeleteButtonsVisible(boolean b) {
+		if (buttonsForm != null)
+			buttonsForm.setDeleteVisible(b);
+		deleteRow.setVisible(b);
+		
+	}
+
+	private void setInsertButtonsVisible(boolean b) {
+		newRow.setVisible(b);
+		if (buttonsForm != null)
+			buttonsForm.setAddVisible(b);
+
+		
+	}
+
+	private boolean isActionAllow(String actionCondition) { // validates condition
+		if (actionCondition.equals("true"))
+			return true;
+		boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(actionCondition);
+		return visibleByTag;
 	}
 
 	public Component  dummy2 ()
@@ -1941,7 +2010,7 @@ private boolean isBoolean(String header, String colType) {
     		tabs.addSelectedChangeListener(event -> {
     			pages2.removeAll();
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
-    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
+   			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
       			keepSelectedPage = tabs.getSelectedIndex();
     		});
@@ -1994,6 +2063,8 @@ private boolean isBoolean(String header, String colType) {
 			String displaySubFormClassName = null;
 			String querySubFormClassName = null;
 			String subLayoutClassName =  "NO LAYOUT";
+			String extraFilterToSelect = null;
+			String tagsForVisibility = null;
 			if (extProp.get("subLayoutClassName") != null)
 			{
 				subLayoutClassName = extProp.get("subLayoutClassName").asText();
@@ -2006,10 +2077,20 @@ private boolean isBoolean(String header, String colType) {
 			{
 				querySubFormClassName = extProp.get("querySubFormClassName").asText();
 			}
-			else if (extProp.get("displaySubFormClassName") == null  && (extProp.get("querySubFormClassName") == null))
+			else if ((subLayoutClassName.indexOf("DynamicMultiForm") ==-1) && ((extProp.get("displaySubFormClassName") == null  && (extProp.get("querySubFormClassName") == null))))
 			{
 				showError("sin definir displaySubFormClassName y/o querySubFormClassName en extended properties ");
-			}	
+			}
+			else if (extProp.get("extraFilterToSelect") != null )
+			{
+				extraFilterToSelect = extProp.get("extraFilterToSelect").asText();
+			}
+			else if (extProp.get("tagsForVisibility") != null )
+			{
+				tagsForVisibility = extProp.get("tagsForVisibility").asText();
+			}
+	
+
 //			JsonNode jsonNode = bean.getRowJSon();
 //			int idxPoint = resourceSubGrid0.indexOf(".");
 //			if (idxPoint > -1)
@@ -2028,9 +2109,23 @@ private boolean isBoolean(String header, String colType) {
 			dataProviderSub.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 			dataProviderSub.setResourceName(subFormResource);
 			dataProviderSub.setFilter(subFormFilter);
-			if (subLayoutClassName.indexOf("DynamicGridDisplay") > -1)
+			if (subLayoutClassName.indexOf("DynamicMultiForm") > -1)
 			{
-				return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
+				DynamicDBean subBean = RestData.getOneRow(subFormResource, subFormFilter, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+				return componDynamicMultiForm (subBean, subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true, tagsForVisibility );
+				
+//			return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
+			}
+			else if (subLayoutClassName.indexOf("DynamicGridDisplay") > -1)
+			{
+				if (extraFilterToSelect != null)
+				{
+					return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true, extraFilterToSelect );
+				}
+				else
+				{
+					return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
+				}
 //			return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
 			}
 			else if (subLayoutClassName.indexOf("DynamicQryGrid") > -1)
@@ -2059,6 +2154,38 @@ private boolean isBoolean(String header, String colType) {
 		}
 		return new Label ("Sin datos error en la carga de Propiedades extendidas");
 	}
+	private String componFilterRowPreseleted(String subFormFilter, String extraFilterToSelect) {
+		String extraFilter = null;
+		if (extraFilterToSelect != null &&extraFilterToSelect.indexOf("#SVKN#") > -1) // #SVN = Session Variable Key Name  By Example- > CLAVE_ALMACEN=#SVKN#"DynamicViewGrid.lastAlmacen#SVNKEnd#
+		{
+			int idxStart = extraFilterToSelect.indexOf("#SVKN#")+6;
+			int idxEnd = extraFilterToSelect.indexOf("#SVNKEnd#");
+			String sVkn = extraFilterToSelect.substring(idxStart,idxEnd );
+			String vForFilter = UtilSessionData.getFormParams(sVkn);
+			if (vForFilter != null)
+			{
+				extraFilter = extraFilterToSelect.substring(0,idxStart-6 )+vForFilter;//+extraFilterToSelect.substring(idxEnd);
+				if (subFormFilter != null && subFormFilter.length() > 1)
+					extraFilter = "("+extraFilter + ")" + "%20AND%20(" +subFormFilter + ")";
+			}
+			else
+				return subFormFilter;			
+		}
+		else if (extraFilterToSelect != null && extraFilterToSelect.length() > 1)
+		{
+			extraFilter = extraFilterToSelect;
+			if (subFormFilter != null && subFormFilter.length() > 1)
+				extraFilter = "("+extraFilter + ")" + "%20AND%20(" +subFormFilter + ")";
+
+		}
+		else 
+		{
+			return subFormFilter;
+		}
+		System.out.println("DynamicViewGrid.componFilterRowPreseleted() extraFilter....:"+extraFilter);
+		return extraFilter;
+	}
+
 	private Component componExternalForm(DynamicDBean subBean, String subLayoutClassName, String subFormResource, String subFormFilter,
 			String subFormClassName, Div divSubForm, DynamicDisplayForAskData dynamicDisplayForAskData) {
 		Binder<DynamicDBean> binderForDialog = new Binder<>(DynamicDBean.class);
@@ -2215,9 +2342,13 @@ private boolean isBoolean(String header, String colType) {
 		}
 		return null;
 	}
-
 	private Component componDynamicGridDisplay(String subLayoutClassName, String subFormResource, String subFormFilter,
 			String subFormClassName, Div divSubForm, boolean b) {
+		return componDynamicGridDisplay(subLayoutClassName, subFormResource, subFormFilter,
+				subFormClassName, divSubForm, b, null) ;
+	}	
+	private Component componDynamicGridDisplay(String subLayoutClassName, String subFormResource, String subFormFilter,
+			String subFormClassName, Div divSubForm, boolean b, String extraFilterToSelect) {// DynamicDBean preSelectRow) {
 		try {
 //			setVisibleRowData(true);
 //			ArrayList<String[]> rowsColList = bean2.getRowsColList();
@@ -2248,9 +2379,95 @@ private boolean isBoolean(String header, String colType) {
 //			setBean.invoke(display,bean2);
 //			setDataProvider.invoke(display, dataProviderForm);
 			divSubForm.removeAll();
-			Method createContent= dynamicForm.getMethod("createContent");
-			Object divInSubDisplay = createContent.invoke(oDynamicForm);
+			if (extraFilterToSelect != null)
+			{
+				DynamicDBean beanPreSelect = RestData.getOneRow(subFormResource, componFilterRowPreseleted(subFormFilter,extraFilterToSelect), UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+				Method createContent= dynamicForm.getMethod("createContent", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class});
+				Method setExtraFilterToSelect= dynamicForm.getMethod("setExtraFilterToSelect", new Class[] {String.class});
+				setExtraFilterToSelect.invoke(oDynamicForm, extraFilterToSelect );
+				Object divInSubDisplay = createContent.invoke(oDynamicForm, beanPreSelect );
+				divSubForm.add((Component)divInSubDisplay);
+			}
+			else
+			{
+				Method createContent= dynamicForm.getMethod("createContent");
+				Object divInSubDisplay = createContent.invoke(oDynamicForm);
+				divSubForm.add((Component)divInSubDisplay);
+			}
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+//		display.beforeEnter(null);
+//		gridSplitDisplay.getElement().removeAllChildren();//removeChild(display.getElement());
+//		gridSplitDisplay.getElement().appendChild(grid.getElement());
+//		gridSplitDisplay.getElement().appendChild(display.getElement());
+
+//	UI.getCurrent().navigate("dymanic");
+		
+		
+		return divSubForm;
+	}
+	private Component componDynamicMultiForm(DynamicDBean bean, String subLayoutClassName, String subFormResource, String subFormFilter,
+			String subFormClassName, Div divSubForm, boolean b, String tagsForVisibility) {// DynamicDBean preSelectRow) {
+		try {
+//			setVisibleRowData(true);
+			ArrayList<String[]> rowsColList = bean.getRowsColList();
+//			if (bean2.isReadOnly()) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC 
+//				buttonsForm.setVisible(false);
+//			if (isSub == false)
+//				selectedRow = bean2;
+//			keepRowBeforChanges = new DynamicDBean(); 
+//			keepRowBeforChanges = RestData.copyDatabean(bean);
+//			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
+			Class<?> dynamicForm = Class.forName(subLayoutClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
+			Object oDynamicForm = dynamicForm.newInstance();
+			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+//			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
+//			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+//			Method setDisplayFormClassName = dynamicForm.getMethod("setDisplayFormClassName", new Class[] {String.class} );
+//			Method setQueryFormClassName = dynamicForm.getMethod("setQueryFormClassName", new Class[] {String.class} );
+			Method setResourceName = dynamicForm.getMethod("setResourceName", new Class[] {String.class} );
+			Method setTagsForVisibility = dynamicForm.getMethod("setTagsForVisibility", new Class[] {String.class} );
+			Method setFilter = dynamicForm.getMethod("setFilter", new Class[] {String.class} );
+			
+//			setDisplayFormClassName.invoke(oDynamicForm, subFormClassName);
+			setResourceName.invoke(oDynamicForm, subFormResource);
+			setTagsForVisibility.invoke(oDynamicForm, tagsForVisibility);
+			setFilter.invoke(oDynamicForm, subFormFilter);
+//			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
+			setRowsColList.invoke(oDynamicForm,rowsColList);//rowsColListGrid);
+//			setBinder.invoke(display,binder);
+			
+//			setBean.invoke(display,bean2);
+//			setDataProvider.invoke(display, dataProviderForm);
+			divSubForm.removeAll();
+			Method createContent= dynamicForm.getMethod("createContent", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class});
+	//		Method setExtraFilterToSelect= dynamicForm.getMethod("setExtraFilterToSelect", new Class[] {String.class});
+	//			setExtraFilterToSelect.invoke(oDynamicForm, extraFilterToSelect );
+			Object divInSubDisplay = createContent.invoke(oDynamicForm, bean );
 			divSubForm.add((Component)divInSubDisplay);
+				
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -2440,7 +2657,7 @@ private boolean isBoolean(String header, String colType) {
 		
 	}
 
-	private void setParentRow(DynamicDBean parentRow) {
+	void setParentRow(DynamicDBean parentRow) {
 		this.parentRow = parentRow;
 		
 	}
@@ -2581,7 +2798,7 @@ private boolean isBoolean(String header, String colType) {
 		while (keysHt.hasMoreElements())
 		{
 			String keyHt = keysHt.nextElement();
-			if (keyHt.startsWith(parentResourceName+"."))
+			if (keyHt.startsWith(parentResourceName+".") && noMoreChildren(keyHt.substring(parentResourceName.length()+1))) // to keep only direct children not sub-children
 			{
 				String child = keyHt.substring(keyHt.lastIndexOf(".")+1);
 				if (child.indexOf("List-") > -1) // to process only subresources List , not FK 
@@ -2637,6 +2854,12 @@ private boolean isBoolean(String header, String colType) {
 //				return null;
 //		}
 	}
+
+	private boolean noMoreChildren(String postParent) { // is there is not more . then is last children
+		if (postParent.indexOf(".") == -1)
+			return true;
+		return false;
+}
 
 	private String getSubResourcePathByOrderPosition(Hashtable<String, String> htChildren, int idx) {
 		List<String> tmp = Collections.list(htChildren.keys());
