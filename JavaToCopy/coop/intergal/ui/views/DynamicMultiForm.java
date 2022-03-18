@@ -43,6 +43,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.polymertemplate.Id;
@@ -500,7 +501,11 @@ private Div fillContent(String formTitle, Div content, int i, DynamicDBean bean)
 		{
 		Component subform = componSubForm(bean, resourceSubGrid);
 		if (subform != null)
-			content = new Div(new H3(formTitle),subform);
+		{
+			H4 title = new H4(formTitle);
+			title.getStyle().set("margin-left", "20px");
+			content = new Div(title,subform);
+		}
 		else 
 			return null;
 		}
@@ -510,6 +515,7 @@ private Div fillContent(String formTitle, Div content, int i, DynamicDBean bean)
 		}
 	content.setWidthFull();
 	content.getStyle().set("height", "100%");
+	content.getStyle().set("border-right", "solid 5px lightgrey");
 	return content;
 }
 private Component componSubForm(DynamicDBean bean, String resourceSubGrid0) {
