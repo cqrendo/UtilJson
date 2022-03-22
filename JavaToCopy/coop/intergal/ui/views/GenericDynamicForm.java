@@ -185,7 +185,7 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 			//			tf.setVisible(visibleByTag);
 						if (isPick)
 						{
-							tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldNameInUI, tf));
+							tf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldNameInUI));
 							Icon icon = new Icon(VaadinIcon.DOWNLOAD_ALT);
 							tf.setSuffixComponent(icon);
 						}
@@ -279,6 +279,12 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 						nf.setReadOnly(isReadOnly);
 						if (!visibleByTag)
 							nf.getElement().getStyle().set("visibility","hidden");
+						if (isPick)
+						{
+							nf.getElement().addEventListener("click", ev->showDialogForPick(ev, fieldNameInUI));
+							Icon icon = new Icon(VaadinIcon.DOWNLOAD_ALT);
+							nf.setSuffixComponent(icon);
+						}
 						if (isRequired)
 							altBinder.forField(nf).asRequired("Requerido").bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));
 						else
@@ -417,7 +423,7 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 			return false;
 	}
 
-	private Object showDialogForPick(DomEvent ev, String fieldName, TextField tf) {
+	private Object showDialogForPick(DomEvent ev, String fieldName) {
 		
 		try {
 		DynamicGridForPick dynamicGridForPick = new DynamicGridForPick(); 

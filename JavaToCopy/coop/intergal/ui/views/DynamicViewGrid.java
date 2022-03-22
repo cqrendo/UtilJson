@@ -250,7 +250,7 @@ private DynamicViewGrid parentGrid;
 private Integer keepHeight;
 private String keepSplitDS = null;
 private Object keepSplitGD =null;
-private int keepSelectedPage = 0;
+//private int keepSelectedPage = 0;
 
 
 private void setParentGrid(DynamicViewGrid parentGrid) {
@@ -1429,6 +1429,12 @@ private boolean isBoolean(String header, String colType) {
 
 	public Component createSubTabs(DynamicDBean bean, String tabsList) {//ArrayList<String[]> rowsFieldList, Boolean isQuery, Boolean cache,String tabsLabels) {
 //		String tabsLabels="1,2,3,4,5";
+		String keepSelectedPageStr = UtilSessionData.getFormParams("DynamicViewGrid.keepSelectedPage");
+		int keepSelectedPage = 0;
+		if (keepSelectedPageStr == null)
+			keepSelectedPageStr = "0";
+		else
+			keepSelectedPage = new Integer(keepSelectedPageStr);
 		String [] tokens = tabsList.split(Pattern.quote(","));
 //		int i = 0;
 //	   	Div contentyDiv0 = new Div(); 
@@ -1625,7 +1631,7 @@ private boolean isBoolean(String header, String colType) {
         			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
         			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
         			pages2.add(selectedPage);
-        			keepSelectedPage = tabs.getSelectedIndex();
+        			keepSelectedPage(tabs.getSelectedIndex()+"");
         		});
         		if (keepSelectedPage != 0)
         			tabs.setSelectedIndex(keepSelectedPage);
@@ -1660,7 +1666,7 @@ private boolean isBoolean(String header, String colType) {
         			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
         			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
         			pages2.add(selectedPage);
-          			keepSelectedPage = tabs.getSelectedIndex();
+        			keepSelectedPage(tabs.getSelectedIndex()+"");
         		});
         		if (keepSelectedPage != 0)
         			tabs.setSelectedIndex(keepSelectedPage);
@@ -1694,7 +1700,7 @@ private boolean isBoolean(String header, String colType) {
         			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
         			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
         			pages2.add(selectedPage);
-          			keepSelectedPage = tabs.getSelectedIndex();
+        			keepSelectedPage(tabs.getSelectedIndex()+"");
         		});
         		if (keepSelectedPage != 0)
         			tabs.setSelectedIndex(keepSelectedPage);
@@ -1726,7 +1732,7 @@ private boolean isBoolean(String header, String colType) {
         			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
         			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
         			pages2.add(selectedPage);
-          			keepSelectedPage = tabs.getSelectedIndex();
+        			keepSelectedPage(tabs.getSelectedIndex()+"");
         		});
         		if (keepSelectedPage != 0)
         			tabs.setSelectedIndex(keepSelectedPage);
@@ -1757,7 +1763,8 @@ private boolean isBoolean(String header, String colType) {
         			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
         			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
         			pages2.add(selectedPage);
-          			keepSelectedPage = tabs.getSelectedIndex();
+ //         			keepSelectedPage = tabs.getSelectedIndex();
+          			keepSelectedPage(tabs.getSelectedIndex()+"");	
         		});
         		if (keepSelectedPage != 0)
         			tabs.setSelectedIndex(keepSelectedPage);
@@ -1787,7 +1794,7 @@ private boolean isBoolean(String header, String colType) {
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
     			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
-      			keepSelectedPage = tabs.getSelectedIndex();
+    			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -1817,7 +1824,7 @@ private boolean isBoolean(String header, String colType) {
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
     			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
-      			keepSelectedPage = tabs.getSelectedIndex();
+    			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -1846,7 +1853,7 @@ private boolean isBoolean(String header, String colType) {
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
     			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
-      			keepSelectedPage = tabs.getSelectedIndex();
+    			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -1873,7 +1880,7 @@ private boolean isBoolean(String header, String colType) {
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
     			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
-      			keepSelectedPage = tabs.getSelectedIndex();
+    			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -1899,7 +1906,7 @@ private boolean isBoolean(String header, String colType) {
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
     			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
-      			keepSelectedPage = tabs.getSelectedIndex();
+    			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -1924,7 +1931,7 @@ private boolean isBoolean(String header, String colType) {
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
     			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
-      			keepSelectedPage = tabs.getSelectedIndex();
+    			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -1947,7 +1954,7 @@ private boolean isBoolean(String header, String colType) {
 			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
 			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
 			pages2.add(selectedPage);
-  			keepSelectedPage = tabs.getSelectedIndex();
+			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -1968,7 +1975,7 @@ private boolean isBoolean(String header, String colType) {
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
     			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
-      			keepSelectedPage = tabs.getSelectedIndex();
+    			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -1990,7 +1997,7 @@ private boolean isBoolean(String header, String colType) {
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
     			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
-      			keepSelectedPage = tabs.getSelectedIndex();
+    			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -2012,7 +2019,7 @@ private boolean isBoolean(String header, String colType) {
     			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
    			selectedPage=fillContentSelectedPage(selectedPage, tabsToPages, bean);
     			pages2.add(selectedPage);
-      			keepSelectedPage = tabs.getSelectedIndex();
+    			keepSelectedPage(tabs.getSelectedIndex()+"");
     		});
     		if (keepSelectedPage != 0)
     			tabs.setSelectedIndex(keepSelectedPage);
@@ -2026,6 +2033,10 @@ private boolean isBoolean(String header, String colType) {
 
     }
 
+	   private void keepSelectedPage(String page) {
+		String key = "DynamicViewGrid.keepSelectedPage";
+		UtilSessionData.setFormParams(key, page);
+	   }
 	private Component fillContentSelectedPage(Component selectedPage, Map<Tab, Component> tabsToPages, DynamicDBean bean) {
 		Optional<String> id = selectedPage.getId();
 		Integer idInt = new Integer (id.get());

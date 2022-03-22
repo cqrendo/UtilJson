@@ -504,6 +504,8 @@ private Div fillContent(String formTitle, Div content, int i, DynamicDBean bean)
 		{
 			H4 title = new H4(formTitle);
 			title.getStyle().set("margin-left", "20px");
+			title.getStyle().set("margin-bottom", "-15px");
+			title.getStyle().set("margin-top", "0px");
 			content = new Div(title,subform);
 		}
 		else 
