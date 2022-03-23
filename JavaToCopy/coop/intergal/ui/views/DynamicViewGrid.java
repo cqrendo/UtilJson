@@ -901,6 +901,7 @@ private boolean isBoolean(String header, String colType) {
 			String resourceSubGrid = extractResourceSubGrid(bean,0);
 			divSubGrid.removeAll();
 			String tabsList = rowsColListGrid.get(0)[12];
+			tabsList = applyTagsForVisibility(tabsList);
 			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
 			{
 			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
@@ -1080,6 +1081,26 @@ private boolean isBoolean(String header, String colType) {
 
 //	UI.getCurrent().navigate("dymanic");
 }
+	private String applyTagsForVisibility(String tabsList) {
+		int startIdxTags = tabsList.indexOf("#tagForV#")+9;
+		int endIdxTags = tabsList.indexOf("#endTag#");
+		if (startIdxTags == 8)
+			return tabsList;
+		String tagsForVisibility = tabsList.substring(startIdxTags, endIdxTags);
+		boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
+		if (visibleByTag)
+		{
+			return tabsList.substring(0,startIdxTags-9)+tabsList.substring(endIdxTags+8);
+		}
+		else
+		{
+			tabsList = tabsList.substring(0,startIdxTags-10);
+			if (tabsList.indexOf(",") == -1) // is only one option is left not tabs then ""
+				return "";
+			return tabsList.substring(0,startIdxTags-10);
+		}
+	}
+
 	private void showQueryForm(boolean show) {
 		if (show == false && layoutQGD != null)
 		{

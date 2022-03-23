@@ -35,7 +35,6 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
-import coop.intergal.tys.ui.views.comprasyventas.articulos.HistogramaEvolMesForm;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.UtilSessionData;

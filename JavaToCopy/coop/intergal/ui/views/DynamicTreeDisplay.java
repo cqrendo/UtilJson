@@ -32,12 +32,12 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
-import coop.intergal.tys.ui.SubMenu;
-import coop.intergal.tys.ui.SubSubmenu;
-import coop.intergal.tys.ui.components.navigation.drawer.NaviItem;
-import coop.intergal.tys.ui.components.navigation.drawer.NaviMenu;
+import coop.intergal.ui.SubMenu;
+import coop.intergal.ui.SubSubmenu;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.FormButtonsBar;
+import coop.intergal.ui.components.navigation.drawer.NaviItem;
+import coop.intergal.ui.components.navigation.drawer.NaviMenu;
 import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DdbHierarchicalDataProvider;
