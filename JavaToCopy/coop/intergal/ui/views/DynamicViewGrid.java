@@ -52,6 +52,8 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.page.PendingJavaScriptResult;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
 import com.vaadin.flow.component.tabs.Tab;
@@ -3527,43 +3529,16 @@ private boolean isBoolean(String header, String colType) {
 //		String reportName = "repo%3A%2F%7E%2Ftys%2FPropPedido%2520JS%2520CR.rpt";
 		System.out.println("DynamicViewGrid.PrintARow()");
 		if (selectedRow.getParams() != null )
-		{		
-		if (selectedRow.getParams().indexOf("reportName") != -1 && selectedRow.getParams().indexOf("reportSf") != -1)
 		{
-			
-			String parReportName = selectedRow.getParams().substring(selectedRow.getParams().indexOf("reportName")+11);
-			int idxNextAnd = parReportName.indexOf("&");
-			int  idxLast = parReportName.length();
-			if (idxNextAnd > -1)
-				idxLast = idxNextAnd;
-			String reportName = parReportName.substring(1,idxLast-1);
-			String parReportSf = selectedRow.getParams().substring(selectedRow.getParams().indexOf("reportSf")+9);
-			idxNextAnd = parReportSf.indexOf("&");
-			idxLast = parReportSf.length();
-			if (idxNextAnd > -1)
-				idxLast = idxNextAnd;
-			String reportSf = parReportSf.substring(1,idxLast-1);
-			int idxStartField = reportSf.indexOf("<<")+ 2;  // @@TODO prepare more more than one field
-			if (idxStartField > 1)
+			if (selectedRow.getParams().indexOf("report1") != -1)
 			{
-				int idxEndField = reportSf.indexOf(">>");
-				String field=reportSf.substring(idxStartField, idxEndField);
-				if ( selectedRow.getRowJSon().get(field) != null)
-				{
-					String value = selectedRow.getRowJSon().get(field).asText();
-					reportSf = reportSf.replace("<<"+field+">>", value ); // TODO @@ poner comillas si el valor  es un string necesario pero encode en HTML
-				}
-				else
-				{
-					DataService.get().showError("Fórmula de selección se refiere a un campo que no existe en el recurso y/o formula de selección ( revisar en el  recurso row.reportSf los <<nombrecampo>>)");
-				}
+				showPopupChooseReport(selectedRow.getParams());
 			}
-			String sf = "&sf=" + reportSf;
-			String datasource = "&DataSource=DB11_"+ UtilSessionData.getCompanyYear();
-			String url = AppConst.CLEAR_REPORT_SERVER+"?report="+reportName+"&init=htm"+sf+datasource;
-			System.out.println("DynamicViewGrid.PrintARow() URL para report ->"+url);
-			UI.getCurrent().getPage().executeJs("window.open('"+url+"', '_blank');");
-			}
+			else if (selectedRow.getParams().indexOf("report") != -1 )
+			{	
+				String [] reportPar = getReportParams("");
+				printReport(reportPar);
+				}
 			else
 			{
 				DataService.get().showError("Falta por definir en los parametros de el recurso nombre de report y/o formula de selección ( poner en el evento del recurso row.reportName y row.reportSf)");
@@ -3573,6 +3548,134 @@ private boolean isBoolean(String header, String colType) {
 		{
 			DataService.get().showError("Falta por definir en el recurso los parametros con el nombre de report y/o formula de selección ( poner en el evento del recurso row.reportName y row.reportSf)");
 		}
+		return null;
+	}
+
+	private void printReport(String[] reportPar) {
+		String reportSf = reportPar[1];
+		String sf = "&sf=" + reportSf;
+		String datasource = "&DataSource=DB11_"+ UtilSessionData.getCompanyYear();
+		String reportRPT = reportPar[0];
+		String url = AppConst.CLEAR_REPORT_SERVER+"?report="+reportRPT+"&init=htm"+sf+datasource;
+		System.out.println("DynamicViewGrid.PrintARow() URL para report ->"+url);
+		UI.getCurrent().getPage().executeJs("window.open('"+url+"', '_blank');");	
+}
+
+	private String[] getReportParams(String postText) {
+		String [] param = new String[4];
+		int idxReport = selectedRow.getParams().indexOf("report"+postText);
+		if (idxReport == -1)
+			return null;
+		String parReportName = selectedRow.getParams().substring(idxReport+7);
+		int idxNextAnd = parReportName.indexOf("&");
+		int  idxLast = parReportName.length();
+		if (idxNextAnd > -1)
+			idxLast = idxNextAnd;
+		String report = parReportName.substring(1,idxLast-1);
+		int idxEndReportName = report.indexOf("#RPT#");
+		String reportName = report.substring(1, idxEndReportName);
+		int idxSF = report.indexOf("#SF#");
+		int idxEndRPT = report.length();
+		String reportSFone = null; 
+		String tagForV = null;
+		int idxtagForV = report.indexOf("#tagForV#");
+		if (idxSF !=-1)
+		{
+			idxEndRPT = idxSF;
+			int idxEndSF = report.length();
+			
+			if (idxtagForV != -1)
+			{
+				idxEndSF = idxtagForV;
+			}
+			reportSFone = report.substring(idxSF+4, idxEndSF);
+			
+		}
+		if (idxtagForV != -1)
+		{
+			int idxEndtagForV = report.indexOf("#endTag#");
+			tagForV = report.substring(idxtagForV+9,idxEndtagForV);
+		}
+		String reportRPT = report.substring(idxEndReportName+5, idxEndRPT);
+		String reportSf = null;
+		String parReportSf = selectedRow.getParams().substring(selectedRow.getParams().indexOf("reportSf")+9);
+		idxNextAnd = parReportSf.indexOf("&");
+		idxLast = parReportSf.length();
+		if (idxNextAnd > -1)
+			idxLast = idxNextAnd;
+		if (reportSFone == null)
+			{
+			reportSf = parReportSf.substring(1,idxLast-1);
+			}
+		else
+			{
+			reportSf = reportSFone;
+			}	
+		
+		int idxStartField = reportSf.indexOf("<<")+ 2;  // @@TODO prepare more more than one field
+		if (idxStartField > 1)
+			{
+			int idxEndField = reportSf.indexOf(">>");
+			String field=reportSf.substring(idxStartField, idxEndField);
+			if ( selectedRow.getRowJSon().get(field) != null)
+				{
+				String value = selectedRow.getRowJSon().get(field).asText();
+				reportSf = reportSf.replace("<<"+field+">>", value ); // TODO @@ poner comillas si el valor  es un string necesario pero encode en HTML
+				}
+			else
+				{
+				DataService.get().showError("Fórmula de selección se refiere a un campo que no existe en el recurso y/o formula de selección ( revisar en el  recurso row.reportSf los <<nombrecampo>>)");
+				}
+			}	
+		param[0] = reportRPT;
+		param[1] = reportSf; 
+		param[2] = reportName;
+		param[3] = tagForV;
+	return param;
+}
+
+	private void showPopupChooseReport(String params) {
+	
+		Dialog dialog = new Dialog();
+		RadioButtonGroup<String> radioGroup = new RadioButtonGroup<>();
+		radioGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
+	    radioGroup.setLabel("Escoge listado");
+		Hashtable<String, String[]> titlesAndRPTs = new Hashtable<String, String[]>();
+		Button print = new Button("imprimir", e -> printSeletedRPT(radioGroup, titlesAndRPTs));
+		List<String> listReports = new ArrayList<>();
+		int i=0;
+		while (true)
+		{
+			String[] param = getReportParams(i+"");
+			if (param != null && param[2] != null)
+			{
+				if (UtilSessionData.isVisibleOrEditableByTag(param[3]))
+					{
+					listReports.add(param[2]);
+					titlesAndRPTs.put(param[2], param);
+					}
+				i++;
+			}
+			else
+				break;
+		}
+		radioGroup.setItems(listReports);
+		dialog.add(radioGroup, print);
+		
+		dialog.open();
+		
+	
+}
+
+	private Object printSeletedRPT(RadioButtonGroup<String> radioGroup, Hashtable<String, String[]> titleAndRPT) {
+		String choosedOption = radioGroup.getValue();
+		if (choosedOption == null)
+		{
+			DataService.get().showError("Debe seleccionar una listado");
+			return null;
+		}
+		String[] rpt = titleAndRPT.get(choosedOption);
+		printReport(rpt);
 		return null;
 	}
 

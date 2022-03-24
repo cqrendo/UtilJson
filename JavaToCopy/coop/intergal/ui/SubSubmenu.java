@@ -57,7 +57,7 @@ import com.vaadin.flow.server.VaadinService;
  */
 @Tag("sub-submenu")
 @JsModule("./src/sub-submenu.js")
-@Route(value = "ssubmenu")//, layout = MainLayout.class)
+@Route(value = "ssubmenuGeneric")//, layout = MainLayout.class)
 public class SubSubmenu extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle {//AfterNavigationObserver, HasDynamicTitle {
 	/**
 	 * 

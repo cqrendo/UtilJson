@@ -302,7 +302,7 @@ public class RestData {
 		{
 			dB.setParams(dB.getParams()+"&splitQuery="+eachRow.get("splitQuery") );				
 		}
-		if (eachRow.get("splitDisplaySubGrid") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
+		if (eachRow.get("splitDisplaySubGrid") != null) 
 		{
 			dB.setParams(dB.getParams()+"&splitDisplaySubGrid="+eachRow.get("splitDisplaySubGrid") );				
 		}
@@ -310,16 +310,61 @@ public class RestData {
 		{
 			dB.setParams(dB.getParams()+"&classForLayout="+eachRow.get("classForLayout") );				
 		}
-		if (eachRow.get("reportName") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
+		if (eachRow.get("report") != null) 
 		{
-			dB.setParams(dB.getParams()+"&reportName="+eachRow.get("reportName") );				
+			dB.setParams(dB.getParams()+"&report="+eachRow.get("report") );				
 		}
-		if (eachRow.get("reportSf") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
+		if (eachRow.get("report0") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report0="+eachRow.get("report0") );				
+		}
+		if (eachRow.get("report1") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report1="+eachRow.get("report1") );				
+		}
+		if (eachRow.get("report2") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report2="+eachRow.get("report2") );				
+		}
+		if (eachRow.get("report3") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report3="+eachRow.get("report3") );				
+		}
+		if (eachRow.get("report4") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report4="+eachRow.get("report4") );				
+		}
+		if (eachRow.get("report5") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report5="+eachRow.get("report5") );				
+		}
+		if (eachRow.get("report6") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report6="+eachRow.get("report6") );				
+		}
+		if (eachRow.get("report7") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report7="+eachRow.get("report7") );				
+		}
+		if (eachRow.get("report8") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report8="+eachRow.get("report8") );				
+		}
+		if (eachRow.get("report9") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report9="+eachRow.get("report9") );				
+		}
+		if (eachRow.get("report10") != null) 
+		{
+			dB.setParams(dB.getParams()+"&report10="+eachRow.get("report10") );				
+		}
+
+		if (eachRow.get("reportSf") != null) 
 		{
 			dB.setParams(dB.getParams()+"&reportSf="+eachRow.get("reportSf") );				
 		}
 
-		if (eachRow.get("methodForRowSelected") != null) // to indicate add row.splitDisplaySubGrid=..px to the event of the resource in LAC 
+		if (eachRow.get("methodForRowSelected") != null) 
 		{
 			dB.setMethodForRowSelected(eachRow.get("methodForRowSelected").asText());				
 		}

@@ -32,7 +32,7 @@ import coop.intergal.vaadin.rest.utils.RestData;
 
 @Tag("sub-menu")
 @JsModule("./src/sub-menu.js")
-@Route(value = AppConst.PAGE_SUBMENU)//, layout = MainLayout.class)
+@Route(value = "submenuGeneric")//-AppConst.PAGE_SUBMENU)//, layout = MainLayout.class)
 //@PageTitle(AppConst.TITLE_MENU_PRINCIPAL)
 //@Secured(Role.ADMIN)
 public class SubMenu extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle {
