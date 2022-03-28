@@ -3557,11 +3557,24 @@ private boolean isBoolean(String header, String colType) {
 		String reportSf = reportPar[1];
 		String sf = "&sf=" + reportSf;
 		String datasource = "&DataSource=DB11_"+ UtilSessionData.getCompanyYear();
-		String reportRPT = reportPar[0];
+		String reportPath = AppConst.REPORT_PATH;
+		reportPath = replaceKeyByValue(reportPath);
+		String reportRPT = reportPath+reportPar[0];
 		String url = AppConst.CLEAR_REPORT_SERVER+"?report="+reportRPT+"&init=htm"+sf+datasource;
 		System.out.println("DynamicViewGrid.PrintARow() URL para report ->"+url);
 		UI.getCurrent().getPage().executeJs("window.open('"+url+"', '_blank');");	
 }
+
+	private String replaceKeyByValue(String reportPath) {
+		int idxKey = reportPath.indexOf("<<");
+		int idxEndKey = reportPath.indexOf(">>");
+		if (idxKey == -1)
+			return reportPath;
+		String key = reportPath.substring(idxKey+2,idxEndKey);
+		String value = UtilSessionData.getKeyValue(key);
+		reportPath = reportPath.replaceAll("<<"+key+">>", value);
+		return reportPath;
+	}
 
 	private String[] getReportParams(String postText) {
 		String [] param = new String[4];
