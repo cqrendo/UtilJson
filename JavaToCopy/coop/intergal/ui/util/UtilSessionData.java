@@ -96,10 +96,16 @@ public class UtilSessionData {
 	    		return false; 
 	    	}			
 	    	String tagKey = tag.substring(0,idxColon);
+	    	boolean trueOrFalse = true;
+	    	if (tagKey.indexOf("!") != -1)
+	    	{
+	    		trueOrFalse = false;
+	    		tagKey = tag.substring(0,idxColon-1);
+	    	}
 	    	String tagValue = tag.substring(idxColon+1);
 	  	    Object keyValue = getKeyValue(tagKey);
 	  	    if (keyValue!=null && keyValue.equals(tagValue))
-	  	    	return true;
+	  	    	return trueOrFalse;
 	  	    }
 		return false;
 	}

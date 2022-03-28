@@ -117,7 +117,13 @@ public class GenericClassForMethods {
 				if ( layoutClassName.indexOf("DynamicViewGrid") > -1 || layoutClassName.indexOf("DynamicQryGridDisplay") > -1)  // when is a grid list is send the origin row to filter the list in the target 
 				{
 					DynamicDBean sourceRow = getRowSelected(divSubGrid, grid, bean);
-					showDialog(sourceRow, resource, layoutClassName, displayFormClassName, grid, filterForPopup, null );
+					if (sourceRow != null )
+						showDialog(sourceRow, resource, layoutClassName, displayFormClassName, grid, filterForPopup, null );
+					else
+						{
+			//			DataService.get().showError("Debe seleccionar un registro");
+						return null;
+						}
 				}
 				else // // when is a Display is send the target row to be show as target
 				{

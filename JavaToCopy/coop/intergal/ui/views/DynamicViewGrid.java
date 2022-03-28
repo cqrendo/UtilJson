@@ -929,9 +929,11 @@ private boolean isBoolean(String header, String colType) {
 //				subDynamicViewGrid.setButtonsRowVisible(false);//(true);
 //				divSubGrid.add(subDynamicViewGrid );
 			}
-			else // resourceSubGrid is null
+			else // resourceSubGrid is null // to hide split
 			{
-				layoutQGD.getDisplaySplitSubGrid().setOrientation(Orientation.HORIZONTAL); // to hide split
+				divSubGrid.getElement().getStyle().set("display", "none");
+//				layoutQGD.getDisplaySplitSubGrid().setOrientation(Orientation.VERTICAL); 
+//				layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(new Double(100));// to hide split
 			}
 			if (layoutQGD != null)
 			{
