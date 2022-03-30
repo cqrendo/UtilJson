@@ -5,7 +5,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
+import javax.naming.CompositeName;
 import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.NameParser;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -14,6 +18,8 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  
@@ -22,7 +28,7 @@ public class LdapTest2 {
     public void run() {
         try {
             DirContext context = getContext();
-            String name = "cn=terra3,dc=intergal,dc=coop";
+            String name = "uid=tu_usuario2,ou=central,ou=gfer,ou=tys,ou=groups,dc=intergal,dc=coop";//"cn=terra3,dc=intergal,dc=coop";
  //           createLDAPObject(context, name);
             createLDAPUser(name, "password", null, "snvalue", "cnvalue" );
 //            createAttribute(context, name, "displayName", "JOBS");
@@ -231,6 +237,55 @@ public class LdapTest2 {
         properties.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=intergal,dc=coop");
         return new InitialDirContext(properties);
     }
+//    public static boolean isMemberOf(String[] roles) throws NamingException {
+//
+//    	ldapBaseDn = ldapConnection.getLdapBaseDn();
+//    	DirContext context = getContext();
+//        String              filter  = String.format(SEARCH_BY_SAM_ACCOUNT_NAME, getUid(uidOu));
+//        SearchControls      constraints = new SearchControls();
+//        constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+//        constraints.setReturningAttributes(attrIdsToSearch);
+//        NamingEnumeration results = context.search("", filter, constraints);
+//
+//
+//        if (results == null || !results.hasMore()) {
+//            System.out.println("No result found");
+//            return false;
+//        }
+//        // Get result for the first entry found
+//        SearchResult result = (SearchResult) results.next();
+//
+//        // Get the entry's distinguished name
+//        NameParser parser = context.getNameParser("");
+//        Name contextName = parser.parse(context.getNameInNamespace());
+//        Name baseName = parser.parse(ldapBaseDn);
+//
+//        Name entryName = parser.parse(new CompositeName(result.getName())
+//                .get(0));
+//
+//        // Get the entry's attributes
+//        Attributes attrs = result.getAttributes();
+//        Attribute attr = attrs.get(attrIdsToSearch[0]);
+//        
+//        if (attr != null)
+//        {
+//        NamingEnumeration<?> e = attr.getAll();
+//        System.out.println("Member of");
+//        while (e.hasMore()) {
+//            String value = (String) e.next();
+//            int i = 0;
+//            while (i < roles.length)
+//            {
+//            	if (value.indexOf("cn="+roles[i]) > -1)
+//            		return true;
+//            	i++;
+//            }
+//            System.out.println(value);
+//        	}
+//        }
+//        return false;
+//        }
+//    
  
     public static void main(String[] args) {
         new LdapTest2().run();

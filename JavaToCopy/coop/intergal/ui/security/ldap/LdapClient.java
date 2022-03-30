@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import javax.naming.CompositeName;
 import javax.naming.Context;
@@ -113,6 +114,10 @@ public class LdapClient {
         cn.add(cnvalue);
         attributes.put(cn);
         
+//        Attribute roles = new BasicAttribute("roles");
+//        roles.add(rolesValue);
+//        attributes.put(roles);
+        
 //       Attribute uid = new BasicAttribute("uid");
 //       uid.add("bob2");
 //       attributes.put(uid);
@@ -196,14 +201,31 @@ public class LdapClient {
         else 	 
         	System.out.println(attrName + ":" + attrs.get(attrName).get());
     }
+    public static String getAttributeValue( String attrName) throws NamingException {
+    	DirContext context = getContext();
+    	Attributes attrs = context.getAttributes(uidOu);
+        if (attrs.get(attrName) == null)
+        {
+        	System.out.println(attrName + " **** NO EXISTE **** ");
+        	return null;
+        }
+        else
+        {
+        	String value = (String) attrs.get(attrName).get();
+        	System.out.println(attrName + ":" + value);
+        	return value;
+        }	
+    }
 //    public static void viewAttribute( String name , String attrName) throws NamingException {
 //        Attributes attrs = getContext().getAttributes(name);
 //        System.out.println(attrName + ":" + attrs.get(attrName).get());
 //    }
     public static boolean isMemberOf(String[] roles) throws NamingException {
 
-    	ldapBaseDn = ldapConnection.getLdapBaseDn();
+  //  	LdapClient.viewAttribute("displayName");
     	DirContext context = getContext();
+    	ldapBaseDn = ldapConnection.getLdapBaseDn();
+//    	DirContext context = getContext();
         String              filter  = String.format(SEARCH_BY_SAM_ACCOUNT_NAME, getUid(uidOu));
         SearchControls      constraints = new SearchControls();
         constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -217,7 +239,7 @@ public class LdapClient {
         }
         // Get result for the first entry found
         SearchResult result = (SearchResult) results.next();
-
+        result.getName();
         // Get the entry's distinguished name
         NameParser parser = context.getNameParser("");
         Name contextName = parser.parse(context.getNameInNamespace());
@@ -248,7 +270,33 @@ public class LdapClient {
         }
         return false;
         }
-    
+    public static boolean isMemberOfOu(String ou) throws NamingException {
+
+    	LdapClient.viewAttribute("cn");
+    	
+    	DirContext context = getContext();
+    	ldapBaseDn = ldapConnection.getLdapBaseDn();
+    	
+        String              filter  = String.format(SEARCH_BY_SAM_ACCOUNT_NAME, getUid(uidOu));
+        SearchControls      constraints = new SearchControls();
+        constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        constraints.setReturningAttributes(attrIdsToSearch);
+        NamingEnumeration<?> results = context.search("", filter, constraints);
+
+
+        if (results == null || !results.hasMore()) {
+            System.out.println("No result found");
+            return false;
+        }
+        // Get result for the first entry found
+        SearchResult result = (SearchResult) results.next();
+        String name = result.getName();
+        if (name.indexOf("ou="+ou) != -1)
+        	return true;
+        else
+        	return false;
+    }  
+     
     private static Object getUid(String uidOu) {
     	//uid=bobx,ou=people
     	int idxStart = uidOu.indexOf("uid=")+4;
@@ -318,6 +366,41 @@ public class LdapClient {
 		if (idxEnd > -1)
 			return dn.substring(0,idxEnd );
 		return dn;
+	}
+
+	public static boolean userHasAnyOfThisTypes(String[] typesToCheck) {
+    	DirContext context;
+		try {
+			context = getContext();
+	   	Attributes attrs = context.getAttributes(uidOu);
+        if (attrs.get("employeeType") == null)
+        	System.out.println("employeeType  **** NO EXISTE **** ");
+        else 
+        {
+        	String employeeType = (String) attrs.get("employeeType").get();
+        	String [] typesEmployee = employeeType.split(Pattern.quote(","));
+        	System.out.println("employeeType :" + attrs.get("employeeType").get());
+        	int i = 0;
+        	while (typesToCheck.length > i)
+        	{
+        		int ii = 0;
+    			while (typesEmployee.length > ii)
+    			{ 
+    				if (typesToCheck[i].equals(typesEmployee[ii]))
+    					return true;
+    				ii++;
+    			}
+        			
+        		i++;
+        	}
+        }
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+ 
+   
+		return false;
 	}
  
 //    public static void main(String[] args) {
