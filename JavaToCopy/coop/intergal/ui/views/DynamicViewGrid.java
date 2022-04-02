@@ -2609,30 +2609,33 @@ private boolean isBoolean(String header, String colType) {
 //			keepRowBeforChanges = new DynamicDBean(); 
 //			keepRowBeforChanges = RestData.copyDatabean(bean);
 //			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
-			Class<?> dynamicForm = Class.forName(subFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
-			display = dynamicForm.newInstance();
-			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
-			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
-			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
-			
-			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
-			setRowsColList.invoke(display,rowsColList);//rowsColListGrid);
-			setBinder.invoke(display,binder);
-			
-			setBean.invoke(display,bean2);
-			setDataProvider.invoke(display, dataProviderForm);
-			divSubForm.removeAll();
-			if (subFormClassName.indexOf("Generated") > -1)
+			if (subFormClassName.equals("NODISPLAY") == false)
 			{
+				Class<?> dynamicForm = Class.forName(subFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
+				display = dynamicForm.newInstance();
+				Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+				Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
+				Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+			
+				setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
+				setRowsColList.invoke(display,rowsColList);//rowsColListGrid);
+				setBinder.invoke(display,binder);
+			
+				setBean.invoke(display,bean2);
+				setDataProvider.invoke(display, dataProviderForm);
+				divSubForm.removeAll();
+				if (subFormClassName.indexOf("Generated") > -1)
+				{
 			//	setDataProvider.invoke(display, dataProvider);
-				Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
-				Object divInSubDisplay = createContent.invoke(display, buttonsForm);
-				divSubForm.add((Component)divInSubDisplay);
-			}
-			else
-			{
+					Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
+					Object divInSubDisplay = createContent.invoke(display, buttonsForm);
+					divSubForm.add((Component)divInSubDisplay);
+				}
+				else
+				{
 				divSubForm.add((Component)display);
-			}
+				}
+			}	
 // ADDING SUB GRIDS			
 			String resourceSubGrid = extractResourceSubGrid(bean2,0);//"CR-ped_proveed_cab.List-ped_proveed_lin"; // TODO adapt to use more than one subresource , use a variable instead of 9
 //			divSubForm.removeAll();
