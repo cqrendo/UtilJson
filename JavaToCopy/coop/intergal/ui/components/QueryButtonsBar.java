@@ -62,7 +62,9 @@ public class QueryButtonsBar extends PolymerTemplate<TemplateModel> {
 
 	public Registration addSearchListener(ComponentEventListener<SearchEvent> listener) {
 		bSearch.getElement().setAttribute("title", "ALT + B (buscar)") ;
-		bSearch.addClickShortcut(Key.KEY_B, KeyModifier.ALT); 
+//		bSearch.addClickShortcut(Key.KEY_B, KeyModifier.ALT); 
+//		this.addAction(new ClickShortcut(searchButton, KeyCode.ENTER, null));
+		bSearch.addClickShortcut(Key.ENTER); 
 		return bSearch.addClickListener(e -> listener.onComponentEvent(new SearchEvent(this, true)));
 }
 

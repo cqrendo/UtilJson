@@ -2743,7 +2743,7 @@ private boolean isBoolean(String header, String colType) {
 			
 			setDataProvider.invoke(displayForAdd, dataProvider);
 			divDisplay.removeAll();
-			if (displayFormClassName.indexOf("Generated") > -1 || addFormClassName.indexOf("Generated") > -1)
+			if (displayFormClassName.indexOf("Generated") > -1 || (addFormClassName !=null && addFormClassName.indexOf("Generated") > -1))
 			{
 			//	setDataProvider.invoke(display, dataProvider);
 				Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
