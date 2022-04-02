@@ -932,6 +932,7 @@ private boolean isBoolean(String header, String colType) {
 			else // resourceSubGrid is null // to hide split
 			{
 				divSubGrid.getElement().getStyle().set("display", "none");
+				layoutQGD.getDisplaySplitSubGrid().getStyle().set("height", "100%");
 //				layoutQGD.getDisplaySplitSubGrid().setOrientation(Orientation.VERTICAL); 
 //				layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(new Double(100));// to hide split
 			}
