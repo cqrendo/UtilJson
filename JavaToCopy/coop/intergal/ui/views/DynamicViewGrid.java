@@ -2282,7 +2282,7 @@ private boolean isBoolean(String header, String colType) {
 				FormButtonsBar formButtonsBar = (FormButtonsBar)getButtons.invoke(layoutPopup);
 				if (formButtonsBar != null &&(subBean.isReadOnly() || isSubResourceReadOnly(subBean.getResourceName()))) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
 					formButtonsBar.setVisible(false);
-				Div divDisplayPopup = (Div) getDivDisplay.invoke(layoutPopup);
+				Div divDisplay = (Div) getDivDisplay.invoke(layoutPopup);
 				if (subLayoutClassName.indexOf("DynamicDisplayForAskData") == -1) // is a form thta ask data for a process
 					{
 					Method getDivSubGrid = dynamicLayout.getMethod("getDivSubGrid");
@@ -2294,7 +2294,7 @@ private boolean isBoolean(String header, String colType) {
 //			DynamicDisplaySubgrid dynamicDisplaySubgrid = new DynamicDisplaySubgrid();
 //			Div divDisplayPopup = dynamicDisplaySubgrid.getDivDisplay();
 //			Div divSubGridPopup =  dynamicDisplaySubgrid.getDivSubGrid();//new Div();
-				Object divInDisplayPopup = new Div();
+				Object divInDisplay = new Div();
 				setVisibleRowData(true);
 //				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
 //					buttonsForm.setVisible(false);
@@ -2303,33 +2303,36 @@ private boolean isBoolean(String header, String colType) {
 				keepRowBeforChanges = RestData.copyDatabean(subBean);
 //			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
 				Class<?> dynamicForm = Class.forName(subFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
-				Object displayPopup = dynamicForm.newInstance();
+				Object display = dynamicForm.newInstance();
 				Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
 				Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
 				Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
 			
 				setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
 				ArrayList<String[]> rowsColListGridPopup = dataProviderPopup.getRowsColList();
-				setRowsColList.invoke(displayPopup,rowsColListGridPopup);
-				setBean.invoke(displayPopup,subBean);
-				setBinder.invoke(displayPopup,binderForDialog);
-				setDataProvider.invoke(displayPopup, dataProviderPopup);
+				setRowsColList.invoke(display,rowsColListGridPopup);
+				setBean.invoke(display,subBean);
+				setBinder.invoke(display,binderForDialog);
+				setDataProvider.invoke(display, dataProviderPopup);
 //				setBean.invoke(displayPopup,bean);
 	//??			resourcePopup = subBean.getResourceName(); // when is a display the bean is the on e to show and has the resourcename
  
-				divDisplayPopup.removeAll();
+				divDisplay.removeAll();
 				if (subFormClassName.indexOf("Generated") > -1)
 				{
 			//	setDataProvider.invoke(display, dataProvider);
 					Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class, GenericClassForMethods.class});
 //					Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
 //					setdVGrid.invoke(display, this); // to use methods in this class
-					divInDisplayPopup = createContent.invoke(displayPopup, buttonsForm, dynamicDisplayForAskData.getGenericClassForMethods() );
-					divDisplayPopup.add((Component)divInDisplayPopup);
+					if (dynamicDisplayForAskData != null)
+						divInDisplay = createContent.invoke(display, buttonsForm, dynamicDisplayForAskData.getGenericClassForMethods() );
+					else
+						divInDisplay = createContent.invoke(display, buttonsForm, null );
+					divDisplay.add((Component)divInDisplay);
 				}
 				else
 				{
-					divDisplayPopup.add((Component)displayPopup);
+					divDisplay.add((Component)display);
 				}
 			
 			
