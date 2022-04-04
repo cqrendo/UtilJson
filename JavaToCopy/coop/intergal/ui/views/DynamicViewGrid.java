@@ -293,8 +293,8 @@ public void setupGrid() { // by Default the grid is not editable, to be editable
 	setupGrid(false, false);
 	
 }
-public void setupGrid(Boolean isGridEditable, Boolean isGridEditableon) {
-	setupGrid(isGridEditable, isGridEditable, false);
+public void setupGrid(Boolean isGridEditable, Boolean hasExportButton) {
+	setupGrid(isGridEditable, hasExportButton, false);
 	
 }
 
