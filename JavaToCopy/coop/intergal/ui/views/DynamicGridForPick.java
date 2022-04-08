@@ -262,6 +262,7 @@ public class DynamicGridForPick extends PolymerTemplate<TemplateModel> implement
 //		grid.setGridSplitDisplay(gridSplitDisplay);
 		grid.setResourceName(resourceName);
 		grid.setupGrid();
+		grid.setHasSideDisplay(false);
 //		divGrid.add(grid );
 //		queryButtonsBar.addClearSearchListener(e -> cleanQryForm());//System.out.println("PedidoProveedorQuery.beforeEnter() BUSCAR>>>>"));
 

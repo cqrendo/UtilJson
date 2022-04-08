@@ -631,7 +631,7 @@ public class JSonClient {
 			resourceName = resourceName.substring(0, posPointForSubR);
 		}
 			
-		ident = getIdentOfResuorce(resourceName, cache, preConfParam);
+		ident = getIdentOfResource(resourceName, cache, preConfParam);
 	
 		///*******  STEP 2 ***** gets a concret resource using ident 
 		try {
@@ -664,7 +664,7 @@ public class JSonClient {
 			return getDataTypeFromTable(tableName, field, cache,preConfParam);
 			}
 	
-	public static String getIdentOfResuorce(String resourceName, boolean cache, String preConfParam) {
+	public static String getIdentOfResource(String resourceName, boolean cache, String preConfParam) {
 		String ident = null;
 		if (keepIdent!= null && keepIdent.get(resourceName) != null)
 			{
@@ -902,7 +902,7 @@ public class JSonClient {
 				subResourceName = resourceName.substring(posPointForSubR+1 );
 				resourceName = resourceName.substring(0, posPointForSubR);
 			} 
-			ident = getIdentOfResuorce(resourceName, cache,preConfParam);
+			ident = getIdentOfResource(resourceName, cache,preConfParam);
 			try {
 				if (ident != null)
 				{
@@ -987,7 +987,7 @@ public class JSonClient {
 				subResourceName = resourceName.substring(posPointForSubR+1 );
 				resourceName = resourceName.substring(0, posPointForSubR);
 			} 
-			ident = getIdentOfResuorce(resourceName, cache,preConfParam);
+			ident = getIdentOfResource(resourceName, cache,preConfParam);
 			try {
 				if (ident != null)
 				{

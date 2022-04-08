@@ -2,6 +2,7 @@ package coop.intergal.ui.views;
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
 import static coop.intergal.AppConst.PAGE_PRODUCTS;
 import static coop.intergal.AppConst.STYLES_CSS;
+import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -65,6 +66,7 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 @JsModule("./src/views/generic/layout/dynamic-qry-grid-display.js")
 //@CssImport(value = "./styles/dialog-overlay.css", themeFor = "vaadin-dialog-overlay")
 @CssImport(value = STYLES_CSS, themeFor = "dynamic-qry-grid-display")
+@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-layout")
 public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, PageConfigurator{//, VaadinServiceInitListener  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
 	public ArrayList<String> getRowsColList() {
@@ -251,11 +253,36 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	public void setFilter(String filter) {
 		this.filter = filter;
 	}
+	private String displayFormClassName;
+	public String getDisplayFormClassName() {
+		return displayFormClassName;
+	}
+
+	public void setDisplayFormClassName(String displayFormClassName) {
+		this.displayFormClassName = displayFormClassName;
+	}
+	private String addFormClassName;
+	public String getAddFormClassName() {
+		return addFormClassName;
+	}
+
+	public void setAddFormClassName(String addFormClassName) {
+		this.addFormClassName = addFormClassName;
+	}
+	private String queryFormClassName;
+
+	public String getQueryFormClassName() {
+		return queryFormClassName;
+	}
+
+	public void setQueryFormClassName(String queryFormClassName) {
+		this.queryFormClassName = queryFormClassName;
+	}
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {  // when is call from a navigation
 //		buttons.setVisible(false);
-
+		setId("DQGD");
 		QueryParameters queryParameters = event.getLocation().getQueryParameters();
 		filter = null; 
 		List<String> parFIlter = queryParameters.getParameters().get("filter");
@@ -308,7 +335,14 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		}
 		prepareLayout(queryFormClassName, displayFormClassName, addFormClassName);
 	}
-		public void prepareLayout(String queryFormClassName, String displayFormClassName, String addFormClassName)
+	public Component createContent() 
+	{
+		
+		prepareLayout(queryFormClassName, displayFormClassName, addFormClassName);
+		return this;
+		
+	}
+	public void prepareLayout(String queryFormClassName, String displayFormClassName, String addFormClassName)
 		{
 //			querySplitGrid.setOrientation(Orientation.VERTICAL);
 			gridSplitDisplay.setOrientation(Orientation.HORIZONTAL);
@@ -385,6 +419,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		grid.setDisplay(divDisplay);
 		grid.setDivSubGrid(divSubGrid);
 		grid.setButtonsForm(buttons);
+		grid.setHasSideDisplay(true);
 		grid.setLayout(this);
 		grid.setResourceName(resourceName);
 		if ((apiname == null || apiname.length() == 0) == false)

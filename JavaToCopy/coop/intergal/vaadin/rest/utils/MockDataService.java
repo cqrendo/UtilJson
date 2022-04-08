@@ -705,7 +705,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 
 
 	@Override
-	public void updateDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
+	public void updateDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh, DdbDataBackEndProvider ddbDataBackEndProvider) {
 		updateDynamicDBean(beansToSaveAndRefresh.get(resourceTobeSave)); // Saves
 		if (errorSaving == false)
 		{
@@ -718,7 +718,9 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 					DynamicDBean beanTBR = beansToSaveAndRefresh.get(resourcelTX);
 					if (beanTBR != null)
 					{
-					putJSonData(allSaveSata.get(i), beanTBR, false);
+						putJSonData(allSaveSata.get(i), beanTBR, false);
+			//			ddbDataBackEndProvider.refreshAll();//refreshItem(beanTBR);
+						
 					}
 				}
 			i++;

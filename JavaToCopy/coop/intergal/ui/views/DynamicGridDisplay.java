@@ -1,6 +1,8 @@
 package coop.intergal.ui.views;
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
 import static coop.intergal.AppConst.PAGE_PRODUCTS;
+import static coop.intergal.AppConst.STYLES_CSS;
+import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.List;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.polymertemplate.Id;
@@ -25,6 +28,7 @@ import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 
 
 //@Tag("dynamic-view-grid")
@@ -33,6 +37,8 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 //@Route(value = PAGE_DYNAMIC, layout = MainLayout.class)   /// @@ TODO cambiado para metaconfig comprobar que no afecta en otros proyectos
 //@PageTitle(AppConst.TITLE_PRODUCTS)
 //@Secured(Role.ADMIN)
+@CssImport(value = STYLES_CSS, themeFor = "dynamic-grid-display")
+@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-layout")
 public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, VaadinServiceInitListener  {
 //public class DynamicGridDisplay extends ThemableMixin(PolymerElement<TemplateModel>) implements BeforeEnterObserver, HasDynamicTitle  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
@@ -48,6 +54,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 
 	public DynamicGridDisplay() {
 		super();
+		setId("DGD");
 //		setupGrid();
 		
 	}
@@ -140,6 +147,16 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 //	private SplitLayout splitQryAndResult;
 	private String displayFormClassName;
 
+	@Id("gridDisplaySubGrid")
+	private SplitLayout gridDisplaySubGrid;
+	public SplitLayout getGridDisplaySubGrid() {
+		return gridDisplaySubGrid;
+	}
+
+	public void setGridDisplaySubGrid(SplitLayout gridDisplaySubGrid) {
+		this.gridDisplaySubGrid = gridDisplaySubGrid;
+	}
+
 
 //	@Autowired()
 //	public DynamicViewGrid(CrudEntityPresenter<DynamicDBean> presenter, CrudForm<DynamicDBean> form) {
@@ -204,7 +221,9 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 //		return presenter;
 //	}
 
-//	@Override
+
+
+	//	@Override
 	protected String getBasePage() {
 		return PAGE_PRODUCTS;
 	}
@@ -322,7 +341,7 @@ public String getResourceName() {
 		grid.setDivSubGrid(divSubGrid);
 		grid.setButtonsForm(buttons);
 		grid.setButtonsRowVisible(false);  // @@ TODO set by parameter  
-//		grid.setLayout(this);
+		grid.setLayout(this);
 //		grid.setGridSplitDisplay(gridSplitDisplay);
 		grid.setResourceName(resourceName);
 		grid.getGrid().addSelectionListener(e -> {

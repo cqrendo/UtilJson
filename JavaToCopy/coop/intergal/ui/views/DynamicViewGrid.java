@@ -252,6 +252,8 @@ private DynamicViewGrid parentGrid;
 private Integer keepHeight;
 private String keepSplitDS = null;
 private Object keepSplitGD =null;
+private DynamicGridDisplay layoutGD;
+private boolean alreadyShowbean = false;
 //private int keepSelectedPage = 0;
 
 
@@ -483,7 +485,13 @@ private void methodForRowSelected(DynamicDBean selectedRow2) {
 			runMethodFor(method, selectedRow2);
 		}
 		else
-			System.out.println("DynamicViewGrid.methodForRowSelected() NOT method assigned");
+			if (hasSideDisplay && alreadyShowbean == false)
+			{
+				showBean(selectedRow2);
+				System.out.println("DynamicViewGrid.methodForRowSelected() NOT method assigned using ShowBean if configure as hasSideDisplay");
+			}
+			else
+				System.out.println("DynamicViewGrid.methodForRowSelected() NOT method assigned");
 		}
 		
 	private void runMethodFor(String methodName, DynamicDBean selectedRow2) {
@@ -819,7 +827,9 @@ private boolean isBoolean(String header, String colType) {
 			{
 				selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
 				showBean(selectedRow);
+				alreadyShowbean  = true;
 				methodForRowSelected(selectedRow); 
+				
 
 				
 			}	
@@ -855,34 +865,40 @@ private boolean isBoolean(String header, String colType) {
 			selectedRow = bean;
 			keepRowBeforChanges = new DynamicDBean(); 
 			keepRowBeforChanges = RestData.copyDatabean(bean);
+			Class<?> dynamicForm = null ;
 //			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
-			Class<?> dynamicForm = Class.forName(displayFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
-			display = dynamicForm.newInstance();
-			Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
-			Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
-			Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
-			Method getButtonsForm= dynamicForm.getMethod("setButtonsForm",new Class[] { FormButtonsBar.class});
-			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
-			setRowsColList.invoke(display,rowsColListGrid);//rowsColListGrid);rowsFieldList // @@ TODO change method names to setRowsFieldList
-			getButtonsForm.invoke(display, buttonsForm);
-			setBean.invoke(display,bean);
-			setBinder.invoke(display,binder);
-			
-			
-			setDataProvider.invoke(display, dataProvider);
-			divDisplay.removeAll();
-			Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
-			setdVGrid.invoke(display, this); // to use methods in this class
+			if (displayFormClassName.equals("NODISPLAY") == false)
+				{
+				dynamicForm = Class.forName(displayFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
+				display = dynamicForm.newInstance();
+				Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+				Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
+				Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+				Method getButtonsForm= dynamicForm.getMethod("setButtonsForm",new Class[] { FormButtonsBar.class});
+				setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
+				setRowsColList.invoke(display,rowsColListGrid);//rowsColListGrid);rowsFieldList // @@ TODO change method names to setRowsFieldList
+				getButtonsForm.invoke(display, buttonsForm);
+				setBean.invoke(display,bean);
+				setBinder.invoke(display,binder);						
+				setDataProvider.invoke(display, dataProvider);
+				divDisplay.removeAll();
+				Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
+				setdVGrid.invoke(display, this); // to use methods in this class
+				}
 			if (displayFormClassName.indexOf("NODISPLAY") > -1)
 			{
 				divDisplay.setVisible(false);
+	//			layoutGD.getGridDisplaySubGrid().getStyle().set("height", "0%");
+				layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(new Double(0));
+	//			layoutGD.getGridDisplaySubGrid().getStyle().set("display", "block ruby");
+
 			}
 			else
 			{
 				divDisplay.setVisible(true);
 			}
 			setButtonsVisibiltyFromExtendedProperties(resourceName);
-			if (displayFormClassName.indexOf("Generated") > -1)
+			if (dynamicForm != null &&  displayFormClassName.indexOf("Generated") > -1)
 			{
 			//	setDataProvider.invoke(display, dataProvider);
 				Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
@@ -892,7 +908,7 @@ private boolean isBoolean(String header, String colType) {
 				divDisplay.add((Component)divInDisplay);
 				
 			}
-			else
+			else if (dynamicForm != null)
 			{
 				divDisplay.add((Component)display);
 			}
@@ -911,9 +927,11 @@ private boolean isBoolean(String header, String colType) {
 				Div content0=new Div(); 
 				divSubGrid.add(fillContent(content0, 0 , bean));	
 //				generatedUtil.setDivSubGrid(divSubGrid); // to run methods for buttons
-				
-				Method setDivSubGrid= dynamicForm.getMethod("setDivSubGrid", new Class[] {com.vaadin.flow.component.html.Div.class});
-				setDivSubGrid.invoke(display, divSubGrid); // to use methods in this class
+				if (dynamicForm != null)
+					{
+					Method setDivSubGrid= dynamicForm.getMethod("setDivSubGrid", new Class[] {com.vaadin.flow.component.html.Div.class});
+					setDivSubGrid.invoke(display, divSubGrid); // to use methods in this class
+					}
 
 	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
 			}
@@ -932,7 +950,19 @@ private boolean isBoolean(String header, String colType) {
 			else // resourceSubGrid is null // to hide split
 			{
 				divSubGrid.getElement().getStyle().set("display", "none");
-				layoutQGD.getDisplaySplitSubGrid().getStyle().set("height", "100%");
+				if (layoutQGD != null)
+					layoutQGD.getDisplaySplitSubGrid().getStyle().set("height", "100%");
+				else if (layoutGD != null)
+				{
+					layoutGD.getGridDisplaySubGrid().getStyle().set("height", "100%");
+					layoutGD.getGridDisplaySubGrid().getStyle().set("display", "block ruby");
+				}
+				else
+				{					
+					Component comp = UiComponentsUtils.findComponent( divSubGrid.getParent().get(), "gridDisplaySubGrid");
+					if (comp != null)
+						comp.getElement().getStyle().set("height", "100%");
+				}	
 //				layoutQGD.getDisplaySplitSubGrid().setOrientation(Orientation.VERTICAL); 
 //				layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(new Double(100));// to hide split
 			}
@@ -1056,6 +1086,14 @@ private boolean isBoolean(String header, String colType) {
 //
 			}
 		showQueryForm(false);	
+		if (displayFormClassName.indexOf("NODISPLAY") > -1)
+		{
+//			divDisplay.setVisible(false);
+//			layoutGD.getGridDisplaySubGrid().getStyle().set("height", "0%");
+			layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(new Double(0));
+//			layoutGD.getGridDisplaySubGrid().getStyle().set("display", "block ruby");
+
+		}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1085,6 +1123,206 @@ private boolean isBoolean(String header, String colType) {
 //		gridSplitDisplay.getElement().appendChild(display.getElement());
 
 //	UI.getCurrent().navigate("dymanic");
+}
+	void refreshBean(DynamicDBean bean ) {
+		try {
+			System.out.println("refreshBean()");
+			
+			setVisibleRowData(true);
+			if (buttonsForm !=null )
+				{
+				if (bean.isReadOnly() || isSubResourceReadOnly(bean.getResourceName())) // when a bean is mark as readOnly buttons for save are hide, to mark as read only add row.readONly=true to the event of the resource in LAC or as Extended property
+				{
+					buttonsForm.setVisible(false);
+					setButtonsRowVisible(false);
+				}
+				else
+				{
+					buttonsForm.setVisible(true);
+					setButtonsRowVisible(false);
+				}
+			}
+			selectedRow = bean;
+			keepRowBeforChanges = new DynamicDBean(); 
+			keepRowBeforChanges = RestData.copyDatabean(bean);
+			Class<?> dynamicForm = null ;
+			if (displayFormClassName.equals("NODISPLAY") == false)
+				{
+				dynamicForm = Class.forName(displayFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
+				display = dynamicForm.newInstance();
+				Method setRowsColList = dynamicForm.getMethod("setRowsColList", new Class[] {java.util.ArrayList.class} );
+				Method setBinder = dynamicForm.getMethod("setBinder", new Class[] {com.vaadin.flow.data.binder.Binder.class} );
+				Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
+				Method getButtonsForm= dynamicForm.getMethod("setButtonsForm",new Class[] { FormButtonsBar.class});
+				setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
+				setRowsColList.invoke(display,rowsColListGrid);//rowsColListGrid);rowsFieldList // @@ TODO change method names to setRowsFieldList
+				getButtonsForm.invoke(display, buttonsForm);
+				setBean.invoke(display,bean);
+				setBinder.invoke(display,binder);						
+				setDataProvider.invoke(display, dataProvider);
+//				divDisplay.removeAll();
+//				Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
+//				setdVGrid.invoke(display, this); // to use methods in this class
+				}
+			if (displayFormClassName.indexOf("NODISPLAY") > -1)
+			{
+				divDisplay.setVisible(false);
+				layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(new Double(0));
+			}
+			else
+			{
+				divDisplay.setVisible(true);
+			}
+			setButtonsVisibiltyFromExtendedProperties(resourceName);
+			if (dynamicForm != null &&  displayFormClassName.indexOf("Generated") > -1)
+			{
+				Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class});
+				divInDisplay = createContent.invoke(display, buttonsForm );
+//				divDisplay.add((Component)divInDisplay);
+				
+			}
+//			else if (dynamicForm != null)
+//			{
+//				divDisplay.add((Component)display);
+//			}
+
+			String resourceSubGrid = extractResourceSubGrid(bean,0);
+//			divSubGrid.removeAll();
+//			String tabsList = rowsColListGrid.get(0)[12];
+//			tabsList = applyTagsForVisibility(tabsList);
+//			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
+//			{
+//				System.out.println("DynamicViewGrid.showBean() ADD SUBGRID");
+//				Div content0=new Div(); 
+//				divSubGrid.add(fillContent(content0, 0 , bean));	
+//				if (dynamicForm != null)
+//					{
+//					Method setDivSubGrid= dynamicForm.getMethod("setDivSubGrid", new Class[] {com.vaadin.flow.component.html.Div.class});
+//					setDivSubGrid.invoke(display, divSubGrid); // to use methods in this class
+//					}
+//
+//			}
+//			else if (resourceSubGrid != null) //123456789
+//			{
+//				divSubGrid.removeAll();
+//				divSubGrid.add(createSubTabs(bean, tabsList));
+//				Method setDivSubGrid= dynamicForm.getMethod("setDivSubGrid", new Class[] {com.vaadin.flow.component.html.Div.class});
+//				setDivSubGrid.invoke(display, divSubGrid); // to use methods in this class
+//
+//			}
+//			else // resourceSubGrid is null // to hide split
+//			{
+//				divSubGrid.getElement().getStyle().set("display", "none");
+//				if (layoutQGD != null)
+//					layoutQGD.getDisplaySplitSubGrid().getStyle().set("height", "100%");
+//				else if (layoutGD != null)
+//				{
+//					layoutGD.getGridDisplaySubGrid().getStyle().set("height", "100%");
+//					layoutGD.getGridDisplaySubGrid().getStyle().set("display", "block ruby");
+//				}
+//				else
+//				{					
+//					Component comp = UiComponentsUtils.findComponent( divSubGrid.getParent().get(), "gridDisplaySubGrid");
+//					if (comp != null)
+//						comp.getElement().getStyle().set("height", "100%");
+//				}	
+//			}
+//			if (layoutQGD != null)
+//			{
+//
+//				if (bean.getParams() != null )
+//				{		
+//				if (bean.getParams().indexOf("classForLayout") != -1)
+//				{
+//					
+//					String parClassForLayout = bean.getParams().substring(bean.getParams().indexOf("classForLayout")+15);
+//					int idxNextAnd = parClassForLayout.indexOf("&");
+//					int  idxLast = parClassForLayout.length();
+//					if (idxNextAnd > -1)
+//						idxLast = idxNextAnd;
+//					String classForLayout = parClassForLayout.substring(1,idxLast-1);
+//					String[] methodAndValue = classForLayout.split(":");
+//					String method = methodAndValue[0];
+//					String value = methodAndValue[1];
+//					Class<?> classLayout = Class.forName("coop.intergal.ui.views.DynamicQryGridDisplay");
+//					Method getDiv = classLayout.getMethod(method);
+//					Div div = (Div) getDiv.invoke(layoutQGD);
+//					div.addClassName(value);
+//	
+//				}
+//				if (bean.getParams() == null || bean.getParams().indexOf("splitGridDisplay") == -1)
+//					System.out.println("DynamicViewGrid.showBean() NOT splitGridDisplay");
+//				if (bean.getParams() != null && bean.getParams().indexOf("splitGridDisplay") != -1) 
+//					{
+//					if ( keepSplitGD == null)
+//						{
+//						String params = bean.getParams().substring(bean.getParams().indexOf("splitGridDisplay")+17);
+//						int idxNextAnd = params.indexOf("&");
+//						int  idxLast = params.length();
+//						if (idxNextAnd > -1)
+//							idxLast = idxNextAnd;
+//						String splitPos = params.substring(1,idxLast-1);
+//						keepSplitGD = splitPos;
+//						System.out.println("DynamicViewGrid.showBean() splitPos <"+ splitPos +">");
+//						layoutQGD.getGridSplitDisplay().setSplitterPosition(new Double(splitPos));
+//						}
+//					}	
+//				else if ( keepSplitGD == null)
+//					{
+//					keepSplitGD = AppConst.DEFAULT_SPLIT_POS_GRID_DISPLAY + "";
+//					layoutQGD.getGridSplitDisplay().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_GRID_DISPLAY);
+//					}				
+//				if (bean.getParams() != null && bean.getParams().indexOf("splitDisplaySubGrid") != -1) 
+//					{
+//					if (keepSplitDS == null)
+//						{
+//						
+//						String params = bean.getParams().substring(bean.getParams().indexOf("splitDisplaySubGrid")+20);
+//						int idxNextAnd = params.indexOf("&");
+//						int  idxLast = params.length();
+//						if (idxNextAnd > -1)
+//							idxLast = idxNextAnd;
+//						String splitPos = params.substring(1,idxLast-1);
+//						keepSplitDS  = splitPos;
+//						System.out.println("DynamicViewGrid.showBean() splitPos splitDisplaySubGrid <"+ splitPos +">");
+//						layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(new Double(splitPos));
+//						}
+//					}
+//			}
+//			else if (keepSplitDS == null)
+//				{
+//				keepSplitDS = AppConst.DEFAULT_SPLIT_POS_DISPLAY_SUBGRID + "";
+//				layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(AppConst.DEFAULT_SPLIT_POS_DISPLAY_SUBGRID);
+//				}
+//			}
+//		showQueryForm(false);	
+//		if (displayFormClassName.indexOf("NODISPLAY") > -1)
+//		{
+//			layoutQGD.getDisplaySplitSubGrid().setSplitterPosition(new Double(0));
+//		}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 }
 	private String applyTagsForVisibility(String tabsList) {
 		int startIdxTags = tabsList.indexOf("#tagForV#")+9;
@@ -1251,6 +1489,7 @@ private boolean isBoolean(String header, String colType) {
 		subDynamicViewGrid.setDisplayParent(display);
 		subDynamicViewGrid.setBeanParent(setBean);
 		subDynamicViewGrid.setParentGrid(this);
+		subDynamicViewGrid.setHasSideDisplay(false);
 		subDynamicViewGrid.getGrid().select(getKeepSelectedChild());
 		divSubGrid.add(subDynamicViewGrid );
 		keepSubGridToBeAlterExternally(subDynamicViewGrid);
@@ -2167,7 +2406,7 @@ private boolean isBoolean(String header, String colType) {
 			}
 			else if (subLayoutClassName.indexOf("DynamicQryGrid") > -1)
 			{
-				return componDynamicQryGrid (subLayoutClassName, subFormResource, subFormFilter, querySubFormClassName, divSubForm, true );
+				return componDynamicQryGrid (subLayoutClassName, subFormResource, subFormFilter, querySubFormClassName, divSubForm, true, subFormClassName );
 //			return componDynamicGridDisplay (subLayoutClassName, subFormResource, subFormFilter, subFormClassName, divSubForm, true );
 			}
 			else if (subLayoutClassName.indexOf("DynamicDisplayOnly") > -1)
@@ -2543,7 +2782,7 @@ private boolean isBoolean(String header, String colType) {
 	}
 
 	private Component componDynamicQryGrid(String subLayoutClassName, String subFormResource, String subFormFilter,
-			String querySubFormClassName, Div divSubForm, boolean b) {
+			String querySubFormClassName, Div divSubForm, boolean b, String subFormClassName) {
 		try {
 			Class<?> dynamicForm = Class.forName(subLayoutClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
 			Object oDynamicForm = dynamicForm.newInstance();
@@ -2555,6 +2794,11 @@ private boolean isBoolean(String header, String colType) {
 			Method setFilter = dynamicForm.getMethod("setFilter", new Class[] {String.class} );
 			
 			setQueryFormClassName.invoke(oDynamicForm, querySubFormClassName);
+			if (subFormClassName !=  null)
+				{
+				Method setDisplayFormClassName = dynamicForm.getMethod("setDisplayFormClassName", new Class[] {String.class} );
+				setDisplayFormClassName.invoke(oDynamicForm, subFormClassName);
+				}
 			setResourceName.invoke(oDynamicForm, subFormResource);
 			setFilter.invoke(oDynamicForm, subFormFilter);
 //			setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
@@ -2985,7 +3229,12 @@ private boolean isBoolean(String header, String colType) {
 			else
 				step = 0;
 			String fKfieldName = fKfilter.substring(step+1, idXEqual - 2  );
-			String parentfieldName = fKfilter.substring(4+idXEqual, idXMark - 1  );
+			String parentfieldName = fKfilter.substring(4+idXEqual, idXMark - 1  );			
+			if (bean.getRowJSon().get(parentfieldName) == null)
+				{
+				DataService.get().showError("ERROR ---> el campo :"+ parentfieldName + " no existe en el recurso :"+ bean.getResourceName());
+				return null;
+				}
 			String parentValue = bean.getRowJSon().get(parentfieldName).asText();
 			if (isADate(parentValue) && AppConst.FORMAT_FOR_DATETIME_FOR_JOIN.length() > 0) {
 				parentValue = "=" +AppConst.FORMAT_FOR_DATETIME_FOR_JOIN.replace("#value#",parentValue ) + "%20and%20";
@@ -3166,6 +3415,10 @@ private boolean isBoolean(String header, String colType) {
 		this.layoutQGD = dynamicQryGridDisplay;
 		
 	}
+	public void setLayout(DynamicGridDisplay dynamicGridDisplay) {
+		this.layoutGD = dynamicGridDisplay;
+		
+	}
 
 //	public void setGridSplitDisplay(SplitLayout gridSplitDisplay) {
 //		this.gridSplitDisplay = gridSplitDisplay;
@@ -3256,7 +3509,8 @@ private boolean isBoolean(String header, String colType) {
 				e.printStackTrace();
 			}
 		
-			showBean(selectedRow);
+//			showBean(selectedRow);
+			refreshBean(selectedRow);
 		}	
 		}
 		return null;
@@ -3324,15 +3578,28 @@ private boolean isBoolean(String header, String colType) {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + row.getRowJSon().toString());
 		if ((dataProvider.getHasNewRow() == true || isInsertingALine == false) && autoSaveGrid == true)
 		{
-			dataProvider.save(beanTobeSave, beansToSaveAndRefresh2);	 
-			dataProvider.setHasNewRow(false);
+//	xx		
+			Class<? extends Object> clas = display.getClass();
+			Method m;
 			try {
+				m = clas.getMethod("getDataProvider");
+				DdbDataBackEndProvider parentDP = (DdbDataBackEndProvider) m.invoke(display);
+				dataProvider.save(beanTobeSave, beansToSaveAndRefresh2, parentDP);	 
+				dataProvider.setHasNewRow(false);
 				if (display!= null && parentRow !=null)
+				{
 					setBeanParent.invoke(display,parentRow);
+					parentGrid.refreshBean(parentGrid.getSelectedRow());
+				}
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			 catch (NoSuchMethodException | SecurityException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
 		}
 //		((Binder<DynamicDBean>) display).setBean(beansToSaveAndRefresh2.get("CR-PED_PROVEED_CAB"));
 //		try {
@@ -3344,7 +3611,7 @@ private boolean isBoolean(String header, String colType) {
 //		showBean(beansToSaveAndRefresh2.get("CR-PED_PROVEED_CAB"));
 //		PedidoProveedorForm displayXX = (PedidoProveedorForm) display;
 //		displayXX.getBean().setCol25("1000");//beansToSaveAndRefresh2.get("CR-PED_PROVEED_CAB"));
-		parentGrid.showBean(parentGrid.getSelectedRow());
+//@@		parentGrid.showBean(parentGrid.getSelectedRow());
 		return null;
 	}
 	public Object deleteRowInGrid(Hashtable<String, DynamicDBean> beansToSaveAndRefresh2, String beanTobeDelete) {
@@ -3357,7 +3624,8 @@ private boolean isBoolean(String header, String colType) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			parentGrid.showBean(parentGrid.getSelectedRow());
+//			parentGrid.showBean(parentGrid.getSelectedRow());
+			parentGrid.refreshBean(parentGrid.getSelectedRow());
 		return null;
 	}
 
@@ -3376,7 +3644,7 @@ private boolean isBoolean(String header, String colType) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		showBean(selectedRow);
+		refreshBean(selectedRow);
 		return null;
 	}
 	

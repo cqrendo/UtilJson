@@ -302,12 +302,17 @@ private long sizeBE;
 		                .reduce(Comparator::thenComparing)
 		                .orElse((o1, o2) -> 0);
 		    }
+		    public boolean save(String ResourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) 
+		    {
+				return save(ResourceTobeSave, beansToSaveAndRefresh, null);				
+			}
 
-			public boolean save(String ResourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) {
+	public boolean save(String ResourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh,
+			DdbDataBackEndProvider parentDP) {
 				DynamicDBean firstBean = beansToSaveAndRefresh.get(ResourceTobeSave);
 				boolean newRow = firstBean.getRowJSon()== null ; // when RowJson is not Fill is a new row
 		        
-		        DataService.get().updateDynamicDBean(ResourceTobeSave, beansToSaveAndRefresh);
+		        DataService.get().updateDynamicDBean(ResourceTobeSave, beansToSaveAndRefresh, this);
 		        boolean hashasError = false;
 		        if (beansToSaveAndRefresh.get("ERROR") != null)
 		        	hashasError = true;		        
@@ -321,6 +326,12 @@ private long sizeBE;
 //		            }
 		        } else if (hashasError == false){
 		            refreshItem(firstBean);
+		            if (parentDP != null)
+		            {
+		            	DynamicDBean parentbean = beansToSaveAndRefresh.get(parentDP.getResourceName());
+		            	parentDP.refreshItem(parentbean);
+		    //        	parentDP.refreshAll();
+		            }
 		        }
 //				return selectedRow;
 				return hashasError;
@@ -355,6 +366,7 @@ private long sizeBE;
 				notification.open();
 					
 				}
+
 
 
 				

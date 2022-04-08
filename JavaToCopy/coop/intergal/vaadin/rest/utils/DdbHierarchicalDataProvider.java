@@ -244,7 +244,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 				DynamicDBean firstBean = beansToSaveAndRefresh.get(ResourceTobeSave);
 				boolean newProduct = firstBean.getCol0()== null ;
 		        
-		        DataService.get().updateDynamicDBean(ResourceTobeSave, beansToSaveAndRefresh);
+		        DataService.get().updateDynamicDBean(ResourceTobeSave, beansToSaveAndRefresh, null); // the third param is the dataprovider to refresh but for now this class is not use only in DynamicTreeDisplay, the default one is DdbDataBackEndProvider, is possible this class is not necessary in that case not problem for null 
 		        if (newProduct) {
 		            refreshAll();
 		        } else {

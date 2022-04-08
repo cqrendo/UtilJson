@@ -39,9 +39,12 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 //@Route(value = "gridDetails", layout = MainLayout.class)
 import static coop.intergal.AppConst.STYLES_CSS;
 import static coop.intergal.AppConst.STYLES_FORM_ITEM_CSS;
+import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
+
 
 @CssImport(value = STYLES_CSS, themeFor="dynamic-grid-display")
 @CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
+@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-layout")
 public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynamicTitle, BeforeEnterObserver {//, AfterNavigationListener {
 
 	/**
@@ -208,6 +211,7 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 	
 	}
 	  public Component createContent(FormButtonsBar buttonsForm, GenericClassForMethods genericClassForMethods) {
+		  this.setId("GeneratedDetails");
 		  this.buttonsForm = buttonsForm;
 		  if (genericClassForMethods != null)
 			  this.genericClassForMethods = genericClassForMethods;		

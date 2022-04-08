@@ -29,7 +29,7 @@ public abstract class DataService implements Serializable {
 	public abstract DynamicDBean getDynamicDBeanById(int productId) ;
 	public abstract void updateDynamicDBean(DynamicDBean customer) ;
 
-	public abstract void updateDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) ;
+	public abstract void updateDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh, DdbDataBackEndProvider ddbDataBackEndProvider) ;
 	public abstract void deleteDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh) ;
 
 	public abstract void showError(String string);

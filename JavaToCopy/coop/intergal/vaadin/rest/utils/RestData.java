@@ -852,7 +852,7 @@ public class RestData {
 							int idxPoint = resourceName.indexOf(".");
 							if (idxPoint > -1) 
 							resourceName = resourceName.substring(0, idxPoint);
-							String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
+							String ident = JSonClient.getIdentOfResource(resourceName, true,preConfParam);
 						
 							 
 							if (ident !=null) 
@@ -1069,7 +1069,7 @@ public class RestData {
 						int idxPoint = resourceName.indexOf(".");
 						if (idxPoint > -1) 
 						resourceName = resourceName.substring(0, idxPoint);
-						String ident = JSonClient.getIdentOfResuorce(resourceName, UtilSessionData.getCache(),preConfParam);
+						String ident = JSonClient.getIdentOfResource(resourceName, UtilSessionData.getCache(),preConfParam);
 						if(ident != null)
 							{
 							JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  
@@ -1335,7 +1335,7 @@ public class RestData {
 						int idxPoint = resourceName.indexOf(".");
 						if (idxPoint > -1) 
 						resourceName = resourceName.substring(0, idxPoint);
-						String ident = JSonClient.getIdentOfResuorce(resourceName, true,preConfParam);
+						String ident = JSonClient.getIdentOfResource(resourceName, true,preConfParam);
 						if(ident != null)
 							{
 							JsonNode resource = JSonClient.get("@resources/"+ident,null,true,preConfParam);  

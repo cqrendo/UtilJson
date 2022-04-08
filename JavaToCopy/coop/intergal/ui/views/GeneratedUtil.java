@@ -1638,6 +1638,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 					{
 						col = grid.addEditColumn(d -> decimalFormatter.encode(decimalFormatter.getCents(d.getCol(colName),ndecimals))).text((item, newValue) -> dynamicViewGrid.colChanged(item,colName,newValue)).setHeader(header)
 						.setTextAlign(ColumnTextAlign.END).setResizable(true);
+
 					}
 				else
 				if (isNotAParentField)
