@@ -22,10 +22,10 @@
  :host(.alignRight) {
      text-align-last: right; 
  }
-/* :host(.labelright) { */
-/* 	text-align: right;  */
-/* 	margin-right: 10px; */
-/*	}  */
+ :host(.labelright) {
+	text-align: right; 
+	margin-right: 10px;
+	}
 
 :host(.lineHeight2) {
 	height:70px;
@@ -72,8 +72,10 @@
 --lumo-secondary-text-color: green;
 
 }
-
-
+:host(.fieldInAGroup) {
+	top: -25px;
+	position: relative;
+}
 vaadin-form-item {
   --vaadin-form-item-label-width: 5em;
 }

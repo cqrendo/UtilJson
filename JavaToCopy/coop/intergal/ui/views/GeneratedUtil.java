@@ -176,7 +176,9 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			String [] tokens = tabsLabels.split(Pattern.quote(","));
 //			int i = 0;
 //		   	Div contentyDiv0 = new Div(); 
-			Tab tab0 =null ;Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;Tab tab5=null ;Tab tab6=null ;Tab tab7=null ;
+		//	Tab tab0 =null ;
+			Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;Tab tab5=null ;Tab tab6=null ;Tab tab7=null ;
+//			FlexBoxLayout contentPreTab=null; 
 			FlexBoxLayout content0=null; 
 			FlexBoxLayout content1=null;
 			FlexBoxLayout content2=null; FlexBoxLayout content3=null;
@@ -191,24 +193,24 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			{ 
 				if (nTabs > 0)
 				{
-					tabTitle = tokens[0];
-					tab0 = new Tab(tabTitle);
+			//		tabTitle = tokens[0];
+			//		tab0 = new Tab(tabTitle);
 					content0 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"0"));
 					content0.setWidthFull();
 					
 				}
 				if (nTabs > 1)
 				{
-					tabTitle = tokens[1];
+					tabTitle = tokens[0];
 					tab1 = new Tab(tabTitle);
 					content1 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"1"));
 					content1.setWidthFull();
-					content1.setVisible(false);
+//					content1.setVisible(false);
 					
 				}
 				if (nTabs > 2)
 				{
-					tabTitle = tokens[2];
+					tabTitle = tokens[1];
 					tab2 = new Tab(tabTitle);
 					content2 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"2"));
 					content2.setWidthFull();
@@ -217,7 +219,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				}
 				if (nTabs > 3)
 				{
-					tabTitle = tokens[3];
+					tabTitle = tokens[2];
 					tab3 = new Tab(tabTitle);
 					content3 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"3"));
 					content3.setWidthFull();
@@ -227,7 +229,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				}
 				if (nTabs > 4)
 				{
-					tabTitle = tokens[4];
+					tabTitle = tokens[3];
 					tab4 = new Tab(tabTitle);
 					content4 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"4"));		
 					content4.setWidthFull();
@@ -236,7 +238,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				}
 				if (nTabs > 5)
 				{
-					tabTitle = tokens[5];
+					tabTitle = tokens[4];
 					tab5 = new Tab(tabTitle);
 					content5 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"5"));
 					content5.setWidthFull();
@@ -245,7 +247,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				}
 				if (nTabs > 6)
 				{
-					tabTitle = tokens[6];
+					tabTitle = tokens[5];
 					tab6 = new Tab(tabTitle);
 					content6 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"6"));
 					content6.setWidthFull();
@@ -255,7 +257,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				}
 				if (nTabs > 7)
 				{
-					tabTitle = tokens[7];
+					tabTitle = tokens[6];
 					tab7 = new Tab(tabTitle);
 					content7 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"7"));		
 					content7.setWidthFull();
@@ -271,7 +273,6 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	    	Div pages =null ;
 	      	if (nTabs > 7)
 			{
-	      		tabsToPages.put(tab0, content0);
 	      		tabsToPages.put(tab1, content1);
 	      		tabsToPages.put(tab2, content2);
 	      		tabsToPages.put(tab3, content3);
@@ -279,28 +280,28 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	      		tabsToPages.put(tab5, content5);
 	      		tabsToPages.put(tab6, content6);
 	      		tabsToPages.put(tab7, content7);
-	      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6,tab7);
-	      		pages = new Div(content0, content1, content2,content3, content4, content5, content6 , content7);
+	      		Tabs tabs = new Tabs(tab1, tab2, tab3, tab4, tab5, tab6,tab7);
+	      		pages = new Div(content1, content2,content3, content4, content5, content6 , content7);
 	      		tabs.addSelectedChangeListener(event -> {
 	      			tabsToPages.values().forEach(page -> page.setVisible(false));
 	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
 	      			selectedPage.setVisible(true);
 	    	});
 		   	Div content = new Div();
-	    	content.add(tabs, pages);
+	    	content.add(content0, tabs, pages);
 			return content;
 			}
 	      	else     	    	
 	      	if (nTabs > 6)
 			{
-	      		tabsToPages.put(tab0, content0);
+//	      		tabsToPages.put(tab0, content0);
 	      		tabsToPages.put(tab1, content1);
 	      		tabsToPages.put(tab2, content2);
 	      		tabsToPages.put(tab3, content3);
 	      		tabsToPages.put(tab4, content4);
 	      		tabsToPages.put(tab5, content5);
 	      		tabsToPages.put(tab6, content6);
-	      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5, tab6);
+	      		Tabs tabs = new Tabs(tab1, tab2, tab3, tab4, tab5, tab6);
 	      		pages = new Div(content0, content1, content2,content3, content4, content5, content6 );
 	      		tabs.addSelectedChangeListener(event -> {
 	      			tabsToPages.values().forEach(page -> page.setVisible(false));
@@ -308,97 +309,92 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	      			selectedPage.setVisible(true);
 	    	});
 		   	Div content = new Div();
-	    	content.add(tabs, pages);
+	    	content.add(content0,tabs, pages);
 			return content;
 			}
 	      	else     	
 	      	if (nTabs > 5)
 			{
-	      		tabsToPages.put(tab0, content0);
 	      		tabsToPages.put(tab1, content1);
 	      		tabsToPages.put(tab2, content2);
 	      		tabsToPages.put(tab3, content3);
 	      		tabsToPages.put(tab4, content4);
 	      		tabsToPages.put(tab5, content5);
-	      		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4, tab5);
-	      		pages = new Div(content0, content1, content2,content3, content4, content5 );
+	      		Tabs tabs = new Tabs(tab1, tab2, tab3, tab4, tab5);
+	      		pages = new Div(content1, content2,content3, content4, content5 );
 	      		tabs.addSelectedChangeListener(event -> {
 	      			tabsToPages.values().forEach(page -> page.setVisible(false));
 	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
 	      			selectedPage.setVisible(true);
 	    	});
 		   	Div content = new Div();
-	    	content.add(tabs, pages);
+	    	content.add(content0, tabs, pages);
 			return content;
 			}
 	      	else     	
 	    	if (nTabs > 4)
 	    		{
-	    		tabsToPages.put(tab0, content0);
 	    		tabsToPages.put(tab1, content1);
 	       		tabsToPages.put(tab2, content2);
 	    		tabsToPages.put(tab3, content3);
 	    		tabsToPages.put(tab4, content4);
-	    		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3, tab4);
-	    		pages = new Div(content0, content1, content2,content3, content4 );
+	    		Tabs tabs = new Tabs(tab1, tab2, tab3, tab4);
+	    		pages = new Div(content1, content2,content3, content4 );
 	    	   	tabs.addSelectedChangeListener(event -> {
 	        	    tabsToPages.values().forEach(page -> page.setVisible(false));
 	        	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
 	        	    selectedPage.setVisible(true);
 	        	});
 	    	   	Div content = new Div();
-	        	content.add(tabs, pages);
+	        	content.add(content0,tabs, pages);
 	    		return content;
 	    		}
 	    	else if (nTabs > 3)
 	    		{
-	    		tabsToPages.put(tab0, content0);
 	    		tabsToPages.put(tab1, content1);
 	       		tabsToPages.put(tab2, content2);
 	    		tabsToPages.put(tab3, content3);
-	    		Tabs tabs = new Tabs(tab0, tab1, tab2, tab3);
-	    		pages = new Div(content0, content1, content2,content3);
+	    		Tabs tabs = new Tabs(tab1, tab2, tab3);
+	    		pages = new Div(content1, content2,content3);
 	    	   	tabs.addSelectedChangeListener(event -> {
 	        	    tabsToPages.values().forEach(page -> page.setVisible(false));
 	        	    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
 	        	    selectedPage.setVisible(true);
 	        	});
 	    	   	Div content = new Div();
-	        	content.add(tabs, pages);
+	        	content.add(content0,tabs, pages);
 	    		return content;
 
 	    		}
 	      	else if (nTabs > 2)
 	      		{
-	      		tabsToPages.put(tab0, content0);
 	      		tabsToPages.put(tab1, content1);
 	      		tabsToPages.put(tab2, content2);
-	      		Tabs tabs = new Tabs(tab0, tab1, tab2);
-	      		pages = new Div(content0, content1, content2);
+	      		Tabs tabs = new Tabs(tab1, tab2);
+	      		pages = new Div(content1, content2);
 	      		tabs.addSelectedChangeListener(event -> {
 	      			tabsToPages.values().forEach(page -> page.setVisible(false));
 	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
 	      			selectedPage.setVisible(true);
 	      		});
 	      		Div content = new Div();
-	        	content.add(tabs, pages);
+	        	content.add(content0,tabs, pages);
 	        	content.setWidthFull();
 	    		return content;
 
 	      		}
 	    	else
 	    		{
-	     		tabsToPages.put(tab0, content0);
 	    		tabsToPages.put(tab1, content1);
-	    		Tabs tabs = new Tabs(tab0, tab1);
-	    		pages = new Div(content0, content1 );
+	    		Tabs tabs = new Tabs(tab1);
+	    		pages = new Div(content1 );
 	     		tabs.addSelectedChangeListener(event -> {
 	      			tabsToPages.values().forEach(page -> page.setVisible(false));
 	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
 	      			selectedPage.setVisible(true);
 	      		});
 	        	Div content = new Div();
-	        	content.add(tabs, pages);
+	        	content.add(content0, tabs, pages);
 	    		return content;
 
 
@@ -421,12 +417,18 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			if (form == null)
 //				form = new FormLayout();
 			FormLayout form = new FormLayout();
+			Span span = new Span();
+			span.getElement().getStyle().set("color", "var(--lumo-body-text-color");			
+			span.getElement().getStyle().set("font-size", "var(--lumo-font-size-s");
+			span.getElement().getStyle().set("font-weight", "500");
+			span.getElement().getStyle().set("border", "1px solid lightgray");
+			span.add(new Label("soy Span"));
 //			if (isQuery)
 //				{
 //				form.setId(ResourceName+"_QRY");
 //				}
 			form.removeAll();
-			
+			form.add(span);	
 			form.getStyle().set("overflow", "inherit");
 			Div statusLabel = new Div();
 			statusLabel.getElement().getStyle().set("color", "var(--lumo-error-text-color)");

@@ -1,4 +1,7 @@
 
+:host(.formMargin0) {
+	margin-top: 0px;
+}
 :host(.formMargin50) {
 	margin-top: 10px;
 }
@@ -23,7 +26,18 @@
 :host(.formMargin400) {
 	margin-top: 370px;
 }
-
+:host(.formMarginL0) {
+	margin-left: 0px;
+}
+:host(.formMarginL10) {
+	margin-left: 10px;
+}
+:host(.formMarginL20) {
+	margin-left: 20px;
+}
+:host(.formMarginL30) {
+	margin-left: 30px;
+}
 :host(.formMarginL50) {
 	margin-left: 50px;
 }
@@ -50,4 +64,13 @@
 }
 :host(.formMarginL400) {
 	margin-left: 400px;
-}	
+}
+:host([legend]) { border: 1px solid; }
+:host::before {	
+    content: attr(legend);
+    top: -14px;
+    position: relative;
+    background: white;
+    left: 4px;
+}
+	

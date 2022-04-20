@@ -3,7 +3,28 @@
 	margin-right: 10px; 
 }
 .formTitle {
-	text-align: center;
-	border: 3px solid;
-	margin-bottom: 20px;
+	background-color: darkblue;
+	color: white;
 }
+:host([legend]) { border: 1px solid; }
+:host::before {	
+    content: attr(legend);
+    top: -14px;
+    position: relative;
+    background: white;
+    left: 4px;
+}
+.onlyButtons {
+	overflow: hidden;
+}
+:host(.editable-custom-effect) [part~="editable-cell"]:hover,
+:host(.editable-custom-effect) [part~="editable-cell"]:focus {
+  background: var(--lumo-contrast-10pct);
+}
+
+:host(.editable-custom-effect) [part~="editable-cell"] {
+  background: var(--lumo-contrast-5pct);
+}  .editable {
+    background-color: #b1ffb7;
+}
+	
