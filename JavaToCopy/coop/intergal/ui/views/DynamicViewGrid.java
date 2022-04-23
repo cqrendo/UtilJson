@@ -934,6 +934,8 @@ private boolean isBoolean(String header, String colType) {
 					}
 
 	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
+				setOrientationDisplaySplitSubGrid(Orientation.VERTICAL);
+				
 			}
 			else if (resourceSubGrid != null) //123456789
 			{
@@ -946,6 +948,7 @@ private boolean isBoolean(String header, String colType) {
 //				DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
 //				subDynamicViewGrid.setButtonsRowVisible(false);//(true);
 //				divSubGrid.add(subDynamicViewGrid );
+				setOrientationDisplaySplitSubGrid(Orientation.VERTICAL);
 			}
 			else // resourceSubGrid is null // to hide split
 			{
@@ -954,8 +957,8 @@ private boolean isBoolean(String header, String colType) {
 					layoutQGD.getDisplaySplitSubGrid().getStyle().set("height", "100%");
 				else if (layoutGD != null)
 				{
-					layoutGD.getGridDisplaySubGrid().getStyle().set("height", "100%");
-					layoutGD.getGridDisplaySubGrid().getStyle().set("display", "block ruby");
+					layoutGD.getDisplaySplitSubGrid().getStyle().set("height", "100%");
+					layoutGD.getDisplaySplitSubGrid().getStyle().set("display", "block ruby");
 				}
 				else
 				{					
@@ -1124,6 +1127,13 @@ private boolean isBoolean(String header, String colType) {
 
 //	UI.getCurrent().navigate("dymanic");
 }
+	private void setOrientationDisplaySplitSubGrid(Orientation orientation) {
+		if (layoutQGD != null)
+			layoutQGD.getDisplaySplitSubGrid().setOrientation(orientation); 
+		else if (layoutGD != null)
+			layoutGD.getDisplaySplitSubGrid().setOrientation(orientation); 		
+	}
+
 	void refreshBean(DynamicDBean bean ) {
 		try {
 			System.out.println("refreshBean()");

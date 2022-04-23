@@ -65,12 +65,47 @@
 :host(.formMarginL400) {
 	margin-left: 400px;
 }
+:host(.fieldGroupPaddingL0) {
+	padding-left:0px;
+}
+:host(.fieldGroupPaddingL5) {
+	padding-left:5px;
+}
+:host(.fieldGroupPaddingL10) {
+	padding-left:10px;
+}
+:host(.fieldGroupPaddingL20) {
+	padding-left:20px;
+}
+:host(.fieldGroupPaddingB0) {	
+	padding-bottom:0px;
+}
+:host(.fieldGroupPaddingB5) {	
+	padding-bottom:5px;
+}
+:host(.fieldGroupPaddingB10) {	
+	padding-bottom:10px;
+}
+:host(.fieldGroupPaddingB20) {	
+	padding-bottom:20px;
+}
+:host(.fieldGroupPaddingB30) {	
+	padding-bottom:30px;
+}
+:host(.fieldGroup10) {
+	padding-left:20px;
+	padding-bottom:10px;
+}
+:host(.fieldGroup20) {
+	padding-left:20px;
+	padding-bottom:20px;
+}			
 :host([legend]) { border: 1px solid; }
 :host::before {	
     content: attr(legend);
-    top: -14px;
     position: relative;
-    background: white;
-    left: 4px;
+	top: -25px;
+	background: #f0f0f0;
+	left: 4px;
 }
 	

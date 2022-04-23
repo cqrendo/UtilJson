@@ -91,7 +91,8 @@ import coop.intergal.vaadin.rest.utils.RestData;
 @CssImport(value = STYLES_CSS, themeFor="dynamic-grid-display")
 @CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
 //@CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-text-field")
-@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-item")
+@CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-layout")//vaadin-form-item")
+
 @Uses(NumberField.class) 
 public class GeneratedUtil  {//, AfterNavigationListener {
 
@@ -143,7 +144,8 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	}
 	private Hashtable<String, String[]> resourceAndSubresources = new Hashtable<String, String[]>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
 
-	private Div divSubGrid; 
+	private Div divSubGrid;
+	private FormLayout activeGroup; 
 
 
 
@@ -177,21 +179,24 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			int i = 0;
 //		   	Div contentyDiv0 = new Div(); 
 		//	Tab tab0 =null ;
-			Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;Tab tab5=null ;Tab tab6=null ;Tab tab7=null ;
-//			FlexBoxLayout contentPreTab=null; 
-			FlexBoxLayout content0=null; 
-			FlexBoxLayout content1=null;
-			FlexBoxLayout content2=null; FlexBoxLayout content3=null;
-			FlexBoxLayout content4=null; 
+			Tab tab1=null ;Tab tab2=null ;Tab tab3=null ;Tab tab4=null ;Tab tab5=null ;Tab tab6=null ;Tab tab7=null ;Tab tab8=null ;Tab tab9=null ;Tab tab10=null ;Tab tab11=null ;
+		   	FlexBoxLayout content0=null; 
+		   	FlexBoxLayout content1=null;
+		   	FlexBoxLayout content2=null; 
+		   	FlexBoxLayout content3=null;
+		   	FlexBoxLayout content4=null; 
 			FlexBoxLayout content5=null; 
 			FlexBoxLayout content6=null; 
 			FlexBoxLayout content7=null; 
-
+			FlexBoxLayout content8=null; 
+			FlexBoxLayout content9=null; 
+			FlexBoxLayout content10=null; 
+			FlexBoxLayout content11=null; 
 		   	int nTabs = tokens.length;
 		   	String tabTitle;
 //			while (tokens.length > i)
 //			{ 
-				if (nTabs > 0)
+				if (nTabs >= 0)
 				{
 			//		tabTitle = tokens[0];
 			//		tab0 = new Tab(tabTitle);
@@ -199,7 +204,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					content0.setWidthFull();
 					
 				}
-				if (nTabs > 1)
+				if (nTabs >= 1)
 				{
 					tabTitle = tokens[0];
 					tab1 = new Tab(tabTitle);
@@ -208,7 +213,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //					content1.setVisible(false);
 					
 				}
-				if (nTabs > 2)
+				if (nTabs >= 2)
 				{
 					tabTitle = tokens[1];
 					tab2 = new Tab(tabTitle);
@@ -217,7 +222,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					content2.setVisible(false);
 					
 				}
-				if (nTabs > 3)
+				if (nTabs >= 3)
 				{
 					tabTitle = tokens[2];
 					tab3 = new Tab(tabTitle);
@@ -227,7 +232,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 
 					
 				}
-				if (nTabs > 4)
+				if (nTabs >= 4)
 				{
 					tabTitle = tokens[3];
 					tab4 = new Tab(tabTitle);
@@ -236,7 +241,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					content4.setVisible(false);
 
 				}
-				if (nTabs > 5)
+				if (nTabs >= 5)
 				{
 					tabTitle = tokens[4];
 					tab5 = new Tab(tabTitle);
@@ -245,7 +250,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					content5.setVisible(false);
 					
 				}
-				if (nTabs > 6)
+				if (nTabs >= 6)
 				{
 					tabTitle = tokens[5];
 					tab6 = new Tab(tabTitle);
@@ -255,7 +260,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 
 					
 				}
-				if (nTabs > 7)
+				if (nTabs >= 7)
 				{
 					tabTitle = tokens[6];
 					tab7 = new Tab(tabTitle);
@@ -263,7 +268,43 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					content7.setWidthFull();
 					content7.setVisible(false);
 
-				}				
+				}
+				if (nTabs >= 8)
+				{
+					tabTitle = tokens[7];
+					tab8 = new Tab(tabTitle);
+					content8 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"8"));		
+					content8.setWidthFull();
+					content8.setVisible(false);
+
+				}
+				if (nTabs >= 9)
+				{
+					tabTitle = tokens[8];
+					tab9 = new Tab(tabTitle);
+					content9 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"9"));		
+					content9.setWidthFull();
+					content9.setVisible(false);
+
+				}
+				if (nTabs >= 10)
+				{
+					tabTitle = tokens[9];
+					tab10 = new Tab(tabTitle);
+					content10 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"10"));		
+					content10.setWidthFull();
+					content10.setVisible(false);
+
+				}
+				if (nTabs >= 11)
+				{
+					tabTitle = tokens[10];
+					tab11 = new Tab(tabTitle);
+					content11 = new FlexBoxLayout(createDetails(resourceName,rowsFieldList, isQuery, cache,"11"));		
+					content11.setWidthFull();
+					content11.setVisible(false);
+
+				}
 //				i++;
 //			}
 
@@ -271,7 +312,101 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	    	Map<Tab, Component> tabsToPages = new HashMap<>();
 	 //   	Tabs tabs = new Tabs(tab0,tab1);
 	    	Div pages =null ;
-	      	if (nTabs > 7)
+	     	if (nTabs >= 11)
+			{
+	      		tabsToPages.put(tab1, content1);
+	      		tabsToPages.put(tab2, content2);
+	      		tabsToPages.put(tab3, content3);
+	      		tabsToPages.put(tab4, content4);
+	      		tabsToPages.put(tab5, content5);
+	      		tabsToPages.put(tab6, content6);
+	      		tabsToPages.put(tab7, content7);
+	      		tabsToPages.put(tab8, content8);
+	     		tabsToPages.put(tab9, content9);
+	     		tabsToPages.put(tab10, content10);
+	     		tabsToPages.put(tab11, content11);
+	      		Tabs tabs = new Tabs( tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8,tab9,tab10,tab11);
+	      		pages = new Div(content1, content2,content3, content4, content5, content6 , content7,content8,content9,content10,content11);
+	      		tabs.addSelectedChangeListener(event -> {
+	      			tabsToPages.values().forEach(page -> page.setVisible(false));
+	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	      			selectedPage.setVisible(true);
+	    	});
+		   	Div content = new Div();
+		   	content.add(content0, tabs, pages);
+			return content;
+			}
+	      	else 
+	      	if (nTabs >= 10)
+			{
+	      		tabsToPages.put(tab1, content1);
+	      		tabsToPages.put(tab2, content2);
+	      		tabsToPages.put(tab3, content3);
+	      		tabsToPages.put(tab4, content4);
+	      		tabsToPages.put(tab5, content5);
+	      		tabsToPages.put(tab6, content6);
+	      		tabsToPages.put(tab7, content7);
+	      		tabsToPages.put(tab8, content8);
+	     		tabsToPages.put(tab9, content9);
+	     		tabsToPages.put(tab10, content10);
+	      		Tabs tabs = new Tabs( tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8,tab9,tab10);
+	      		pages = new Div(content1, content2,content3, content4, content5, content6 , content7,content8,content9,content10);
+	      		tabs.addSelectedChangeListener(event -> {
+	      			tabsToPages.values().forEach(page -> page.setVisible(false));
+	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	      			selectedPage.setVisible(true);
+	    	});
+		   	Div content = new Div();
+		   	content.add(content0, tabs, pages);
+			return content;
+			}
+	      	else 
+	      	if (nTabs >= 9)
+			{
+	      		tabsToPages.put(tab1, content1);
+	      		tabsToPages.put(tab2, content2);
+	      		tabsToPages.put(tab3, content3);
+	      		tabsToPages.put(tab4, content4);
+	      		tabsToPages.put(tab5, content5);
+	      		tabsToPages.put(tab6, content6);
+	      		tabsToPages.put(tab7, content7);
+	      		tabsToPages.put(tab8, content8);
+	     		tabsToPages.put(tab9, content9);
+	      		Tabs tabs = new Tabs( tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8,tab9);
+	      		pages = new Div(content1, content2,content3, content4, content5, content6 , content7,content8,content9);
+	      		tabs.addSelectedChangeListener(event -> {
+	      			tabsToPages.values().forEach(page -> page.setVisible(false));
+	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	      			selectedPage.setVisible(true);
+	    	});
+		   	Div content = new Div();
+		   	content.add(content0, tabs, pages);
+			return content;
+			}
+	      	else 
+	      	if (nTabs >= 8)
+			{
+	      		tabsToPages.put(tab1, content1);
+	      		tabsToPages.put(tab2, content2);
+	      		tabsToPages.put(tab3, content3);
+	      		tabsToPages.put(tab4, content4);
+	      		tabsToPages.put(tab5, content5);
+	      		tabsToPages.put(tab6, content6);
+	      		tabsToPages.put(tab7, content7);
+	      		tabsToPages.put(tab8, content8);
+	      		Tabs tabs = new Tabs( tab1, tab2, tab3, tab4, tab5, tab6,tab7,tab8);
+	      		pages = new Div(content1, content2,content3, content4, content5, content6 , content7,content8);
+	      		tabs.addSelectedChangeListener(event -> {
+	      			tabsToPages.values().forEach(page -> page.setVisible(false));
+	      			Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+	      			selectedPage.setVisible(true);
+	    	});
+		   	Div content = new Div();
+		   	content.add(content0, tabs, pages);
+			return content;
+			}
+	      	else  
+	      	if (nTabs >= 7)
 			{
 	      		tabsToPages.put(tab1, content1);
 	      		tabsToPages.put(tab2, content2);
@@ -292,7 +427,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			return content;
 			}
 	      	else     	    	
-	      	if (nTabs > 6)
+	      	if (nTabs >= 6)
 			{
 //	      		tabsToPages.put(tab0, content0);
 	      		tabsToPages.put(tab1, content1);
@@ -313,7 +448,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			return content;
 			}
 	      	else     	
-	      	if (nTabs > 5)
+	      	if (nTabs >= 5)
 			{
 	      		tabsToPages.put(tab1, content1);
 	      		tabsToPages.put(tab2, content2);
@@ -332,7 +467,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			return content;
 			}
 	      	else     	
-	    	if (nTabs > 4)
+	    	if (nTabs >= 4)
 	    		{
 	    		tabsToPages.put(tab1, content1);
 	       		tabsToPages.put(tab2, content2);
@@ -349,7 +484,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	        	content.add(content0,tabs, pages);
 	    		return content;
 	    		}
-	    	else if (nTabs > 3)
+	    	else if (nTabs >= 3)
 	    		{
 	    		tabsToPages.put(tab1, content1);
 	       		tabsToPages.put(tab2, content2);
@@ -366,7 +501,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 	    		return content;
 
 	    		}
-	      	else if (nTabs > 2)
+	      	else if (nTabs >= 2)
 	      		{
 	      		tabsToPages.put(tab1, content1);
 	      		tabsToPages.put(tab2, content2);
@@ -417,18 +552,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			if (form == null)
 //				form = new FormLayout();
 			FormLayout form = new FormLayout();
-			Span span = new Span();
-			span.getElement().getStyle().set("color", "var(--lumo-body-text-color");			
-			span.getElement().getStyle().set("font-size", "var(--lumo-font-size-s");
-			span.getElement().getStyle().set("font-weight", "500");
-			span.getElement().getStyle().set("border", "1px solid lightgray");
-			span.add(new Label("soy Span"));
+			form.setWidthFull();
+			form.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
+//	esta en DPreview	      content.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
+//		      content.setHeight("100%");
 //			if (isQuery)
 //				{
 //				form.setId(ResourceName+"_QRY");
 //				}
 			form.removeAll();
-			form.add(span);	
 			form.getStyle().set("overflow", "inherit");
 			Div statusLabel = new Div();
 			statusLabel.getElement().getStyle().set("color", "var(--lumo-error-text-color)");
@@ -439,6 +571,8 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			statusLabel.getElement().getStyle().set("top","100px");
 			statusLabel.getElement().getStyle().set("padding","0px 10px");
 			binder.setStatusLabel(statusLabel);
+			if (buttonsForm != null)
+				buttonsForm.getCustomButtons().removeAll();
 //			binder.addStatusChangeListener(e -> showWarning(e));
 			//with error
 			if (isQuery == false)
@@ -506,6 +640,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 				int idFieldType = 0;
 				if ( idFieldTypeStr.isEmpty() == false)
 					idFieldType = new Integer (idFieldTypeStr);
+				String orderAndlabel = rowField[6];
 				String fieldWidth = rowField[7];
 				String fieldSize = rowField[13];
 				String validationRuleName = rowField[14];
@@ -598,6 +733,74 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
 				}
+
+				if (fieldName.equals("#SPACE#") && (idFieldType != 10) ) // NOT BOTTON
+				{
+					if ( orderAndlabel.indexOf("GRP#")!= -1)
+					{
+						String legend = orderAndlabel.substring(orderAndlabel.lastIndexOf("#")+1);
+						activeGroup = new FormLayout();	
+						activeGroup.setResponsiveSteps(
+								calculateResponsiveStep(1),
+								calculateResponsiveStep(2),
+								calculateResponsiveStep(3),
+								calculateResponsiveStep(4),
+								calculateResponsiveStep(5),
+								calculateResponsiveStep(6),
+								calculateResponsiveStep(7),
+								calculateResponsiveStep(8),
+								calculateResponsiveStep(9),
+								calculateResponsiveStep(10),
+								calculateResponsiveStep(11),
+								calculateResponsiveStep(12),
+								calculateResponsiveStep(13),
+								calculateResponsiveStep(14),
+								calculateResponsiveStep(15),
+								calculateResponsiveStep(16),
+								calculateResponsiveStep(17),
+								calculateResponsiveStep(18),
+								calculateResponsiveStep(19),
+								calculateResponsiveStep(20),
+								calculateResponsiveStep(21),
+								calculateResponsiveStep(22),
+								calculateResponsiveStep(23),
+								calculateResponsiveStep(24),
+								calculateResponsiveStep(25),
+								calculateResponsiveStep(26),
+								calculateResponsiveStep(27),
+								calculateResponsiveStep(28),
+								calculateResponsiveStep(29),
+								calculateResponsiveStep(30),
+								calculateResponsiveStep(31),
+								calculateResponsiveStep(32),
+						calculateResponsiveStep(33),
+						calculateResponsiveStep(34),
+						calculateResponsiveStep(35),
+						calculateResponsiveStep(36),
+						calculateResponsiveStep(37),
+						calculateResponsiveStep(38),
+						calculateResponsiveStep(39),
+						calculateResponsiveStep(40));
+						form.setColspan(activeGroup, colspan);
+						activeGroup.getElement().setAttribute("legend",legend);
+						activeGroup.setId(fieldNameInUI);
+						activeGroup = addClassNames(activeGroup, classNamesItem);
+						if ((classNamesItem == null || classNamesItem.isEmpty()) && classNamesItem.indexOf("fieldGroup") != -1 )
+							activeGroup = addClassNames(activeGroup,"fieldGroup10");
+						form.add(activeGroup);
+					}
+					else if ( orderAndlabel.indexOf("GRP/#")!= -1)
+					{
+						activeGroup = null;
+					}
+					else
+					{	Span s = new Span();
+						FormLayout.FormItem item = form.addFormItem(s, label );
+						item = addClassNames(item, classNamesItem);
+						item.setId(fieldNameInUI);
+						form.setColspan(item, colspan);
+					}
+				}
 				else if (idFieldType == 10) // is a button
 				{
 		//			Button b = new Button(label);
@@ -611,19 +814,22 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					}
 					else if (idButtonBarForButtons.equals("3")) // Formulario
 					{
-						FormLayout.FormItem item = form.addFormItem(b, "");
+						FormLayout.FormItem item = null;
+						if (activeGroup != null)
+						{
+							item = activeGroup.addFormItem(b, "");
+							form.add(activeGroup);
+				
+						}
+						else
+						{	
+		
+							item = form.addFormItem(b, "");
+						}
 						item = addClassNames(item, classNamesItem);
 						item.setId(fieldNameInUI);
 						form.setColspan(item, colspan);
 					}	
-				}
-				else if (fieldName.equals("#SPACE#"))
-				{
-					Span s = new Span();
-					FormLayout.FormItem item = form.addFormItem(s, label );
-					item = addClassNames(item, classNamesItem);
-					item.setId(fieldNameInUI);
-					form.setColspan(item, colspan);
 				}
 				else if (idFieldType == 2) // is TextArea
 				{
@@ -633,7 +839,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					else
 						ta.setHeight(fieldHeight);
 					Div l = alingLabel(label); 
-					FormLayout.FormItem item = form.addFormItem(ta, l );
+					FormLayout.FormItem item = null;
+					if (activeGroup != null)
+					{
+						item = activeGroup.addFormItem(ta, l );
+						item = addClassNames(item, ".fieldInAGroup");
+						form.add(activeGroup);
+					}
+					else	
+						item = form.addFormItem(ta, l );
 					item.setId(fieldNameInUI);
 // not in clon		item.addClickListener(e ->ShowFieldToEdit(e.getSource().getId()));
 					item = addClassNames(item, classNamesItem);
@@ -669,7 +883,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					binder.forField((EsDatePicker) dp)
 					.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
 					.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
-					FormLayout.FormItem item = form.addFormItem(dp, l );
+					FormLayout.FormItem item = null;
+					if (activeGroup != null)
+					{
+						item = activeGroup.addFormItem(dp, l );
+						item = addClassNames(item, ".fieldInAGroup");
+						form.add(activeGroup);
+					}
+					else
+						item = form.addFormItem(dp, l );
 //					if (isRightLabel)
 //						item.addClassName("filabelright");
 //					else
@@ -740,7 +962,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					}	
 //********
 					
-					FormLayout.FormItem item = form.addFormItem(nf, l );
+					FormLayout.FormItem item = null;
+					if (activeGroup != null)
+					{
+						item = activeGroup.addFormItem(nf, l );
+						item = addClassNames(item, ".fieldInAGroup");
+						form.add(activeGroup);
+					}
+					else
+						item = form.addFormItem(nf, l );
 //					if (isRightLabel)
 //						item.addClassName("filabelright");
 //					else
@@ -771,7 +1001,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					else
 						binder.forField(cTf)
 						.bind(d-> currencyFormatter.encode(CurrencyFormatter.getCents(d.getCol(fieldNameInUI))), (d,v)-> d.setColInteger(v,fieldNameInUI));
-					FormLayout.FormItem item = form.addFormItem(cTf, l );
+					FormLayout.FormItem item = null;
+					if (activeGroup != null)
+					{
+						item = activeGroup.addFormItem(cTf, l );
+						item = addClassNames(item, ".fieldInAGroup");
+						form.add(activeGroup);
+					}
+					else
+						item = form.addFormItem(cTf, l );
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
@@ -834,7 +1072,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					}	
 //********
 					
-					FormLayout.FormItem item = form.addFormItem(bdf, l );
+					FormLayout.FormItem item = null;
+					if (activeGroup != null)
+					{
+						item = activeGroup.addFormItem(bdf, l );
+						item = addClassNames(item, ".fieldInAGroup");
+						form.add(activeGroup);
+					}
+					else
+						item = form.addFormItem(bdf, l );
 //					if (isRightLabel)
 //						item.addClassName("filabelright");
 //					else
@@ -866,8 +1112,16 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //							id-> getRowById(id, cB))
 //							﻿.bind( Bean::getGenderId, Bean::setGenderId);
 					boolean isRightLabel = false;
-					Div l = alingLabel(label); 
-					FormLayout.FormItem item = form.addFormItem(cB, l );
+					Div l = alingLabel(label);
+					
+					FormLayout.FormItem item = null;
+					if (activeGroup != null)
+					{
+						item = activeGroup.addFormItem(cB, l );
+						item = addClassNames(item, ".fieldInAGroup");
+						form.add(activeGroup);
+					}
+						item = form.addFormItem(cB, l );
 					if (isQuery)
 						{
 						item.getElement().setAttribute("title","Ayuda busqueda...."); 
@@ -911,8 +1165,16 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					}
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
-					Div l = alingLabel(label); 
-					FormLayout.FormItem item = form.addFormItem(checkB, l );
+					Div l = alingLabel(label);
+					FormLayout.FormItem item = null;
+					if (activeGroup != null)
+					{
+						item = activeGroup.addFormItem(checkB, l );
+						item = addClassNames(item, ".fieldInAGroup");
+						form.add(activeGroup);
+					}
+					else
+						item = form.addFormItem(checkB, l );
 //					if (isRightLabel)
 //						item.addClassName("filabelright");
 //					else
@@ -957,7 +1219,15 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					boolean isRightLabel = false;
 //					if (label.endsWith("#"))isRightLabel = true;
 					Div l = alingLabel(label); 
-					FormLayout.FormItem item = form.addFormItem(tf, l );
+					FormLayout.FormItem item = null;
+					if (activeGroup != null)
+					{
+						item = activeGroup.addFormItem(tf, l );
+						item = addClassNames(item, ".fieldInAGroup");
+						form.add(activeGroup);
+					}
+					else
+						item = form.addFormItem(tf, l );
 //					if (isRightLabel)
 //						item.addClassName("filabelright");
 //					else

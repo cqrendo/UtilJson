@@ -147,15 +147,16 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 //	private SplitLayout splitQryAndResult;
 	private String displayFormClassName;
 
-	@Id("gridDisplaySubGrid")
-	private SplitLayout gridDisplaySubGrid;
-	public SplitLayout getGridDisplaySubGrid() {
-		return gridDisplaySubGrid;
+	@Id("displaySplitSubGrid")
+	private SplitLayout displaySplitSubGrid;
+	public SplitLayout getDisplaySplitSubGrid() {
+		return displaySplitSubGrid;
 	}
 
-	public void setGridDisplaySubGrid(SplitLayout gridDisplaySubGrid) {
-		this.gridDisplaySubGrid = gridDisplaySubGrid;
+	public void setDisplaySplitSubGrid(SplitLayout displaySplitSubGrid) {
+		this.displaySplitSubGrid = displaySplitSubGrid;
 	}
+
 
 
 //	@Autowired()
@@ -220,6 +221,7 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 //	protected CrudEntityPresenterREST<DynamicDBean> getPresenter() {
 //		return presenter;
 //	}
+
 
 
 
@@ -409,6 +411,7 @@ public String getResourceName() {
 	public String getPageTitle() {
 		return title;
 	}
+
 
 //	@Override
 //	public void serviceInit(ServiceInitEvent event) {
