@@ -933,7 +933,7 @@ public class RestData {
 //				String tableNameToSearch = genericResourceName+variant;
 				String tableNameToSearch = genericResourceName;
 				System.out.println("RestData.getRowsFieldList()  tablename to search = "+tableNameToSearch );
-				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInDisplay=true&order=fieldOrder";
+				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInDisplay=true&order=tab,fieldOrder";
 				cols = JSonClient.get("CR-FieldTemplate",filter , cache, AppConst.PRE_CONF_PARAM_METADATA); // TODO put false to true
 				if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 				{
@@ -1210,7 +1210,7 @@ public class RestData {
 //				String tableNameToSearch = genericResourceName+variant;
 				String tableNameToSearch = genericResourceName;
 				System.out.println("RestData.getRowsFieldList()  tablename to search = "+tableNameToSearch );
-				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInQuery=true&order=queryOrder";
+				String filter = "tableName='"+tableNameToSearch+"'%20AND%20showInQuery=true&order=tabQuery,queryOrder";
 				cols = JSonClient.get("CR-FieldTemplate",filter , cache, AppConst.PRE_CONF_PARAM_METADATA); // TODO put false to true
 				if (cols != null && cols.size() > 0 && cols.get("errorMessage") == null)
 				{

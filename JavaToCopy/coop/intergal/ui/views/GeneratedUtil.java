@@ -552,8 +552,9 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 //			if (form == null)
 //				form = new FormLayout();
 			FormLayout form = new FormLayout();
-			form.setWidthFull();
-			form.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
+//			form.setWidthFull();
+//			form.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
+			form.setWidth(AppConst.DEFAULT_WIDTH_FORM);
 //	esta en DPreview	      content.setMinWidth(AppConst.DEFAULT_WIDTH_FORM);
 //		      content.setHeight("100%");
 //			if (isQuery)

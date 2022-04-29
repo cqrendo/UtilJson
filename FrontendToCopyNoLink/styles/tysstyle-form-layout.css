@@ -92,6 +92,33 @@
 :host(.fieldGroupPaddingB30) {	
 	padding-bottom:30px;
 }
+:host(.fieldGroupMarginL0) {
+	margin-left:0px;
+}
+:host(.fieldGroupMarginL5) {
+	margin-left:5px;
+}
+:host(.fieldGroupMarginL10) {
+	margin-left:10px;
+}
+:host(.fieldGroupMarginL20) {
+	margin-left:20px;
+}
+:host(.fieldGroupMarginB0) {	
+	margin-bottom:0px;
+}
+:host(.fieldGroupMarginB5) {	
+	margin-bottom:5px;
+}
+:host(.fieldGroupMarginB10) {	
+	margin-bottom:10px;
+}
+:host(.fieldGroupMarginB20) {	
+	margin-bottom:20px;
+}
+:host(.fieldGroupMarginB30) {	
+	margin-bottom:30px;
+}
 :host(.fieldGroup10) {
 	padding-left:20px;
 	padding-bottom:10px;
