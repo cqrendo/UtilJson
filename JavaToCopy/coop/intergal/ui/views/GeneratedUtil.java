@@ -1798,7 +1798,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		int idFieldType = 0;
 		if ( idFieldTypeStr.isEmpty() == false)
 			idFieldType = new Integer (idFieldTypeStr);
-		String colHeader = colData[6];
+//		String colHeader = colData[6];
 		boolean isPick = isPick (colData [1]);
 		grid.setId(colData[11]); // contents titla for grid 
 		Column<DynamicDBean> col = null;
@@ -1818,8 +1818,8 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 				itemButtoms.add(b);
 		}
 		if (colData[1].indexOf("#SIG#")>-1) { // #SIG# = Show In Grid
-//			String header = TranslateResource.getFieldLocale(colData[0], preConfParam);
-			String header = colHeader;
+			String header = TranslateResource.getFieldLocale(colData[6], AppConst.PRE_CONF_PARAM);
+//			String header = colHeader;
 			// @@1
 //			if (colData[1].indexOf("#SIG#")>-1)
 //			{
