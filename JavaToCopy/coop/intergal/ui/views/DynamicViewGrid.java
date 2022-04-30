@@ -845,6 +845,12 @@ private boolean isBoolean(String header, String colType) {
 	}
 
 	void showBean(DynamicDBean bean ) {
+		if (displayFormClassName == null)  // nothing to show.
+		{	
+			return;
+		}
+		else
+		{	
 		try {
 			System.out.println("DynamicViewGrid.showBean()");
 			
@@ -867,6 +873,7 @@ private boolean isBoolean(String header, String colType) {
 			keepRowBeforChanges = RestData.copyDatabean(bean);
 			Class<?> dynamicForm = null ;
 //			Class<?> dynamicForm = Class.forName("coop.intergal.tys.ui.views.DynamicForm");
+
 			if (displayFormClassName.equals("NODISPLAY") == false)
 				{
 				dynamicForm = Class.forName(displayFormClassName);//"coop.intergal.tys.ui.views.comprasyventas.compras.PedidoProveedorForm");
@@ -1119,7 +1126,7 @@ private boolean isBoolean(String header, String colType) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		}
 //		display.beforeEnter(null);
 //		gridSplitDisplay.getElement().removeAllChildren();//removeChild(display.getElement());
 //		gridSplitDisplay.getElement().appendChild(grid.getElement());
@@ -3589,25 +3596,33 @@ private boolean isBoolean(String header, String colType) {
 		if ((dataProvider.getHasNewRow() == true || isInsertingALine == false) && autoSaveGrid == true)
 		{
 //	xx		
-			Class<? extends Object> clas = display.getClass();
-			Method m;
-			try {
-				m = clas.getMethod("getDataProvider");
-				DdbDataBackEndProvider parentDP = (DdbDataBackEndProvider) m.invoke(display);
-				dataProvider.save(beanTobeSave, beansToSaveAndRefresh2, parentDP);	 
-				dataProvider.setHasNewRow(false);
-				if (display!= null && parentRow !=null)
-				{
-					setBeanParent.invoke(display,parentRow);
-					parentGrid.refreshBean(parentGrid.getSelectedRow());
-				}
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			if (display != null)
+			{
+				Class<? extends Object> clas = display.getClass();
+				Method m;
+				try {
+					m = clas.getMethod("getDataProvider");
+					DdbDataBackEndProvider parentDP = (DdbDataBackEndProvider) m.invoke(display);
+					dataProvider.save(beanTobeSave, beansToSaveAndRefresh2, parentDP);	 
+					dataProvider.setHasNewRow(false);
+					if (display!= null && parentRow !=null)
+					{
+						setBeanParent.invoke(display,parentRow);
+						parentGrid.refreshBean(parentGrid.getSelectedRow());
+					}
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
-			 catch (NoSuchMethodException | SecurityException e1) {
+				}
+				catch (NoSuchMethodException | SecurityException e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+					e1.printStackTrace();
+				}
+			}
+			else
+			{
+				dataProvider.save(beanTobeSave, beansToSaveAndRefresh2, null);	 
+				dataProvider.setHasNewRow(false);
 			}
 
 		}
