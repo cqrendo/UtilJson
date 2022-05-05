@@ -88,6 +88,7 @@ import coop.intergal.vaadin.rest.utils.RestData;
 
 //@PageTitle("Payments")
 //@Route(value = "gridDetails", layout = MainLayout.class)
+@CssImport(value = "./styles/shared-styles.js")
 @CssImport(value = STYLES_CSS, themeFor="dynamic-grid-display")
 @CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
 //@CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-text-field")
@@ -564,13 +565,14 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			form.removeAll();
 			form.getStyle().set("overflow", "inherit");
 			Div statusLabel = new Div();
-			statusLabel.getElement().getStyle().set("color", "var(--lumo-error-text-color)");
+			statusLabel.getElement().getStyle().set("color", "white");//"var(--lumo-error-text-color)");
 			statusLabel.getElement().getStyle().set("white-space", "nowrap");
 			statusLabel.getElement().getStyle().set("position","absolute");
-			statusLabel.getElement().getStyle().set("background-color","azure");
+			statusLabel.getElement().getStyle().set("background-color","#982f5f");
 			statusLabel.getElement().getStyle().set("left","100px");
-			statusLabel.getElement().getStyle().set("top","100px");
-			statusLabel.getElement().getStyle().set("padding","0px 10px");
+			statusLabel.getElement().getStyle().set("top","20px");
+			statusLabel.getElement().getStyle().set("padding","0 20px");
+			statusLabel.getElement().getStyle().set("border-radius", "20px");
 			binder.setStatusLabel(statusLabel);
 			if (buttonsForm != null)
 				buttonsForm.getCustomButtons().removeAll();
@@ -579,6 +581,8 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 			if (isQuery == false)
 			{
 				FormLayout.FormItem itemSL = form.addFormItem(statusLabel,"");
+				itemSL.getElement().getStyle().set("height","0");
+			//	itemSL.getElement().getStyle().set("top","30px");	
 				form.setColspan(itemSL, 40);
 			}	
 			form.setResponsiveSteps(

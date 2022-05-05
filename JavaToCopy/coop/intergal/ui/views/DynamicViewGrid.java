@@ -337,7 +337,7 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton) {
 		grid.setMultiSort(true);
 		grid.addClassNames("editable-custom-effect");
 		int largo = grid.getDataProvider().size(null); // contar numero de registros
-	     if (largo > 6) {
+	     if (largo > 12) {
 	    	 grid.setAllRowsVisible(false);
 	    	 this.getElement().getStyle().set("height", "100%");
 	     	}

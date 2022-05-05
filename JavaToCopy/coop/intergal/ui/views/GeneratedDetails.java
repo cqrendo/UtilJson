@@ -10,16 +10,20 @@ import java.util.regex.Pattern;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.LocalDateToDateConverter;
+import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
 import coop.intergal.ui.components.EsDatePicker;
@@ -41,11 +45,12 @@ import static coop.intergal.AppConst.STYLES_CSS;
 import static coop.intergal.AppConst.STYLES_FORM_ITEM_CSS;
 import static coop.intergal.AppConst.STYLES_FORM_LAYOUT_ITEM_CSS;
 
-
+@Tag("generated-details")
 @CssImport(value = STYLES_CSS, themeFor="dynamic-grid-display")
 @CssImport(value = STYLES_FORM_ITEM_CSS, themeFor = "vaadin-form-item")
 @CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-layout")
-public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynamicTitle, BeforeEnterObserver {//, AfterNavigationListener {
+@JsModule("./src/views/generic/forms/generated-details.js")
+public class GeneratedDetails extends PolymerTemplate<TemplateModel> {//extends FormLayout{//ViewFrame implements HasDynamicTitle, BeforeEnterObserver {//, AfterNavigationListener {
 
 	/**
 	 * 
@@ -112,7 +117,9 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 	public void setButtonsForm(FormButtonsBar buttonsForm) {
 		this.buttonsForm = buttonsForm;
 	}
-
+	public GeneratedDetails() {
+		super();
+	}
 	@Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
@@ -260,232 +267,8 @@ public class GeneratedDetails extends FormLayout{//ViewFrame implements HasDynam
 			}
 	//		return details;
 	}
-	private Component createDetailsOLD() {
-				
-			
-			this.binder = new Binder<DynamicDBean>(DynamicDBean.class);
-			rowsFieldList = dataProvider.getRowsFieldList();
-		    if (bean != null)
-				binder.setBean(bean);
 
-			Iterator<String[]> itRowsFieldList = rowsFieldList.iterator();
-			if (form == null)
-				form = new FormLayout();
-			form.removeAll();
-			form.setResponsiveSteps(
-//				new ResponsiveStep("31em",1),
-//				new ResponsiveStep("32em",2),
-//				new ResponsiveStep("33em",3),
-//				new ResponsiveStep("34em",4),
-//				new ResponsiveStep("45em",5),
-//				new ResponsiveStep("46em",6),
-//				new ResponsiveStep("47em",7),
-//				new ResponsiveStep("48em",8),
-//				new ResponsiveStep("49em",9),
-//				new ResponsiveStep("50em",10),
-//				new ResponsiveStep("51em",11),
-//				new ResponsiveStep("52em",12),
-//				new ResponsiveStep("63em",13),
-//				new ResponsiveStep("64em",14),
-//				new ResponsiveStep("65em",15),
-//				new ResponsiveStep("66em",16));
-					calculateResponsiveStep(1),
-					calculateResponsiveStep(2),
-					calculateResponsiveStep(3),
-					calculateResponsiveStep(4),
-					calculateResponsiveStep(5),
-					calculateResponsiveStep(6),
-					calculateResponsiveStep(7),
-					calculateResponsiveStep(8),
-					calculateResponsiveStep(9),
-					calculateResponsiveStep(10),
-					calculateResponsiveStep(11),
-					calculateResponsiveStep(12),
-					calculateResponsiveStep(13),
-					calculateResponsiveStep(14),
-					calculateResponsiveStep(15),
-					calculateResponsiveStep(16),
-					calculateResponsiveStep(17),
-					calculateResponsiveStep(18),
-					calculateResponsiveStep(19),
-					calculateResponsiveStep(20),
-					calculateResponsiveStep(21),
-					calculateResponsiveStep(22),
-					calculateResponsiveStep(23),
-					calculateResponsiveStep(24),
-					calculateResponsiveStep(25),
-					calculateResponsiveStep(26),
-					calculateResponsiveStep(27),
-					calculateResponsiveStep(28),
-					calculateResponsiveStep(29),
-					calculateResponsiveStep(30),
-					calculateResponsiveStep(31),
-					calculateResponsiveStep(32),
-			calculateResponsiveStep(33),
-			calculateResponsiveStep(34),
-			calculateResponsiveStep(35),
-			calculateResponsiveStep(36),
-			calculateResponsiveStep(37),
-			calculateResponsiveStep(38),
-			calculateResponsiveStep(39),
-			calculateResponsiveStep(40));
-					
-//					new ResponsiveStep("15em",1),
-//					new ResponsiveStep("16em",2),
-//					new ResponsiveStep("16.5em",3),
-//					new ResponsiveStep("17em",4),
-//					new ResponsiveStep("17.5em",5),
-//					new ResponsiveStep("18em",6),
-//					new ResponsiveStep("18.5em",7),
-//					new ResponsiveStep("19em",8),
-//					new ResponsiveStep("19.5em",9),
-//					new ResponsiveStep("20em",10),
-//					new ResponsiveStep("20.5em",11),
-//					new ResponsiveStep("21em",12),
-//					new ResponsiveStep("21.5em",13),
-//					new ResponsiveStep("22em",14),
-//					new ResponsiveStep("22.5em",15),
-//					new ResponsiveStep("23em",16),
-//					new ResponsiveStep("23.5em",17),
-//					new ResponsiveStep("24em",18),
-//					new ResponsiveStep("24.5em",19),
-//					new ResponsiveStep("25em",20),
-//					new ResponsiveStep("25.5em",21),
-//					new ResponsiveStep("26em",22),
-//					new ResponsiveStep("26.5em",23),
-//					new ResponsiveStep("37em",24),
-//					new ResponsiveStep("37.5em",25),
-//					new ResponsiveStep("38em",26),
-//					new ResponsiveStep("38.5em",27),
-//					new ResponsiveStep("58em",28),
-//					new ResponsiveStep("62em",19),
-//					new ResponsiveStep("66em",30),
-//					new ResponsiveStep("70.5em",31),
-//					new ResponsiveStep("74em",32));
-			
-			int i = 0;
-			int ii = 0;
-			Div div = new Div();
-		//	FormLayout.FormItem item = formLayout.addFormItem(phoneLayout, "Phone");
-//			form.setColSpan(item, 2);
-			int nRow = 0;
-			while (itRowsFieldList.hasNext())
-			{
-//				Label label = new Label(itRowsColList.next()[0]);
-//				label.setWidth("500px");
-				String[] rowField = itRowsFieldList.next();
-				String filedName = rowField[0];
-				boolean isReadOnly = isReadOnly( rowField [1]);
-				String label = rowField[6];
-				String fieldNameInUI = rowField[2];
-				String idFieldType = rowField[3];
-				String fieldWidth = rowField[7];
-				String classNames =  rowField[8];
-				String classNamesForm = ""; 
-				String classNamesItem = ""; 
-				String [] tokens = classNames.split(Pattern.quote("."));
-				int iii = 0;
-				while (tokens.length > iii)
-				{ 
-					if (tokens[iii].indexOf("form") > -1 )  // form CSS must include form in his name
-						classNamesForm = classNamesForm + "." + tokens[iii];
-					else
-						classNamesItem = classNamesItem + "." + tokens[iii];
-					iii ++;
-				}
-				if (nRow == 0)
-				{
-					form.setClassName("");
-					form = addClassNames(form,classNamesForm.trim());
-					title = rowField[9];
-					
-				}
-		
-				nRow ++;
-				
-				System.out.println("DetailsPreview.createDetails()" +" filedName " + filedName + " "+classNames  );
 
-				if( fieldWidth.isEmpty())
-					fieldWidth = "10";
-				
-				int idxMark = fieldWidth.indexOf("#");
-				Integer colspan = 0;
-				if (idxMark == -1)
-				{
-					colspan = new Integer (fieldWidth);
-					fieldWidth = (colspan)+1+"em";
-				}
-				else
-				{
-					colspan = new Integer (fieldWidth.substring(0,idxMark));
-					fieldWidth = fieldWidth.substring(idxMark+1)+"em";
-				}
-				
-				TextField tf = new TextField();//itRowsColList.next()[0]);
-				tf.setReadOnly(isReadOnly);
-				tf.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-				if (filedName.equals("#SPACE#"))
-				{
-					Span s = new Span();
-					FormLayout.FormItem item = form.addFormItem(s, label );
-					item = addClassNames(item, classNamesItem);
-					item.setId(fieldNameInUI);
-					form.setColspan(item, colspan);
-				}
-				else if (idFieldType.equals("1")) // is Date
-				{
-					EsDatePicker dp = new EsDatePicker();
-					dp.getElement().setAttribute("theme", "small");
-					boolean isRightLabel = false;
-//					if (label.endsWith("#"))isRightLabel = true;
-					Div l = alingLabel(label); 
-					binder.forField((EsDatePicker) dp)
-					.withConverter(new LocalDateToDateConverter( ZoneId.systemDefault()))
-					.bind(d-> d.getColDate(fieldNameInUI), (d,v)-> d.setColDate(v,fieldNameInUI));//DynamicDBean::setCol2Date);	
-					FormLayout.FormItem item = form.addFormItem(dp, l );
-//					if (isRightLabel)
-//						item.addClassName("filabelright");
-//					else
-					item = addClassNames(item, classNamesItem);
-					form.setColspan(item, colspan);
-					dp.setWidth(fieldWidth);
-				}
-				else
-				{
-					binder.bind(tf, fieldNameInUI);
-//				form.add(fi);
-					boolean isRightLabel = false;
-//					if (label.endsWith("#"))isRightLabel = true;
-					Div l = alingLabel(label); 
-					FormLayout.FormItem item = form.addFormItem(tf, l );
-//					if (isRightLabel)
-//						item.addClassName("filabelright");
-//					else
-					item = addClassNames(item, classNamesItem);
-					form.setColspan(item, colspan);
-					tf.setWidth(fieldWidth);
-				}
-				i++;
-				
-			}
-			return form;
-	    }
-	private ResponsiveStep calculateResponsiveStep(int i) {
-		int em = i * 22;
-		String strEm =  em +"";
-		strEm = strEm.substring(0,strEm.length()-1 ); 
-//		System.out.println("GenericGridDetails.calculateResponsiveStep()......"+ strEm + "em");
-		return new ResponsiveStep(strEm+"em",i);
-	}
-	private FormItem addClassNames(FormItem item, String classNames) {
-		StringTokenizer tokens = new StringTokenizer(classNames,".");
-		while (tokens.hasMoreElements())
-		{
-			String eachClass = tokens.nextToken();
-			item.addClassName(eachClass);
-		}
-	return item;
-}
 	private FormLayout addClassNames(FormLayout formLayout, String classNames) {
 		StringTokenizer tokens = new StringTokenizer(classNames,".");
 		while (tokens.hasMoreElements())
