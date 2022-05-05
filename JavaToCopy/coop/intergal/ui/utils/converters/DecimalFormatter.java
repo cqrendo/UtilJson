@@ -36,7 +36,9 @@ public class DecimalFormatter implements ModelEncoder<BigInteger, String> {
 			col = col.substring(0,idxE-1 );
 		String cents= col;
 		int idXOfPoint = col.indexOf(".");
-		if (idXOfPoint == -1) // not decimala -> 1 is converted to 1.00
+		if (nDecimals == 0)
+			return new BigInteger (cents+"00");
+		if (idXOfPoint == -1 ) // not decimala -> 1 is converted to 1.00
 		{
 			cents = cents + "00";
 		}

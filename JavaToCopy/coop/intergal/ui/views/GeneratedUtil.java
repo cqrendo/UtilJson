@@ -1021,7 +1021,7 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 					cTf.setWidth(fieldWidth);
 
 				}
-				else if (idFieldType > 100 && isQuery == false) // is Decimal
+				else if (idFieldType >= 100 && isQuery == false) // is Decimal
 				{
 //					BigDecimalField bdf = new BigDecimalField();
 					int nDecimals = idFieldType - 100 ; 
@@ -1549,6 +1549,19 @@ public void proccesButton(Button b, DynamicDBean bean2) {
 		while (tokens.hasMoreElements())
 		{
 			String eachClass = tokens.nextToken();
+			if (eachClass.indexOf("#style#") > -1) /// to indicate manual styles : by example #style#margin:red;backround:black
+			{
+				StringTokenizer tokens2 = new StringTokenizer(eachClass.substring(7),";");
+				while (tokens2.hasMoreElements())
+				{
+					String eachStyle = tokens2.nextToken();
+					int idxColon = eachStyle.indexOf(":");
+					String key = eachStyle.substring(0,idxColon);
+					String value = eachStyle.substring(idxColon+1);
+					item.getElement().getStyle().set(key, value);
+				}
+			}
+			else
 			item.addClassName(eachClass);
 		}
 	return item;
@@ -1558,7 +1571,20 @@ public void proccesButton(Button b, DynamicDBean bean2) {
 		while (tokens.hasMoreElements())
 		{
 			String eachClass = tokens.nextToken();
-			formLayout.addClassName(eachClass);
+			if (eachClass.indexOf("#style#") > -1) /// to indicate manual styles : by example #style#margin:red;backround:black
+			{
+				StringTokenizer tokens2 = new StringTokenizer(eachClass.substring(7),";");
+				while (tokens2.hasMoreElements())
+				{
+					String eachStyle = tokens2.nextToken();
+					int idxColon = eachStyle.indexOf(":");
+					String key = eachStyle.substring(0,idxColon);
+					String value = eachStyle.substring(idxColon+1);
+					formLayout.getElement().getStyle().set(key, value);
+				}
+			}
+			else
+				formLayout.addClassName(eachClass);
 		}
 	return formLayout;
 }
@@ -2083,7 +2109,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
     	return false;
     }
     private static boolean isDecimal(String header, int idFieldType) {
-    	if (idFieldType > 100)
+    	if (idFieldType >= 100)
     		return true;
     	return false;
     }
