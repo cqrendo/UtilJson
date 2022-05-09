@@ -36,13 +36,15 @@ public class TranslateResource {
 			}
 			catch (java.util.MissingResourceException e2)
 			{
-				clave = getClaveFromFieldTemplate(field, tableName);	
+				
+				//clave = getClaveFromFieldTemplate(field, tableName);	
+				return clave;
 			}
 		}
 	    return clave;
 	}
 
-	private static String getClaveFromFieldTemplate(String field, String tableName) {
+	private static String getClaveFromFieldTemplate(String field, String tableName) {  // for now is not use , in future could be use as way to search translate from a database o service.
 		try {
 			String filtro = "fieldName='"+field +"'";
 			if (tableName != null)

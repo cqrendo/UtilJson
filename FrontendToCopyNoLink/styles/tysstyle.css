@@ -6,13 +6,16 @@
 	background-color: darkblue;
 	color: white;
 }
-:host([legend]) { border: 1px solid; }
+:host([legend]) { 
+	border: 1px solid #a2436e;
+	}
 :host::before {	
     content: attr(legend);
     top: -14px;
     position: relative;
     background: white;
     left: 4px;
+    font-size: 15px;
 }
 .onlyButtons {
 	overflow: hidden;
@@ -25,6 +28,6 @@
 :host(.editable-custom-effect) [part~="editable-cell"] {
   background: var(--lumo-contrast-5pct);
 }  .editable {
-    background-color: #b1ffb7;
+    background-color: #adcef9;
 }
 	

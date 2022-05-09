@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -31,7 +30,6 @@ import org.vaadin.textfieldformatter.NumeralFieldFormatter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -73,7 +71,6 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FlexBoxLayout;
 import coop.intergal.ui.components.FormButtonsBar;
-import coop.intergal.ui.components.detailsdrawer.DetailsDrawer;
 import coop.intergal.ui.security.SecurityUtils;
 import coop.intergal.ui.util.GenericClassForMethods;
 import coop.intergal.ui.util.UtilSessionData;
@@ -95,20 +92,13 @@ import coop.intergal.vaadin.rest.utils.RestData;
 @CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-layout")//vaadin-form-item")
 
 @Uses(NumberField.class) 
-public class GeneratedUtil  {//, AfterNavigationListener {
-
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMarginL50";
+public class GeneratedUtil  {private static final String CLASSNAME_FOR_FORM_QUERY = ".formMargin50.formMarginL50";
 //	private Grid<DynamicDBean> grid;
 	private DynamicViewGrid grid;
 
  //   private ListDataProvider<Payment> dataProvider;
 //	private DdbDataBackEndProvider dataProvider;
-    private DetailsDrawer detailsDrawer;
+//    private DetailsDrawer detailsDrawer;
     protected Binder<DynamicDBean> binder;
 //	private FormLayout form;
 //	private ArrayList<String[]> rowsColList;
@@ -799,8 +789,18 @@ public class GeneratedUtil  {//, AfterNavigationListener {
 						activeGroup = null;
 					}
 					else
-					{	Span s = new Span();
-						FormLayout.FormItem item = form.addFormItem(s, label );
+					{	
+						Span s = new Span();
+						FormLayout.FormItem item = null;
+						if (activeGroup != null)
+							{
+							item = activeGroup.addFormItem(s, label);
+							form.add(activeGroup);							
+							}
+						else
+						{		
+							item = form.addFormItem(s, label );
+						}
 						item = addClassNames(item, classNamesItem);
 						item.setId(fieldNameInUI);
 						form.setColspan(item, colspan);
@@ -1606,6 +1606,9 @@ public void proccesButton(Button b, DynamicDBean bean2) {
 		
 		if (params == null)
 			return false;
+		if (grid != null)
+			if (grid.isRootResourceReadOnly())
+				return true;
 		if (params.indexOf("#CNoEDT#")>-1)
 			return true;
 		else 

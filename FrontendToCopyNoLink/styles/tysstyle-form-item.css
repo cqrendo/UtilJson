@@ -5,19 +5,19 @@
 }
 :host(.labelleft) {
 	flex-direction: row;
-	height:35px;
-     margin-top:0px !important;
+	height:35px !important;
+    margin-top:0px !important;
      
  }
  :host(.labeltop) {
 	flex-direction: column;
-	height:75px;
-     margin-top:0px !important;
+	height:50px !important;
+    margin-top:0 !important;
  }
 :host(.filabelright) {
-	height:35px;
-     margin-top:0px !important;
-     text-align: right; 
+	height:35px !important;
+    margin-top:0 !important;
+    text-align: right; 
  }
  :host(.alignRight) {
      text-align-last: right; 
@@ -60,6 +60,14 @@
 :host(.labelXXXXL) {
 	--vaadin-form-item-label-width: 25em;
 }
+:host(.nolabelInAGroup) {
+	top: 2px !important;
+	position: relative;
+}
+:host(.nolabel) {
+	top: 15px !important;
+	position: relative;
+}
 :host(.titleInForm) {
 	--vaadin-form-item-label-width: 65em;
 	text-align: center;
@@ -68,12 +76,10 @@
 	--lumo-secondary-text-color: white;
 }	
 :host(.colorGreen) {	
-
 --lumo-secondary-text-color: green;
-
 }
 :host(.fieldInAGroup) {
-	top: -25px;
+	top: -11px;
 	position: relative;
 }
 vaadin-form-item {

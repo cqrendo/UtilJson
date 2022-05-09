@@ -1,3 +1,7 @@
+:host {
+  padding-top: 0 !important;
+  padding-bottom: 2px !important;
+}
 
 :host(.formMargin0) {
 	margin-top: 0px;
@@ -119,6 +123,9 @@
 :host(.fieldGroupMarginB30) {	
 	margin-bottom:30px;
 }
+:host(.fieldGroupMarginT30) {	
+	margin-top:30px;
+}
 :host(.fieldGroup10) {
 	padding-left:20px;
 	padding-bottom:10px;
@@ -127,12 +134,18 @@
 	padding-left:20px;
 	padding-bottom:20px;
 }			
-:host([legend]) { border: 1px solid; }
+:host([legend]) { 
+/* 	border: 1px solid #a2436e; */
+	border: 1px solid #4c6ba3; 
+	}
 :host::before {	
     content: attr(legend);
     position: relative;
-	top: -25px;
-	background: #f0f0f0;
+	top: -15px;
+/* 	background: #f0f0f0; */
+	background: #f9f9f9;
 	left: 4px;
+    font-size: 15px;
+    color: #29477d;
 }
 	
