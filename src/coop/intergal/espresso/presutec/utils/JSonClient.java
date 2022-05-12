@@ -1041,7 +1041,7 @@ public class JSonClient {
 								JsonNode subResources3 = eachRow2.get("subresources");
 								if (subResources3 != null && subResources3.elements().hasNext())
 									{
-									for (JsonNode eachRow3 : subResources2) {
+									for (JsonNode eachRow3 : subResources3) {
 										String childResource3 = eachRow3.get("name").asText();
 										String resourceNameWithParent3 = getResourceName(resourceNameWithParent2,childResource3); //(childResource2,childResource3);
 										if (ht.get(resourceNameWithParent3) == null)

@@ -372,7 +372,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		else // isInsert Put Data from filter
 		{
 			String fKfilter = dB.getFilter();  
-			if (fKfilter != null)
+			if (fKfilter != null && fKfilter.isEmpty() == false)
 			{
 	//			int fKfilterLength = fKfilter.length();
 				//FASE_CABEZERA='3'%20and%20CLAVE_ALMACEN='32'%20and%20N_PEDIDO='1'

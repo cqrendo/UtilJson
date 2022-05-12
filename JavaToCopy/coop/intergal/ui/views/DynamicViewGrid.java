@@ -234,7 +234,7 @@ private boolean cache = UtilSessionData.getCache();
 private Object divInDisplay;
 @Id("divExporter")
 private Div divExporter;
-private Boolean isResourceReadOnly;
+private Boolean isResourceReadOnly = false;
 private int position = 20;
 //private Dialog dialogForShow;
 //private Dialog dialogForShow;
@@ -308,9 +308,11 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton) {
 	setupGrid(isGridEditable, hasExportButton, false);
 	
 }
-
-
-	public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean hasShowQueryButton ) {
+public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean hasShowQueryButton) {
+	setupGrid(isGridEditable, hasExportButton, false, true);
+}	
+	
+	public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean hasShowQueryButton, Boolean hasSideDisplay ) {
 	
 	//	grid.scrollTo(1); 
 	//	grid.getDataProvider().
@@ -339,6 +341,8 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton) {
 		dataProvider.setResourceName(getResourceName());
 		dataProvider.setFilter(getFilter());
 		rootResourceReadOnly = isSubResourceReadOnly(getResourceName()) ;
+		if (rootResourceReadOnly == true)
+			isGridEditable = false;
 //		grid = new Grid<>(DynamicDBean.class); 
 //		grid.setPageSize(333);
 		grid.removeAllColumns();
@@ -377,7 +381,7 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton) {
 		rowsColListGrid = dataProvider.getRowsColList();
 //		rowsFieldList = dataProvider.getRowsFieldList();
 		setButtonsVisibiltyFromExtendedProperties(resourceName);
-		if (iAmRootGrid)
+		if (iAmRootGrid && hasSideDisplay)
 		{
 			newRow.addClickListener(e -> insertANewRow(addFormClassName));
 			deleteRow.addClickListener(e ->DeleteARow());
@@ -572,20 +576,24 @@ private Object deleteBeanFromList() {
 	{
 	beansToSaveAndRefresh.clear();
 	beansToSaveAndRefresh.put(rowTobeDelete.getResourceName(), rowTobeDelete);
-	beansToSaveAndRefresh.put(parentRow.getResourceName(), parentRow);
+	if (parentRow != null)
+		beansToSaveAndRefresh.put(parentRow.getResourceName(), parentRow);
 	deleteRowInGrid(beansToSaveAndRefresh, rowTobeDelete.getResourceName());
 		if (beansToSaveAndRefresh.containsKey("ERROR") == false) 
 		{
 			dataProvider.setHasNewRow(false);
-			try {
+			if (parentRow != null)
+				{
+				try {
 //			RestData.refresh(selectedRow);
 //			parentRow = RestData.getOneRow(parentRow.getResourceName(), "N_PEDIDO=1", preConfParam, parentRow.getRowsColList());
 //			dataProvider.refresh(parentRow);
-				setBeanParent.invoke(display,parentRow);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					setBeanParent.invoke(display,parentRow);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-			}
+					e.printStackTrace();
+				}
+			}	
 //			newRow.setText("nueva linea");
 //			isInError = false;
 		}
@@ -1656,6 +1664,16 @@ private boolean isBoolean(String header, String colType) {
 			{
 				setUpdateButtonsVisible(true);
 			}
+			if (extProp.get("isReadOnly") != null)
+			{
+				isResourceReadOnly = extProp.get("isReadOnly").asBoolean();
+//				return isResourceReadOnly;
+			}
+			else
+			{
+				isResourceReadOnly = false;
+//				return isResourceReadOnly;
+			}	
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -3660,14 +3678,17 @@ private boolean isBoolean(String header, String colType) {
 //		System.out.println("DynamicViewGrid.saveSelectedRow() --->" + row.getRowJSon().toString());
 			dataProvider.delete(beanTobeDelete, beansToSaveAndRefresh2);	 
 			dataProvider.setHasNewRow(false);
-			try {
-				setBeanParent.invoke(display,parentRow);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			if (parentRow != null)
+			{
+				try {
+					setBeanParent.invoke(display,parentRow);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+					e.printStackTrace();
+				}			
 //			parentGrid.showBean(parentGrid.getSelectedRow());
-			parentGrid.refreshBean(parentGrid.getSelectedRow());
+				parentGrid.refreshBean(parentGrid.getSelectedRow());
+			}
 		return null;
 	}
 
@@ -3719,7 +3740,10 @@ private boolean isBoolean(String header, String colType) {
 		{ 			
 			beansToSaveAndRefresh.clear();
 			beansToSaveAndRefresh.put(rowIsInserted.getResourceName(), rowIsInserted);
-			beansToSaveAndRefresh.put(parentRow.getResourceName(), parentRow);
+			if (parentRow != null)
+				{
+				beansToSaveAndRefresh.put(parentRow.getResourceName(), parentRow);
+				}
 			saveRowGridIfNotInserting(beansToSaveAndRefresh, rowIsInserted.getResourceName());
 			if (beansToSaveAndRefresh.containsKey("ERROR") == false) 
 			{
@@ -3728,7 +3752,8 @@ private boolean isBoolean(String header, String colType) {
 	//			RestData.refresh(selectedRow);
 	//			parentRow = RestData.getOneRow(parentRow.getResourceName(), "N_PEDIDO=1", preConfParam, parentRow.getRowsColList());
 	//			dataProvider.refresh(parentRow);
-					setBeanParent.invoke(display,parentRow);
+					if (parentRow != null)
+						setBeanParent.invoke(display,parentRow);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

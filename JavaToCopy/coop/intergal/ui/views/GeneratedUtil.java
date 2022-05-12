@@ -1813,7 +1813,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 	}
 
 	// ******* COLUMNS ********
-	public Column<DynamicDBean> addFormatedColumn(int i, ArrayList<String[]> rowsColListGrid, DynamicViewGrid dynamicViewGrid, GridPro<DynamicDBean> grid, boolean isGridEditable, Div itemButtoms) {  // for now grid is not editable , then was copy and adapted from DynamicViewGrid
+	public Column<DynamicDBean> addFormatedColumn(int i, ArrayList<String[]> rowsColListGrid, DynamicViewGrid dynamicViewGrid, GridPro<DynamicDBean> grid, boolean isGridEditable, Div itemButtons) {  // for now grid is not editable , then was copy and adapted from DynamicViewGrid
 //		String colName = "col"+i;
 		
 		String[] colData = rowsColListGrid.get(i);
@@ -1848,7 +1848,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 			b.setId(buttonLabel);
 			b.addClickListener(e-> proccesButton(b));
 			if (idButtonBarForButtons.equals("1")) // Botonera Listado
-				itemButtoms.add(b);
+				itemButtons.add(b);
 		}
 		if (colData[1].indexOf("#SIG#")>-1) { // #SIG# = Show In Grid
 			String header = TranslateResource.getFieldLocale(colData[6], AppConst.PRE_CONF_PARAM);

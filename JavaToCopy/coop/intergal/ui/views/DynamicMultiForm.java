@@ -363,7 +363,8 @@ private String extractResourceSubGrid(DynamicDBean bean, int idx) {
 		{
 			String child = keyHt.substring(keyHt.lastIndexOf(".")+1);
 			if (child.indexOf("List-") > -1) // to process only subresources List , not FK 
-				htChildren.put(keyHt, child);
+				if (htChildren.get(keyHt) == null) // to avoid duplicates
+					htChildren.put(keyHt, child);
 		}	
 		
 	}

@@ -358,7 +358,7 @@ public class DynamicQryGrid extends PolymerTemplate<TemplateModel> implements Be
 		System.out.println("DynamicQryGridDisplay.beforeEnter() CACHE "+ cache);
 		grid.setiAmRootGrid(true);
 		grid.setCache(cache);
-		grid.setupGrid(false, true, true);
+		grid.setupGrid(true, true, true, false);
 //		grid.setAddFormClassName(addFormClassName);
 
 //		buttons.setVisible(false);

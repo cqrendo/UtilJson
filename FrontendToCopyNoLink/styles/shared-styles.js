@@ -564,7 +564,7 @@ $_documentContainer.innerHTML = `<dom-module id="bakery-dialog-overlay-theme" th
 	    background-color: white !important;
 	    border-bottom: #284c96 10px solid;
 	    color: transparent !important;
-	    background-image: url("/images/logos/tys3.png");
+	    background-image: url("images/logos/tys3.png");
 	}
 	[part="description"] {
 		color: #284c96 !important;
@@ -583,6 +583,15 @@ $_documentContainer.innerHTML = `<dom-module id="bakery-dialog-overlay-theme" th
   </template>
 </dom-module>
 <dom-module id="dynamic-qry-grid-display-tys" theme-for="dynamic-qry-grid-display"> 
+  <template> 
+   <style>
+    #divQuery {
+    	background: #e0e4eb !important;
+    }
+    </style>
+  </template>
+</dom-module>
+<dom-module id="dynamic-qry-grid-tys" theme-for="dynamic-qry-grid"> 
   <template> 
    <style>
     #divQuery {
