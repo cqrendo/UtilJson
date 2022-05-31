@@ -319,7 +319,13 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 							String value = getValueFromField(form, id, fieldObj, isGeneratedForm);
 							if (!value.isEmpty()) {
 								if (isNumber == false)
-									value=addAutoComodin(value);
+								{
+									int idxComa = value.indexOf(",");
+									if (idxComa == -1)
+										value=addAutoComodin(value);
+									else
+										value=componeTextList(value);
+								}
 								else 
 									value=componeNumberFilter(value);
 								setFKIdsForFilter(rowCol[4], value);
@@ -328,15 +334,28 @@ public class GenericDynamicQuery extends PolymerTemplate<TemplateModel> {
 						else if (rowCol[3].isEmpty() || rowCol[3].equals("0")) { // text field 
 								String value = getValueFromField(form, id, fieldObj, isGeneratedForm);								
 								if (!value.isEmpty()) {
-									value=addAutoComodin(value);
+									int idxComa = value.indexOf(",");
+									if (idxComa == -1)
+										value=addAutoComodin(value);
 									System.out.println("GenericDynamicForm.getFieldsData() fieldName " + rowCol[0]
 										+ " valor :" + value + "");
 								// filter=componefilter(filter, rowCol[0], ((TextField) fieldObj).getValue());
 									if (filter.length() > 1)
-										filter = filter + "%20AND%20" + rowCol[0]
+									{									
+										if (idxComa == -1)
+											filter = filter + "%20AND%20" + rowCol[0]
 												+ determineOperator(value);
+										else
+											filter = filter + "%20AND%20" + rowCol[0]
+											    + componeTextList(value);
+									}	
 									else
-										filter = rowCol[0] + determineOperator(value);
+									{
+										if (idxComa == -1)
+											filter = rowCol[0] + determineOperator(value);
+										else
+											filter = rowCol[0] + componeTextList(value);
+									}
 								}
 						} 
 						else if (isNumber) { // number field 
@@ -1083,6 +1102,11 @@ public static Component findComponentXX(Component component, String searchid) {
 	private String componeNumberList(String value) {
 		value = value.trim(); // deletes extra blanks pre and post
 		return "%20IN("+value+")";
+	}
+	private String componeTextList(String value) {
+		value = value.trim(); // deletes extra blanks pre and post
+		value= value.replace(",","','");
+		return "%20IN('"+value+"')";
 	}
 
 

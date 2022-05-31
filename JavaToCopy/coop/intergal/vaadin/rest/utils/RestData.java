@@ -363,6 +363,11 @@ public class RestData {
 		{
 			dB.setParams(dB.getParams()+"&reportSf="+eachRow.get("reportSf") );				
 		}
+		else if (eachRow.get("reportSF") != null) 
+		{
+			dB.setParams(dB.getParams()+"&reportSf="+eachRow.get("reportSF") );				
+		}
+
 
 		if (eachRow.get("methodForRowSelected") != null) 
 		{
@@ -696,6 +701,7 @@ public class RestData {
 //			cache = CACHE_TRUE;
 //		}
 		boolean cache = UtilSessionData.getCache();
+
 		if (rowsColList == null || rowsColList.isEmpty() || cache == false)
 				{
 				JsonNode cols;

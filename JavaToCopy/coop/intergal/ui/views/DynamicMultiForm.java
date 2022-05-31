@@ -786,6 +786,8 @@ public String componFKFilter(DynamicDBean bean, String resourceSubGrid) {
 	}
 	if (componFilter.length()>9)
 		componFilter = componFilter.substring(0, componFilter.length()-9); // to delete last and
+	if (componFilter.indexOf("'null'") >-1)
+		componFilter = componFilter.replaceAll("'null'", "null");
 	return componFilter;
 }
 private Component componDynamicGridDisplay(String subLayoutClassName, String subFormResource, String subFormFilter,

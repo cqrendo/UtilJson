@@ -171,9 +171,14 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 				System.out.println("PedidoProveedorForm.bindFields() fieldName ...."  + fieldNameInUI);
 				if (!fieldNameInUI.equals("null"))
 				{	
-					Field field = ((class1)).getDeclaredField(altField);//.get(instancia);
-					field.setAccessible(true);
-					Object fieldObj = field.get(object);
+					Field field = null;
+					Object fieldObj = null;
+					if (idButtonBarForButtons.equals("2") == false) // buttons in "botonera Formulario" no existen en la clase
+							{
+							field = ((class1)).getDeclaredField(altField);//.get(instancia);
+							field.setAccessible(true);
+							fieldObj = field.get(object);
+							}
 					if (idFieldType == 0)  // is Text Field
 					{
 						TextField tf = ((TextField) fieldObj);
@@ -342,12 +347,14 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 					else if (idFieldType == 10) // is a button
 					{
 			//			Button b = new Button(label);
-						Button b =((Button) fieldObj);;
-						b.setId(label);
-						b.addClickListener(e-> proccesButton(b));
-						b.setVisible(false); 
+	
 						if ((idButtonBarForButtons.equals("2") && visibleByTag)) // Botonera formulario
 						{
+							if (fieldObj != null)  // in the case that the button is defined in JS but you want to show 
+							{
+								Button b =((Button) fieldObj);
+								b.setVisible(false);	
+							}
 						//	b.setVisible(false); 
 						//	Button bCustom = new Button(label);
 							Button bCustom =coop.intergal.ui.util.UIUtils.createPrimaryButton(label);							
@@ -358,6 +365,10 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 						}
 						else if (idButtonBarForButtons.equals("3")) // Formulario
 						{
+							Button b =((Button) fieldObj);
+							b.setId(label);
+							b.addClickListener(e-> proccesButton(b));
+							
 							b.setVisible(visibleByTag);
 						}	
 						}

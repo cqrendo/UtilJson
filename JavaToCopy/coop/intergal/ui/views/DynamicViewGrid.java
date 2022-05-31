@@ -39,6 +39,9 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.grid.GridMultiSelectionModel;
+import com.vaadin.flow.component.grid.GridMultiSelectionModel.SelectAllCheckboxVisibility;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
 import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.html.Div;
@@ -73,6 +76,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.metadata.ui.views.dev.lac.FieldTemplateComboRelatedForPick;
+import coop.intergal.tys.backend.Person;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.GenericClassForMethods;
 import coop.intergal.ui.util.UtilSessionData;
@@ -255,6 +259,8 @@ private Object keepSplitGD =null;
 private DynamicGridDisplay layoutGD;
 private boolean alreadyShowbean = false;
 private boolean rootResourceReadOnly;
+private String activeTabs= null;
+private boolean isSubResourceMultiSelect;
 //private int keepSelectedPage = 0;
 
 
@@ -284,6 +290,10 @@ private void setParentGrid(DynamicViewGrid parentGrid) {
 ////		presenter.setView(this);
 //	}
 
+public DynamicViewGrid getParentGrid() {
+	return parentGrid;
+}
+
 public String getAddFormClassName() {
 	return addFormClassName;
 }
@@ -309,10 +319,10 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton) {
 	
 }
 public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean hasShowQueryButton) {
-	setupGrid(isGridEditable, hasExportButton, false, true);
+	setupGrid(isGridEditable, hasExportButton, false, true, false);
 }	
 	
-	public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean hasShowQueryButton, Boolean hasSideDisplay ) {
+	public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean hasShowQueryButton, Boolean hasSideDisplay, Boolean hasMultiSelect ) {
 	
 	//	grid.scrollTo(1); 
 	//	grid.getDataProvider().
@@ -350,6 +360,20 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean h
 		grid.setEnterNextRow(true);
 		grid.setMultiSort(true);
 		grid.addClassNames("editable-custom-effect");
+		if (hasMultiSelect)
+		{
+//	        grid.setItems(new DynamicDBean(1,"John", "Doe", "j@j.com", "Something"),
+//                    new DynamicDBean(2,"John", "Doe", "j@j.com", "Something"),
+//                    new DynamicDBean(3,"John", "Doe", "j@j.com", "Something"),
+//                    new DynamicDBean(4,"John", "Doe", "j@j.com", "Something"));
+			dataProvider.setIsMultiSelect(true);
+			grid.setSelectionMode(SelectionMode.MULTI);
+			GridMultiSelectionModel<DynamicDBean> model = (GridMultiSelectionModel<DynamicDBean>) grid.getSelectionModel();
+			model.setSelectAllCheckboxVisibility(SelectAllCheckboxVisibility.VISIBLE);
+		}
+//		else
+//		{
+//			grid.setDataProvider(dataProvider);
 		int largo = grid.getDataProvider().size(null); // contar numero de registros
 	     if (largo > 12) {
 	    	 grid.setAllRowsVisible(false);
@@ -360,6 +384,7 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean h
 	    	 grid.setAllRowsVisible(true);
 //	    	 this.getElement().getStyle().set("max-height", "100%");
 	    	 }
+//		}
 //	     this.getElement().getStyle().set("height", "100%");
 //		grid.setHeightByRows(true);  /// Is you use it breaks pagination 
 
@@ -440,7 +465,7 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean h
         }
 //		itemButtons.add(anchor);
 //		grid.getColumns().forEach(column -> column.setAutoWidth(true));
-
+		//}  /// BORRAME
 }
 
 
@@ -941,16 +966,23 @@ private boolean isBoolean(String header, String colType) {
 			
 	//		divDisplay.remove((Component) display);
 			
-			String resourceSubGrid = extractResourceSubGrid(bean,0);
+			
 			divSubGrid.removeAll();
 			String tabsList = rowsColListGrid.get(0)[12];
-			tabsList = applyTagsForVisibility(tabsList);
-			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
+			tabsList = applyTagsForVisibility(tabsList, bean); // to apply visibility depending in data
+			int lastIdxActiveTabs = activeTabs.indexOf(",");
+			if (lastIdxActiveTabs == -1)
+				lastIdxActiveTabs = activeTabs.length();
+			int idxTab = 0;	
+			if (activeTabs  != null && activeTabs.length() > 0)
+				idxTab = new Integer(activeTabs.substring(0,lastIdxActiveTabs));
+			String resourceSubGrid = extractResourceSubGrid(bean,idxTab);
+			if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0 || activeTabs.indexOf(",") == -1)) // there only one tab
 			{
 			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
 				System.out.println("DynamicViewGrid.showBean() ADD SUBGRID");
 				Div content0=new Div(); 
-				divSubGrid.add(fillContent(content0, 0 , bean));	
+				divSubGrid.add(fillContent(content0, getActiveTab(0) , bean));	
 //				generatedUtil.setDivSubGrid(divSubGrid); // to run methods for buttons
 				if (dynamicForm != null)
 					{
@@ -1362,24 +1394,81 @@ private boolean isBoolean(String header, String colType) {
 		}
 
 }
-	private String applyTagsForVisibility(String tabsList) {
-		int startIdxTags = tabsList.indexOf("#tagForV#")+9;
-		int endIdxTags = tabsList.indexOf("#endTag#");
+	private String applyTagsForVisibility(String tabsList, DynamicDBean bean) {
+		String [] tokens = tabsList.split(Pattern.quote(","));
+		int i = 0;
+		String tabs = "";
+		activeTabs = "";
+		while (tokens.length > i)
+		{
+			String tab = tokens[i];
+			String visibleOrNotTab = applyTagsForVisibilityEachTab(tab, bean);
+			if (visibleOrNotTab.length() != 0)
+			{
+				if (tabs.isEmpty())
+					tabs = visibleOrNotTab;
+				else
+					tabs = tabs + ","+ visibleOrNotTab; 
+				if (activeTabs.length() > 0)
+					activeTabs = activeTabs+","+i;
+				else
+					activeTabs = ""+i;	
+			}	
+			i++;
+		}
+		return tabs;
+	}
+	private String applyTagsForVisibilityEachTab(String tab, DynamicDBean bean) {
+		int startIdxTags = tab.indexOf("#tagForV#")+9;
+		int endIdxTags = tab.indexOf("#endTag#");
 		if (startIdxTags == 8)
-			return tabsList;
-		String tagsForVisibility = tabsList.substring(startIdxTags, endIdxTags);
+			return tab;
+		String tagsForVisibility = tab.substring(startIdxTags, endIdxTags);
+		if (tagsForVisibility.indexOf("row") >-1) // when row is indicate then here check visibility with bean
+		{
+			return applyTagsForVisibilityByRow(tab, bean);
+		}
+//			return tab; 
 		boolean visibleByTag = UtilSessionData.isVisibleOrEditableByTag(tagsForVisibility);
 		if (visibleByTag)
 		{
-			return tabsList.substring(0,startIdxTags-9)+tabsList.substring(endIdxTags+8);
+			return tab.substring(0,startIdxTags-9)+tab.substring(endIdxTags+8);
 		}
 		else
 		{
-			tabsList = tabsList.substring(0,startIdxTags-10);
-			if (tabsList.indexOf(",") == -1) // is only one option is left not tabs then ""
-				return "";
-			return tabsList.substring(0,startIdxTags-10);
+			return "";
+//			tab = tab.substring(0,startIdxTags-10);
+//			if (tab.indexOf(",") == -1) // is only one option is left not tabs then ""
+//				return "";
+//			return tab.substring(0,startIdxTags-10);
 		}
+	}
+	private String applyTagsForVisibilityByRow(String tab, DynamicDBean bean) {
+		int startIdxTags = tab.indexOf("#tagForV#")+9;
+		int endIdxTags = tab.indexOf("#endTag#");
+		if (startIdxTags == 8)
+			return tab;
+		String tagsForVisibility = tab.substring(startIdxTags, endIdxTags);
+		if (tagsForVisibility.indexOf("row.") > -1 && bean.getRowJSon() != null)  // visibility depends in a value of the row, create a virtual field that returns true or false , depending on condition
+		{
+			int idxStart = tagsForVisibility.indexOf("row.")+4;
+			int idxEnd = tagsForVisibility.length();
+			if (tagsForVisibility.indexOf(",") > -1 )
+				idxEnd = tagsForVisibility.indexOf(",");
+			String tagKey = tagsForVisibility.substring(idxStart, idxEnd )	;
+			boolean visibleByTag =false;
+			if (bean.getRowJSon().get(tagKey) != null)
+				visibleByTag = bean.getRowJSon().get(tagKey).asBoolean();
+			if (visibleByTag)
+			{
+				return tab.substring(0,startIdxTags-9)+tab.substring(endIdxTags+8);
+			}
+			else
+			{
+				return "";
+			}
+		}
+		return tab;
 	}
 
 	private void showQueryForm(boolean show) {
@@ -1518,6 +1607,7 @@ private boolean isBoolean(String header, String colType) {
 		DynamicViewGrid subDynamicViewGrid = new DynamicViewGrid();
 		subDynamicViewGrid.setCache(cache);
 		boolean isSubResourceReadOnly = isSubResourceReadOnly(resourceSubGrid2);
+		boolean isSubResourceMultiSelect = isSubResourceMultiSelect(resourceSubGrid2);
 		subDynamicViewGrid.setButtonsRowVisible(isSubResourceReadOnly == false);
 //			subDynamicViewGrid.getElement().getStyle().set("height","100%");
 		subDynamicViewGrid.setResourceName(resourceSubGrid2);
@@ -1526,7 +1616,10 @@ private boolean isBoolean(String header, String colType) {
 		boolean isGridEditable = true;
 		if (isSubResourceReadOnly)
 			isGridEditable = false;
-		subDynamicViewGrid.setupGrid(isGridEditable,true);
+		if (isSubResourceMultiSelect)
+			subDynamicViewGrid.setupGrid(isGridEditable, true, false, false, true );
+		else
+			subDynamicViewGrid.setupGrid(isGridEditable,true);
 		subDynamicViewGrid.setParentRow(selectedRow);
 		subDynamicViewGrid.setDisplayParent(display);
 		subDynamicViewGrid.setBeanParent(setBean);
@@ -1567,6 +1660,27 @@ private boolean isBoolean(String header, String colType) {
 			{
 				isResourceReadOnly = false;
 				return isResourceReadOnly;
+			}	
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+	private boolean isSubResourceMultiSelect(String resourceSubGrid2) {
+		try {
+//			if (isResourceReadOnly != null)
+//				return isResourceReadOnly;
+			JsonNode extProp = JSonClient.get("JS_ExtProp", resourceSubGrid2, cache, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+			if (extProp.get("multiSelect") != null)
+			{
+				isSubResourceMultiSelect = extProp.get("multiSelect").asBoolean();
+				return isSubResourceMultiSelect;
+			}
+			else
+			{
+				isSubResourceMultiSelect = false;
+				return isSubResourceMultiSelect;
 			}	
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -1749,7 +1863,7 @@ private boolean isBoolean(String header, String colType) {
 		String keyForParams = "DynamicViewGrid.keepSelectedPage->"+bean.getResourceName();
 		String keepSelectedPageStr = UtilSessionData.getFormParams(keyForParams); // bean.getResourceName() is include to diferente subtabs that can exit arround the session 
 		int keepSelectedPage = 0;
-		if (keepSelectedPageStr == null)
+		if (keepSelectedPageStr == null || activeTabs.isEmpty() == false)
 			keepSelectedPageStr = "0";
 		else
 			keepSelectedPage = new Integer(keepSelectedPageStr);
@@ -1785,7 +1899,7 @@ private boolean isBoolean(String header, String colType) {
 			{
 				tabTitle = tokens[0];
 				tab0 = new Tab(tabTitle);				
-				content0 = fillContent(content0, 0, bean);	
+				content0 = fillContent(content0, getActiveTab(0), bean);	
 				content0.setId("0");
 			}
 			if (nTabs > 1)
@@ -2351,12 +2465,23 @@ private boolean isBoolean(String header, String colType) {
 
     }
 
-	   private void keepSelectedPage(String page, String keyForParams) {
+	   private int getActiveTab(int i) {
+		if (activeTabs.isEmpty())
+			return i;
+		String [] tokens = activeTabs.split(Pattern.quote(","));
+		return new Integer(tokens[i]);
+	}
+
+	private void keepSelectedPage(String page, String keyForParams) {
 		   UtilSessionData.setFormParams(keyForParams, page);
 	   }
 	private Component fillContentSelectedPage(Component selectedPage, Map<Tab, Component> tabsToPages, DynamicDBean bean) {
 		Optional<String> id = selectedPage.getId();
+//		boolean isActiveTab = activeTabs.indexOf(id.get()) != -1;
+//		if (isActiveTab == false && activeTabs.isEmpty() == false)
+//			return null;
 		Integer idInt = new Integer (id.get());
+		idInt = getActiveTab(idInt); // Adapts to the list related with active tabs
 //		if (id.equals("0"))
 //		{
 			Div content = (Div) tabsToPages.get(selectedPage);
@@ -2638,7 +2763,7 @@ private boolean isBoolean(String header, String colType) {
 						{
 			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
 						Div content0=new Div(); 
-						divSubGridPopup.add(fillContent(content0, 0 , subBean));	
+						divSubGridPopup.add(fillContent(content0, getActiveTab(0) , subBean));	
 	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());
 					}
 					else if (resourceSubGrid != null)
@@ -3302,6 +3427,8 @@ private boolean isBoolean(String header, String colType) {
 		}
 		if (componFilter.length()>9)
 			componFilter = componFilter.substring(0, componFilter.length()-9); // to delete last and
+		if (componFilter.indexOf("'null'") >-1)
+			componFilter = componFilter.replaceAll("'null'", "null");
 		return componFilter;
 	}
 
@@ -3548,6 +3675,9 @@ private boolean isBoolean(String header, String colType) {
 		if (selectedRow.getResourceName().equals("CR-FormTemplate")) 
 			selectedRow.setCol9(getApiID(apiname));
 		beansToSaveAndRefresh.clear();
+		boolean isNewRow =false;
+		if (selectedRow.getRowJSon() == null)
+			isNewRow  = true;
 		beansToSaveAndRefresh.put(selectedRow.getResourceName(), selectedRow);
 		dataProvider.save(selectedRow.getResourceName(), beansToSaveAndRefresh);	
 //		((Binder<DynamicDBean>) display).setBean(selectedRow);
@@ -3561,8 +3691,10 @@ private boolean isBoolean(String header, String colType) {
 				e.printStackTrace();
 			}
 		
-//			showBean(selectedRow);
-			refreshBean(selectedRow);
+			if (isNewRow)
+				showBean(selectedRow);
+			else
+				refreshBean(selectedRow);
 		}	
 		}
 		return null;

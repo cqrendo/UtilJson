@@ -246,7 +246,7 @@ public class GenericClassForMethods {
 			String idMProcess = idButton.substring(idxIdProcess+4);
 			String filter = "idProcess="+idMProcess;
 			JsonNode rowsList;
-			rowsList = JSonClient.get("CR-Process",filter,false,AppConst.PRE_CONF_PARAM_METADATA,1+"");
+			rowsList = JSonClient.get("CR-Process",filter,false,AppConst.PRE_CONF_PARAM_METADATA,100+"");
 			JsonNode rowProcess = rowsList.get(0);  
 			System.out.println("GenericClassForMethods.processButtonForProcess() "+ rowProcess.get("name").asText());
 			JsonNode rowsSteps = rowProcess.get("List-ProcessStep");
@@ -355,13 +355,42 @@ public class GenericClassForMethods {
 	private void proccesDataInputOuput(JsonNode rowStep, DynamicViewGrid grid, String inputResourceForReadData, DynamicDBean rowOfInputData) {//(DynamicDBean rowPreviousStep, JsonNode rowStep, DynamicViewGrid grid, String inputResourceForReadData, DynamicDBean rowOfInputData) {
 		Hashtable<Integer, DynamicDBean> beansFromGrid = new Hashtable<Integer, DynamicDBean>();
 		Integer id=0;
+		DynamicDBean parentRowInForm = null;
+		if (grid != null && grid.getParentGrid() != null)
+			parentRowInForm = grid.getParentGrid().getSelectedRow();
+		boolean hasMultiSelect = grid.getDataProvider().getIsMultiSelect();
 		if (rowStep.get("groupBy") != null && rowStep.get("groupBy").asText().equals("row") )  // is only processed one row
 		{
 			beansFromGrid.put(id,rowOfInputData);
 		}
-		else
+		else if (hasMultiSelect )
+		{
+			Set<DynamicDBean> rowsStreamS = grid.getGrid().getSelectedItems();
+//			grid.getGrid().getSelectedItems();j
+//		grid.getGrid().getSelectedItems();j
+			Iterator<DynamicDBean> rowsInput = rowsStreamS.iterator();
+			String filterForInput = "null";
+			if (rowStep != null)
+				filterForInput = rowStep.get("filterForProcessInput").asText();
+			while (rowsInput.hasNext()) {
+				DynamicDBean rowInput = rowsInput.next();
+				if (rowInput.getRowJSon().get("NotProcessRow") == null && rowInput.getRowJSon().get(filterForInput) == null) // 
+				{
+					beansFromGrid.put(id,rowInput);
+					id++;
+					System.out.println("GenericClassForMethods.proccesDataInputOuput() SI PROCESAR "+ rowInput.getRowJSon().get("cantidadPedirFinal"));
+				}
+				else
+				{
+					System.out.println("GenericClassForMethods.proccesDataInputOuput() NO PROCESAR "+ rowInput.getRowJSon().get("cantidadPedirFinal"));
+				}
+			
+		}
+		}
+		else 
 		{
 			Stream<DynamicDBean> rowsStream = ((DataProvider<DynamicDBean, String>) grid.getGrid().getDataProvider()).fetch(createQuery(grid.getGrid()));
+//			grid.getGrid().getSelectedItems();j
 //		grid.getGrid().getSelectedItems();j
 			Iterator<DynamicDBean> rowsInput = rowsStream.iterator();
 			String filterForInput = "null";
@@ -395,7 +424,7 @@ public class GenericClassForMethods {
 				if (i == 0) // first row
 				{
 					firstRowInput = beansFromGrid.get(0);
-					lastParent = insertOrUpdateOutput(firstRowInput, rowStep, true, lastParent);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
+					lastParent = insertOrUpdateOutput(firstRowInput, rowStep, true, lastParent, parentRowInForm, grid);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
 					if ((lastParent == null && dQGD == null) || (lastParent != null && lastParent.getParams() != null && lastParent.getParams().startsWith("ERROR WITH INSERT")))	 // it means a error , not more rows are proccesed 	 // when is the type dQGD it means that there is a form to add items, then not parent 
 						i=999999;
 					keepFirstParent = lastParent;
@@ -411,7 +440,7 @@ public class GenericClassForMethods {
 //	!!!!!			System.out.println("GenericClassForMethods.proccesDataInputOuput() ROW INPUT --->"+ row.getRowJSon().get("DESCRIPCION").asText());
 					if (keepGroup != null && row.getRowJSon().get(groupBy).asText().equals(keepGroup) == false) // Group change
 						{
-						lastParent = insertOrUpdateOutput(row, rowStep, true, lastParent);
+						lastParent = insertOrUpdateOutput(row, rowStep, true, lastParent, parentRowInForm, grid);
 						if (lastParent == null || (lastParent.getParams() != null && lastParent.getParams().startsWith("ERROR WITH INSERT")))	 // it means a error , not more rows are proccesed 	 // it means a error , not more rows are processed 
 							i=999999;
 
@@ -419,7 +448,7 @@ public class GenericClassForMethods {
 						}
 					else
 						{
-						DynamicDBean newRow = insertOrUpdateOutput(row, rowStep, false, lastParent);
+						DynamicDBean newRow = insertOrUpdateOutput(row, rowStep, false, lastParent, parentRowInForm, grid);
 						if (newRow == null || newRow.getCol0().equals("ERROR WITH INSERT"))	 // it) //(row, rowStep, false, lastParent, rowOfInputData);
 							i=999999;
 						}
@@ -432,7 +461,7 @@ public class GenericClassForMethods {
 		else  // only one row is processed
 		{
 			DynamicDBean RowInput = beansFromGrid.get(0);
-			lastParent = insertOrUpdateOutput(RowInput, rowStep, true, lastParent);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
+			lastParent = insertOrUpdateOutput(RowInput, rowStep, true, lastParent, parentRowInForm, grid);//(firstRowInput, rowStep, true, lastParent, rowPreviousStep);
 		}
 //		JsonNode rowsStepOuput = rowStep.get("List-ProcessStepOutput");
 //		processInputOuput(grid, inputResourceForReadData, rowOfInputData, rowsStepOuput);
@@ -447,7 +476,7 @@ public class GenericClassForMethods {
 //			}
 //		return keepFirstParent;
 	}
-	private DynamicDBean insertOrUpdateOutput(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent) {//(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean rowPreviousStep) {
+	private DynamicDBean insertOrUpdateOutput(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean parentRowInForm, DynamicViewGrid grid) {//(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean rowPreviousStep) {
 //		if (rowStep.get("filter"))
 		
 		JsonNode rowsStepOuput = rowStep.get("List-ProcessStepOutput");
@@ -456,7 +485,7 @@ public class GenericClassForMethods {
 			JsonNode ouputResource = rowStepOuput.get("resource"); 
 			if (rowStep.get("inputResourceForReadData").equals(rowStepOuput.get("resource"))) // when the input and output are the same row then is an update
 			{
-				lastParent = updateAnOuputRow(rowStepOuput, null, rowInputData);
+				lastParent = updateAnOuputRow(rowStepOuput, null, rowInputData, grid);
 			}
 			else if (ouputResource != null && ouputResource.asText().indexOf("@form@") > -1) // the output is in a resource of a form 
 			{
@@ -481,7 +510,7 @@ public class GenericClassForMethods {
 				if (rowStepOuput.get("filter").asText().equals("null") && isNewForGroupChange) // is new row for groupBy change in root 
 				{
 					lastParent = //insertAnOuputRow(rowStepOuput, null, rowPreviousStep);
-								 insertAnOuputRow(rowStepOuput, null, rowInputData);//(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean rowPreviousStep) {
+								 insertAnOuputRow(rowStepOuput, null, rowInputData, parentRowInForm);//(DynamicDBean rowInputData, JsonNode rowStep, boolean isNewForGroupChange, DynamicDBean lastParent, DynamicDBean rowPreviousStep) {
 				}
 //				else if (filter.equals("null") == false && filter.indexOf("rowAD.") > -1 ) // if the rowAD.field has data it means that the a row is not created
 //				{
@@ -496,7 +525,7 @@ public class GenericClassForMethods {
 			else // is a ChildRow
 			{
 	//			insertAnOuputRow(rowStepOuput, lastParent, rowPreviousStep);
-				DynamicDBean newChild = insertAnOuputRow(rowStepOuput, lastParent, rowInputData);//(rowStepOuput, lastParent, rowInputData, rowPreviousStep);
+				DynamicDBean newChild = insertAnOuputRow(rowStepOuput, lastParent, rowInputData, parentRowInForm);//(rowStepOuput, lastParent, rowInputData, rowPreviousStep);
 				if (newChild.getCol0().equals("ERROR WITH INSERT"))			
 					{
 					lastParent.setParams("ERROR WITH INSERT##"+lastParent.getParams());
@@ -517,7 +546,7 @@ public class GenericClassForMethods {
 //		// TODO Auto-generated method stub
 //		return null;
 //	}
-	private DynamicDBean insertAnOuputRow(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData) {//(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
+	private DynamicDBean insertAnOuputRow(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData, DynamicDBean parentRowInForm) {//(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
 		String ouputResource = rowStepOuput.get("resource").asText();
 		System.out.println("PROCEESS AN INSERT for " +ouputResource);
 		DynamicDBean newBean = new DynamicDBean(); 
@@ -529,7 +558,7 @@ public class GenericClassForMethods {
 		newBean.setRowsColList(dataProviderOuput.getRowsColList());
 		newBean.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 		GeneratedUtil.fillDefaultValues(newBean);
-		newBean = fillDataOuput(newBean, rowStepOuput, rowInputData);//(newBean, rowStepOuput, rowInputData, rowPreviousStep);
+		newBean = fillDataOuput(newBean, rowStepOuput, rowInputData, parentRowInForm);//(newBean, rowStepOuput, rowInputData, rowPreviousStep);
 		Hashtable<String, DynamicDBean> beansToSaveAndRefresh = new Hashtable<String, DynamicDBean>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
 		beansToSaveAndRefresh.clear();
 		beansToSaveAndRefresh.put(newBean.getResourceName(), newBean);
@@ -551,7 +580,7 @@ public class GenericClassForMethods {
 
 		
 	}
-	private DynamicDBean updateAnOuputRow(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData) {//(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
+	private DynamicDBean updateAnOuputRow(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData, DynamicViewGrid grid) {//(JsonNode rowStepOuput, DynamicDBean lastParent, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
 		String ouputResource = rowStepOuput.get("resource").asText();
 		System.out.println("PROCEESS AN UPDATE for " +ouputResource);
 		DdbDataBackEndProvider dataProviderOuput = new DdbDataBackEndProvider();
@@ -569,6 +598,10 @@ public class GenericClassForMethods {
 			beanWithError.setCol0("ERROR WITH INSERT");
 			return beanWithError;
 		}
+		else
+		{
+			grid.getDataProvider().refresh(rowInputData);
+		}
 		return rowInputData;
 
 		
@@ -585,7 +618,7 @@ public class GenericClassForMethods {
 		newBean.setRowsColList(dataProviderOuput.getRowsColList());
 		newBean.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 		GeneratedUtil.fillDefaultValues(newBean);
-		newBean = fillDataOuput(newBean, rowStepOuput, rowInputData);//(newBean, rowStepOuput, rowInputData, rowPreviousStep);
+		newBean = fillDataOuput(newBean, rowStepOuput, rowInputData, null);//(newBean, rowStepOuput, rowInputData, rowPreviousStep);
 		Hashtable<String, DynamicDBean> beansToSaveAndRefresh = new Hashtable<String, DynamicDBean>(); // to send DynamicDBean to be save and refresh, the name of the one to be save is send in another param
 		beansToSaveAndRefresh.clear();
 		beansToSaveAndRefresh.put(newBean.getResourceName(), newBean);
@@ -613,12 +646,14 @@ public class GenericClassForMethods {
 	//	Orvisa@.03
 		
 	}
-	private DynamicDBean fillDataOuput(DynamicDBean newBean, JsonNode rowStepOuput, DynamicDBean rowInputData) {//fillDataOuput(DynamicDBean newBean, JsonNode rowStepOuput, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
+	private DynamicDBean fillDataOuput(DynamicDBean newBean, JsonNode rowStepOuput, DynamicDBean rowInputData, DynamicDBean parentRowInForm) {//fillDataOuput(DynamicDBean newBean, JsonNode rowStepOuput, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
 		JsonNode rowsStepOuputMap = rowStepOuput.get("List-ProcessStepOutputMap");
 		ArrayList<String[]> colList = newBean.getRowsColList();
 		for (JsonNode rowStepOuputMap : rowsStepOuputMap) 
 		{
-			newBean.setCol(getValueForField(rowStepOuputMap.get("fieldValue").asText(), rowInputData), getColNameInUi(rowStepOuputMap.get("ouputField").asText(), colList, rowStepOuput.get("resource").asText() ));
+			String valueForField = getValueForField(rowStepOuputMap.get("fieldValue").asText(), rowInputData, parentRowInForm);
+			String colNameInUi = getColNameInUi(rowStepOuputMap.get("ouputField").asText(), colList, rowStepOuput.get("resource").asText() );
+			newBean.setCol(valueForField, colNameInUi);
 		}
 		return newBean;
 	//	Orvisa@.03
@@ -647,7 +682,15 @@ public class GenericClassForMethods {
 		}
 		return null;
 	}
-	private String getValueForField(String valueFormula, DynamicDBean rowInputData) {//(String valueFormula, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
+	private String getValueForField(String valueFormula, DynamicDBean rowInputData, DynamicDBean parentRowInForm) {//(String valueFormula, DynamicDBean rowInputData, DynamicDBean rowPreviousStep) {
+		if (valueFormula.indexOf("rowPD") > -1)
+		{
+			int idxStart = valueFormula.indexOf("rowPD") + 6;
+			String colNameToGetValue = valueFormula.substring(idxStart);
+			String colNameInUi = getColNameInUi(colNameToGetValue, parentRowInForm.getRowsColList(),parentRowInForm.getResourceName());
+			System.out.println("rowPD GenericClassForMethods.getValueForField() valueFormula "+ valueFormula + " colNameInUi " + colNameInUi + " value "+ parentRowInForm.getCol(colNameInUi));
+			return parentRowInForm.getCol(colNameInUi);
+		}
 		if (valueFormula.indexOf("rowID") > -1)
 		{
 			int idxStart = valueFormula.indexOf("rowID") + 6;

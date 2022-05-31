@@ -365,8 +365,15 @@ public class DynamicDBean {// implements Serializable {
 
 	public DynamicDBean() {
 	}
-	
-    public int getMaxColNumber() {
+	// BORRAME
+    public DynamicDBean(int i, String string, String string2, String string3, String string4) {
+    	this.col0 = string;
+    	this.col1 = string2;
+    	this.col2 = string3;
+    	this.col3 = string4;
+	}
+
+	public int getMaxColNumber() {
 		return maxColNumber;
 	}
 

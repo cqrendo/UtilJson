@@ -48,7 +48,17 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 //	private WrappedSession keepLastWSession;
 	private String variant = "";
 	private Consumer<Long> sizeChangeListener;
+	private Boolean isMultiSelect = false;
+	public Boolean getIsMultiSelect() {
+		return isMultiSelect;
+	}
+
+	public void setIsMultiSelect(Boolean isMultiSelect) {
+		this.isMultiSelect = isMultiSelect;
+	}
 private long sizeBE;
+
+private Collection<DynamicDBean> keepRows;
 
 
 	public String getVariant() {
@@ -193,6 +203,9 @@ private long sizeBE;
 //		        if (limit > 200) // no esta claro porque esta esta limitacion por ahora esta anulada, linit es 50npor defecto al no ser que se use grid.setPageSize(int);
 //		        	limit = 200;
 		        List<QuerySortOrder> sortOrdersFields = query.getSortOrders();
+// @@ TO CLEAN
+		        if (isMultiSelect && keepRows != null)  /// when a grid is multiselect it fails it selectALL if you do getAllDynamicDBean...
+		        	return keepRows.stream();
 		        Collection<DynamicDBean> rows = DataService.get().getAllDynamicDBean(offset,limit,cache, resourceName, preConfParam, getRowsColList(variant),  filter,sortOrdersFields, hasNewRow, variant);
 		        if (rows.size() == 1 && sizeBE > 1)
 		        {
@@ -211,6 +224,9 @@ private long sizeBE;
 		                    .sorted(comparator(query.getFilter().get()));
 		        }
 	//	        System.out.println("DdbDataBackEndProvider.fetchFromBackEnd()......."+ stream.toArray().length);
+		     // @@ TO CLEAN
+		        if (isMultiSelect)
+		        		keepRows = rows;
 		        return stream;//.skip(offset).limit(limit);
 		    }
 
@@ -366,6 +382,9 @@ private long sizeBE;
 				notification.open();
 					
 				}
+
+	
+	
 
 
 

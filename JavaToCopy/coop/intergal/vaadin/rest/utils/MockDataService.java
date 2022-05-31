@@ -509,10 +509,10 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 				{
 					if((value == null || value.toString().equals("") ==  true || value.toString().equals("null") ==  true) && colNameInUI.equals("null") == false && colNameInUI.startsWith("FK-") == false)// && isCheckBox(o) == false)// to process when you empty the field
 					{
-						if (value == null || colType == 3 || colType == 5 || colType == 4 || colType > 100) // 3 currency, 5 number , 4 = boolean > 100 decimal
+//						if (value == null || colType == 3 || colType == 5 || colType == 4 || colType > 100) // 3 currency, 5 number , 4 = boolean > 100 decimal
 							newEntityinfo.put(colNameInTable, NullNode.getInstance()); 
-						else
-							newEntityinfo.put(colNameInTable, (String) ""); 
+//						else
+//							newEntityinfo.put(colNameInTable, (String) ""); 
 					}
 					i++;
 				}
@@ -693,7 +693,7 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		 if (resource.indexOf(":")> -1) // is a table not a resource by example  main:tabla
 			 resource=resource.substring(resource.indexOf(":")+1);
 //		 if (resource.indexOf(".")> -1) // is a sub-resource
-		 if (resource.equals(resourceName))
+		 if (resource.equals(resourceName) || sameTableName(resourceName, resource))
 			 return lTxsumary.get(i).get("@metadata").get("href").asText();
 		 else
 			 i ++;
@@ -703,6 +703,27 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		return null;
 	}
 
+
+	private boolean sameTableName(String resourceName, String resource) {
+		
+		if (resourceName.indexOf(".") == -1) /// only subnodes can be ambiguous that means that in the case of that 2 children are from the same table only one is return independent of wich you change then you return data form table name
+			return false;
+		String tableName1 = getTableName(resourceName);
+		String tableName2 = getTableName(resource);
+		return tableName1.equals(tableName2);
+	}
+
+	private String getTableName(String resourceName) {
+		int idxLastPoint = resourceName.lastIndexOf(".")+1;
+		String tablename;
+		tablename = resourceName.substring(idxLastPoint);
+		int idxList = tablename.indexOf("List-")+5;			
+		int idx__ = tablename.indexOf("__");	
+		if (idx__ == -1)
+			return tablename.substring(idxList);
+		else
+			return tablename.substring(idxList, idx__);
+	}
 
 	@Override
 	public void updateDynamicDBean(String resourceTobeSave, Hashtable<String, DynamicDBean> beansToSaveAndRefresh, DdbDataBackEndProvider ddbDataBackEndProvider) {
@@ -882,6 +903,8 @@ private String getTableName(JsonNode rowJson) {    // TODO @CQR make an alternti
 		}
 		if (componFilter.length()>9)
 			componFilter = componFilter.substring(0, componFilter.length()-9); // to delete last and
+		if (componFilter.indexOf("'null'") >-1)
+			componFilter = componFilter.replaceAll("'null'", "null");
 		return componFilter;
 	}
 }

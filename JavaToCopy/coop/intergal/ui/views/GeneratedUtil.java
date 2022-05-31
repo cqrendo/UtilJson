@@ -918,6 +918,7 @@ public class GeneratedUtil  {private static final String CLASSNAME_FOR_FORM_QUER
 					Div l = alingLabel(label); 
 //					setValidators(null, nf, fieldNameInUI, validationRuleName, isRequired, isQuery, cache);
 					setBeanValidators(validationRuleName, isQuery, cache) ;
+	
 					if (isRequired && isQuery == false && fieldSize.length() == 0)
 					{
 						binder.forField(nf).asRequired("Requerido")
@@ -932,6 +933,7 @@ public class GeneratedUtil  {private static final String CLASSNAME_FOR_FORM_QUER
 //				            }
 //				        }).bind(d-> d.getColInteger(fieldNameInUI), (d,v)-> d.setColInteger(v,fieldNameInUI));//.bind("col9");
 					}
+					
 					if (fieldSize.length() > 0 && isQuery == false)	
 					{
 	//					nf.setMax(100);
@@ -979,6 +981,13 @@ public class GeneratedUtil  {private static final String CLASSNAME_FOR_FORM_QUER
 //					if (isRightLabel)
 //						item.addClassName("filabelright");
 //					else
+					if (isPick)
+					{
+						Component formForFields = nf.getParent().get().getParent().get();
+						Icon icon = new Icon(VaadinIcon.DOWNLOAD_ALT);
+						icon.getElement().addEventListener("click", ev->showDialogForPick(formForFields,resourceName, null,null, bean, fieldNameInUI, cache, isQuery));
+						nf.setSuffixComponent(icon);
+					}
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
@@ -1126,6 +1135,7 @@ public class GeneratedUtil  {private static final String CLASSNAME_FOR_FORM_QUER
 						item = addClassNames(item, ".fieldInAGroup");
 						form.add(activeGroup);
 					}
+					else
 						item = form.addFormItem(cB, l );
 					if (isQuery)
 						{
