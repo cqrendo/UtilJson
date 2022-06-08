@@ -1,14 +1,12 @@
 package coop.intergal.ui.views;
-import static coop.intergal.AppConst.DEFAULT_API_NAME;
 import static coop.intergal.AppConst.PACKAGE_VIEWS;
-import static coop.intergal.AppConst.PAGE_DYNAMIC_TREE;
 import static coop.intergal.AppConst.PAGE_PRODUCTS;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.flow.component.Tag;
@@ -16,10 +14,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.polymertemplate.Id;
-import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
-import com.vaadin.flow.component.polymertemplate.TemplateParser;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -27,38 +22,35 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinService;
-import com.vaadin.flow.templatemodel.TemplateModel;
 
 import coop.intergal.AppConst;
-import coop.intergal.espresso.presutec.utils.JSonClient;
-import coop.intergal.ui.SubMenu;
-import coop.intergal.ui.SubSubmenu;
-import coop.intergal.ui.components.FlexBoxLayout;
+import coop.intergal.tys.ui.components.navigation.drawer.NaviMenu;
 import coop.intergal.ui.components.FormButtonsBar;
-import coop.intergal.ui.components.navigation.drawer.NaviItem;
-import coop.intergal.ui.components.navigation.drawer.NaviMenu;
 import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DdbHierarchicalDataProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
+import coop.intergal.vaadin.rest.utils.RestData;
+
 
 //@Tag("dynamic-view-grid")
 @Tag("dynamic-tree-display")
 @JsModule("./src/views/generic/layout/dynamic-tree-display.js")
-@Route(value = PAGE_DYNAMIC_TREE)//, layout = MainView.class)
+//(value = PAGE_DYNAMIC_TREE)//, layout = MainView.class)
 //@PageTitle(AppConst.TITLE_PRODUCTS)
-//@Secured(Role.ADMIN)
-public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle  {
+//@Secured(Role.ADMIN)   PolymerTemplate<TemplateModel>
+@JsModule("@vaadin/vaadin-lumo-styles/badge")
+
+public class DynamicTreeDisplay extends DynamicViewGrid implements BeforeEnterObserver, HasDynamicTitle  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
-	private String preConfParam;
+	private DynamicQryGridDisplay layoutQGD;
 	public ArrayList<String> getRowsColList() {
 		return rowsColList;
 	}
 
-	public void setRowsColList(ArrayList<String> rowsColList) {
-		this.rowsColList = rowsColList;
-	}	
+//	public void setRowsColList(ArrayList<String> rowsColList) {
+//		this.rowsColList = rowsColList;
+//	}	
 
 	public DynamicTreeDisplay() {
 		super();
@@ -66,15 +58,15 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 		
 	}
 
-	public DynamicTreeDisplay(TemplateParser parser, VaadinService service) {
-		super(parser, service);
-		// TODO Auto-generated constructor stub
-	}
-
-	public DynamicTreeDisplay(TemplateParser parser) {
-		super(parser);
-		// TODO Auto-generated constructor stub
-	}
+//	public DynamicTreeDisplay(TemplateParser parser, VaadinService service) {
+//		super(parser, service);
+//		// TODO Auto-generated constructor stub
+//	}
+//
+//	public DynamicTreeDisplay(TemplateParser parser) {
+//		super(parser);
+//		// TODO Auto-generated constructor stub
+//	}
 
 	/**
 	 * 
@@ -112,18 +104,24 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 	private String filter;
 	@Id("buttons")
 	private FormButtonsBar buttons;
+	private FormButtonsBar buttonsForm;
 	private String apiname;
 //	private NaviDrawer naviDrawer;
 //	@Id("splitQryAndResult")
 //	private SplitLayout splitQryAndResult;
-	private FlexBoxLayout viewContainer;
-	private FlexBoxLayout column;
-	private FlexBoxLayout row;
-	private FlexBoxLayout flexBoxLayout;
 	private TreeGrid<DynamicDBean> treeGrid = new TreeGrid<>();
 	private DdbHierarchicalDataProvider dataProvider;
 	private ArrayList<String[]> rowsColListGrid;
 	private NaviMenu menu;
+	private int firstShowCol;
+	private DynamicDBean selectedRow;
+	private String displayFormClassName;
+	private DynamicDBean keepRowBeforChanges;
+	private Object display;
+	private Method setBean;
+	private Object divInDisplay;
+	private boolean isResourceReadOnly;
+//	private NaviMenu menu;
 	private static final String CLASS_NAME = "root";
 	
 
@@ -247,7 +245,7 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 //			}
 		title="..";
 		String queryFormClassName = null;
-		String displayFormClassName  = null;
+//		String displayFormClassName  = null;
 //		String resourceSubGrid = null;
 		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
 		{
@@ -278,11 +276,15 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 //		{
 //			filter = "APIname='"+apiname+"'";
 //		}
-		initNaviItems();
+//		initStructure();
+//		initNaviItems();
+		setupGrid();
+		divTree.add(treeGrid);
 //		grid.setFilter(filter);
 //		grid.setupGrid(false);
 //		divGrid.add(grid );
-		divTree.add(menu);
+//		divTree.add(menu);
+//		divTree.addClassName(CLASS_NAME);
 		buttons.setVisible(false);
 //		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
 //		buttons.addCancelListener(e -> grid.undoSelectedRow());
@@ -298,42 +300,40 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 	public String getPageTitle() {
 		return title;
 	}
+	@Override
 	public void setupGrid() {
 		
-	//	grid.scrollTo(1); 
-	//	grid.getDataProvider().
-	//	DdbDataProvider dataProvider = new DdbDataProvider();
 		dataProvider = new DdbHierarchicalDataProvider();
 		dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
 		dataProvider.setResourceName(resourceName);
-//		dataProvider.setFilter(getFilter());
-//		grid = new Grid<>(DynamicDBean.class); 
-//		grid.removeAllColumns();
-		treeGrid.setDataProvider(dataProvider);
-//		treeGrid.setEnterNextRow(true);
-		treeGrid.setMultiSort(true);
+		
+		Collection<DynamicDBean> rootList = RestData.getResourceData(0,0,resourceName, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM, dataProvider.getRowsColList(), null, true, false, null);
 
-//		Crud<DynamicDBean> crud = new Crud<>();
-//		crud.setDataProvider(dataProvider);
-//		grid.addColumn(DynamicDBean::getCol1).setHeader("Product Name").setFlexGrow(10);
+		treeGrid.setMultiSort(true);
+		treeGrid.setItems(rootList, this::getSubList);
 		rowsColListGrid = dataProvider.getRowsColList();
 //		newRow.addClickListener(e -> insertBeanInList());
 //		deleteRow.addClickListener(e -> deleteBeanFromList());
 //		grid.removeAllColumns();
 		int numberOFCols = rowsColListGrid.size();//length;
 		System.out.println("DynamicTreeDisplay.setupGrid() "+ numberOFCols);
-		treeGrid.addHierarchyColumn(DynamicDBean::getCol0).setHeader("Account Title");
-	//       addColumn(Customer::getId, new NumberRenderer()).setCaption("Id");
-		for (int i=0;i<numberOFCols; i++)
+		firstShowCol = 0;
+		for (int i=1;i<numberOFCols; i++)
 		{
 			Column<DynamicDBean> col = addTreeColumn(i);
 			if (col != null)
 				col.setAutoWidth(true);
 		}
+		treeGrid.addSelectionListener(e -> {
+			if (e.getFirstSelectedItem().isPresent())
+				selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
+				System.out.println("Registro seleccionado " + selectedRow.getCol0());
+				methodForRowSelected(selectedRow); 
+			});
 //		grid.getColumns().forEach(column -> column.setAutoWidth(true));
 
 }
-	   private Column<DynamicDBean> addTreeColumn(int i) {
+	   private Column<DynamicDBean> addTreeColumn(int i) { // es la columna 0
 		   
 		   String[] colData = rowsColListGrid.get(i);
 		   String colName = colData[2];
@@ -343,73 +343,83 @@ public class DynamicTreeDisplay extends PolymerTemplate<TemplateModel> implement
 		   if (colData[1].indexOf("#SIG#")>-1) { 
 			   System.out.println("DynamicTreeDisplay.addTreeColumn() "+ colName);
 			   String header = colHeader;
-			   col = treeGrid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+			   if (firstShowCol == 0) // the first column is the HierarchyColumn
+				   col = treeGrid.addHierarchyColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+			   else
+				   col = treeGrid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+			   firstShowCol ++;
 		   }
-		// TODO Auto-generated method stub
 		return col;
 	}
-	   
-	   public void initNaviItems() {
-	        menu = new NaviMenu();//naviDrawer.getMenu();
-	        menu.removeAll();
-			try {
-				JsonNode rowsList = JSonClient.get(resourceName,filter,false,UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM,500+"");
-				for (JsonNode eachRow : rowsList)  {
-					String optionName = eachRow.get("DESCRIPCION").asText();
-					String subLevel= "";
-					if (eachRow.get("subLevel") != null)
-						{
-						subLevel =  eachRow.get("subLevel").asText();
-						String subLevelFilter = eachRow.get("subLevelFilter").asText();
-						String resourceName1 = resourceName+"."+subLevel;
-						NaviItem submenu = menu.addNaviItem(VaadinIcon.ACCORDION_MENU, optionName,
-						                SubSubmenu.class);
-						 JsonNode rowsList1 = JSonClient.get(resourceName1,subLevelFilter,false,UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM,500+"");
-						 for (JsonNode eachRow1 : rowsList1)  
-								{
-									String optionName1 = eachRow1.get("DESCRIPCION").asText();
-									String subLevel1= "";
-									if (eachRow1.get("subLevel") != null)
-										{
-										subLevel1 =  eachRow1.get("subLevel").asText();
-										String subLevelFilter1 = eachRow1.get("subLevelFilter").asText();
-										String resourceName2 = resourceName1+"."+subLevel1;
-										NaviItem submenu1 = menu.addNaviItem(submenu, optionName1,
-								                null);
-										JsonNode rowsList2 = JSonClient.get(resourceName2,subLevelFilter1,false,UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM,500+"");
+	    public Collection<DynamicDBean> getSubList(DynamicDBean bean) {
+	    	if (bean.getRowJSon().get("subLevel") == null)
+	    		return new ArrayList<DynamicDBean>();;
+	//    	String subFilter = bean.getRowJSon().get("subLevelFilter").asText();
+	    	String subLevel = bean.getRowJSon().get("subLevel").asText();
+	    	JsonNode rowJson = bean.getRowJSon().get(subLevel);
+	    	String resourceNameRoot = bean.getResourceName()+"."+subLevel;
+			DdbHierarchicalDataProvider subDataProvider = new DdbHierarchicalDataProvider();
+			subDataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+			subDataProvider.setResourceName(resourceName);
+	
+			Collection<DynamicDBean> subList = RestData.getResourceData(rowJson,resourceNameRoot,  UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM, subDataProvider.getRowsColList(), true, false, null);
 
-										 for (JsonNode eachRow2 : rowsList2)  {
-												{
-													String optionName2 = eachRow2.get("DESCRIPCION").asText();
-													String subLevel2= "";
-													if (eachRow2.get("subLevel") != null)
-														{
-														subLevel2 =  eachRow2.get("subLevel").asText();
-														String subLevelFilter2 = eachRow2.get("subLevelFilter").asText();
-														resourceName = resourceName+"."+subLevel2;
-														NaviItem submenu2 = menu.addNaviItem(submenu1, optionName2,
-												                null);
-														}
-												}	
-											//			JsonNode rowsList2 = JSonClient.get(resourceName,subLevelFilter,false,AppConst.PRE_CONF_PARAM_METADATA,500+"");
-										 }
-										}
-								}
-						}
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-//	        menu.addNaviItem(VaadinIcon.HOME, "Home", Home.class);
-//	        menu.addNaviItem(VaadinIcon.INSTITUTION, "Accounts", GenericGrid.class);
-//	        menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", GenericGridDetails.class);
-//	        menu.addNaviItem(VaadinIcon.CHART, "Statistics", Statistics.class);
-	//
-//	        NaviItem personnel = menu.addNaviItem(VaadinIcon.USERS, "Personnel",
-//	                null);
-//	        menu.addNaviItem(personnel, "Accountants", Accountants.class);
-//	        menu.addNaviItem(personnel, "Managers", Managers.class);
+	        return subList;
 	    }
+	    private void methodForRowSelected(DynamicDBean selectedRow2) {
+	    	//xxx		
+	    			String method = selectedRow2.getMethodForRowSelected();
+	    			if (method != null)
+	    			{
+	    				runMethodFor(method, selectedRow2);
+	    			}
+	    			else
+	    			{
+//	    				if (hasSideDisplay && alreadyShowbean == false)
+//	    				{
+	    					showBean(selectedRow2);
+	    					System.out.println("DynamicViewGrid.methodForRowSelected() NOT method assigned using ShowBean if configure as hasSideDisplay");
+//	    				}
+//	    				else
+//	    					System.out.println("DynamicViewGrid.methodForRowSelected() NOT method assigned");
+	    			}
+	    }
+	    			
+	    		private void runMethodFor(String methodName, DynamicDBean selectedRow2) {
+	    			System.out.println("method to run "+ methodName);
+//	    			Class<?> dynamicQuery;
+	    			try {
+	    				Class<?> classForMethods = Class.forName(AppConst.CLASS_FOR_METHODS);
+	    				Object oClassForMethods = classForMethods.newInstance();
+	    				Method method = classForMethods.getMethod(methodName, new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class, coop.intergal.ui.views.DynamicViewGrid.class} );
+//	    				this.getParent().get().getParent().get().getParent().get().getParent().get().getParent().get().getChildren().findFirst();
+//	    				UI.getCurrent().getChildren().findFirst();
+	    				method.invoke(oClassForMethods,selectedRow2, this);
+	    			} catch (ClassNotFoundException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			} catch (InstantiationException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			} catch (IllegalAccessException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			} catch (IllegalArgumentException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			} catch (InvocationTargetException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			} catch (NoSuchMethodException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			} catch (SecurityException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			}
 
+
+	    		
+	    	}
+ 
 }

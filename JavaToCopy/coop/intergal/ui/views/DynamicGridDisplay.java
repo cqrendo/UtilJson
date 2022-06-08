@@ -29,6 +29,8 @@ import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
+
 
 
 //@Tag("dynamic-view-grid")
@@ -149,6 +151,11 @@ public class DynamicGridDisplay extends PolymerTemplate<TemplateModel> implement
 
 	@Id("displaySplitSubGrid")
 	private SplitLayout displaySplitSubGrid;
+
+	private String gridClassName;
+
+	@Id("gridSplitDisplay")
+	private SplitLayout gridSplitDisplay;
 	public SplitLayout getDisplaySplitSubGrid() {
 		return displaySplitSubGrid;
 	}
@@ -319,72 +326,81 @@ public String getResourceName() {
 					cache = true;
 				}
 			//*** PACKAGE_VIEWS is used when the class is no generic for several projects. and corresponds a particular class for the form
+			
 			queryFormClassName = queryParameters.getParameters().get("queryFormClassName").get(0);
 			displayFormClassName= queryParameters.getParameters().get("displayFormClassName").get(0);
 			if (queryFormClassName.startsWith("coop.intergal.ui.views") == false)
 				queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
 			if (displayFormClassName.startsWith("coop.intergal.ui.views") == false)
 				displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
-			
+			if (queryParameters.getParameters().get("gridClassName") != null)
+			{
+				gridClassName = queryParameters.getParameters().get("gridClassName").get(0);
+			}
+
 //			resourceSubGrid =  queryParameters.getParameters().get("resourceSubGrid").get(0);
 		}
 		createContent() ;
-	}
+		}
 		public Component createContent() {
 			return createContent(null);
 		}
+
 		public Component createContent(DynamicDBean preSelectRow) {
-		
+
 //		splitQryAndResult.setSplitterPosition(2);
 //		gridDisplaySubGrid.setMinWidth("20px");
+			gridSplitDisplay.setOrientation(Orientation.HORIZONTAL);
+			displaySplitSubGrid.setOrientation(Orientation.VERTICAL);
 
-		grid.setDisplayFormClassName(displayFormClassName);
-		grid.setDisplay(divDisplay);
-		grid.setDivSubGrid(divSubGrid);
-		grid.setButtonsForm(buttons);
-		grid.setButtonsRowVisible(false);  // @@ TODO set by parameter  
-		grid.setLayout(this);
+			grid.setDisplayFormClassName(displayFormClassName);
+			grid.setDisplay(divDisplay);
+			grid.setDivSubGrid(divSubGrid);
+			grid.setButtonsForm(buttons);
+			grid.setButtonsRowVisible(false); // @@ TODO set by parameter
+			grid.setLayout(this);
 //		grid.setGridSplitDisplay(gridSplitDisplay);
-		grid.setResourceName(resourceName);
-		grid.getGrid().addSelectionListener(e -> {
-			DynamicDBean seletedRow;
-			if (e.getFirstSelectedItem().isPresent())
-				{
-					seletedRow = (DynamicDBean)e.getFirstSelectedItem().get();
-					if (extraFilterToSelect != null)
-						keepSessionDataForFilter(seletedRow,extraFilterToSelect);
-					grid.showBean(seletedRow);
+			grid.setResourceName(resourceName);
+			if (grid.getGrid() != null) {
+				grid.getGrid().addSelectionListener(e -> {
+					DynamicDBean seletedRow;
+					if (e.getFirstSelectedItem().isPresent()) {
+						seletedRow = (DynamicDBean) e.getFirstSelectedItem().get();
+						if (extraFilterToSelect != null)
+							keepSessionDataForFilter(seletedRow, extraFilterToSelect);
+						grid.showBean(seletedRow);
+					}
+				});
+			}
+			if ((apiname == null || apiname.length() == 0) == false) {
+				if (filter != null && filter.length() > 0) {
+					filter = filter + "%20%AND%20APIname='" + apiname + "'";
+				} else {
+					filter = "APIname='" + apiname + "'";
 				}
-			});
-		if ((apiname == null || apiname.length() == 0) == false)
-		{
-			if (filter != null  && filter.length() > 0)
-			{
-				filter = filter + "%20%AND%20APIname='"+apiname+"'";
 			}
+			grid.setFilter(filter);
+			System.out.println("DynamicGridDisplay.beforeEnter() CACHE " + cache);
+			grid.setCache(cache);
+			if (gridClassName != null && gridClassName.equals("TreeGrid"))
+				grid.setupTreeGrid(null);
 			else
-			{
-			filter = "APIname='"+apiname+"'";
-			}
-		}
-		grid.setFilter(filter);
-		System.out.println("DynamicGridDisplay.beforeEnter() CACHE "+ cache);
-		grid.setCache(cache);
-		grid.setupGrid(false, true);
-		if (preSelectRow != null)
-			grid.showBean(preSelectRow);
+//			grid.setupGrid(false, true, true);
+				grid.setupGrid(false, true);
+			if (preSelectRow != null)
+				grid.showBean(preSelectRow);
 //		divGrid.add(grid );
-		buttons.setVisible(false);
-		buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
-		buttons.addCancelListener(e -> grid.undoSelectedRow());
-		buttons.addAddListener(e -> grid.insertANewRow());
-		buttons.addDeleteListener(e -> grid.DeleteARow());
-		buttons.addPrintListener(e -> grid.PrintARow());
-	
+			buttons.setVisible(false);
+			buttons.addSaveListener(e -> grid.saveSelectedRow(apiname));
+			buttons.addCancelListener(e -> grid.undoSelectedRow());
+			buttons.addAddListener(e -> grid.insertANewRow());
+			buttons.addDeleteListener(e -> grid.DeleteARow());
+			buttons.addPrintListener(e -> grid.PrintARow());
+
 //		queryButtonsBar.addClearSearchListener(e -> cleanQryForm());//System.out.println("PedidoProveedorQuery.beforeEnter() BUSCAR>>>>"));
 
-		return this;
-	}
+			return this;
+		}
 
 	private void keepSessionDataForFilter(DynamicDBean seletedRow, String extraFilterToSelect2) {
 		if (extraFilterToSelect2 != null &&extraFilterToSelect2.indexOf("#SVKN#") > -1) // #SVN = Session Variable Key Name  By Example- > CLAVE_ALMACEN=#SVKN#"DynamicViewGrid.lastAlmacen#SVNKEnd#

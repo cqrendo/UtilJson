@@ -19,6 +19,8 @@ public class ProcessParams {
 		if (selectRow != null)
 		{
 			JsonNode rowJson = selectRow.getRowJSon();
+			if (rowJson.get(fieldForValue) == null)
+				DataService.get().showError("Error el campo:" +fieldForValue +" no existe en el recurso:" + selectRow.getResourceName());
 			String valueKey = rowJson.get(fieldForValue).asText();
 			int idxStart = filterForNavigation.indexOf("rowtarget.")+10;
 			String targetKey = filterForNavigation.substring(idxStart);

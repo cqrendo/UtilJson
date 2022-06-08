@@ -149,6 +149,64 @@ public class RestData {
 		System.out.println("RestData.getResourceCustomer() after FILL LIST "+ resourceName + " Filter:" +filter + " " + new Date());
 		return customerList;
 	}
+	public static List<DynamicDBean> getResourceData(JsonNode rowsList,  String resourceName, String preConfParam, ArrayList<String[]> rowsColList,  boolean cache, boolean hasNewRow, String variant) {
+
+		if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)
+			System.out.println("RestData.getResourceData()  DEBUG GET_DATA_FROM_BACK_END <<Activado>>");
+//		boolean cache = UtilSessionData.getCache(); // getting data is not affected by cache fixed in session
+		if (cache == false)
+			keepFieldName.clear();
+		List<DynamicDBean> customerList = new ArrayList<DynamicDBean>();
+		try { //TODO CACHE IS FALSE always , put as param, 
+			if (rowsList.get("statusCode") != null)
+			{
+				String errorMsg = rowsList.get("errorMessage").asText();
+		
+				//	showError(errorMsg);  doesn't work in this scope, 
+				System.err.println("*********** ERROR ******* "+errorMsg);
+				DynamicDBean d = new DynamicDBean();
+				d.setCol0("##ERROR## "+ errorMsg);
+				customerList.add(d);
+				return customerList;
+			}
+			else
+			{
+			String col1name = rowsColList.get(0)[0]; 
+			int i = 0;
+			while (col1name.equals("#SPACE#"))  // to get the first real field
+			{
+				col1name = rowsColList.get(i)[0];
+				i ++;
+			}
+			if ( rowsList.get(col1name) != null) // it means that the result is only one row, not an array, then no loop  
+			{
+				DynamicDBean d = fillRow(rowsList, rowsColList, preConfParam, resourceName);//, cols.get(0)); 
+				d.setResourceName(resourceName);
+				d.setPreConfParam(preConfParam);
+		//		d.setFilter(filter);
+				customerList.add(d);				
+			}
+			else
+			{	
+			for (JsonNode eachRow : rowsList)  {
+				
+				if (isARealRow(eachRow)) // when are more rows than a pagesize it comes a row with out data TODO handle this page
+				{
+					DynamicDBean d = fillRow(eachRow, rowsColList, preConfParam, resourceName);//, cols.get(0)); 
+					d.setResourceName(resourceName);
+					d.setPreConfParam(preConfParam);
+			//		d.setFilter(filter);
+					customerList.add(d);
+				}
+			}	
+		}
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}// preConfParam, null);//globalVars.getPagesize());
+		System.out.println("RestData.getResourceCustomer() after FILL LIST (JsonNODE)"+ resourceName + " " + new Date());
+		return customerList;
+	}
 	public static List<DynamicDBean> getResourceData(String textToReturn) { // to fill data for by example a data of combo with given text
 
 		if (AppConst.DEBUG_GET_DATA_FROM_BACK_END)

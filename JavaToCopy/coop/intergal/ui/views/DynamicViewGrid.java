@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -61,8 +62,14 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout.Orientation;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.dom.Node;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -86,8 +93,10 @@ import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.ui.utils.converters.DecimalFormatter;
 import coop.intergal.vaadin.rest.utils.DataService;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
+import coop.intergal.vaadin.rest.utils.DdbHierarchicalDataProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 import coop.intergal.vaadin.rest.utils.RestData;
+
 
 
 //@Tag("dynamic-view-grid")
@@ -175,7 +184,7 @@ public class DynamicViewGrid extends PolymerTemplate<TemplateModel> implements  
 //	@Id("search")
 //	private SearchBar search;
 
-	@Id("grid")
+//	@Id("grid")
 	private GridPro<DynamicDBean> grid;
 
 //	private CrudEntityPresenter<DynamicDBean> presenter;
@@ -262,6 +271,14 @@ private boolean rootResourceReadOnly;
 private String activeTabs= null;
 private boolean isSubResourceMultiSelect;
 //private int keepSelectedPage = 0;
+@Id("divGrid")
+private Div divGrid;
+private int firstShowCol;
+private TreeGrid<DynamicDBean> treeGrid;
+private DdbDataBackEndProvider subDataProvider;
+private String filterTree;
+private String keepColUIForFilter;
+private String keepColNameForFilter;
 
 
 public boolean isRootResourceReadOnly() {
@@ -328,6 +345,10 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean h
 	//	grid.getDataProvider().
 	//	DdbDataProvider dataProvider = new DdbDataProvider();
 //		Grid gridx = new Grid();
+		grid = new GridPro();
+		grid.setHeight("inherit");
+		divGrid.removeAll();
+		divGrid.add(grid);
 //	@@1	
 		grid.addSelectionListener(e -> {
 			if (e.getFirstSelectedItem().isPresent())
@@ -467,7 +488,151 @@ public void setupGrid(Boolean isGridEditable, Boolean hasExportButton, Boolean h
 //		grid.getColumns().forEach(column -> column.setAutoWidth(true));
 		//}  /// BORRAME
 }
+	public void setupTreeGrid(String valueFilter) {
+		filterTree = null;
+		if (valueFilter != null)
+			filterTree  = valueFilter;//"DESCRIPCION%20like('%25"+valueFilter+"%25')"; // TODO change DESCRIPCION by a param value
+		treeGrid = new TreeGrid<DynamicDBean>();
+		treeGrid.setHeight("inherit");
+	    TextField tfSearch = new TextField();
+	    if (valueFilter != null)
+	    	tfSearch.setValue(valueFilter);
+	    tfSearch.setPrefixComponent(VaadinIcon.SEARCH.create());
+	    tfSearch.setValueChangeMode(ValueChangeMode.ON_CHANGE);
+//	    textField.setValueChangeMode(ValueChangeMode.EAGER);
+	    tfSearch.setClearButtonVisible(true);
+	    tfSearch.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+	    tfSearch.setWidthFull();
+	    tfSearch.getStyle().set("max-width", "100%");
 
+		tfSearch.addValueChangeListener(
+	            e -> filterTreeGrid(e.getValue()));
+
+		divGrid.removeAll();
+		divGrid.add(tfSearch, treeGrid);
+		
+		dataProvider = new DdbDataBackEndProvider();//new DdbHierarchicalDataProvider();
+		dataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+		dataProvider.setResourceName(resourceName);
+		
+		Collection<DynamicDBean> rootList = RestData.getResourceData(0,0,resourceName, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM, dataProvider.getRowsColList(), null, true, false, null);
+		if (filterTree != null)
+			rootList = filterList(rootList);
+		treeGrid.setMultiSort(true);
+		subDataProvider = new DdbDataBackEndProvider();
+//		subNodeList = 
+		treeGrid.setItems(rootList, this::getSubList);
+		rowsColListGrid = dataProvider.getRowsColList();
+//		newRow.addClickListener(e -> insertBeanInList());
+//		deleteRow.addClickListener(e -> deleteBeanFromList());
+//		grid.removeAllColumns();
+		int numberOFCols = rowsColListGrid.size();//length;
+		System.out.println("DynamicTreeDisplay.setupGrid() "+ numberOFCols);
+		firstShowCol = 0;
+		for (int i=1;i<numberOFCols; i++)
+		{
+			Column<DynamicDBean> col = addTreeColumn(i);
+			if (col != null)
+				col.setAutoWidth(true);
+		}
+		treeGrid.addSelectionListener(e -> {
+			if (e.getFirstSelectedItem().isPresent())
+				selectedRow =(DynamicDBean)e.getFirstSelectedItem().get();
+				System.out.println("Registro seleccionado " + selectedRow.getCol0());
+				methodForRowSelected(selectedRow); 
+			});
+//		grid.getColumns().forEach(column -> column.setAutoWidth(true));
+
+}
+	   private Collection<DynamicDBean> filterList(Collection<DynamicDBean> listToFilter) {
+		List<DynamicDBean> filteredList = new ArrayList<DynamicDBean>();
+		Iterator<DynamicDBean> itlistToFilter = listToFilter.iterator();
+		while (itlistToFilter.hasNext())
+		{
+			DynamicDBean row = itlistToFilter.next();
+			if (row.getCol(keepColUIForFilter).indexOf(filterTree) >-1)
+			{
+				filteredList.add(row);				
+			}
+			else if (searchInSubNodes(row.getRowJSon()))
+			{	
+				filteredList.add(row);	
+			}	
+			
+				
+		}
+		return filteredList;
+	}
+
+	private boolean searchInSubNodes(JsonNode rowJSon) {
+		if (rowJSon.get("subLevel") == null)
+			return false;
+		String subLevel = rowJSon.get("subLevel").asText();
+    	JsonNode rowJson = rowJSon.get(subLevel);
+    	if (rowJson != null)
+    	{    		
+    		List<JsonNode> values = rowJson.findValues(keepColNameForFilter);
+    		
+    		int i = 0;
+			while (i  < values.size())
+    		{
+    			if (values.get(i).asText().indexOf(filterTree) > -1)
+    				return true; 
+    			i++;
+    		}
+    		
+    	}	
+		return false;
+	}
+
+	private Object filterTreeGrid(String value) {
+//		if (value.length() < 5)
+//			return null;
+		setupTreeGrid(value);
+		return null;
+	}
+
+	private Column<DynamicDBean> addTreeColumn(int i) { // es la columna 0
+		   
+		   String[] colData = rowsColListGrid.get(i);
+		   String colName = colData[0];
+		   String colNameInUI = colData[2];
+		   String colType = colData[3];
+		   String colHeader = colData[6];
+		   Column<DynamicDBean> col = null;
+		   if (colData[1].indexOf("#SIG#")>-1) { 
+			   System.out.println("DynamicTreeDisplay.addTreeColumn() "+ colName);
+			   String header = colHeader;
+			   if (firstShowCol == 0) // the first column is the HierarchyColumn
+			   {
+				   col = treeGrid.addHierarchyColumn(d -> d.getCol(colNameInUI)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+				   keepColUIForFilter = colNameInUI;
+				   keepColNameForFilter = colName;
+			   }
+			   else
+				   col = treeGrid.addColumn(d -> d.getCol(colName)).setHeader(header).setResizable(true).setSortProperty(colData[0]) ;
+			   firstShowCol ++;
+		   }
+		return col;
+	}
+	    public Collection<DynamicDBean> getSubList(DynamicDBean bean) {
+	    	if (bean.getRowJSon().get("subLevel") == null)
+	    		return new ArrayList<DynamicDBean>();;
+	//    	String subFilter = bean.getRowJSon().get("subLevelFilter").asText();
+	    	String subLevel = bean.getRowJSon().get("subLevel").asText();
+	    	JsonNode rowJson = bean.getRowJSon().get(subLevel);
+	    	String resourceNameRoot = bean.getResourceName()+"."+subLevel;
+	    	
+			subDataProvider.setPreConfParam(UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM);
+			subDataProvider.setResourceName(resourceNameRoot);
+			ArrayList<String[]> subRowsFieldList = RestData.getRowsFieldList(null, resourceNameRoot, UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM, cache);
+			subDataProvider.setRowsColList(subRowsFieldList);
+	
+			Collection<DynamicDBean> subList = RestData.getResourceData(rowJson,resourceNameRoot,  UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM, subDataProvider.getRowsColList(), true, false, null);
+			if (filterTree != null)
+				subList = filterList(subList);
+	        return subList;
+	    }
 
 public boolean isiAmRootGrid() {
 		return iAmRootGrid;
@@ -863,7 +1028,7 @@ private boolean isBoolean(String header, String colType) {
 			setResourceName(queryParameters.getParameters().get("resourceName").get(0));
 
 		    
-		if (hasSideDisplay )
+		if (hasSideDisplay && grid != null)
 		{
 		grid.addSelectionListener(e -> {
 			if (e.getFirstSelectedItem().isPresent())
@@ -888,6 +1053,7 @@ private boolean isBoolean(String header, String colType) {
 	}
 
 	void showBean(DynamicDBean bean ) {
+		
 		if (displayFormClassName == null)  // nothing to show.
 		{	
 			return;
@@ -926,7 +1092,7 @@ private boolean isBoolean(String header, String colType) {
 				Method setDataProvider= dynamicForm.getMethod("setDataProvider", new Class[] {coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider.class} );
 				Method getButtonsForm= dynamicForm.getMethod("setButtonsForm",new Class[] { FormButtonsBar.class});
 				setBean = dynamicForm.getMethod("setBean", new Class[] {coop.intergal.vaadin.rest.utils.DynamicDBean.class} );
-				setRowsColList.invoke(display,rowsColListGrid);//rowsColListGrid);rowsFieldList // @@ TODO change method names to setRowsFieldList
+				setRowsColList.invoke(display,selectedRow.getRowsColList());//rowsColListGrid);//rowsColListGrid);rowsFieldList // @@ TODO change method names to setRowsFieldList
 				getButtonsForm.invoke(display, buttonsForm);
 				setBean.invoke(display,bean);
 				setBinder.invoke(display,binder);						
@@ -947,7 +1113,7 @@ private boolean isBoolean(String header, String colType) {
 			{
 				divDisplay.setVisible(true);
 			}
-			setButtonsVisibiltyFromExtendedProperties(resourceName);
+			setButtonsVisibiltyFromExtendedProperties(selectedRow.getResourceName());
 			if (dynamicForm != null &&  displayFormClassName.indexOf("Generated") > -1)
 			{
 			//	setDataProvider.invoke(display, dataProvider);
@@ -1642,7 +1808,8 @@ private boolean isBoolean(String header, String colType) {
 
 	private void keepSubGridToBeAlterExternally(DynamicViewGrid subDynamicViewGrid) {
 		DynamicQryGridDisplay dQGD = (DynamicQryGridDisplay) UiComponentsUtils.findComponent(UI.getCurrent(), "DQGD");
-		dQGD.getDvgIntheForm().put(subDynamicViewGrid.getResourceName(),subDynamicViewGrid );
+		if (dQGD !=null)
+			dQGD.getDvgIntheForm().put(subDynamicViewGrid.getResourceName(),subDynamicViewGrid );
 		
 	}
 
@@ -2466,7 +2633,7 @@ private boolean isBoolean(String header, String colType) {
     }
 
 	   private int getActiveTab(int i) {
-		if (activeTabs.isEmpty())
+		if (activeTabs == null || activeTabs.isEmpty())
 			return i;
 		String [] tokens = activeTabs.split(Pattern.quote(","));
 		return new Integer(tokens[i]);

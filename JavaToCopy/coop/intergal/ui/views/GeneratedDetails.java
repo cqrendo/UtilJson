@@ -35,9 +35,11 @@ import coop.intergal.ui.util.GenericClassForMethods;
 import coop.intergal.ui.util.LumoStyles;
 import coop.intergal.ui.util.TextColor;
 import coop.intergal.ui.util.UIUtils;
+import coop.intergal.ui.util.UtilSessionData;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
+import coop.intergal.vaadin.rest.utils.RestData;
 
 //@PageTitle("Payments")
 //@Route(value = "gridDetails", layout = MainLayout.class)
@@ -249,7 +251,11 @@ public class GeneratedDetails extends PolymerTemplate<TemplateModel> {//extends 
 			generatedUtil.setGenericClassForMethods(genericClassForMethods);
 //			generatedUtil.setDivSubGrid(divSubGrid);
 	//		if (cache == false)
-			rowsFieldList = dataProvider.getRowsFieldList();
+			
+			if (dataProvider.getResourceName().equals(bean.getResourceName()))
+				rowsFieldList = dataProvider.getRowsFieldList();
+			else
+				rowsFieldList = RestData.getRowsFieldList(null, bean.getResourceName(), UtilSessionData.getCompanyYear()+AppConst.PRE_CONF_PARAM, cache);
 			String tabs ="";
 	   		if (rowsFieldList != null)
 			{

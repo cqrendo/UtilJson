@@ -270,6 +270,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		this.addFormClassName = addFormClassName;
 	}
 	private String queryFormClassName;
+	private String gridClassName;
 
 	public String getQueryFormClassName() {
 		return queryFormClassName;
@@ -297,6 +298,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		String queryFormClassName = null;
 		String displayFormClassName  = null;
 		String addFormClassName  = null;
+		String gridClassName = null;
 		if (queryParameters != null && !queryParameters.getParameters().isEmpty())
 		{
 			title=queryParameters.getParameters().get("title").get(0);
@@ -330,19 +332,23 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 				displayFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("displayFormClassName").get(0);
 			if (queryFormClassName.startsWith("coop.intergal") == false)
 				queryFormClassName = PACKAGE_VIEWS+queryParameters.getParameters().get("queryFormClassName").get(0);
-
+			
+			if (queryParameters.getParameters().get("gridClassName") != null)
+				{
+				gridClassName= queryParameters.getParameters().get("gridClassName").get(0);
+				}
 
 		}
-		prepareLayout(queryFormClassName, displayFormClassName, addFormClassName);
+		prepareLayout(queryFormClassName, displayFormClassName, addFormClassName, gridClassName);
 	}
 	public Component createContent() 
 	{
 		
-		prepareLayout(queryFormClassName, displayFormClassName, addFormClassName);
+		prepareLayout(queryFormClassName, displayFormClassName, addFormClassName, gridClassName);
 		return this;
 		
 	}
-	public void prepareLayout(String queryFormClassName, String displayFormClassName, String addFormClassName)
+	public void prepareLayout(String queryFormClassName, String displayFormClassName, String addFormClassName, String gridClassName)
 		{
 //			querySplitGrid.setOrientation(Orientation.VERTICAL);
 			gridSplitDisplay.setOrientation(Orientation.HORIZONTAL);
@@ -437,7 +443,10 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 		System.out.println("DynamicQryGridDisplay.beforeEnter() CACHE "+ cache);
 		grid.setiAmRootGrid(true);
 		grid.setCache(cache);
-		grid.setupGrid(false, true, true);
+		if (gridClassName != null && gridClassName.equals("TreeGrid"))
+			grid.setupTreeGrid(null);
+		else	
+			grid.setupGrid(false, true, true);
 		grid.setAddFormClassName(addFormClassName);
 
 		buttons.setVisible(false);

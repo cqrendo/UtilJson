@@ -626,7 +626,7 @@ public class GeneratedUtil  {private static final String CLASSNAME_FOR_FORM_QUER
 				String fieldName = rowField[0];
 				if (fieldName.equals("TOTAL_LINEAS"))
 					System.out.println("STOP DEBUG");	
-				boolean isReadOnly = isReadOnly( rowField [1]);
+ 				boolean isReadOnly = isReadOnly( rowField [1]);
 				boolean isPick = isPick (rowField [1]);
 				boolean isRequired = isRequired( rowField [1]);
 				String label = rowField[6];
@@ -727,9 +727,10 @@ public class GeneratedUtil  {private static final String CLASSNAME_FOR_FORM_QUER
 					item = addClassNames(item, classNamesItem);
 					item.setId(fieldNameInUI);
 					form.setColspan(item, colspan);
+				
 				}
 
-				if (fieldName.equals("#SPACE#") && (idFieldType != 10) ) // NOT BOTTON
+				else if (fieldName.equals("#SPACE#") && (idFieldType != 10) ) // NOT BOTTON
 				{
 					if ( orderAndlabel.indexOf("GRP#")!= -1)
 					{
