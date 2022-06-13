@@ -38,6 +38,7 @@ import coop.intergal.espresso.presutec.utils.JSonClient;
 import coop.intergal.ui.components.EsDatePicker;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.UtilSessionData;
+import coop.intergal.ui.utils.ProcessParams;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
 import coop.intergal.ui.utils.converters.DecimalFormatter;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
@@ -442,12 +443,22 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 		DynamicDBean currentRow = binder.getBean();
 		String filter="tableName='"+currentRow.getResourceName()+"'%20AND%20FieldNameInUI='"+fieldName+"'";
 		String parentResource = "";
-		
+		String parFilterForPick;
+		String filterForPick =null;
+
 		JsonNode rowsList = JSonClient.get("FieldTemplate",filter,true,AppConst.PRE_CONF_PARAM_METADATA,"1");
 		for (JsonNode eachRow : rowsList)  {
 			if (eachRow.size() > 0)
 			{
 				parentResource = eachRow.get("parentResource").asText();
+				int idxFilter = parentResource.indexOf("@FILTER"); //@FILTERrow.subgrid.CLAVEARTICULO=rowtarget.CLAVE_ARTICULO
+				if (idxFilter != -1)
+					{
+					
+					parFilterForPick = parentResource.substring(idxFilter+7);
+					parentResource = parentResource.substring(0,idxFilter);
+					filterForPick  = ProcessParams.componFilterFromParams(parFilterForPick, currentRow);
+					}
 				pickMapFields =  eachRow.get("pickMapFields").asText();
 				queryFormForPickClassName =  eachRow.get("queryFormForPickClassName").asText();
 			}
@@ -481,6 +492,7 @@ private static DecimalFormatter decimalFormatter = new DecimalFormatter();
 		
 		grid.setButtonsRowVisible(false);
 		grid.setResourceName(parentResource);
+		grid.setFilter(filterForPick);
 		grid.setupGrid();
 //			subDynamicViewGrid.getElement().getStyle().set("height","100%");
 //		subDynamicViewGrid.setResourceName(resourceSubGrid);

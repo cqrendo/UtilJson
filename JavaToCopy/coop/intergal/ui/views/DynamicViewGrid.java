@@ -1052,7 +1052,7 @@ private boolean isBoolean(String header, String colType) {
 		return null;
 	}
 
-	void showBean(DynamicDBean bean ) {
+	public void showBean(DynamicDBean bean ) {
 		
 		if (displayFormClassName == null)  // nothing to show.
 		{	
@@ -1792,7 +1792,8 @@ private boolean isBoolean(String header, String colType) {
 		subDynamicViewGrid.setParentGrid(this);
 		subDynamicViewGrid.setHasSideDisplay(false);
 		subDynamicViewGrid.getGrid().select(getKeepSelectedChild());
-		divSubGrid.add(subDynamicViewGrid );
+		if (divSubGrid != null)
+			divSubGrid.add(subDynamicViewGrid );
 		keepSubGridToBeAlterExternally(subDynamicViewGrid);
 		Div divTab = new Div();
 		divTab.getStyle().set("height","100%");
@@ -2030,7 +2031,7 @@ private boolean isBoolean(String header, String colType) {
 		String keyForParams = "DynamicViewGrid.keepSelectedPage->"+bean.getResourceName();
 		String keepSelectedPageStr = UtilSessionData.getFormParams(keyForParams); // bean.getResourceName() is include to diferente subtabs that can exit arround the session 
 		int keepSelectedPage = 0;
-		if (keepSelectedPageStr == null || activeTabs.isEmpty() == false)
+		if (keepSelectedPageStr == null || (activeTabs == null || activeTabs.isEmpty() == false))
 			keepSelectedPageStr = "0";
 		else
 			keepSelectedPage = new Integer(keepSelectedPageStr);
@@ -2906,12 +2907,13 @@ private boolean isBoolean(String header, String colType) {
 				{
 			//	setDataProvider.invoke(display, dataProvider);
 					Method createContent= dynamicForm.getMethod("createContent",new Class[] { FormButtonsBar.class, GenericClassForMethods.class});
-//					Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
+					FormButtonsBar buttonsFormExternalForm = new FormButtonsBar();
+					//					Method setdVGrid= dynamicForm.getMethod("setDVGrid", new Class[] {coop.intergal.ui.views.DynamicViewGrid.class});
 //					setdVGrid.invoke(display, this); // to use methods in this class
 					if (dynamicDisplayForAskData != null)
-						divInDisplay = createContent.invoke(display, buttonsForm, dynamicDisplayForAskData.getGenericClassForMethods() );
+						divInDisplay = createContent.invoke(display, buttonsFormExternalForm, dynamicDisplayForAskData.getGenericClassForMethods() );
 					else
-						divInDisplay = createContent.invoke(display, buttonsForm, null );
+						divInDisplay = createContent.invoke(display, buttonsFormExternalForm, null );
 					divDisplay.add((Component)divInDisplay);
 				}
 				else
@@ -2922,13 +2924,14 @@ private boolean isBoolean(String header, String colType) {
 			
 	//		divDisplay.remove((Component) display);
 				if (subLayoutClassName.indexOf("DynamicDisplayForAskData") == -1 && (subLayoutClassName.indexOf("DynamicDisplayOnly") == -1)) // this layout for now doesn't have subgrid
-					{
+				{
 					String resourceSubGrid = extractResourceSubGrid(subBean,0);
 					divSubGridPopup.removeAll();
-					String tabsList = rowsColListGrid.get(0)[12];
+					String tabsList = subBean.getRowsColList().get(0)[12];//rowsColListGrid.get(0)[12];
 					if (resourceSubGrid != null && (tabsList == null || tabsList.length() == 0)) // there only one tab
 						{
 			//	divSubGrid.add(componSubgrid(bean, resourceSubGrid));
+						
 						Div content0=new Div(); 
 						divSubGridPopup.add(fillContent(content0, getActiveTab(0) , subBean));	
 	//??			setDataProvider.invoke(display, subDynamicViewGrid.getDataProvider());

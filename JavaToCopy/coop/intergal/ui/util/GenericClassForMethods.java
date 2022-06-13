@@ -26,6 +26,7 @@ import com.vaadin.flow.function.SerializableComparator;
 
 import coop.intergal.AppConst;
 import coop.intergal.espresso.presutec.utils.JSonClient;
+import coop.intergal.ui.utils.Broadcaster;
 import coop.intergal.ui.utils.ProcessParams;
 import coop.intergal.ui.views.DynamicDisplayForAskData;
 import coop.intergal.ui.views.DynamicGridForPick;
@@ -398,7 +399,10 @@ public class GenericClassForMethods {
 				filterForInput = rowStep.get("filterForProcessInput").asText();
 			while (rowsInput.hasNext()) {
 				DynamicDBean rowInput = rowsInput.next();
-				if (rowInput.getRowJSon().get("NotProcessRow") == null && rowInput.getRowJSon().get(filterForInput) == null) // 
+				if ((rowInput.getRowJSon().get("NotProcessRow") == null 
+						|| rowInput.getRowJSon().get("NotProcessRow").equals("null") 
+						|| rowInput.getRowJSon().get("NotProcessRow").asBoolean() == false) 
+						&& rowInput.getRowJSon().get(filterForInput) == null) // 
 				{
 					beansFromGrid.put(id,rowInput);
 					id++;
@@ -503,7 +507,14 @@ public class GenericClassForMethods {
 				subgridToAddItem.insertBeanInList(); // prepare a new item
 				subgridToAddItem.setRowIsInserted(newItem); // fills data
 				subgridToAddItem.insertBeanInList(); // saves the item
-			}
+				///refresh the row
+				DynamicDBean parentRow = subgridToAddItem.getParentGrid().getSelectedRow();
+				subgridToAddItem.getParentGrid().setSelectedRow(parentRow);//.showBean(parentRow);
+			     Broadcaster.broadcast("Actualizado desde otro formulario");
+//			        message.setValue("");
+//				dQGD.getPage().reload();
+//				dQGD.createContent();//.notify();
+				}
 			else if (rowStepOuput.get("childOf").asText().equals("null")) // is root ouput row
 			{
 				String filter = rowStepOuput.get("filter").asText();

@@ -74,6 +74,7 @@ import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.security.SecurityUtils;
 import coop.intergal.ui.util.GenericClassForMethods;
 import coop.intergal.ui.util.UtilSessionData;
+import coop.intergal.ui.utils.ProcessParams;
 import coop.intergal.ui.utils.TranslateResource;
 import coop.intergal.ui.utils.UiComponentsUtils;
 import coop.intergal.ui.utils.converters.CurrencyFormatter;
@@ -1685,10 +1686,19 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		String titleGrid ="";
 		
 		JsonNode rowsList = JSonClient.get("CR-FieldTemplate",filter,cache,AppConst.PRE_CONF_PARAM_METADATA,"1");
+		String parFilterForPick;
+		String filterForPick =null;
 		for (JsonNode eachRow : rowsList)  {
 			if (eachRow.size() > 0)
 			{
 				parentResource = eachRow.get("parentResource").asText();
+				int idxFilter = parentResource.indexOf("@FILTER"); //@FILTERrow.subgrid.CLAVEARTICULO=rowtarget.CLAVE_ARTICULO
+				if (idxFilter != -1)
+					{
+					parFilterForPick = parentResource.substring(idxFilter+7);
+					parentResource = parentResource.substring(0,idxFilter);					
+					filterForPick  = ProcessParams.componFilterFromParams(parFilterForPick, currentRow);
+					}
 				pickMapFields =  eachRow.get("pickMapFields").asText();
 //				titleGrid = eachRow.get("titleGrid").asText();
 				queryFormForPickClassName =  eachRow.get("queryFormForPickClassName").asText();
@@ -1733,6 +1743,7 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		
 		grid.setButtonsRowVisible(false);
 		grid.setResourceName(parentResource);
+		grid.setFilter(filterForPick);
 		grid.setupGrid();
 
 		//			subDynamicViewGrid.getElement().getStyle().set("height","100%");
@@ -1757,6 +1768,8 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 		dialogForPick.setCloseOnOutsideClick(false);
 		if (titleGrid.length() > 2)
 			dialogForPick.add(new H3(titleGrid));
+		dialogForPick.setWidth(AppConst.DEFAULT_PICK_DIALOG_WITHD);
+		dialogForPick.setHeight(AppConst.DEFAULT_PICK_DIALOG_HEIGHT);
 		dialogForPick.add(dynamicGridForPick);
 		dialogForPick.open();
 		
@@ -1766,6 +1779,11 @@ private Object showDialogForPick(Component parentTF, String resourceName, Dynami
 			e.printStackTrace();
 		}
 		
+		return null;
+	}
+
+	private String componeFilterForPick() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

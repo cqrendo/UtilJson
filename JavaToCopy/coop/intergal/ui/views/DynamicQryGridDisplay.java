@@ -18,12 +18,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -35,6 +37,10 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.component.polymertemplate.TemplateParser;
@@ -45,6 +51,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.QueryParameters;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PageConfigurator;
 import com.vaadin.flow.server.SynchronizedRequestHandler;
@@ -58,6 +65,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 import coop.intergal.AppConst;
 import coop.intergal.ui.components.FormButtonsBar;
 import coop.intergal.ui.util.UtilSessionData;
+import coop.intergal.ui.utils.Broadcaster;
 import coop.intergal.vaadin.rest.utils.DdbDataBackEndProvider;
 import coop.intergal.vaadin.rest.utils.DynamicDBean;
 
@@ -67,6 +75,8 @@ import coop.intergal.vaadin.rest.utils.DynamicDBean;
 //@CssImport(value = "./styles/dialog-overlay.css", themeFor = "vaadin-dialog-overlay")
 @CssImport(value = STYLES_CSS, themeFor = "dynamic-qry-grid-display")
 @CssImport(value = STYLES_FORM_LAYOUT_ITEM_CSS, themeFor = "vaadin-form-layout")
+@Push
+@Route (AppConst.PAGE_DYNAMIC_QGD)
 public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implements BeforeEnterObserver, HasDynamicTitle{//, PageConfigurator{//, VaadinServiceInitListener  {
 	private ArrayList <String> rowsColList; //= getRowsCnew String[] { "code_customer", "name_customer", "cif", "amountUnDisbursedPayments" };
 	public ArrayList<String> getRowsColList() {
@@ -93,6 +103,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	public DynamicQryGridDisplay() {
 		super();
 		setId("DQGD");
+			
 //		Date now = new Date();
 //		String id = "QRDView";// + now.getTime();
 //		 setId(id);
@@ -271,6 +282,8 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	}
 	private String queryFormClassName;
 	private String gridClassName;
+	private Registration broadcasterRegistration;
+	VerticalLayout messages = new VerticalLayout();
 
 	public String getQueryFormClassName() {
 		return queryFormClassName;
@@ -344,6 +357,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 	public Component createContent() 
 	{
 		
+//		divTitle.add(messages);
 		prepareLayout(queryFormClassName, displayFormClassName, addFormClassName, gridClassName);
 		return this;
 		
@@ -390,6 +404,7 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
 						h4.getStyle().set("padding", "0");
 						h4.getStyle().set("margin", "0");
 						divTitle.add(h4);
+	//					divTitle.add(messages); // for push to show message
 						}
 					}
 				divQuery.add((Component)divInDisplay);
@@ -575,6 +590,10 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
                 ui.close();
             }
         );
+        broadcasterRegistration = Broadcaster.register(newMessage -> {
+            ui.access(() -> messages.add(new Span(newMessage)));
+        });
+    
 
         // Polling only needed for the demo
 //        ui.setPollInterval(1000);
@@ -595,6 +614,11 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
             }
         );
     }
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        broadcasterRegistration.remove();
+        broadcasterRegistration = null;
+    }
 
     private void addLogMessage(String message) {
         VaadinSession.getCurrent().setAttribute("log", getLogValue() + "\n" + LocalTime.now() + " " + message);
@@ -609,6 +633,8 @@ public class DynamicQryGridDisplay extends PolymerTemplate<TemplateModel> implem
     private static String getLogValue() {
         return Objects.toString(VaadinSession.getCurrent().getAttribute("log"), "");
     }
+
+
 }
 
 

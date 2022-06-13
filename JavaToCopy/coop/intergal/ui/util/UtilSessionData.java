@@ -27,7 +27,7 @@ public class UtilSessionData {
 		boolean cache = true ;
 		if (cacheStr != null && cacheStr.equals("false"))
 			cache = false;
-		System.out.println("UtilSessionData.getCache() ->" +cache );
+//		System.out.println("UtilSessionData.getCache() ->" +cache );
 		return cache; 
 	}
 	public static void setCache(String cache) {
